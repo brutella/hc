@@ -8,11 +8,30 @@ const (
     TLVType_Proof            = 0x04 // ED25519 or SRP proof
     TLVType_EncryptedData    = 0x05 // data with auth tag
     TLVType_SequenceNumber   = 0x06 // integer
-    TLVType_ErrorCode        = 0x07 // integer
+    TLVType_ErrorCode        = 0x07 // integer, see TLVStatus
     TLVType_Ed25519Signature = 0x0A // 64 bytes
     
     TLVType_MFiCertificate   = 0x09
     TLVType_MFiSignature     = 0x0A
+)
+
+const (
+    TLVStatus_NoError               = 0x00
+    TLVStatus_UnkownError           = 0x01
+    TLVStatus_AuthError             = 0x02
+    TLVStatus_TooManyAttemptsError  = 0x03
+    TLVStatus_UnkownPeerError       = 0x04
+    TLVStatus_MaxPeerError          = 0x05
+    TLVStatus_MaxAuthAttempsError   = 0x06
+)
+
+const (
+    SRPUsername = "Pair-Setup"
+)
+
+const (
+    HKDFSalt = "Pair-Setup-Encrypt-Salt"
+    HKDFInfo = "Pair-Setup-Encrypt-Info"
 )
 
 const (

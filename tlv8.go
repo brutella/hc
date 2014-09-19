@@ -35,7 +35,7 @@ func ReadTLV8(r io.Reader) (*TLV8Container, error) {
     return &TLV8Container{Items:items}, nil
 }
 
-func (t *TLV8Container) Get(tag uint8) []byte {
+func (t *TLV8Container) GetBuffer(tag uint8) *bytes.Buffer {
     // TODO append
     var b bytes.Buffer
     for _, item := range t.Items {
@@ -44,7 +44,17 @@ func (t *TLV8Container) Get(tag uint8) []byte {
         }
     }
     
-    return b.Bytes()
+    return &b
+}
+
+func (t *TLV8Container) GetBytes(tag uint8) []byte {
+    return t.GetBuffer(tag).Bytes()
+}
+
+func (t *TLV8Container) GetUInt64(tag uint8) uint64 {
+    integer, _ :=  binary.ReadUvarint(t.GetBuffer(tag))
+    
+    return integer
 }
 
 func (t *TLV8Container) Set(tag uint8, value []byte) {

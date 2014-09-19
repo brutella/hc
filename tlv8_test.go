@@ -13,7 +13,7 @@ func TestTLV8Get(t *testing.T) {
     message := bytes.NewBuffer(rawMessage)
     container, err := ReadTLV8(message)
     assert.Nil(t, err)
-    assert.Equal(t, container.Get(1), []byte{0xAF, 0xFA})
+    assert.Equal(t, container.GetBytes(1), []byte{0xAF, 0xFA})
 }
 
 func TestTLV8GetFromMultipleSource(t *testing.T) {
@@ -23,7 +23,7 @@ func TestTLV8GetFromMultipleSource(t *testing.T) {
     message := bytes.NewBuffer(rawMessage)
     container, err := ReadTLV8(message)
     assert.Nil(t, err)
-    assert.Equal(t, container.Get(1), []byte{0xAF, 0xFA, 0xBF, 0xFB, 0xAA})
+    assert.Equal(t, container.GetBytes(1), []byte{0xAF, 0xFA, 0xBF, 0xFB, 0xAA})
 }
 
 func TestTLV8SetMoreThanMaxBytes(t *testing.T) {
@@ -44,7 +44,7 @@ func TestTLV8SetMoreThanMaxBytes(t *testing.T) {
 func TestTLV8Set(t *testing.T) {
     container := &TLV8Container{}
     container.Set(1, []byte{0xAF, 0xFA})
-    assert.Equal(t, container.Get(1), []byte{0xAF, 0xFA})
+    assert.Equal(t, container.GetBytes(1), []byte{0xAF, 0xFA})
 }
 
 func TestTLV8Bytes(t *testing.T) {
