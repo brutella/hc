@@ -7,7 +7,13 @@ import (
     "bytes"
 )
 
-func TestTLV8Get(t *testing.T) {
+func TestTLV8SetByte(t *testing.T) {
+    container := TLV8Container{}
+    container.SetByte(1, 0xF)
+    assert.Equal(t, container.GetByte(1), byte(0xF))
+}
+
+func TestTLV8GetBytes(t *testing.T) {
     data := "0102AFFA"
     rawMessage, _ := hex.DecodeString(data)    
     message := bytes.NewBuffer(rawMessage)
@@ -16,7 +22,7 @@ func TestTLV8Get(t *testing.T) {
     assert.Equal(t, container.GetBytes(1), []byte{0xAF, 0xFA})
 }
 
-func TestTLV8GetFromMultipleSource(t *testing.T) {
+func TestTLV8GetBytesFromMultipleSource(t *testing.T) {
     data := "0102AFFA0103BFFBAA"
     rawMessage, _ := hex.DecodeString(data)
     
@@ -32,7 +38,7 @@ func TestTLV8SetMoreThanMaxBytes(t *testing.T) {
     bytes, _ := hex.DecodeString(data)
     assert.Equal(t, len(bytes), 384)
     
-    container.Set(1, bytes)
+    container.SetBytes(1, bytes)
     
     // split up in 255 chunks
     // 01(type)FF(length=255)bytes...01(type)81(length=129)bytes...
@@ -41,15 +47,15 @@ func TestTLV8SetMoreThanMaxBytes(t *testing.T) {
     assert.Equal(t, container.BytesBuffer().Bytes(), expected_bytes)
 }
 
-func TestTLV8Set(t *testing.T) {
+func TestTLV8SetBytes(t *testing.T) {
     container := &TLV8Container{}
-    container.Set(1, []byte{0xAF, 0xFA})
+    container.SetBytes(1, []byte{0xAF, 0xFA})
     assert.Equal(t, container.GetBytes(1), []byte{0xAF, 0xFA})
 }
 
-func TestTLV8Bytes(t *testing.T) {
+func TestTLV8BytesBuffer(t *testing.T) {
     container := &TLV8Container{}
-    container.Set(1, []byte{0xAF, 0xFA})
+    container.SetBytes(1, []byte{0xAF, 0xFA})
     
     assert.Equal(t, container.BytesBuffer().Bytes(), []byte{0x01, 0x02, 0xAF, 0xFA})
 }

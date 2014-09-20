@@ -9,9 +9,10 @@ import (
 type PairingSession struct {
     srp *srp.SRP
     session *srp.ServerSession
-    salt []byte
-    publicKey []byte
-    secretKey []byte
+    salt []byte // s
+    publicKey []byte // B
+    secretKey []byte // S
+    encryptionKey []byte // K
 }
 
 func NewPairingSession(username string, password string) (*PairingSession, error) {
@@ -44,18 +45,29 @@ func (p *PairingSession) Salt() []byte {
     return p.salt
 }
 
-func (p *PairingSession) ProofFromClientProof(proof []byte) ([]byte, error) {
-	if !p.session.VerifyClientAuthenticator(proof) { // Validates M1 based on S and A
+func (p *PairingSession) ProofFromClientProof(clientProof []byte) ([]byte, error) {
+	if !p.session.VerifyClientAuthenticator(clientProof) { // Validates M1 based on S and A
 		return nil, errors.New("Client proof is not valid")
 	}
     
-	return p.session.ComputeAuthenticator(proof), nil
+	return p.session.ComputeAuthenticator(clientProof), nil
 }
 
-func (p *PairingSession) SecretKeyFromClientPublicKey(key []byte) ([]byte, error) {
-	skey, err := p.session.ComputeKey(key) // S
-    p.secretKey = skey
+func (p *PairingSession) SetupSecretKeyFromClientPublicKey(key []byte) (error) {
+	key, err := p.session.ComputeKey(key) // S
+    if err == nil {
+        p.secretKey = key
+    }
     
-    return skey, err
+    return err
+}
+
+func (p *PairingSession) SetupEncryptionKey(salt []byte, info []byte) (error) {
+    key, err := HKDF_SHA512_256(p.secretKey, salt, info)
+    if err == nil {
+        p.encryptionKey = key
+    }
+    
+    return err
 }
 
