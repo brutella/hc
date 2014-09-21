@@ -18,21 +18,20 @@ const (
 )
 
 type PairingController struct {
+    accessory *Accessory
     session *PairingSession
     curSeq byte
 }
 
-func NewPairingController(username string, password string) (*PairingController, error) {
-    if len(username) == 0 || len(password) == 0 {
-        return nil, NewErrorf("Invalid username %s or password %s", username, password)
-    }
+func NewPairingController(accessory *Accessory) (*PairingController, error) {
     
-    session, err := NewPairingSession(username, password)
+    session, err := NewPairingSession("Pair-Setup", accessory.password)
     if err != nil {
         return nil, err
     }
     
     controller := PairingController{
+                                    accessory: accessory,
                                     session: session,
                                     curSeq: SequenceWaitingForRequest,
                                 }
@@ -163,16 +162,17 @@ func (c *PairingController) Handle(r io.Reader) (io.Reader, error) {
             tlv_out.SetByte(TLVType_ErrorCode, TLVStatus_UnkownError) // send error 1
         } else {
             decrypted_buffer := bytes.NewBuffer(decrypted)
-            tlv_in, _ := ReadTLV8(decrypted_buffer)
+            tlv_in, err := ReadTLV8(decrypted_buffer)
+            if err != nil {
+                return nil, err
+            }
+            
             username  := tlv_in.GetBytes(TLVType_Username)
-            ltpk      := tlv_in.GetBytes(TLVType_Proof)
+            ltpk      := tlv_in.GetBytes(TLVType_PublicKey)
             signature := tlv_in.GetBytes(TLVType_Ed25519Signature)
-            fmt.Println("  -> Username:", hex.EncodeToString(username))
+            fmt.Println("  -> Username:", string(username))
             fmt.Println("  -> LTPK:", hex.EncodeToString(ltpk))
             fmt.Println("  -> Signature:", hex.EncodeToString(signature))
-            if len(ltpk) != 32 {
-                return nil, NewErrorf("3d25519 signature has invalid length %d", len(ltpk))
-            }
             
             // Calculate `H`
             H, _ := HKDF_SHA512_256(c.session.secretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
@@ -181,13 +181,37 @@ func (c *PairingController) Handle(r io.Reader) (io.Reader, error) {
             material = append(material, username...)
             material = append(material, ltpk...)
             
-            if ValidateSignature(ltpk, material, signature) == false {
+            if ValidateED25519Signature(ltpk, material, signature) == false {
                 c.reset()
-                fmt.Println("Could not verify ed25519 signature")
+                fmt.Println("[Failed] ed25519 signature is invalid")
                 // Return auth error
                 tlv_out.SetByte(TLVType_ErrorCode, TLVStatus_AuthError) // send error 2
             } else {
-                // Store ltpk, username and H
+                fmt.Println("[Success] ed25519 signature is valid")
+                // TODO Store ltpk, username and H
+                
+                // Send username, LTPK, proof as encrypted message
+                H2, err := HKDF_SHA512_256(c.session.secretKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
+                material = make([]byte, 0)
+                material = append(material, H2...)
+                material = append(material, []byte(c.accessory.name)...)
+                material = append(material, c.accessory.publicKey...) // LTPK
+    
+                signature, err := ED25519Signature(c.accessory.secretKey, material)
+                if err != nil {
+                    return nil, err
+                }
+                
+                tlvPairKeyExchange := TLV8Container{}
+                tlvPairKeyExchange.SetBytes(TLVType_Username, []byte(c.accessory.name))
+                tlvPairKeyExchange.SetBytes(TLVType_PublicKey, []byte(c.accessory.publicKey))
+                tlvPairKeyExchange.SetBytes(TLVType_Proof, []byte(signature))
+                
+                var tag [16]byte
+                encrypted, tag, _ := EncryptAndSeal(c.session.encryptionKey, []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), tag, nil)    
+                tlv_out.SetByte(TLVType_AuthMethod, 0)
+                tlv_out.SetByte(TLVType_SequenceNumber, SequenceKeyExchangeRequest)
+                tlv_out.SetBytes(TLVType_EncryptedData, append(encrypted, tag[:]...))
             }
         }
         

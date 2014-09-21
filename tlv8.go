@@ -25,7 +25,7 @@ func ReadTLV8(r io.Reader) (*TLV8Container, error) {
         }
         
         item.value = make([]byte, item.length)
-        if _, err := io.ReadFull(r, item.value); err != nil {
+        if _, err := io.ReadFull(r, item.value); err != nil && err != io.EOF {
             return nil, err
         }
         
