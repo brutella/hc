@@ -91,22 +91,13 @@ func (c *VerifyController) handlePairVerifyStart(tlv_in *TLV8Container) (*TLV8Co
     if len(clientPublicKey) != 32 {
         return nil, NewErrorf("Invalid client public key size %d", len(clientPublicKey))
     }
+    var otherPublicKey [32]byte
+    copy(otherPublicKey[:], clientPublicKey)
     
-    copy(c.session.clientPublicKey[:], clientPublicKey)
-    
-    secretKey := Curve25519_GenerateSecretKey()
-    publicKey := Curve25519_PublicKey(secretKey)
-    
-    var key [32]byte
-    copy(key[:], clientPublicKey)
-    sharedKey := Curve25519_SharedSecret(secretKey, key)
-    
-    c.session.secretKey = secretKey
-    c.session.publicKey = publicKey
-    c.session.sharedKey = sharedKey
+    c.session.GenerateKeysWithOtherPublicKey(otherPublicKey)
     
     material := make([]byte, 0)
-    material = append(material, publicKey[:]...)
+    material = append(material, c.session.publicKey[:]...)
     material = append(material, c.accessory.name...)
     material = append(material, clientPublicKey...)
     signature, _ := ED25519Signature(c.accessory.secretKey, material)
@@ -186,7 +177,7 @@ func (c *VerifyController) handlePairVerifyFinish(tlv_in *TLV8Container) (*TLV8C
         }
         
         material := make([]byte, 0)
-        material = append(material, c.session.clientPublicKey[:]...)
+        material = append(material, c.session.otherPublicKey[:]...)
         material = append(material, c.session.publicKey[:]...)
         
         if ValidateED25519Signature(client.publicKey, material, signature) == false {

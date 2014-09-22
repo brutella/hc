@@ -1,7 +1,7 @@
 package gohap
 
 type PairVerifySession struct {
-    clientPublicKey [32]byte
+    otherPublicKey [32]byte
     publicKey [32]byte
     secretKey [32]byte
     sharedKey [32]byte
@@ -10,4 +10,17 @@ type PairVerifySession struct {
 
 func NewPairVerifySession() (*PairVerifySession) {
     return &PairVerifySession{}
+}
+
+// Generate Curve25519 public, secret and shared key for a specified other public key
+// The other public key is also stored for further use in `otherPublicKey` property
+func (s *PairVerifySession) GenerateKeysWithOtherPublicKey(otherPublicKey [32]byte) {
+    secretKey := Curve25519_GenerateSecretKey()
+    publicKey := Curve25519_PublicKey(secretKey)
+    sharedKey := Curve25519_SharedSecret(secretKey, otherPublicKey)
+    
+    s.otherPublicKey = otherPublicKey
+    s.secretKey = secretKey
+    s.publicKey = publicKey
+    s.sharedKey = sharedKey
 }

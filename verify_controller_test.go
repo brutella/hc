@@ -18,6 +18,8 @@ func TestPairVerifyIntegration(t *testing.T) {
     assert.Nil(t, err)
     
     client := NewHAPPairVerifyClient("Unit Test", accessory.password)
+    // Setup LTPK for client
+    context.SaveClient(&Client{name:client.name, publicKey: client.publicKey})
     
     tlvVerifyStart := TLV8Container{}
     tlvVerifyStart.SetByte(TLVType_AuthMethod, 0)
