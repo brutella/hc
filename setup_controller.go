@@ -17,20 +17,20 @@ const (
     SequenceKeyExchangeRepond  = 0x06
 )
 
-type PairingController struct {
+type SetupController struct {
     accessory *Accessory
     session *PairingSession
     curSeq byte
 }
 
-func NewPairingController(accessory *Accessory) (*PairingController, error) {
+func NewSetupController(accessory *Accessory) (*SetupController, error) {
     
     session, err := NewPairingSession("Pair-Setup", accessory.password)
     if err != nil {
         return nil, err
     }
     
-    controller := PairingController{
+    controller := SetupController{
                                     accessory: accessory,
                                     session: session,
                                     curSeq: SequenceWaitingForRequest,
@@ -39,7 +39,7 @@ func NewPairingController(accessory *Accessory) (*PairingController, error) {
     return &controller, nil
 }
 
-func (c *PairingController) Handle(r io.Reader) (io.Reader, error) {
+func (c *SetupController) Handle(r io.Reader) (io.Reader, error) {
     var tlv_out *TLV8Container
     var err error
     
@@ -93,7 +93,7 @@ func (c *PairingController) Handle(r io.Reader) (io.Reader, error) {
 // Server -> Client
 // - B: server public key
 // - s: salt
-func (c *PairingController) handlePairStart(tlv_in *TLV8Container) (*TLV8Container, error) {
+func (c *SetupController) handlePairStart(tlv_in *TLV8Container) (*TLV8Container, error) {
     tlv_out := TLV8Container{}
     c.curSeq = SequenceStartRespond
     
@@ -115,7 +115,7 @@ func (c *PairingController) handlePairStart(tlv_in *TLV8Container) (*TLV8Contain
 // - M2: proof
 // or
 // - auth error
-func (c *PairingController) handlePairVerify(tlv_in *TLV8Container) (*TLV8Container, error) {
+func (c *SetupController) handlePairVerify(tlv_in *TLV8Container) (*TLV8Container, error) {
     tlv_out := TLV8Container{}
     c.curSeq = SequenceVerifyRespond
     
@@ -165,7 +165,7 @@ func (c *PairingController) handlePairVerify(tlv_in *TLV8Container) (*TLV8Contai
 // 
 // Server -> Client
 // - encrpyted tlv8: accessory LTPK, accessory name, signature (of H2, accessory name, LTPK)
-func (c *PairingController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8Container, error) {
+func (c *SetupController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8Container, error) {
     tlv_out := TLV8Container{}
     
     c.curSeq = SequenceKeyExchangeRepond
@@ -178,7 +178,7 @@ func (c *PairingController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8Conta
     fmt.Println("->     Message:", hex.EncodeToString(message))
     fmt.Println("->     MAC:", hex.EncodeToString(mac))
     
-    decrypted, err := DecryptAndVerify(c.session.encryptionKey, []byte("PS-Msg05"), message, mac, nil)
+    decrypted, err := Chacha20DecryptAndPoly1305Verify(c.session.encryptionKey, []byte("PS-Msg05"), message, mac, nil)
     
     if err != nil {
         c.reset()
@@ -231,7 +231,7 @@ func (c *PairingController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8Conta
             tlvPairKeyExchange.SetBytes(TLVType_Proof, []byte(signature))
             
             var mac [16]byte
-            encrypted, mac, _ := EncryptAndSeal(c.session.encryptionKey, []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), mac, nil)    
+            encrypted, mac, _ := Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey, []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), mac, nil)    
             tlv_out.SetByte(TLVType_AuthMethod, 0)
             tlv_out.SetByte(TLVType_SequenceNumber, SequenceKeyExchangeRequest)
             tlv_out.SetBytes(TLVType_EncryptedData, append(encrypted, mac[:]...))
@@ -241,7 +241,7 @@ func (c *PairingController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8Conta
     return &tlv_out, nil
 }
 
-func (c *PairingController) reset() {
+func (c *SetupController) reset() {
     c.curSeq = SequenceWaitingForRequest
     // TODO: reset session
 }

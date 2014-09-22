@@ -30,7 +30,7 @@ func TestPairingIntegration(t *testing.T) {
     log.Println("LTPK:", hex.EncodeToString(LTPK))
     log.Println("LTSK:", hex.EncodeToString(LTSK))
     
-    controller, err := NewPairingController(accessory)
+    controller, err := NewSetupController(accessory)
     assert.Nil(t, err)
     
     tlvPairStart := TLV8Container{}
@@ -101,7 +101,7 @@ func TestPairingIntegration(t *testing.T) {
     assert.Nil(t, err)
     
     var tag [16]byte // zeros
-    encrypted, tag, err := EncryptAndSeal(K, []byte("PS-Msg05"), tlvPairKeyExchange.BytesBuffer().Bytes(), tag, nil)
+    encrypted, tag, err := Chacha20EncryptAndPoly1305Seal(K, []byte("PS-Msg05"), tlvPairKeyExchange.BytesBuffer().Bytes(), tag, nil)
     assert.Nil(t, err)
     
     tlvKeyExchangeRequest := TLV8Container{}
