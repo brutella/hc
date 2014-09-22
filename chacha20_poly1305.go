@@ -7,6 +7,7 @@ import(
     "github.com/tonnerre/golang-go.crypto/poly1305"
 )
 
+// Decrypts a message with chacha20 and verifies it with poly1305
 func Chacha20DecryptAndPoly1305Verify(key, nonce, message, mac, add []byte) ([]byte, error) {
     var chacha20_out = make([]byte, len(message))
     var poly1305_out [16]byte
@@ -46,8 +47,7 @@ func Chacha20DecryptAndPoly1305Verify(key, nonce, message, mac, add []byte) ([]b
     return chacha20_out, nil
 }
 
-// Encrypts and seals a message
-// The returns values are the encrypted data, mac, error
+// Encrypts the message with chacha20 and seals the message with poly1305
 func Chacha20EncryptAndPoly1305Seal(key, nonce, message []byte, mac [16]byte, add []byte) ([]byte /*encrypted*/, [16]byte /*mac*/, error) {
     var chacha20_out = make([]byte, len(message))
     var poly1305_out [16]byte
