@@ -11,11 +11,17 @@ type fileStorage struct {
     dir_path string
 }
 
-func NewFileStorage(dir string) Storage {
-    return &fileStorage{dir_path: dir}
+// Create a file storage for the specified directory
+// Any folders are created if necessary
+//
+// Every key-value pair is stored in seperate file
+func NewFileStorage(dir string) (Storage, error) {
+    err := os.MkdirAll(dir, 0666)    
+    return &fileStorage{dir_path: dir}, err
 }
 
-func (f *fileStorage) Update(key string, value []byte) error {
+// Sets the value for a specific key
+func (f *fileStorage) Set(key string, value []byte) error {
     file, err := f.fileForWrite(key)
     
     if err != nil {
@@ -28,6 +34,7 @@ func (f *fileStorage) Update(key string, value []byte) error {
     return err
 }
 
+// Returns the value for a specific key
 func (f *fileStorage) Get(key string) ([]byte, error) {
     file, err := f.fileForRead(key)
     
@@ -51,13 +58,12 @@ func (f *fileStorage) Get(key string) ([]byte, error) {
     return b.Bytes(), nil
 }
 
+// Deletes the file for the corresponding key
 func (f *fileStorage) Delete(key string) error {
     return os.Remove(f.filePathToFile(key))
 }
 
-
 // Private
-
 func (f *fileStorage) dir() string {
     return filepath.Dir(f.dir_path)
 }
