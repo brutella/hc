@@ -17,6 +17,7 @@ type HAPPairSetupClient struct {
 
 func NewHAPPairSetupClient(username string, password string) *HAPPairSetupClient {
     rp, err := srp.NewSRP("openssl.3072", sha512.New, nil)
+    rp.SaltLength = 16
     client := rp.NewClientSession([]byte("Pair-Setup"), []byte(password))
     _, _, err = rp.ComputeVerifier([]byte(password))
     if err != nil {

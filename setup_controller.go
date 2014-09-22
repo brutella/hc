@@ -64,18 +64,21 @@ func (c *SetupController) Handle(r io.Reader) (io.Reader, error) {
     switch seq {
     case SequenceStartRequest:
         if c.curSeq != SequenceWaitingForRequest {
+            c.reset()
             return nil, NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
         tlv_out, err = c.handlePairStart(tlv_in)
     case SequenceVerifyRequest:
         if c.curSeq != SequenceStartRespond {
+            c.reset()
             return nil, NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
         tlv_out, err = c.handlePairVerify(tlv_in)
     case SequenceKeyExchangeRequest:        
         if c.curSeq != SequenceVerifyRespond {
+            c.reset()
             return nil, NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
@@ -100,8 +103,8 @@ func (c *SetupController) handlePairStart(tlv_in *TLV8Container) (*TLV8Container
     c.curSeq = SequenceStartRespond
     
     tlv_out.SetByte(TLVType_SequenceNumber, c.curSeq)
-    tlv_out.SetBytes(TLVType_Salt, c.session.Salt())
-    tlv_out.SetBytes(TLVType_PublicKey, c.session.PublicKey())
+    tlv_out.SetBytes(TLVType_Salt, c.session.salt)
+    tlv_out.SetBytes(TLVType_PublicKey, c.session.publicKey)
     
     fmt.Println("<-     B:", hex.EncodeToString(tlv_out.GetBytes(TLVType_PublicKey)))
     fmt.Println("<-     s:", hex.EncodeToString(tlv_out.GetBytes(TLVType_Salt)))

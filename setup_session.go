@@ -24,6 +24,7 @@ func NewPairSetupSession(username string, password string) (*PairSetupSession, e
     	salt, v, err := srp.ComputeVerifier([]byte(password))
     	if err == nil {
         	session := srp.NewServerSession([]byte(username), salt, v)
+            
             pairing := PairSetupSession{
                         srp: srp, 
                         session: session, 

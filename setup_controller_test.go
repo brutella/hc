@@ -19,6 +19,7 @@ func TestPairingIntegration(t *testing.T) {
     tlvPairStart := TLV8Container{}
     tlvPairStart.SetByte(TLVType_AuthMethod, 0)
     tlvPairStart.SetByte(TLVType_SequenceNumber, SequenceStartRequest)
+    
     reader, err := controller.Handle(tlvPairStart.BytesBuffer())
     assert.Nil(t, err)
     

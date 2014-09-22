@@ -5,8 +5,8 @@ const (
     TLVType_Username         = 0x01 // string
     TLVType_Salt             = 0x02 // 16 bytes
     TLVType_PublicKey        = 0x03 // either SRP client public key (384 bytes) or ED25519 LTPK (32 bytes)
-    TLVType_Proof            = 0x04 // SRP proof
-    TLVType_EncryptedData    = 0x05 // data with auth tag
+    TLVType_Proof            = 0x04 // 64 bytes (SRP proof)
+    TLVType_EncryptedData    = 0x05 // data with auth tag (mac)
     TLVType_SequenceNumber   = 0x06 // integer
     TLVType_ErrorCode        = 0x07 // integer, see TLVStatus
     TLVType_Ed25519Signature = 0x0A // 64 bytes
@@ -23,15 +23,6 @@ const (
     TLVStatus_UnkownPeerError       = 0x04
     TLVStatus_MaxPeerError          = 0x05
     TLVStatus_MaxAuthAttempsError   = 0x06
-)
-
-const (
-    SRPUsername = "Pair-Setup"
-)
-
-const (
-    HKDFSalt = "Pair-Setup-Encrypt-Salt"
-    HKDFInfo = "Pair-Setup-Encrypt-Info"
 )
 
 const (

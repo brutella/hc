@@ -56,11 +56,13 @@ func (c *VerifyController) Handle(r io.Reader) (io.Reader, error) {
     switch seq {
     case VerifyStartRequest:
         if c.curSeq != WaitingForRequest {
+            c.reset()
             return nil, NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         tlv_out, err = c.handlePairVerifyStart(tlv_in)
     case VerifyFinishRequest:
         if c.curSeq != VerifyStartRespond {
+            c.reset()
             return nil, NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
