@@ -46,6 +46,10 @@ func (t *TLV8Container) GetBuffer(tag uint8) *bytes.Buffer {
     return &b
 }
 
+func (t *TLV8Container) GetString(tag uint8) string {
+    return string(t.GetBytes(tag))
+}
+
 func (t *TLV8Container) GetBytes(tag uint8) []byte {
     return t.GetBuffer(tag).Bytes()
 }
@@ -54,6 +58,10 @@ func (t *TLV8Container) GetByte(tag uint8) byte {
     buffer := t.GetBuffer(tag)
     b, _ := buffer.ReadByte()
     return b
+}
+
+func (t *TLV8Container) SetString(tag uint8, value string) {
+    t.SetBytes(tag, []byte(value))
 }
 
 func (t *TLV8Container) SetBytes(tag uint8, value []byte) {

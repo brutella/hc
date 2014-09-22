@@ -18,19 +18,21 @@ const (
 )
 
 type SetupController struct {
+    context *Context
     accessory *Accessory
-    session *PairingSession
+    session *PairSetupSession
     curSeq byte
 }
 
-func NewSetupController(accessory *Accessory) (*SetupController, error) {
+func NewSetupController(context *Context, accessory *Accessory) (*SetupController, error) {
     
-    session, err := NewPairingSession("Pair-Setup", accessory.password)
+    session, err := NewPairSetupSession("Pair-Setup", accessory.password)
     if err != nil {
         return nil, err
     }
     
     controller := SetupController{
+                                    context: context,
                                     accessory: accessory,
                                     session: session,
                                     curSeq: SequenceWaitingForRequest,
@@ -150,7 +152,7 @@ func (c *SetupController) handlePairVerify(tlv_in *TLV8Container) (*TLV8Containe
     
     fmt.Println("<-     M2:", hex.EncodeToString(tlv_out.GetBytes(TLVType_Proof)))
     fmt.Println("        S:", hex.EncodeToString(c.session.secretKey))
-    fmt.Println("        K:", hex.EncodeToString(c.session.encryptionKey))
+    fmt.Println("        K:", hex.EncodeToString(c.session.encryptionKey[:]))
     
     return &tlv_out, nil
 }
@@ -178,7 +180,7 @@ func (c *SetupController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8Contain
     fmt.Println("->     Message:", hex.EncodeToString(message))
     fmt.Println("->     MAC:", hex.EncodeToString(mac))
     
-    decrypted, err := Chacha20DecryptAndPoly1305Verify(c.session.encryptionKey, []byte("PS-Msg05"), message, mac, nil)
+    decrypted, err := Chacha20DecryptAndPoly1305Verify(c.session.encryptionKey[:], []byte("PS-Msg05"), message, mac, nil)
     
     if err != nil {
         c.reset()
@@ -191,18 +193,18 @@ func (c *SetupController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8Contain
             return nil, err
         }
         
-        username  := tlv_in.GetBytes(TLVType_Username)
+        username  := tlv_in.GetString(TLVType_Username)
         ltpk      := tlv_in.GetBytes(TLVType_PublicKey)
         signature := tlv_in.GetBytes(TLVType_Ed25519Signature)
-        fmt.Println("->     Username:", string(username))
+        fmt.Println("->     Username:", username)
         fmt.Println("->     LTPK:", hex.EncodeToString(ltpk))
         fmt.Println("->     Signature:", hex.EncodeToString(signature))
         
         // Calculate `H`
-        H, _ := HKDF_SHA512_256(c.session.secretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
+        H, _ := HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
         material := make([]byte, 0)
-        material = append(material, H...)
-        material = append(material, username...)
+        material = append(material, H[:]...)
+        material = append(material, []byte(username)...)
         material = append(material, ltpk...)
         
         if ValidateED25519Signature(ltpk, material, signature) == false {
@@ -211,12 +213,14 @@ func (c *SetupController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8Contain
             tlv_out.SetByte(TLVType_ErrorCode, TLVStatus_AuthError) // return error 2
         } else {
             fmt.Println("[Success] ed25519 signature is valid")
-            // TODO Store client LTP and name
+            // Store client LTPK and name
+            c.context.SetKeyForClientWithName(username, ltpk)
+            fmt.Printf("[Storage] Stored LTPK '%s' for client '%s'\n", hex.EncodeToString(ltpk), username)
             
             // Send username, LTPK, signature as encrypted message
-            H2, err := HKDF_SHA512_256(c.session.secretKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
+            H2, err := HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
             material = make([]byte, 0)
-            material = append(material, H2...)
+            material = append(material, H2[:]...)
             material = append(material, []byte(c.accessory.name)...)
             material = append(material, c.accessory.publicKey...)
 
@@ -226,12 +230,12 @@ func (c *SetupController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8Contain
             }
             
             tlvPairKeyExchange := TLV8Container{}
-            tlvPairKeyExchange.SetBytes(TLVType_Username, []byte(c.accessory.name))
-            tlvPairKeyExchange.SetBytes(TLVType_PublicKey, []byte(c.accessory.publicKey))
+            tlvPairKeyExchange.SetString(TLVType_Username, c.accessory.name)
+            tlvPairKeyExchange.SetBytes(TLVType_PublicKey, c.accessory.publicKey)
             tlvPairKeyExchange.SetBytes(TLVType_Proof, []byte(signature))
             
             var mac [16]byte
-            encrypted, mac, _ := Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey, []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), mac, nil)    
+            encrypted, mac, _ := Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), mac, nil)    
             tlv_out.SetByte(TLVType_AuthMethod, 0)
             tlv_out.SetByte(TLVType_SequenceNumber, SequenceKeyExchangeRequest)
             tlv_out.SetBytes(TLVType_EncryptedData, append(encrypted, mac[:]...))

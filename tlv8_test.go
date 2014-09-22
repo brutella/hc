@@ -59,3 +59,10 @@ func TestTLV8BytesBuffer(t *testing.T) {
     
     assert.Equal(t, container.BytesBuffer().Bytes(), []byte{0x01, 0x02, 0xAF, 0xFA})
 }
+
+func TestTLV8String(t *testing.T) {
+    container := &TLV8Container{}
+    container.SetString(1, "Hello World")
+    
+    assert.Equal(t, container.GetString(1), "Hello World")
+}

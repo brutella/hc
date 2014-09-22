@@ -6,16 +6,16 @@ import (
     "errors"
 )
 
-type PairingSession struct {
+type PairSetupSession struct {
     srp *srp.SRP
     session *srp.ServerSession
     salt []byte // s
     publicKey []byte // B
     secretKey []byte // S
-    encryptionKey []byte // K
+    encryptionKey [32]byte // K
 }
 
-func NewPairingSession(username string, password string) (*PairingSession, error) {
+func NewPairSetupSession(username string, password string) (*PairSetupSession, error) {
     var err error
     
 	srp, err := srp.NewSRP("openssl.3072", sha512.New, nil)
@@ -24,7 +24,7 @@ func NewPairingSession(username string, password string) (*PairingSession, error
     	salt, v, err := srp.ComputeVerifier([]byte(password))
     	if err == nil {
         	session := srp.NewServerSession([]byte(username), salt, v)
-            pairing := PairingSession{
+            pairing := PairSetupSession{
                         srp: srp, 
                         session: session, 
                         salt: salt,
@@ -37,15 +37,15 @@ func NewPairingSession(username string, password string) (*PairingSession, error
     return nil, err
 }
 
-func (p *PairingSession) PublicKey() []byte {
+func (p *PairSetupSession) PublicKey() []byte {
     return p.publicKey
 }
 
-func (p *PairingSession) Salt() []byte {
+func (p *PairSetupSession) Salt() []byte {
     return p.salt
 }
 
-func (p *PairingSession) ProofFromClientProof(clientProof []byte) ([]byte, error) {
+func (p *PairSetupSession) ProofFromClientProof(clientProof []byte) ([]byte, error) {
 	if !p.session.VerifyClientAuthenticator(clientProof) { // Validates M1 based on S and A
 		return nil, errors.New("Client proof is not valid")
 	}
@@ -53,7 +53,7 @@ func (p *PairingSession) ProofFromClientProof(clientProof []byte) ([]byte, error
 	return p.session.ComputeAuthenticator(clientProof), nil
 }
 
-func (p *PairingSession) SetupSecretKeyFromClientPublicKey(key []byte) (error) {
+func (p *PairSetupSession) SetupSecretKeyFromClientPublicKey(key []byte) (error) {
 	key, err := p.session.ComputeKey(key) // S
     if err == nil {
         p.secretKey = key
@@ -62,8 +62,8 @@ func (p *PairingSession) SetupSecretKeyFromClientPublicKey(key []byte) (error) {
     return err
 }
 
-func (p *PairingSession) SetupEncryptionKey(salt []byte, info []byte) (error) {
-    key, err := HKDF_SHA512_256(p.secretKey, salt, info)
+func (p *PairSetupSession) SetupEncryptionKey(salt []byte, info []byte) (error) {
+    key, err := HKDF_SHA512(p.secretKey, salt, info)
     if err == nil {
         p.encryptionKey = key
     }

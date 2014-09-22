@@ -19,7 +19,6 @@ func ValidateED25519Signature(key, data, signature []byte) bool {
 }
 
 // Signs (ED25519) data based on public and secret key
-// TODO can we just use public key as ed25519 sign key?
 func ED25519Signature(key, data []byte) ([]byte, error) {
     if len(key) != ed25519.PrivateKeySize {
         return nil, NewErrorf("Invalid size of key (%d)\n", len(key))

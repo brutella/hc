@@ -3,34 +3,17 @@ package gohap
 import (
     "testing"
     "github.com/stretchr/testify/assert"
-    "log"
-    "crypto/sha512"
-    "github.com/tadglines/go-pkgs/crypto/srp"
-    "encoding/hex"
+    "os"
 )
-
-
-func SRPClient(username []byte, password []byte) *srp.ClientSession {
-    rp, err := srp.NewSRP("openssl.3072", sha512.New, nil)
-    client := rp.NewClientSession(username, password)
-    _, _, err = rp.ComputeVerifier(password)
-    if err != nil {
-        log.Fatal(err)
-    }
-    
-    return client
-}
 
 func TestPairingIntegration(t *testing.T) {
     accessory, err := NewAccessory("HAP Test", "123-45-678")
     assert.Nil(t, err)
     
-    LTPK, LTSK, err := ED25519GenerateKey("UnitTest")
+    storage, err := NewFileStorage(os.TempDir())
     assert.Nil(t, err)
-    log.Println("LTPK:", hex.EncodeToString(LTPK))
-    log.Println("LTSK:", hex.EncodeToString(LTSK))
-    
-    controller, err := NewSetupController(accessory)
+    context := NewContext(storage)
+    controller, err := NewSetupController(context, accessory)
     assert.Nil(t, err)
     
     tlvPairStart := TLV8Container{}
@@ -50,14 +33,14 @@ func TestPairingIntegration(t *testing.T) {
     
     // Client
     // 1) Receive salt `s` and public key `B`
-    client := SRPClient([]byte("Pair-Setup"), []byte("123-45-678"))
-    clientSecretKey, err := client.ComputeKey(salt, publicKey)
+    client := NewHAPClient("Unit Test", "123-45-678")
+    clientSecretKey, err := client.session.ComputeKey(salt, publicKey)
     assert.Nil(t, err)
     assert.NotNil(t, clientSecretKey)
     
     // 2) Send public key `A` and proof `M1`
-    clientPublicKey := client.GetA() // LTPK
-    clientProof := client.ComputeAuthenticator() // M1
+    clientPublicKey := client.session.GetA() // SRP public key
+    clientProof := client.session.ComputeAuthenticator() // M1
     
     tlvPairVerify := TLV8Container{}
     tlvPairVerify.SetByte(TLVType_AuthMethod, 0)
@@ -80,28 +63,27 @@ func TestPairingIntegration(t *testing.T) {
     
     // Client
     // 1) Check M2
-    assert.True(t, client.VerifyServerAuthenticator(serverProof))
+    assert.True(t, client.session.VerifyServerAuthenticator(serverProof))
     
     // 2) Send username, LTPK, proof as encrypted message
-    H2, err := HKDF_SHA512_256(clientSecretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
-    clientUsername := "Unit Test"
+    H2, err := HKDF_SHA512(clientSecretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
     material := make([]byte, 0)
-    material = append(material, H2...)
-    material = append(material, clientUsername...)
-    material = append(material, LTPK...)
+    material = append(material, H2[:]...)
+    material = append(material, client.name...)
+    material = append(material, client.publicKey...)
     
-    signature, err := ED25519Signature(LTSK, material)
+    signature, err := ED25519Signature(client.secretKey, material)
     assert.Nil(t, err)
     tlvPairKeyExchange := TLV8Container{}
-    tlvPairKeyExchange.SetBytes(TLVType_Username, []byte(clientUsername))
-    tlvPairKeyExchange.SetBytes(TLVType_PublicKey, []byte(LTPK))
+    tlvPairKeyExchange.SetString(TLVType_Username, client.name)
+    tlvPairKeyExchange.SetBytes(TLVType_PublicKey, []byte(client.publicKey))
     tlvPairKeyExchange.SetBytes(TLVType_Ed25519Signature, []byte(signature))
     
-    K, err := HKDF_SHA512_256(clientSecretKey, []byte("Pair-Setup-Encrypt-Salt"), []byte("Pair-Setup-Encrypt-Info"))
+    K, err := HKDF_SHA512(clientSecretKey, []byte("Pair-Setup-Encrypt-Salt"), []byte("Pair-Setup-Encrypt-Info"))
     assert.Nil(t, err)
     
     var tag [16]byte // zeros
-    encrypted, tag, err := Chacha20EncryptAndPoly1305Seal(K, []byte("PS-Msg05"), tlvPairKeyExchange.BytesBuffer().Bytes(), tag, nil)
+    encrypted, tag, err := Chacha20EncryptAndPoly1305Seal(K[:], []byte("PS-Msg05"), tlvPairKeyExchange.BytesBuffer().Bytes(), tag, nil)
     assert.Nil(t, err)
     
     tlvKeyExchangeRequest := TLV8Container{}
