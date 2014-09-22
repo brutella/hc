@@ -21,6 +21,6 @@ func (c *Context) ClientForName(name string) (*Client) {
     return nil
 }
 
-func (c *Context) SetKeyForClientWithName(name string, key[]byte) {
-    c.storage.Set(name, key)
+func (c *Context) SaveClient(client *Client) {
+    c.storage.Set(client.name, client.publicKey)
 }

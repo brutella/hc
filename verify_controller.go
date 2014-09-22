@@ -22,11 +22,11 @@ type VerifyController struct {
     curSeq byte
 }
 
-func NewVerifyController(context *Context, accessory *Accessory, storage Storage) (*VerifyController, error) {    
+func NewVerifyController(context *Context, accessory *Accessory) (*VerifyController, error) {    
     controller := VerifyController{
                                     context: context,
                                     accessory: accessory,
-                                    session: NewPairVerifySession(storage),
+                                    session: NewPairVerifySession(),
                                     curSeq: WaitingForRequest,
                                 }
     
@@ -88,16 +88,22 @@ func (c *VerifyController) handlePairVerifyStart(tlv_in *TLV8Container) (*TLV8Co
     
     clientPublicKey := tlv_in.GetBytes(TLVType_PublicKey)
     fmt.Println("->     A:", hex.EncodeToString(clientPublicKey))
+    if len(clientPublicKey) != 32 {
+        return nil, NewErrorf("Invalid client public key size %d", len(clientPublicKey))
+    }
+    
+    copy(c.session.clientPublicKey[:], clientPublicKey)
     
     secretKey := Curve25519_GenerateSecretKey()
     publicKey := Curve25519_PublicKey(secretKey)
     
     var key [32]byte
     copy(key[:], clientPublicKey)
-    sharedSecret := Curve25519_SharedSecret(secretKey, key)
+    sharedKey := Curve25519_SharedSecret(secretKey, key)
     
     c.session.secretKey = secretKey
     c.session.publicKey = publicKey
+    c.session.sharedKey = sharedKey
     
     material := make([]byte, 0)
     material = append(material, publicKey[:]...)
@@ -105,7 +111,7 @@ func (c *VerifyController) handlePairVerifyStart(tlv_in *TLV8Container) (*TLV8Co
     material = append(material, clientPublicKey...)
     signature, _ := ED25519Signature(c.accessory.secretKey, material)
     
-    K, _ := HKDF_SHA512(sharedSecret[:], []byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
+    K, _ := HKDF_SHA512(c.session.sharedKey[:], []byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
     c.session.encryptionKey = K
     
     // Encrypt
@@ -142,12 +148,12 @@ func (c *VerifyController) handlePairVerifyStart(tlv_in *TLV8Container) (*TLV8Co
 func (c *VerifyController) handlePairVerifyFinish(tlv_in *TLV8Container) (*TLV8Container, error) {
     c.curSeq = VerifyFinishRespond
     
-    clientPublicKey := tlv_in.GetBytes(TLVType_PublicKey)
     data := tlv_in.GetBytes(TLVType_EncryptedData)
     message := data[:(len(data) - 16)]
-    mac := data[len(message):] // 16 byte (MAC)
+    var mac [16]byte
+    copy(mac[:], data[len(message):]) // 16 byte (MAC)
     fmt.Println("->     Message:", hex.EncodeToString(message))
-    fmt.Println("->     MAC:", hex.EncodeToString(mac))
+    fmt.Println("->     MAC:", hex.EncodeToString(mac[:]))
     
     decrypted, err := Chacha20DecryptAndPoly1305Verify(c.session.encryptionKey[:], []byte("PV-Msg03"), message, mac, nil)
     
@@ -180,7 +186,7 @@ func (c *VerifyController) handlePairVerifyFinish(tlv_in *TLV8Container) (*TLV8C
         }
         
         material := make([]byte, 0)
-        material = append(material, clientPublicKey...)
+        material = append(material, c.session.clientPublicKey[:]...)
         material = append(material, c.session.publicKey[:]...)
         
         if ValidateED25519Signature(client.publicKey, material, signature) == false {

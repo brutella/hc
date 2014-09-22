@@ -2,13 +2,14 @@ package gohap
 
 import(
     "encoding/binary"
+    "encoding/hex"
     "bytes"
     "github.com/tang0th/go-chacha20"
     "github.com/tonnerre/golang-go.crypto/poly1305"
 )
 
 // Decrypts a message with chacha20 and verifies it with poly1305
-func Chacha20DecryptAndPoly1305Verify(key, nonce, message, mac, add []byte) ([]byte, error) {
+func Chacha20DecryptAndPoly1305Verify(key, nonce, message []byte, mac [16]byte, add []byte) ([]byte, error) {
     var chacha20_out = make([]byte, len(message))
     var poly1305_out [16]byte
     var poly1305_key [32]byte
@@ -39,8 +40,8 @@ func Chacha20DecryptAndPoly1305Verify(key, nonce, message, mac, add []byte) ([]b
     
     poly1305.Sum(&poly1305_out, poly1305_in, &poly1305_key)
     
-    if bytes.Equal(poly1305_out[:], mac) == false {
-        return nil, NewErrorf("MAC incorrect")
+    if bytes.Equal(poly1305_out[:], mac[:]) == false {
+        return nil, NewErrorf("MAC incorrect %s", hex.EncodeToString(poly1305_out[:]), hex.EncodeToString(mac[:]))
     }
     
     chacha20.XORKeyStream(chacha20_out, message, nonce, key)

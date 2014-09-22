@@ -176,9 +176,10 @@ func (c *SetupController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8Contain
     
     data := tlv_in.GetBytes(TLVType_EncryptedData)
     message := data[:(len(data) - 16)]
-    mac := data[len(message):] // 16 byte (MAC)
+    var mac [16]byte
+    copy(mac[:], data[len(message):]) // 16 byte (MAC)
     fmt.Println("->     Message:", hex.EncodeToString(message))
-    fmt.Println("->     MAC:", hex.EncodeToString(mac))
+    fmt.Println("->     MAC:", hex.EncodeToString(mac[:]))
     
     decrypted, err := Chacha20DecryptAndPoly1305Verify(c.session.encryptionKey[:], []byte("PS-Msg05"), message, mac, nil)
     
@@ -214,7 +215,8 @@ func (c *SetupController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8Contain
         } else {
             fmt.Println("[Success] ed25519 signature is valid")
             // Store client LTPK and name
-            c.context.SetKeyForClientWithName(username, ltpk)
+            client := NewClient(username, ltpk)
+            c.context.SaveClient(client)
             fmt.Printf("[Storage] Stored LTPK '%s' for client '%s'\n", hex.EncodeToString(ltpk), username)
             
             // Send username, LTPK, signature as encrypted message

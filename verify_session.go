@@ -1,13 +1,13 @@
 package gohap
 
 type PairVerifySession struct {
-    storage Storage
-    
+    clientPublicKey [32]byte
     publicKey [32]byte
     secretKey [32]byte
-    encryptionKey [32]byte // K
+    sharedKey [32]byte
+    encryptionKey [32]byte
 }
 
-func NewPairVerifySession(s Storage) (*PairVerifySession) {
-    return &PairVerifySession{storage: s}
+func NewPairVerifySession() (*PairVerifySession) {
+    return &PairVerifySession{}
 }

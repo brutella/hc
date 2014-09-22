@@ -33,7 +33,7 @@ func TestPairingIntegration(t *testing.T) {
     
     // Client
     // 1) Receive salt `s` and public key `B`
-    client := NewHAPClient("Unit Test", "123-45-678")
+    client := NewHAPPairSetupClient("Unit Test", accessory.password)
     clientSecretKey, err := client.session.ComputeKey(salt, publicKey)
     assert.Nil(t, err)
     assert.NotNil(t, clientSecretKey)

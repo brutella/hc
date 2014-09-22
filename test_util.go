@@ -6,7 +6,7 @@ import(
     "log"
 )
 
-type HAPClient struct {
+type HAPPairSetupClient struct {
     name string
     password string
     publicKey []byte
@@ -15,7 +15,7 @@ type HAPClient struct {
     session *srp.ClientSession
 }
 
-func NewHAPClient(username string, password string) *HAPClient {
+func NewHAPPairSetupClient(username string, password string) *HAPPairSetupClient {
     rp, err := srp.NewSRP("openssl.3072", sha512.New, nil)
     client := rp.NewClientSession([]byte("Pair-Setup"), []byte(password))
     _, _, err = rp.ComputeVerifier([]byte(password))
@@ -25,7 +25,7 @@ func NewHAPClient(username string, password string) *HAPClient {
     
     LTPK, LTSK, err := ED25519GenerateKey(username)
     
-    hap := HAPClient{
+    hap := HAPPairSetupClient{
                 name: username, 
                 password: password, 
                 publicKey: LTPK, 
@@ -35,4 +35,42 @@ func NewHAPClient(username string, password string) *HAPClient {
             }
             
     return &hap
+}
+
+type HAPPairVerifyClient struct {
+    name string
+    password string
+    publicKey []byte
+    secretKey []byte
+    session *PairVerifySession
+}
+
+func NewHAPPairVerifyClient(username string, password string) *HAPPairVerifyClient {
+    LTPK, LTSK, _ := ED25519GenerateKey(username)
+    
+    // Client session keys
+    secretKey := Curve25519_GenerateSecretKey()
+    publicKey := Curve25519_PublicKey(secretKey)
+    session := NewPairVerifySession()
+    session.publicKey = publicKey
+    session.secretKey = secretKey
+    
+    hap := HAPPairVerifyClient{
+                name: username, 
+                password: password, 
+                publicKey: LTPK, 
+                secretKey: LTSK,
+                session: session,
+            }
+            
+    return &hap
+}
+
+func (c *HAPPairVerifyClient) GenerateSharedSecret(otherPublicKey []byte) {
+    var key [32]byte
+    copy(key[:], otherPublicKey)
+    c.session.sharedKey = Curve25519_SharedSecret(c.session.secretKey, key)
+    
+    K, _ := HKDF_SHA512(c.session.sharedKey[:], []byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
+    c.session.encryptionKey = K
 }
