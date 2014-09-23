@@ -24,13 +24,13 @@ func ReadTLV8(r io.Reader) (*TLV8Container, error) {
             return nil, err
         }
         
-        bytes := make([]byte, item.length)
-        if err := binary.Read(r, binary.LittleEndian, &bytes); err != nil {
+        item.value = make([]byte, item.length)
+        if err := binary.Read(r, binary.LittleEndian, &item.value); err != nil {
             return nil, err
         }
+        
         // Reverse
-        // sort.Sort(sort.Reverse(ByteSequence(bytes)))
-        item.value = bytes
+        // sort.Sort(sort.Reverse(ByteSequence(item.value)))
         items = append(items, item)
     }
     

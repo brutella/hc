@@ -3,7 +3,6 @@ package gohap
 import(
     "crypto/sha512"
     "github.com/tadglines/go-pkgs/crypto/srp"
-    "log"
 )
 
 type HAPPairSetupClient struct {
@@ -16,15 +15,9 @@ type HAPPairSetupClient struct {
 }
 
 func NewHAPPairSetupClient(username string, password string) *HAPPairSetupClient {
-    rp, err := srp.NewSRP("openssl.3072", sha512.New, nil)
-    rp.SaltLength = 16
-    client := rp.NewClientSession([]byte("Pair-Setup"), []byte(password))
-    _, _, err = rp.ComputeVerifier([]byte(password))
-    if err != nil {
-        log.Fatal(err)
-    }
-    
-    LTPK, LTSK, err := ED25519GenerateKey(username)
+    rp, _ := srp.NewSRP("rfc5054.3072", sha512.New, nil)
+    client := rp.NewClientSession([]byte("Pair-Setup"), []byte(password))    
+    LTPK, LTSK, _ := ED25519GenerateKey(username)
     
     hap := HAPPairSetupClient{
                 name: username, 
