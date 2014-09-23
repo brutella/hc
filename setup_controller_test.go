@@ -30,7 +30,6 @@ func TestPairingIntegration(t *testing.T) {
     salt := result.GetBytes(TLVType_Salt)
     assert.Equal(t, len(salt), 16) // must be 16 bytes long
     publicKey := result.GetBytes(TLVType_PublicKey)
-    assert.NotNil(t, publicKey)
     
     // Client
     // 1) Receive salt `s` and public key `B`

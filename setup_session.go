@@ -18,22 +18,22 @@ type PairSetupSession struct {
 func NewPairSetupSession(username string, password string) (*PairSetupSession, error) {
     var err error
     
-	srp, err := srp.NewSRP("openssl.3072", sha512.New, nil)
-	if err == nil {
+    srp, err := srp.NewSRP("openssl.3072", sha512.New, nil)
+    if err == nil {
         srp.SaltLength = 16
-    	salt, v, err := srp.ComputeVerifier([]byte(password))
-    	if err == nil {
-        	session := srp.NewServerSession([]byte(username), salt, v)
+        salt, v, err := srp.ComputeVerifier([]byte(password))
+        if err == nil {
+            session := srp.NewServerSession([]byte(username), salt, v)
             
             pairing := PairSetupSession{
                         srp: srp, 
                         session: session, 
-                        salt: salt,
+                        salt: salt[:],
                         publicKey: session.GetB(),
                     }
             return &pairing, nil
-    	}
-	}
+        }
+    }
     
     return nil, err
 }

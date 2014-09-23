@@ -24,11 +24,13 @@ func ReadTLV8(r io.Reader) (*TLV8Container, error) {
             return nil, err
         }
         
-        item.value = make([]byte, item.length)
-        if _, err := io.ReadFull(r, item.value); err != nil && err != io.EOF {
+        bytes := make([]byte, item.length)
+        if err := binary.Read(r, binary.LittleEndian, &bytes); err != nil {
             return nil, err
         }
-        
+        // Reverse
+        // sort.Sort(sort.Reverse(ByteSequence(bytes)))
+        item.value = bytes
         items = append(items, item)
     }
     
@@ -93,6 +95,7 @@ func (t *TLV8Container) SetByte(tag uint8, b byte) {
 func (t *TLV8Container) BytesBuffer() *bytes.Buffer {
     var b bytes.Buffer
     for _, item := range t.Items {
+        // Since we are using just 1 byte for tag and length, the byte order does not matter
         b.Write([]byte{item.tag})
         b.Write([]byte{item.length})
         b.Write(item.value)
