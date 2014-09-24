@@ -1,17 +1,17 @@
 package gohap
 
 type Accessory struct {
-    name string
-    password string
-    publicKey []byte
-    secretKey []byte
+    Name string
+    Password string
+    PublicKey []byte
+    SecretKey []byte
 }
 
 func NewAccessory(name string, password string) (*Accessory, error){
-    a := Accessory{name: name, password: password}
+    a := Accessory{Name: name, Password: password}
     public, secret, err := ED25519GenerateKey(name + password)
-    a.publicKey = public
-    a.secretKey = secret
+    a.PublicKey = public
+    a.SecretKey = secret
     
     return &a, err
 }

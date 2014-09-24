@@ -26,7 +26,7 @@ type SetupController struct {
 
 func NewSetupController(context *Context, accessory *Accessory) (*SetupController, error) {
     
-    session, err := NewPairSetupSession("Pair-Setup", accessory.password)
+    session, err := NewPairSetupSession("Pair-Setup", accessory.Password)
     if err != nil {
         return nil, err
     }
@@ -103,8 +103,8 @@ func (c *SetupController) handlePairStart(tlv_in *TLV8Container) (*TLV8Container
     c.curSeq = SequenceStartRespond
     
     tlv_out.SetByte(TLVType_SequenceNumber, c.curSeq)
-    tlv_out.SetBytes(TLVType_Salt, c.session.salt)
     tlv_out.SetBytes(TLVType_PublicKey, c.session.publicKey)
+    tlv_out.SetBytes(TLVType_Salt, c.session.salt)
     
     fmt.Println("<-     B:", hex.EncodeToString(tlv_out.GetBytes(TLVType_PublicKey)))
     fmt.Println("<-     s:", hex.EncodeToString(tlv_out.GetBytes(TLVType_Salt)))
@@ -177,7 +177,7 @@ func (c *SetupController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8Contain
     
     tlv_out.SetByte(TLVType_SequenceNumber, c.curSeq)
     
-    data := tlv_in.GetBytes(TLVType_EncryptedData)
+    data := tlv_in.GetBytes(TLVType_EncryptedData)    
     message := data[:(len(data) - 16)]
     var mac [16]byte
     copy(mac[:], data[len(message):]) // 16 byte (MAC)
@@ -226,17 +226,17 @@ func (c *SetupController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8Contain
             H2, err := HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
             material = make([]byte, 0)
             material = append(material, H2[:]...)
-            material = append(material, []byte(c.accessory.name)...)
-            material = append(material, c.accessory.publicKey...)
+            material = append(material, []byte(c.accessory.Name)...)
+            material = append(material, c.accessory.PublicKey...)
 
-            signature, err := ED25519Signature(c.accessory.secretKey, material)
+            signature, err := ED25519Signature(c.accessory.SecretKey, material)
             if err != nil {
                 return nil, err
             }
             
             tlvPairKeyExchange := TLV8Container{}
-            tlvPairKeyExchange.SetString(TLVType_Username, c.accessory.name)
-            tlvPairKeyExchange.SetBytes(TLVType_PublicKey, c.accessory.publicKey)
+            tlvPairKeyExchange.SetString(TLVType_Username, c.accessory.Name)
+            tlvPairKeyExchange.SetBytes(TLVType_PublicKey, c.accessory.PublicKey)
             tlvPairKeyExchange.SetBytes(TLVType_Proof, []byte(signature))
             
             var mac [16]byte

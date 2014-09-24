@@ -2,41 +2,44 @@ package gohap
 
 import(
     "crypto/sha512"
-    "github.com/tadglines/go-pkgs/crypto/srp"
+    // "github.com/tadglines/go-pkgs/crypto/srp"
+    "github.com/theojulienne/go-srp/crypto/srp"
 )
 
 type HAPPairSetupClient struct {
-    name string
-    password string
-    publicKey []byte
-    secretKey []byte
+    Name string
+    Password string
+    PublicKey []byte
+    SecretKey []byte
     srp *srp.SRP
-    session *srp.ClientSession
+    Session *srp.ClientSession
 }
 
 func NewHAPPairSetupClient(username string, password string) *HAPPairSetupClient {
-    rp, _ := srp.NewSRP("rfc5054.3072", sha512.New, nil)
-    client := rp.NewClientSession([]byte("Pair-Setup"), []byte(password))    
+    srp_username := []byte("Pair-Setup")
+    rp, _ := srp.NewSRP("rfc5054.3072", sha512.New, SHA512KeyDerivativeFunction(srp_username))
+    
+    client := rp.NewClientSession(srp_username, []byte(password))
     LTPK, LTSK, _ := ED25519GenerateKey(username)
     
     hap := HAPPairSetupClient{
-                name: username, 
-                password: password, 
-                publicKey: LTPK, 
-                secretKey: LTSK, 
+                Name: username, 
+                Password: password, 
+                PublicKey: LTPK, 
+                SecretKey: LTSK, 
                 srp: rp, 
-                session: client,
+                Session: client,
             }
             
     return &hap
 }
 
 type HAPPairVerifyClient struct {
-    name string
-    password string
-    publicKey []byte
-    secretKey []byte
-    session *PairVerifySession
+    Name string
+    Password string
+    PublicKey []byte
+    SecretKey []byte
+    Session *PairVerifySession
 }
 
 func NewHAPPairVerifyClient(username string, password string) *HAPPairVerifyClient {
@@ -50,11 +53,11 @@ func NewHAPPairVerifyClient(username string, password string) *HAPPairVerifyClie
     session.secretKey = secretKey
     
     hap := HAPPairVerifyClient{
-                name: username, 
-                password: password, 
-                publicKey: LTPK, 
-                secretKey: LTSK,
-                session: session,
+                Name: username, 
+                Password: password, 
+                PublicKey: LTPK, 
+                SecretKey: LTSK,
+                Session: session,
             }
             
     return &hap
@@ -63,8 +66,8 @@ func NewHAPPairVerifyClient(username string, password string) *HAPPairVerifyClie
 func (c *HAPPairVerifyClient) GenerateSharedSecret(otherPublicKey []byte) {
     var key [32]byte
     copy(key[:], otherPublicKey)
-    c.session.sharedKey = Curve25519_SharedSecret(c.session.secretKey, key)
+    c.Session.sharedKey = Curve25519_SharedSecret(c.Session.secretKey, key)
     
-    K, _ := HKDF_SHA512(c.session.sharedKey[:], []byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
-    c.session.encryptionKey = K
+    K, _ := HKDF_SHA512(c.Session.sharedKey[:], []byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
+    c.Session.encryptionKey = K
 }

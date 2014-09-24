@@ -24,3 +24,11 @@ func (s *PairVerifySession) GenerateKeysWithOtherPublicKey(otherPublicKey [32]by
     s.publicKey = publicKey
     s.sharedKey = sharedKey
 }
+
+func (s *PairVerifySession) PublicKey() []byte {
+    return s.publicKey[:]
+}
+
+func (s *PairVerifySession) EncryptionKey() []byte {
+    return s.encryptionKey[:]
+}

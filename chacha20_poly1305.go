@@ -3,7 +3,7 @@ package gohap
 import(
     "encoding/binary"
     "encoding/hex"
-    "bytes"
+    _"bytes"
     "github.com/tang0th/go-chacha20"
     "github.com/tonnerre/golang-go.crypto/poly1305"
 )
@@ -13,11 +13,12 @@ func Chacha20DecryptAndPoly1305Verify(key, nonce, message []byte, mac [16]byte, 
     var chacha20_out = make([]byte, len(message))
     var poly1305_out [16]byte
     var poly1305_key [32]byte
-    var zeros = make([]byte, 32)
+    var chacha20_key_out [64]byte
+    var zeros = make([]byte, 64)
     
     // poly1305 key is chacha20 over 32 zeros
-    chacha20.XORKeyStream(chacha20_out, zeros, nonce, key)
-    copy(chacha20_out[:], poly1305_key[:])
+    chacha20.XORKeyStream(chacha20_key_out[:], zeros, nonce, key)
+    copy(poly1305_key[:], chacha20_key_out[:])
     
     // poly1305 byte order
     // - add bytes up to mod 16 (if available)
@@ -40,7 +41,7 @@ func Chacha20DecryptAndPoly1305Verify(key, nonce, message []byte, mac [16]byte, 
     
     poly1305.Sum(&poly1305_out, poly1305_in, &poly1305_key)
     
-    if bytes.Equal(poly1305_out[:], mac[:]) == false {
+    if poly1305.Verify(&mac, poly1305_in, &poly1305_key) == false {
         return nil, NewErrorf("MAC incorrect %s", hex.EncodeToString(poly1305_out[:]), hex.EncodeToString(mac[:]))
     }
     
@@ -53,12 +54,12 @@ func Chacha20EncryptAndPoly1305Seal(key, nonce, message []byte, mac [16]byte, ad
     var chacha20_out = make([]byte, len(message))
     var poly1305_out [16]byte
     var poly1305_key [32]byte
-    var zeros = make([]byte, 32)
+    var chacha20_key_out [64]byte
+    var zeros = make([]byte, 64)
     
     // poly1305 key is chacha20 over 32 zeros
-    chacha20.XORKeyStream(chacha20_out, zeros, nonce, key)
-    copy(chacha20_out[:], poly1305_key[:])
-    
+    chacha20.XORKeyStream(chacha20_key_out[:], zeros, nonce, key)
+    copy(poly1305_key[:], chacha20_key_out[:])
     chacha20.XORKeyStream(chacha20_out, message, nonce, key)
     
     poly1305_in := make([]byte, 0)

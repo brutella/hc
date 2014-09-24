@@ -17,14 +17,14 @@ func TestPairVerifyIntegration(t *testing.T) {
     controller, err := NewVerifyController(context, accessory)
     assert.Nil(t, err)
     
-    client := NewHAPPairVerifyClient("Unit Test", accessory.password)
+    client := NewHAPPairVerifyClient("Unit Test", accessory.Password)
     // Setup LTPK for client
-    context.SaveClient(&Client{name:client.name, publicKey: client.publicKey})
+    context.SaveClient(NewClient(client.Name,client.PublicKey))
     
     tlvVerifyStart := TLV8Container{}
     tlvVerifyStart.SetByte(TLVType_AuthMethod, 0)
     tlvVerifyStart.SetByte(TLVType_SequenceNumber, VerifyStartRequest)
-    tlvVerifyStart.SetBytes(TLVType_PublicKey, client.session.publicKey[:])
+    tlvVerifyStart.SetBytes(TLVType_PublicKey, client.Session.PublicKey())
     
     reader, err := controller.Handle(tlvVerifyStart.BytesBuffer())
     assert.Nil(t, err)
@@ -40,8 +40,8 @@ func TestPairVerifyIntegration(t *testing.T) {
     serverPublicKey := tlvVerifyResponse.GetBytes(TLVType_PublicKey)
     assert.NotNil(t, serverPublicKey)
     client.GenerateSharedSecret(serverPublicKey)
-    assert.NotNil(t, client.session.sharedKey)
-    assert.NotNil(t, client.session.encryptionKey)
+    assert.NotNil(t, client.Session.sharedKey)
+    assert.NotNil(t, client.Session.encryptionKey)
     
     // Decrypt
     data := tlvVerifyResponse.GetBytes(TLVType_EncryptedData)
@@ -49,7 +49,7 @@ func TestPairVerifyIntegration(t *testing.T) {
     var mac [16]byte
     copy(mac[:], data[len(message):]) // 16 byte (MAC)    
     
-    decrypted, err := Chacha20DecryptAndPoly1305Verify(client.session.encryptionKey[:], []byte("PV-Msg02"), message, mac, nil)
+    decrypted, err := Chacha20DecryptAndPoly1305Verify(client.Session.EncryptionKey(), []byte("PV-Msg02"), message, mac, nil)
     assert.Nil(t, err)
     
     decrypted_buffer := bytes.NewBuffer(decrypted)
@@ -64,8 +64,8 @@ func TestPairVerifyIntegration(t *testing.T) {
     material := make([]byte, 0)
     material = append(material, serverPublicKey[:]...)
     material = append(material, username...)
-    material = append(material, client.session.publicKey[:]...)
-    assert.True(t, ValidateED25519Signature(accessory.publicKey, material, signature))
+    material = append(material, client.Session.PublicKey()...)
+    assert.True(t, ValidateED25519Signature(accessory.PublicKey, material, signature))
     
     // Client -> Server
     // encrypted tlv: username and signature
@@ -74,17 +74,17 @@ func TestPairVerifyIntegration(t *testing.T) {
     tlvVerifyFinish.SetByte(TLVType_SequenceNumber, VerifyFinishRequest)
     
     tlv_encrypt := TLV8Container{}
-    tlv_encrypt.SetString(TLVType_Username, client.name)
+    tlv_encrypt.SetString(TLVType_Username, client.Name)
     
     material = make([]byte, 0)
-    material = append(material, client.session.publicKey[:]...)
+    material = append(material, client.Session.PublicKey()...)
     material = append(material, serverPublicKey...)
     
-    signature, err = ED25519Signature(client.secretKey, material)
+    signature, err = ED25519Signature(client.SecretKey, material)
     assert.Nil(t, err)
     tlv_encrypt.SetBytes(TLVType_Ed25519Signature, signature)
     
-    encrypted, mac, _ := Chacha20EncryptAndPoly1305Seal(client.session.encryptionKey[:], []byte("PV-Msg03"), tlv_encrypt.BytesBuffer().Bytes(), mac, nil)
+    encrypted, mac, _ := Chacha20EncryptAndPoly1305Seal(client.Session.EncryptionKey(), []byte("PV-Msg03"), tlv_encrypt.BytesBuffer().Bytes(), mac, nil)
     
     tlvVerifyFinish.SetBytes(TLVType_EncryptedData, append(encrypted, mac[:]...))
     

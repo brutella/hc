@@ -28,19 +28,20 @@ func TestPairingIntegration(t *testing.T) {
     assert.Equal(t, result.GetByte(TLVType_ErrorCode), byte(TLVStatus_NoError))
     assert.Equal(t, result.GetByte(TLVType_SequenceNumber), byte(SequenceStartRespond))
     salt := result.GetBytes(TLVType_Salt)
-    assert.Equal(t, len(salt), 16) // must be 16 bytes long
+    assert.Equal(t, len(salt), 16) // 16 bytes
     publicKey := result.GetBytes(TLVType_PublicKey)
+    assert.Equal(t, len(publicKey), 384) // 384 bytes
     
     // Client
     // 1) Receive salt `s` and public key `B`
-    client := NewHAPPairSetupClient("Unit Test", accessory.password)
-    clientSecretKey, err := client.session.ComputeKey(salt, publicKey)
+    client := NewHAPPairSetupClient("Unit Test", accessory.Password)
+    clientSecretKey, err := client.Session.ComputeKey(salt, publicKey)
     assert.Nil(t, err)
     assert.NotNil(t, clientSecretKey)
     
     // 2) Send public key `A` and proof `M1`
-    clientPublicKey := client.session.GetA() // SRP public key
-    clientProof := client.session.ComputeAuthenticator() // M1
+    clientPublicKey := client.Session.GetA() // SRP public key
+    clientProof := client.Session.ComputeAuthenticator() // M1
     
     tlvPairVerify := TLV8Container{}
     tlvPairVerify.SetByte(TLVType_AuthMethod, 0)
@@ -63,20 +64,20 @@ func TestPairingIntegration(t *testing.T) {
     
     // Client
     // 1) Check M2
-    assert.True(t, client.session.VerifyServerAuthenticator(serverProof))
+    assert.True(t, client.Session.VerifyServerAuthenticator(serverProof))
     
     // 2) Send username, LTPK, proof as encrypted message
     H2, err := HKDF_SHA512(clientSecretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
     material := make([]byte, 0)
     material = append(material, H2[:]...)
-    material = append(material, client.name...)
-    material = append(material, client.publicKey...)
+    material = append(material, client.Name...)
+    material = append(material, client.PublicKey...)
     
-    signature, err := ED25519Signature(client.secretKey, material)
+    signature, err := ED25519Signature(client.SecretKey, material)
     assert.Nil(t, err)
     tlvPairKeyExchange := TLV8Container{}
-    tlvPairKeyExchange.SetString(TLVType_Username, client.name)
-    tlvPairKeyExchange.SetBytes(TLVType_PublicKey, []byte(client.publicKey))
+    tlvPairKeyExchange.SetString(TLVType_Username, client.Name)
+    tlvPairKeyExchange.SetBytes(TLVType_PublicKey, []byte(client.PublicKey))
     tlvPairKeyExchange.SetBytes(TLVType_Ed25519Signature, []byte(signature))
     
     K, err := HKDF_SHA512(clientSecretKey, []byte("Pair-Setup-Encrypt-Salt"), []byte("Pair-Setup-Encrypt-Info"))

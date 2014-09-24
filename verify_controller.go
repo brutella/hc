@@ -100,16 +100,16 @@ func (c *VerifyController) handlePairVerifyStart(tlv_in *TLV8Container) (*TLV8Co
     
     material := make([]byte, 0)
     material = append(material, c.session.publicKey[:]...)
-    material = append(material, c.accessory.name...)
+    material = append(material, c.accessory.Name...)
     material = append(material, clientPublicKey...)
-    signature, _ := ED25519Signature(c.accessory.secretKey, material)
+    signature, _ := ED25519Signature(c.accessory.SecretKey, material)
     
     K, _ := HKDF_SHA512(c.session.sharedKey[:], []byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
     c.session.encryptionKey = K
     
     // Encrypt
     tlv_encrypt := TLV8Container{}
-    tlv_encrypt.SetString(TLVType_Username, c.accessory.name)
+    tlv_encrypt.SetString(TLVType_Username, c.accessory.Name)
     tlv_encrypt.SetBytes(TLVType_Ed25519Signature, signature)
     
     var mac [16]byte
@@ -174,7 +174,7 @@ func (c *VerifyController) handlePairVerifyFinish(tlv_in *TLV8Container) (*TLV8C
             return nil, NewErrorf("Client %s is unknown", username)
         }
         
-        if len(client.publicKey) == 0 {
+        if len(client.PublicKey) == 0 {
             return nil, NewErrorf("No LTPK available for client %s", username)
         }
         
@@ -182,7 +182,7 @@ func (c *VerifyController) handlePairVerifyFinish(tlv_in *TLV8Container) (*TLV8C
         material = append(material, c.session.otherPublicKey[:]...)
         material = append(material, c.session.publicKey[:]...)
         
-        if ValidateED25519Signature(client.publicKey, material, signature) == false {
+        if ValidateED25519Signature(client.PublicKey, material, signature) == false {
             fmt.Println("[Failed] ed25519 signature is invalid")
             c.reset()
             tlv_out.SetByte(TLVType_ErrorCode, TLVStatus_UnkownPeerError) // return error 4

@@ -22,5 +22,5 @@ func (c *Context) ClientForName(name string) (*Client) {
 }
 
 func (c *Context) SaveClient(client *Client) {
-    c.storage.Set(client.name, client.publicKey)
+    c.storage.Set(client.Name, client.PublicKey)
 }

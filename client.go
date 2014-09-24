@@ -1,10 +1,10 @@
 package gohap
 
 type Client struct {
-    name string
-    publicKey []byte
+    Name string
+    PublicKey []byte
 }
 
 func NewClient(name string, publicKey []byte) *Client {
-    return &Client{name: name, publicKey: publicKey}
+    return &Client{Name: name, PublicKey: publicKey}
 }
