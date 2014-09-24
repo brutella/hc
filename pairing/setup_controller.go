@@ -1,6 +1,8 @@
 package gohap
 
 import(
+    "github.com/brutella/gohap"
+    
     "io"
     "fmt"
     "encoding/hex"
@@ -18,13 +20,13 @@ const (
 )
 
 type SetupController struct {
-    context *Context
-    accessory *Accessory
+    context *gohap.Context
+    accessory *gohap.Accessory
     session *PairSetupSession
     curSeq byte
 }
 
-func NewSetupController(context *Context, accessory *Accessory) (*SetupController, error) {
+func NewSetupController(context *gohap.Context, accessory *gohap.Accessory) (*SetupController, error) {
     
     session, err := NewPairSetupSession("Pair-Setup", accessory.Password)
     if err != nil {
@@ -42,56 +44,56 @@ func NewSetupController(context *Context, accessory *Accessory) (*SetupControlle
 }
 
 func (c *SetupController) Handle(r io.Reader) (io.Reader, error) {
-    var tlv_out *TLV8Container
+    var tlv_out *gohap.TLV8Container
     var err error
     
-    tlv_in, err := ReadTLV8(r)
+    tlv_in, err := gohap.ReadTLV8(r)
     if err != nil {
         return nil, err
     }
     
-    method := tlv_in.GetByte(TLVType_AuthMethod)
+    method := tlv_in.GetByte(gohap.TLVType_AuthMethod)
     
     // It is valid that method is not sent
     // If method is sent then it must be 0x00
     if method != 0x00 {
-        return nil, NewErrorf("Cannot handle auth method %b", method)
+        return nil, gohap.NewErrorf("Cannot handle auth method %b", method)
     }
     
-    seq := tlv_in.GetByte(TLVType_SequenceNumber)
+    seq := tlv_in.GetByte(gohap.TLVType_SequenceNumber)
     fmt.Println("->     Seq:", seq)
     
     switch seq {
     case SequenceStartRequest:
         if c.curSeq != SequenceWaitingForRequest {
             c.reset()
-            return nil, NewErrorf("Controller is in wrong state (%d)", c.curSeq)
+            return nil, gohap.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
         tlv_out, err = c.handlePairStart(tlv_in)
     case SequenceVerifyRequest:
         if c.curSeq != SequenceStartRespond {
             c.reset()
-            return nil, NewErrorf("Controller is in wrong state (%d)", c.curSeq)
+            return nil, gohap.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
         tlv_out, err = c.handlePairVerify(tlv_in)
     case SequenceKeyExchangeRequest:        
         if c.curSeq != SequenceVerifyRespond {
             c.reset()
-            return nil, NewErrorf("Controller is in wrong state (%d)", c.curSeq)
+            return nil, gohap.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
         tlv_out, err = c.handleKeyExchange(tlv_in)
     default:
-        return nil, NewErrorf("Cannot handle sequence number %d", seq)
+        return nil, gohap.NewErrorf("Cannot handle sequence number %d", seq)
     }
     
     if err != nil {
         fmt.Println("[ERROR]", err)
         return nil, err
     } else {
-        fmt.Println("<-     Seq:", tlv_out.GetByte(TLVType_SequenceNumber))
+        fmt.Println("<-     Seq:", tlv_out.GetByte(gohap.TLVType_SequenceNumber))
         fmt.Println("-------------")
         return tlv_out.BytesBuffer(), nil
     }
@@ -103,16 +105,16 @@ func (c *SetupController) Handle(r io.Reader) (io.Reader, error) {
 // Server -> Client
 // - B: server public key
 // - s: salt
-func (c *SetupController) handlePairStart(tlv_in *TLV8Container) (*TLV8Container, error) {
-    tlv_out := TLV8Container{}
+func (c *SetupController) handlePairStart(tlv_in *gohap.TLV8Container) (*gohap.TLV8Container, error) {
+    tlv_out := gohap.TLV8Container{}
     c.curSeq = SequenceStartRespond
     
-    tlv_out.SetByte(TLVType_SequenceNumber, c.curSeq)
-    tlv_out.SetBytes(TLVType_PublicKey, c.session.publicKey)
-    tlv_out.SetBytes(TLVType_Salt, c.session.salt)
+    tlv_out.SetByte(gohap.TLVType_SequenceNumber, c.curSeq)
+    tlv_out.SetBytes(gohap.TLVType_PublicKey, c.session.publicKey)
+    tlv_out.SetBytes(gohap.TLVType_Salt, c.session.salt)
     
-    fmt.Println("<-     B:", hex.EncodeToString(tlv_out.GetBytes(TLVType_PublicKey)))
-    fmt.Println("<-     s:", hex.EncodeToString(tlv_out.GetBytes(TLVType_Salt)))
+    fmt.Println("<-     B:", hex.EncodeToString(tlv_out.GetBytes(gohap.TLVType_PublicKey)))
+    fmt.Println("<-     s:", hex.EncodeToString(tlv_out.GetBytes(gohap.TLVType_Salt)))
     
     return &tlv_out, nil
 }
@@ -125,13 +127,13 @@ func (c *SetupController) handlePairStart(tlv_in *TLV8Container) (*TLV8Container
 // - M2: proof
 // or
 // - auth error
-func (c *SetupController) handlePairVerify(tlv_in *TLV8Container) (*TLV8Container, error) {
-    tlv_out := TLV8Container{}
+func (c *SetupController) handlePairVerify(tlv_in *gohap.TLV8Container) (*gohap.TLV8Container, error) {
+    tlv_out := gohap.TLV8Container{}
     c.curSeq = SequenceVerifyRespond
     
-    tlv_out.SetByte(TLVType_SequenceNumber, c.curSeq)
+    tlv_out.SetByte(gohap.TLVType_SequenceNumber, c.curSeq)
     
-    cpublicKey := tlv_in.GetBytes(TLVType_PublicKey)
+    cpublicKey := tlv_in.GetBytes(gohap.TLVType_PublicKey)
     fmt.Println("->     A:", hex.EncodeToString(cpublicKey))
     
     err := c.session.SetupSecretKeyFromClientPublicKey(cpublicKey)
@@ -139,14 +141,14 @@ func (c *SetupController) handlePairVerify(tlv_in *TLV8Container) (*TLV8Containe
         return nil, err
     }
     
-    cproof := tlv_in.GetBytes(TLVType_Proof)
+    cproof := tlv_in.GetBytes(gohap.TLVType_Proof)
     fmt.Println("->     M1:", hex.EncodeToString(cproof))
     
     sproof, err := c.session.ProofFromClientProof(cproof)
     if err != nil || len(sproof) == 0 { // proof `M1` is wrong
         fmt.Println("[Failed] Proof M1 is wrong")
         c.reset()
-        tlv_out.SetByte(TLVType_ErrorCode, TLVStatus_AuthError) // return error 2
+        tlv_out.SetByte(gohap.TLVType_ErrorCode, gohap.TLVStatus_AuthError) // return error 2
     } else {
         fmt.Println("[Success] Proof M1 is valid")
         err := c.session.SetupEncryptionKey([]byte("Pair-Setup-Encrypt-Salt"), []byte("Pair-Setup-Encrypt-Info"))
@@ -155,10 +157,10 @@ func (c *SetupController) handlePairVerify(tlv_in *TLV8Container) (*TLV8Containe
         }
         
         // Return proof `M1`
-        tlv_out.SetBytes(TLVType_Proof, sproof)
+        tlv_out.SetBytes(gohap.TLVType_Proof, sproof)
     }
     
-    fmt.Println("<-     M2:", hex.EncodeToString(tlv_out.GetBytes(TLVType_Proof)))
+    fmt.Println("<-     M2:", hex.EncodeToString(tlv_out.GetBytes(gohap.TLVType_Proof)))
     fmt.Println("        S:", hex.EncodeToString(c.session.secretKey))
     fmt.Println("        K:", hex.EncodeToString(c.session.encryptionKey[:]))
     
@@ -175,83 +177,83 @@ func (c *SetupController) handlePairVerify(tlv_in *TLV8Container) (*TLV8Containe
 // 
 // Server -> Client
 // - encrpyted tlv8: accessory LTPK, accessory name, signature (of H2, accessory name, LTPK)
-func (c *SetupController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8Container, error) {
-    tlv_out := TLV8Container{}
+func (c *SetupController) handleKeyExchange(tlv_in *gohap.TLV8Container) (*gohap.TLV8Container, error) {
+    tlv_out := gohap.TLV8Container{}
     
     c.curSeq = SequenceKeyExchangeRepond
     
-    tlv_out.SetByte(TLVType_SequenceNumber, c.curSeq)
+    tlv_out.SetByte(gohap.TLVType_SequenceNumber, c.curSeq)
     
-    data := tlv_in.GetBytes(TLVType_EncryptedData)    
+    data := tlv_in.GetBytes(gohap.TLVType_EncryptedData)    
     message := data[:(len(data) - 16)]
     var mac [16]byte
     copy(mac[:], data[len(message):]) // 16 byte (MAC)
     fmt.Println("->     Message:", hex.EncodeToString(message))
     fmt.Println("->     MAC:", hex.EncodeToString(mac[:]))
     
-    decrypted, err := Chacha20DecryptAndPoly1305Verify(c.session.encryptionKey[:], []byte("PS-Msg05"), message, mac, nil)
+    decrypted, err := gohap.Chacha20DecryptAndPoly1305Verify(c.session.encryptionKey[:], []byte("PS-Msg05"), message, mac, nil)
     
     if err != nil {
         c.reset()
         fmt.Println(err)
-        tlv_out.SetByte(TLVType_ErrorCode, TLVStatus_UnkownError) // return error 1
+        tlv_out.SetByte(gohap.TLVType_ErrorCode, gohap.TLVStatus_UnkownError) // return error 1
     } else {
         decrypted_buffer := bytes.NewBuffer(decrypted)
-        tlv_in, err := ReadTLV8(decrypted_buffer)
+        tlv_in, err := gohap.ReadTLV8(decrypted_buffer)
         if err != nil {
             return nil, err
         }
         
-        username  := tlv_in.GetString(TLVType_Username)
-        ltpk      := tlv_in.GetBytes(TLVType_PublicKey)
-        signature := tlv_in.GetBytes(TLVType_Ed25519Signature)
+        username  := tlv_in.GetString(gohap.TLVType_Username)
+        ltpk      := tlv_in.GetBytes(gohap.TLVType_PublicKey)
+        signature := tlv_in.GetBytes(gohap.TLVType_Ed25519Signature)
         fmt.Println("->     Username:", username)
         fmt.Println("->     LTPK:", hex.EncodeToString(ltpk))
         fmt.Println("->     Signature:", hex.EncodeToString(signature))
         
         // Calculate `H`
-        H, _ := HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
+        H, _ := gohap.HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
         material := make([]byte, 0)
         material = append(material, H[:]...)
         material = append(material, []byte(username)...)
         material = append(material, ltpk...)
         
-        if ValidateED25519Signature(ltpk, material, signature) == false {
+        if gohap.ValidateED25519Signature(ltpk, material, signature) == false {
             fmt.Println("[Failed] ed25519 signature is invalid")
             c.reset()
-            tlv_out.SetByte(TLVType_ErrorCode, TLVStatus_AuthError) // return error 2
+            tlv_out.SetByte(gohap.TLVType_ErrorCode, gohap.TLVStatus_AuthError) // return error 2
         } else {
             fmt.Println("[Success] ed25519 signature is valid")
             // Store client LTPK and name
-            client := NewClient(username, ltpk)
+            client := gohap.NewClient(username, ltpk)
             c.context.SaveClient(client)
             fmt.Printf("[Storage] Stored LTPK '%s' for client '%s'\n", hex.EncodeToString(ltpk), username)
             
             // Send username, LTPK, signature as encrypted message
-            H2, err := HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
+            H2, err := gohap.HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
             material = make([]byte, 0)
             material = append(material, H2[:]...)
             material = append(material, []byte(c.accessory.Name)...)
             material = append(material, c.accessory.PublicKey...)
 
-            signature, err := ED25519Signature(c.accessory.SecretKey, material)
+            signature, err := gohap.ED25519Signature(c.accessory.SecretKey, material)
             if err != nil {
                 return nil, err
             }
             
-            tlvPairKeyExchange := TLV8Container{}
-            tlvPairKeyExchange.SetString(TLVType_Username, c.accessory.Name)
-            tlvPairKeyExchange.SetBytes(TLVType_PublicKey, c.accessory.PublicKey)
-            tlvPairKeyExchange.SetBytes(TLVType_Ed25519Signature, []byte(signature))
+            tlvPairKeyExchange := gohap.TLV8Container{}
+            tlvPairKeyExchange.SetString(gohap.TLVType_Username, c.accessory.Name)
+            tlvPairKeyExchange.SetBytes(gohap.TLVType_PublicKey, c.accessory.PublicKey)
+            tlvPairKeyExchange.SetBytes(gohap.TLVType_Ed25519Signature, []byte(signature))
             
-            fmt.Println("<-     Username:", tlvPairKeyExchange.GetString(TLVType_Username))
-            fmt.Println("<-     LTPK:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TLVType_PublicKey)))
-            fmt.Println("<-     Signature:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TLVType_Ed25519Signature)))
+            fmt.Println("<-     Username:", tlvPairKeyExchange.GetString(gohap.TLVType_Username))
+            fmt.Println("<-     LTPK:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(gohap.TLVType_PublicKey)))
+            fmt.Println("<-     Signature:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(gohap.TLVType_Ed25519Signature)))
             
-            encrypted, mac, _ := Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)    
-            tlv_out.SetByte(TLVType_AuthMethod, 0)
-            tlv_out.SetByte(TLVType_SequenceNumber, SequenceKeyExchangeRequest)
-            tlv_out.SetBytes(TLVType_EncryptedData, append(encrypted, mac[:]...))
+            encrypted, mac, _ := gohap.Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)    
+            tlv_out.SetByte(gohap.TLVType_AuthMethod, 0)
+            tlv_out.SetByte(gohap.TLVType_SequenceNumber, SequenceKeyExchangeRequest)
+            tlv_out.SetBytes(gohap.TLVType_EncryptedData, append(encrypted, mac[:]...))
         }
     }
     

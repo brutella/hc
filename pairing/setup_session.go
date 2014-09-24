@@ -1,6 +1,7 @@
 package gohap
 
 import (
+    "github.com/brutella/gohap"
     "crypto/sha512"
     
     // Do not use because of https://github.com/tadglines/go-pkgs/issues/2
@@ -24,7 +25,7 @@ type PairSetupSession struct {
 func NewPairSetupSession(username string, password string) (*PairSetupSession, error) {
     var err error
     
-    srp, err := srp.NewSRP(SRPGroup, sha512.New, SHA512KeyDerivativeFunction(sha512.New, []byte(username)))
+    srp, err := srp.NewSRP(SRPGroup, sha512.New, KeyDerivativeFuncRFC2945(sha512.New, []byte(username)))
     if err == nil {
         srp.SaltLength = 16
         salt, v, err := srp.ComputeVerifier([]byte(password))
@@ -66,7 +67,7 @@ func (p *PairSetupSession) SetupSecretKeyFromClientPublicKey(key []byte) (error)
 //
 // Only 32 bytes are used from HKDF-SHA512
 func (p *PairSetupSession) SetupEncryptionKey(salt []byte, info []byte) (error) {
-    key, err := HKDF_SHA512(p.secretKey, salt, info)
+    key, err := gohap.HKDF_SHA512(p.secretKey, salt, info)
     if err == nil {
         p.encryptionKey = key
     }

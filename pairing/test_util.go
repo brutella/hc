@@ -1,6 +1,7 @@
 package gohap
 
 import(
+    "github.com/brutella/gohap"
     "crypto/sha512"
     // "github.com/tadglines/go-pkgs/crypto/srp"
     "github.com/theojulienne/go-srp/crypto/srp"
@@ -17,10 +18,10 @@ type HAPPairSetupClient struct {
 
 func NewHAPPairSetupClient(username string, password string) *HAPPairSetupClient {
     srp_username := []byte("Pair-Setup")
-    rp, _ := srp.NewSRP(SRPGroup, sha512.New, SHA512KeyDerivativeFunction(sha512.New, srp_username))
+    rp, _ := srp.NewSRP(SRPGroup, sha512.New, KeyDerivativeFuncRFC2945(sha512.New, srp_username))
     
     client := rp.NewClientSession(srp_username, []byte(password))
-    LTPK, LTSK, _ := ED25519GenerateKey(username)
+    LTPK, LTSK, _ := gohap.ED25519GenerateKey(username)
     
     hap := HAPPairSetupClient{
                 Name: username, 
@@ -43,11 +44,11 @@ type HAPPairVerifyClient struct {
 }
 
 func NewHAPPairVerifyClient(username string, password string) *HAPPairVerifyClient {
-    LTPK, LTSK, _ := ED25519GenerateKey(username)
+    LTPK, LTSK, _ := gohap.ED25519GenerateKey(username)
     
     // Client session keys
-    secretKey := Curve25519_GenerateSecretKey()
-    publicKey := Curve25519_PublicKey(secretKey)
+    secretKey := gohap.Curve25519_GenerateSecretKey()
+    publicKey := gohap.Curve25519_PublicKey(secretKey)
     session := NewPairVerifySession()
     session.publicKey = publicKey
     session.secretKey = secretKey
@@ -66,8 +67,8 @@ func NewHAPPairVerifyClient(username string, password string) *HAPPairVerifyClie
 func (c *HAPPairVerifyClient) GenerateSharedSecret(otherPublicKey []byte) {
     var key [32]byte
     copy(key[:], otherPublicKey)
-    c.Session.sharedKey = Curve25519_SharedSecret(c.Session.secretKey, key)
+    c.Session.sharedKey = gohap.Curve25519_SharedSecret(c.Session.secretKey, key)
     
-    K, _ := HKDF_SHA512(c.Session.sharedKey[:], []byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
+    K, _ := gohap.HKDF_SHA512(c.Session.sharedKey[:], []byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
     c.Session.encryptionKey = K
 }
