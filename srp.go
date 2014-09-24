@@ -1,22 +1,21 @@
 package gohap
 
 import(
-    "crypto/sha512"
-    // "github.com/tadglines/go-pkgs/crypto/srp"
     "github.com/theojulienne/go-srp/crypto/srp"
 )
 
-func SRP6Password(username, password []byte) []byte {
-    // H(U | ":" | P)
-    h := sha512.New()
-    h.Write(username)
-    h.Write([]byte(":"))
-    return h.Sum(password)
-}
-// x = H(s | H(I | ":" | P))
-func SHA512KeyDerivativeFunction(username []byte) srp.KeyDerivationFunc {
+// Main SRP algorithm is described in http://srp.stanford.edu/design.html
+// The HAP uses the SRP-6a Stanford implementation with the following characteristics
+// - x = H(s | H(I | ":" | P)) -> called the key derivate function
+
+const (
+    SRPGroup = "rfc5054.3072" // N (modulo) == 384 byte
+)
+
+// Does x = H(s | H(I | ":" | P)) which is required by the Stanford SRP-6a implementation
+func SHA512KeyDerivativeFunction(h srp.HashFunc, username []byte) srp.KeyDerivationFunc {
 	return func(salt, password []byte) []byte {
-        h := sha512.New()
+        h := h()
         h.Write(username)
         h.Write([]byte(":"))
         h.Write(password)

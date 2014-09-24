@@ -17,7 +17,7 @@ type HAPPairSetupClient struct {
 
 func NewHAPPairSetupClient(username string, password string) *HAPPairSetupClient {
     srp_username := []byte("Pair-Setup")
-    rp, _ := srp.NewSRP("rfc5054.3072", sha512.New, SHA512KeyDerivativeFunction(srp_username))
+    rp, _ := srp.NewSRP(SRPGroup, sha512.New, SHA512KeyDerivativeFunction(sha512.New, srp_username))
     
     client := rp.NewClientSession(srp_username, []byte(password))
     LTPK, LTSK, _ := ED25519GenerateKey(username)
