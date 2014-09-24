@@ -87,9 +87,14 @@ func (c *SetupController) Handle(r io.Reader) (io.Reader, error) {
         return nil, NewErrorf("Cannot handle sequence number %d", seq)
     }
     
-    fmt.Println("<-     Seq:", tlv_out.GetByte(TLVType_SequenceNumber))
-    fmt.Println("-------------")
-    return tlv_out.BytesBuffer(), err
+    if err != nil {
+        fmt.Println("[ERROR]", err)
+        return nil, err
+    } else {
+        fmt.Println("<-     Seq:", tlv_out.GetByte(TLVType_SequenceNumber))
+        fmt.Println("-------------")
+        return tlv_out.BytesBuffer(), nil
+    }
 }
 
 // Client -> Server
@@ -237,10 +242,13 @@ func (c *SetupController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8Contain
             tlvPairKeyExchange := TLV8Container{}
             tlvPairKeyExchange.SetString(TLVType_Username, c.accessory.Name)
             tlvPairKeyExchange.SetBytes(TLVType_PublicKey, c.accessory.PublicKey)
-            tlvPairKeyExchange.SetBytes(TLVType_Proof, []byte(signature))
+            tlvPairKeyExchange.SetBytes(TLVType_Ed25519Signature, []byte(signature))
             
-            var mac [16]byte
-            encrypted, mac, _ := Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), mac, nil)    
+            fmt.Println("<-     Username:", tlvPairKeyExchange.GetString(TLVType_Username))
+            fmt.Println("<-     LTPK:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TLVType_PublicKey)))
+            fmt.Println("<-     Signature:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TLVType_Ed25519Signature)))
+            
+            encrypted, mac, _ := Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)    
             tlv_out.SetByte(TLVType_AuthMethod, 0)
             tlv_out.SetByte(TLVType_SequenceNumber, SequenceKeyExchangeRequest)
             tlv_out.SetBytes(TLVType_EncryptedData, append(encrypted, mac[:]...))

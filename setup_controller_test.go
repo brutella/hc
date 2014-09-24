@@ -4,6 +4,8 @@ import (
     "testing"
     "github.com/stretchr/testify/assert"
     "os"
+    "fmt"
+    "encoding/hex"
 )
 
 func TestPairingIntegration(t *testing.T) {
@@ -82,9 +84,9 @@ func TestPairingIntegration(t *testing.T) {
     
     K, err := HKDF_SHA512(clientSecretKey, []byte("Pair-Setup-Encrypt-Salt"), []byte("Pair-Setup-Encrypt-Info"))
     assert.Nil(t, err)
+    fmt.Println("K:", hex.EncodeToString(K[:]))
     
-    var tag [16]byte // zeros
-    encrypted, tag, err := Chacha20EncryptAndPoly1305Seal(K[:], []byte("PS-Msg05"), tlvPairKeyExchange.BytesBuffer().Bytes(), tag, nil)
+    encrypted, tag, err := Chacha20EncryptAndPoly1305Seal(K[:], []byte("PS-Msg05"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)
     assert.Nil(t, err)
     
     tlvKeyExchangeRequest := TLV8Container{}
@@ -103,4 +105,6 @@ func TestPairingIntegration(t *testing.T) {
     assert.Equal(t, keyVerifyResponse.GetByte(TLVType_SequenceNumber), byte(SequenceKeyExchangeRepond))
     keyVerifyResponseEncrypted := keyVerifyResponse.GetBytes(TLVType_EncryptedData)
     assert.NotNil(t, keyVerifyResponseEncrypted)
+    
+    // TODO verify response, encrpyted data, signature,...
 }  

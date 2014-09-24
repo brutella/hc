@@ -3,22 +3,30 @@ package gohap
 import(
     "encoding/binary"
     "encoding/hex"
-    _"bytes"
-    "github.com/tang0th/go-chacha20"
+    _"crypto/cipher"
+    "github.com/codahale/chacha20"
     "github.com/tonnerre/golang-go.crypto/poly1305"
+    "fmt"
 )
 
 // Decrypts a message with chacha20 and verifies it with poly1305
+// Nonce should be 8 byte
 func Chacha20DecryptAndPoly1305Verify(key, nonce, message []byte, mac [16]byte, add []byte) ([]byte, error) {
-    var chacha20_out = make([]byte, len(message))
-    var poly1305_out [16]byte
-    var poly1305_key [32]byte
-    var chacha20_key_out [64]byte
-    var zeros = make([]byte, 64)
+    
+    chacha20, err := chacha20.NewCipher(key, nonce)
+    if err != nil {
+        panic(err)
+    }
     
     // poly1305 key is chacha20 over 32 zeros
-    chacha20.XORKeyStream(chacha20_key_out[:], zeros, nonce, key)
-    copy(poly1305_key[:], chacha20_key_out[:])
+    var poly1305_key [32]byte
+    var chacha20_key_out = make([]byte, 64)
+    var zeros = make([]byte, 64)
+    chacha20.XORKeyStream(chacha20_key_out, zeros)
+    copy(poly1305_key[:], chacha20_key_out)
+    
+    var chacha20_out = make([]byte, len(message))
+    var poly1305_out [16]byte
     
     // poly1305 byte order
     // - add bytes up to mod 16 (if available)
@@ -45,29 +53,37 @@ func Chacha20DecryptAndPoly1305Verify(key, nonce, message []byte, mac [16]byte, 
         return nil, NewErrorf("MAC incorrect %s", hex.EncodeToString(poly1305_out[:]), hex.EncodeToString(mac[:]))
     }
     
-    chacha20.XORKeyStream(chacha20_out, message, nonce, key)
+    chacha20.XORKeyStream(chacha20_out, message)
+    fmt.Println(hex.EncodeToString(chacha20_out))
     return chacha20_out, nil
 }
 
 // Encrypts the message with chacha20 and seals the message with poly1305
-func Chacha20EncryptAndPoly1305Seal(key, nonce, message []byte, mac [16]byte, add []byte) ([]byte /*encrypted*/, [16]byte /*mac*/, error) {
-    var chacha20_out = make([]byte, len(message))
-    var poly1305_out [16]byte
-    var poly1305_key [32]byte
-    var chacha20_key_out [64]byte
-    var zeros = make([]byte, 64)
+// Nonce should be 8 byte
+func Chacha20EncryptAndPoly1305Seal(key, nonce, message []byte, add []byte) ([]byte /*encrypted*/, [16]byte /*mac*/, error) {
+    
+    chacha20, err := chacha20.NewCipher(key, nonce)
+    if err != nil {
+        panic(err)
+    }
     
     // poly1305 key is chacha20 over 32 zeros
-    chacha20.XORKeyStream(chacha20_key_out[:], zeros, nonce, key)
-    copy(poly1305_key[:], chacha20_key_out[:])
-    chacha20.XORKeyStream(chacha20_out, message, nonce, key)
+    var poly1305_key [32]byte
+    var chacha20_key_out = make([]byte, 64)
+    var zeros = make([]byte, 64)
+    chacha20.XORKeyStream(chacha20_key_out, zeros)
+    copy(poly1305_key[:], chacha20_key_out)
+    
+    var chacha20_out = make([]byte, len(message))
+    var poly1305_out [16]byte    
+    chacha20.XORKeyStream(chacha20_out, message)
     
     poly1305_in := make([]byte, 0)
     if len(add) > 0 {
         poly1305_in = AddBytes(poly1305_in, add, 16)
     }
     
-    poly1305_in = AddBytes(poly1305_in, message, 16)
+    poly1305_in = AddBytes(poly1305_in, chacha20_out, 16)
     add_len := make([]byte, 8)
     message_len := make([]byte, 8)
     binary.LittleEndian.PutUint64(add_len, uint64(len(add)))

@@ -78,13 +78,14 @@ func TestPairVerifyIntegration(t *testing.T) {
     
     material = make([]byte, 0)
     material = append(material, client.Session.PublicKey()...)
+    material = append(material, []byte(client.Name)...)
     material = append(material, serverPublicKey...)
     
     signature, err = ED25519Signature(client.SecretKey, material)
     assert.Nil(t, err)
     tlv_encrypt.SetBytes(TLVType_Ed25519Signature, signature)
     
-    encrypted, mac, _ := Chacha20EncryptAndPoly1305Seal(client.Session.EncryptionKey(), []byte("PV-Msg03"), tlv_encrypt.BytesBuffer().Bytes(), mac, nil)
+    encrypted, mac, _ := Chacha20EncryptAndPoly1305Seal(client.Session.EncryptionKey(), []byte("PV-Msg03"), tlv_encrypt.BytesBuffer().Bytes(), nil)
     
     tlvVerifyFinish.SetBytes(TLVType_EncryptedData, append(encrypted, mac[:]...))
     

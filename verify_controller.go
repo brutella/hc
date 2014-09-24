@@ -112,8 +112,7 @@ func (c *VerifyController) handlePairVerifyStart(tlv_in *TLV8Container) (*TLV8Co
     tlv_encrypt.SetString(TLVType_Username, c.accessory.Name)
     tlv_encrypt.SetBytes(TLVType_Ed25519Signature, signature)
     
-    var mac [16]byte
-    encrypted, mac, _ := Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PV-Msg02"), tlv_encrypt.BytesBuffer().Bytes(), mac, nil)
+    encrypted, mac, _ := Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PV-Msg02"), tlv_encrypt.BytesBuffer().Bytes(), nil)
     
     tlv_out := TLV8Container{}    
     tlv_out.SetByte(TLVType_SequenceNumber, c.curSeq)
@@ -180,6 +179,8 @@ func (c *VerifyController) handlePairVerifyFinish(tlv_in *TLV8Container) (*TLV8C
         
         material := make([]byte, 0)
         material = append(material, c.session.otherPublicKey[:]...)
+        // TODO Report that material does not include username in docs
+        material = append(material, []byte(username)...)
         material = append(material, c.session.publicKey[:]...)
         
         if ValidateED25519Signature(client.PublicKey, material, signature) == false {
