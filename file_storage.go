@@ -16,8 +16,15 @@ type fileStorage struct {
 //
 // Every key-value pair is stored in seperate file
 func NewFileStorage(dir string) (Storage, error) {
-    err := os.MkdirAll(dir, 0666)    
-    return &fileStorage{dir_path: dir}, err
+    path, err := filepath.Abs(dir)
+    if err != nil {
+        return nil, err
+    }
+    
+    // Why 0777?
+    // Read http://unix.stackexchange.com/questions/21251/why-do-directories-need-the-executable-x-permission-to-be-opened
+    err = os.MkdirAll(path, 0777)
+    return &fileStorage{dir_path: path}, err
 }
 
 // Sets the value for a specific key
@@ -65,11 +72,11 @@ func (f *fileStorage) Delete(key string) error {
 
 // Private
 func (f *fileStorage) dir() string {
-    return filepath.Dir(f.dir_path)
+    return f.dir_path
 }
 
 func (f *fileStorage) filePathToFile(file string) string {
-    return filepath.Join([]string{f.dir(), file}...)
+    return filepath.Join(f.dir(), file)
 }
 
 func (f *fileStorage) fileForWrite(key string) (*os.File, error) {

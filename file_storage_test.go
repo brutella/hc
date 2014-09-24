@@ -22,19 +22,30 @@ func TestFileStorage(t *testing.T) {
     assert.Nil(t, storage.Delete("test"))
 }
 
+// func TestCreatingDirectory (t *testing.T) {
+//     dir := filepath.Join(".", "testing")
+//     assert.Nil(t, os.MkdirAll(dir, 0666))
+// }
+
 func TestStoreInSubdirectory (t *testing.T){
-    storage, err := NewFileStorage(filepath.Join(os.TempDir(), "hap"))
+    dir, _ := filepath.Abs(filepath.Join(os.TempDir(), "hap"))
+    storage, err := NewFileStorage(dir)
     assert.Nil(t, err)
     assert.NotNil(t, storage)
-    
+        
     err = storage.Set("test", []byte("ASDF"))
     assert.Nil(t, err)
     
-    read, err := storage.Get("test")
+    path := filepath.Join(dir, "test")
+    f, err := os.OpenFile(path, os.O_RDONLY, 0776)
     assert.Nil(t, err)
-    assert.Equal(t, read, []byte("ASDF"))
+    assert.NotNil(t, f)
     
-    assert.Nil(t, storage.Delete("test"))
+    defer f.Close()
+    
+    var buffer []byte = make([]byte, 32)
+    n, _ := f.Read(buffer)
+    assert.Equal(t, buffer[:n], []byte("ASDF"))
 }
 
 func TestDeleteUndefined(t *testing.T) {
