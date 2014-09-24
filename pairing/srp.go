@@ -1,4 +1,4 @@
-package gohap
+package hap
 
 import(
     "github.com/theojulienne/go-srp/crypto/srp"

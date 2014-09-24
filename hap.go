@@ -1,4 +1,4 @@
-package gohap
+package hap
 
 const (
     TLVType_AuthMethod       = 0x00 // integer, either 0x00 (uncertified) or 0x01 (MFi compliant)

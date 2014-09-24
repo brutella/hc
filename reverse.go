@@ -1,4 +1,4 @@
-package gohap
+package hap
 
 type ByteSequence []byte
 

@@ -1,7 +1,7 @@
-package gohap
+package hap
 
 import (
-    "github.com/brutella/gohap"
+    "github.com/brutella/hap"
     "crypto/sha512"
     
     // Do not use because of https://github.com/tadglines/go-pkgs/issues/2
@@ -67,7 +67,7 @@ func (p *PairSetupSession) SetupSecretKeyFromClientPublicKey(key []byte) (error)
 //
 // Only 32 bytes are used from HKDF-SHA512
 func (p *PairSetupSession) SetupEncryptionKey(salt []byte, info []byte) (error) {
-    key, err := gohap.HKDF_SHA512(p.secretKey, salt, info)
+    key, err := hap.HKDF_SHA512(p.secretKey, salt, info)
     if err == nil {
         p.encryptionKey = key
     }

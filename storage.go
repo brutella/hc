@@ -1,4 +1,4 @@
-package gohap
+package hap
 
 type Storage interface {
     Set(key string, value []byte) error

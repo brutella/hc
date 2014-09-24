@@ -1,4 +1,4 @@
-package gohap
+package hap
 
 import(
     "crypto/sha512"

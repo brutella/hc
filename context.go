@@ -1,4 +1,4 @@
-package gohap
+package hap
 
 type Context struct {
     storage Storage
