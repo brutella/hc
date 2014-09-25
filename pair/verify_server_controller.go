@@ -186,6 +186,8 @@ func (c *VerifyServerController) handlePairVerifyFinish(tlv_in *hap.TLV8Containe
             tlv_out.SetByte(hap.TLVType_ErrorCode, hap.TLVStatus_UnkownPeerError) // return error 4
         } else {
             fmt.Println("[Success] signature is valid")
+            // Verification is done now generation incoming and outgoing encryption keys
+            c.context.GenerateEncryptionKeysWithSharedkey(c.session.sharedKey)
         }
     }
     
