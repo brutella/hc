@@ -145,7 +145,9 @@ func (c *VerifyClientController) handlePairVerifyRespond(tlv_in *hap.TLV8Contain
     material = append(material, username...)
     material = append(material, c.session.publicKey[:]...)
     
-    if hap.ValidateED25519Signature(c.accessory.PublicKey, material, signature) == false {
+    LTPK := c.context.PublicKeyForAccessory(c.accessory)
+    
+    if hap.ValidateED25519Signature(LTPK, material, signature) == false {
         return nil, hap.NewErrorf("Could not validate signature")
     }
     

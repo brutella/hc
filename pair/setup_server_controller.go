@@ -218,21 +218,24 @@ func (c *SetupServerController) handleKeyExchange(tlv_in *hap.TLV8Container) (*h
             c.context.SaveClient(client)
             fmt.Printf("[Storage] Stored LTPK '%s' for client '%s'\n", hex.EncodeToString(ltpk), username)
             
+            LTPK := c.context.PublicKeyForAccessory(c.accessory)
+            LTSK := c.context.SecretKeyForAccessory(c.accessory)
+            
             // Send username, LTPK, signature as encrypted message
             H2, err := hap.HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
             material = make([]byte, 0)
             material = append(material, H2[:]...)
             material = append(material, []byte(c.accessory.Name)...)
-            material = append(material, c.accessory.PublicKey...)
+            material = append(material, LTPK...)
 
-            signature, err := hap.ED25519Signature(c.accessory.SecretKey, material)
+            signature, err := hap.ED25519Signature(LTSK, material)
             if err != nil {
                 return nil, err
             }
             
             tlvPairKeyExchange := hap.TLV8Container{}
             tlvPairKeyExchange.SetString(hap.TLVType_Username, c.accessory.Name)
-            tlvPairKeyExchange.SetBytes(hap.TLVType_PublicKey, c.accessory.PublicKey)
+            tlvPairKeyExchange.SetBytes(hap.TLVType_PublicKey, LTPK)
             tlvPairKeyExchange.SetBytes(hap.TLVType_Ed25519Signature, []byte(signature))
             
             fmt.Println("<-     Username:", tlvPairKeyExchange.GetString(hap.TLVType_Username))

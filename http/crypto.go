@@ -32,6 +32,7 @@ func Encrypt(r io.Reader, context *hap.Context) (io.Reader, error){
     return &b, nil
 }
 
+// Decrypts the whole thing again
 func Decrypt(r io.Reader, context *hap.Context) (io.Reader, error){
     var b bytes.Buffer
     for {

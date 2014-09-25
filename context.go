@@ -36,6 +36,14 @@ func (c *Context) SaveClient(client *Client) {
     c.storage.Set(client.Name + ".ltpk", client.PublicKey)
 }
 
+func (c *Context) PublicKeyForAccessory(a *Accessory) []byte {
+    return a.publicKey
+}
+
+func (c *Context) SecretKeyForAccessory(a *Accessory) []byte {
+    return a.secretKey
+}
+
 func (c *Context) GenerateEncryptionKeysWithSharedkey(sharedKey [32]byte) error {
     c.SharedKey = sharedKey
     salt := []byte("Control-Salt")

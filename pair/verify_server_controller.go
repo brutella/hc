@@ -98,11 +98,13 @@ func (c *VerifyServerController) handlePairVerifyStart(tlv_in *hap.TLV8Container
     c.session.GenerateSharedKeyWithOtherPublicKey(otherPublicKey)
     c.session.SetupEncryptionKey([]byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
     
+    LTSK := c.context.SecretKeyForAccessory(c.accessory)
+    
     material := make([]byte, 0)
     material = append(material, c.session.publicKey[:]...)
     material = append(material, c.accessory.Name...)
     material = append(material, clientPublicKey...)
-    signature, _ := hap.ED25519Signature(c.accessory.SecretKey, material)
+    signature, _ := hap.ED25519Signature(LTSK, material)
     
     // Encrypt
     tlv_encrypt := hap.TLV8Container{}
