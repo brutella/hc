@@ -2,12 +2,13 @@ package pair
 
 import (
     "github.com/brutella/hap"
-    
+
     "testing"
     "github.com/stretchr/testify/assert"
     "os"
 )
 
+// Tests the pairing setup
 func TestPairingIntegration(t *testing.T) {
     accessory, err := hap.NewAccessory("HAP Test", "123-45-678")
     assert.Nil(t, err)

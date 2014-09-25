@@ -7,6 +7,7 @@ import (
     "os"
 )
 
+// Tests the pairing key verification
 func TestPairVerifyIntegration(t *testing.T) {
     accessory, err := hap.NewAccessory("HAP Test", "123-45-678")
     assert.Nil(t, err)
@@ -19,7 +20,7 @@ func TestPairVerifyIntegration(t *testing.T) {
     
     name := "UnitTest"
     client_controller := NewVerifyClientController(context, accessory, name)
-    context.SaveClient(hap.NewClient(name,client_controller.LTPK)) // make LTPK available for server
+    context.SaveClient(hap.NewClient(name,client_controller.LTPK)) // make LTPK available to server
     
     tlvVerifyStartRequest := client_controller.InitialKeyVerifyRequest()
     // 1) C -> S
