@@ -1,7 +1,7 @@
-package hap
+package model
 
 type Service struct {
     Id int `json:"iid"`
-    Type UUID `json:"type"`
+    Type ServiceType `json:"type"`
     Characteristics []Characteristic `json:"characteristics"`
 }
