@@ -4,7 +4,7 @@ import(
 )
 
 type Accessory struct {
-    UUId int `json:"aid"`
+    Id int `json:"aid"`
     Services []*Service `json:"services"`
     
     idCount int
