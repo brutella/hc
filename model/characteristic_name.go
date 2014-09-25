@@ -1,13 +1,13 @@
 package model
 
 type NameCharacteristic struct {
-    StringCharacteristic
+    *StringCharacteristic
 }
 
-func NewNameCharacteristic(name string) NameCharacteristic {
+func NewNameCharacteristic(name string) *NameCharacteristic {
     str := NewStringCharacteristic(name)
     str.Type = CharTypeName
     str.Permissions = []string{PermRead}
     
-    return NameCharacteristic{str}
+    return &NameCharacteristic{str}
 }

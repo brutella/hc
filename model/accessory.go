@@ -1,18 +1,29 @@
 package model
 
+import(
+)
+
 type Accessory struct {
     UUId int `json:"aid"`
-    Services []Service `json:"services"`
+    Services []*Service `json:"services"`
     
-    Characteristics []Characteristic
+    idCount int
 }
 
-type AccessoryInfo struct {
-    Accessory
+func NewAccessory() *Accessory {
+    return &Accessory{
+        idCount: 1,
+    }
 }
 
-// func NewAccessoryInfo(name string) (*AccessoryInfo, error){
-//     a := Accessory{Name: name, Password: password}
-//
-//     return &a, err
-// }
+func (a *Accessory) AddService(s *Service) {
+    s.Id = a.idCount
+    a.idCount += 1
+    
+    for _, c := range s.Characteristics {
+        c.Id = a.idCount
+        a.idCount += 1
+    }
+    
+    a.Services = append(a.Services, s)
+}

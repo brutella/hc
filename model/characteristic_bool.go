@@ -1,14 +1,14 @@
 package model
 
 type BoolCharacteristic struct {
-    NumberCharacteristic
+    *NumberCharacteristic
 }
 
-func NewBoolCharacteristic(value bool) BoolCharacteristic {
+func NewBoolCharacteristic(value bool) *BoolCharacteristic {
     integer := 0
     if value == true {
         integer = 1
     }
     number := NewNumberCharacteristic(integer, 0, 0, 0, FormatBool, )
-    return BoolCharacteristic{number}
+    return &BoolCharacteristic{number}
 }

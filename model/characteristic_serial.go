@@ -1,13 +1,13 @@
 package model
 
 type SerialNumberCharacteristic struct {
-    StringCharacteristic
+    *StringCharacteristic
 }
 
-func NewSerialNumberCharacteristic(serial string) SerialNumberCharacteristic {
+func NewSerialNumberCharacteristic(serial string) *SerialNumberCharacteristic {
     str := NewStringCharacteristic(serial)
     str.Type = CharTypeSerialNumber
     str.Permissions = []string{PermRead}
     
-    return SerialNumberCharacteristic{str}
+    return &SerialNumberCharacteristic{str}
 }
