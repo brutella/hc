@@ -82,7 +82,7 @@ func (c *VerifyServerController) Handle(r io.Reader) (io.Reader, error) {
 
 // Server -> Client
 // - B: server public key
-// - signature: from server publickey, server name, client public key
+// - signature: from server session public key, server name, client session public key
 func (c *VerifyServerController) handlePairVerifyStart(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
     c.curSeq = VerifyStartRespond
     
@@ -129,12 +129,11 @@ func (c *VerifyServerController) handlePairVerifyStart(tlv_in *hap.TLV8Container
 // Client -> Server
 // - Encrypted tlv8: username and signature
 //
-// Server
-// - Decrypt tlv8 and validate signature
+// Server enrypty tlv8 and validates signature
 
 // Server -> Client
 // - only sequence number
-// - error code (on error)
+// - error code (optional)
 func (c *VerifyServerController) handlePairVerifyFinish(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
     c.curSeq = VerifyFinishRespond
     

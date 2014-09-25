@@ -91,10 +91,14 @@ func (c *VerifyClientController) InitialKeyVerifyRequest() (io.Reader) {
 
 // Server -> Client
 // - B: server public key
-// - signature: from server publickey, server name, client public key
+// - encrypted message
+//      - username
+//      - signature: from server session public key, server name, client session public key
 //
 // Client -> Server
-// - 
+// - encrypted message
+//      - username
+//      - signature: from client session public key, server name, server session public key,
 func (c *VerifyClientController) handlePairVerifyRespond(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {        
     serverPublicKey := tlv_in.GetBytes(hap.TLVType_PublicKey)
     if len(serverPublicKey) != 32 {
@@ -171,15 +175,8 @@ func (c *VerifyClientController) handlePairVerifyRespond(tlv_in *hap.TLV8Contain
     return &tlv_out, nil
 }
 
-// Client -> Server
-// - Encrypted tlv8: username and signature
-//
-// Server
-// - Decrypt tlv8 and validate signature
-
 // Server -> Client
-// - only sequence number
-// - error code (on error)
+// - only error ocde (optional)
 func (c *VerifyClientController) handlePairVerifyFinishRespond(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {    
     err_code := tlv_in.GetByte(hap.TLVStatus_NoError)
     if err_code != 0x00 {

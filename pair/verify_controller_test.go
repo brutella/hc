@@ -28,10 +28,10 @@ func TestPairVerifyIntegration(t *testing.T) {
     // 2) S -> C
     tlvFinishRequest, err := client_controller.Handle(tlvVerifyStartRespond)
     assert.Nil(t, err)
-    
+    // 3) C -> S
     tlvFinishRespond, err := controller.Handle(tlvFinishRequest)
     assert.Nil(t, err)
-    
+    // 4) S -> C 
     response, err := client_controller.Handle(tlvFinishRespond)
     assert.Nil(t, err)
     assert.Nil(t, response)
