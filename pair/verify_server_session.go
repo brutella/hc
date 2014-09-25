@@ -4,7 +4,7 @@ import(
     "github.com/brutella/hap"
 )
 
-type PairVerifySession struct {
+type VerifyServerSession struct {
     otherPublicKey [32]byte
     publicKey [32]byte
     secretKey [32]byte
@@ -12,13 +12,13 @@ type PairVerifySession struct {
     encryptionKey [32]byte
 }
 
-func NewPairVerifySession() (*PairVerifySession) {
-    return &PairVerifySession{}
+func NewVerifyServerSession() (*VerifyServerSession) {
+    return &VerifyServerSession{}
 }
 
 // Generate Curve25519 public, secret and shared key for a specified other public key
 // The other public key is also stored for further use in `otherPublicKey` property
-func (s *PairVerifySession) GenerateKeysWithOtherPublicKey(otherPublicKey [32]byte) {
+func (s *VerifyServerSession) GenerateKeysWithOtherPublicKey(otherPublicKey [32]byte) {
     secretKey := hap.Curve25519_GenerateSecretKey()
     publicKey := hap.Curve25519_PublicKey(secretKey)
     sharedKey := hap.Curve25519_SharedSecret(secretKey, otherPublicKey)
@@ -29,10 +29,10 @@ func (s *PairVerifySession) GenerateKeysWithOtherPublicKey(otherPublicKey [32]by
     s.sharedKey = sharedKey
 }
 
-func (s *PairVerifySession) PublicKey() []byte {
+func (s *VerifyServerSession) PublicKey() []byte {
     return s.publicKey[:]
 }
 
-func (s *PairVerifySession) EncryptionKey() []byte {
+func (s *VerifyServerSession) EncryptionKey() []byte {
     return s.encryptionKey[:]
 }

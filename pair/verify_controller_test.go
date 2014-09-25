@@ -15,7 +15,7 @@ func TestPairVerifyIntegration(t *testing.T) {
     storage, err := hap.NewFileStorage(os.TempDir())
     assert.Nil(t, err)
     context := hap.NewContext(storage)
-    controller, err := NewVerifyController(context, accessory)
+    controller, err := NewVerifyServerController(context, accessory)
     assert.Nil(t, err)
     
     client := NewHAPPairVerifyClient("Unit Test", accessory.Password)

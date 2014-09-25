@@ -39,7 +39,7 @@ type HAPPairVerifyClient struct {
     Password string
     PublicKey []byte
     SecretKey []byte
-    Session *PairVerifySession
+    Session *VerifyServerSession
 }
 
 func NewHAPPairVerifyClient(username string, password string) *HAPPairVerifyClient {
@@ -48,7 +48,7 @@ func NewHAPPairVerifyClient(username string, password string) *HAPPairVerifyClie
     // Client session keys
     secretKey := hap.Curve25519_GenerateSecretKey()
     publicKey := hap.Curve25519_PublicKey(secretKey)
-    session := NewPairVerifySession()
+    session := NewVerifyServerSession()
     session.publicKey = publicKey
     session.secretKey = secretKey
     

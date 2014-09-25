@@ -18,21 +18,21 @@ const (
     SequenceKeyExchangeRepond  = 0x06
 )
 
-type SetupController struct {
+type SetupServerController struct {
     context *hap.Context
     accessory *hap.Accessory
-    session *PairSetupSession
+    session *SetupServerSession
     curSeq byte
 }
 
-func NewSetupController(context *hap.Context, accessory *hap.Accessory) (*SetupController, error) {
+func NewSetupServerController(context *hap.Context, accessory *hap.Accessory) (*SetupServerController, error) {
     
-    session, err := NewPairSetupSession("Pair-Setup", accessory.Password)
+    session, err := NewSetupServerSession("Pair-Setup", accessory.Password)
     if err != nil {
         return nil, err
     }
     
-    controller := SetupController{
+    controller := SetupServerController{
                                     context: context,
                                     accessory: accessory,
                                     session: session,
@@ -42,7 +42,7 @@ func NewSetupController(context *hap.Context, accessory *hap.Accessory) (*SetupC
     return &controller, nil
 }
 
-func (c *SetupController) Handle(r io.Reader) (io.Reader, error) {
+func (c *SetupServerController) Handle(r io.Reader) (io.Reader, error) {
     var tlv_out *hap.TLV8Container
     var err error
     
@@ -104,7 +104,7 @@ func (c *SetupController) Handle(r io.Reader) (io.Reader, error) {
 // Server -> Client
 // - B: server public key
 // - s: salt
-func (c *SetupController) handlePairStart(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
+func (c *SetupServerController) handlePairStart(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
     tlv_out := hap.TLV8Container{}
     c.curSeq = SequenceStartRespond
     
@@ -126,7 +126,7 @@ func (c *SetupController) handlePairStart(tlv_in *hap.TLV8Container) (*hap.TLV8C
 // - M2: proof
 // or
 // - auth error
-func (c *SetupController) handlePairVerify(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
+func (c *SetupServerController) handlePairVerify(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
     tlv_out := hap.TLV8Container{}
     c.curSeq = SequenceVerifyRespond
     
@@ -176,7 +176,7 @@ func (c *SetupController) handlePairVerify(tlv_in *hap.TLV8Container) (*hap.TLV8
 // 
 // Server -> Client
 // - encrpyted tlv8: accessory LTPK, accessory name, signature (of H2, accessory name, LTPK)
-func (c *SetupController) handleKeyExchange(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
+func (c *SetupServerController) handleKeyExchange(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
     tlv_out := hap.TLV8Container{}
     
     c.curSeq = SequenceKeyExchangeRepond
@@ -259,7 +259,7 @@ func (c *SetupController) handleKeyExchange(tlv_in *hap.TLV8Container) (*hap.TLV
     return &tlv_out, nil
 }
 
-func (c *SetupController) reset() {
+func (c *SetupServerController) reset() {
     c.curSeq = SequenceWaitingForRequest
     // TODO: reset session
 }

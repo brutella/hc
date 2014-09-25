@@ -17,7 +17,7 @@ func TestPairingIntegration(t *testing.T) {
     storage, err := hap.NewFileStorage(os.TempDir())
     assert.Nil(t, err)
     context := hap.NewContext(storage)
-    controller, err := NewSetupController(context, accessory)
+    controller, err := NewSetupServerController(context, accessory)
     assert.Nil(t, err)
     
     tlvPairStart := hap.TLV8Container{}

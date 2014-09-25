@@ -16,25 +16,25 @@ const (
     VerifyFinishRespond = 0x04
 )
 
-type VerifyController struct {
+type VerifyServerController struct {
     context *hap.Context
     accessory *hap.Accessory
-    session *PairVerifySession
+    session *VerifyServerSession
     curSeq byte
 }
 
-func NewVerifyController(context *hap.Context, accessory *hap.Accessory) (*VerifyController, error) {    
-    controller := VerifyController{
+func NewVerifyServerController(context *hap.Context, accessory *hap.Accessory) (*VerifyServerController, error) {    
+    controller := VerifyServerController{
                                     context: context,
                                     accessory: accessory,
-                                    session: NewPairVerifySession(),
+                                    session: NewVerifyServerSession(),
                                     curSeq: WaitingForRequest,
                                 }
     
     return &controller, nil
 }
 
-func (c *VerifyController) Handle(r io.Reader) (io.Reader, error) {
+func (c *VerifyServerController) Handle(r io.Reader) (io.Reader, error) {
     var tlv_out *hap.TLV8Container
     var err error
     
@@ -91,7 +91,7 @@ func (c *VerifyController) Handle(r io.Reader) (io.Reader, error) {
 // Server -> Client
 // - B: server public key
 // - signature: from server publickey, server name, client public key
-func (c *VerifyController) handlePairVerifyStart(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
+func (c *VerifyServerController) handlePairVerifyStart(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
     c.curSeq = VerifyStartRespond
     
     clientPublicKey := tlv_in.GetBytes(hap.TLVType_PublicKey)
@@ -143,7 +143,7 @@ func (c *VerifyController) handlePairVerifyStart(tlv_in *hap.TLV8Container) (*ha
 // Server -> Client
 // - only sequence number
 // - error code (on error)
-func (c *VerifyController) handlePairVerifyFinish(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
+func (c *VerifyServerController) handlePairVerifyFinish(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
     c.curSeq = VerifyFinishRespond
     
     data := tlv_in.GetBytes(hap.TLVType_EncryptedData)
@@ -201,6 +201,6 @@ func (c *VerifyController) handlePairVerifyFinish(tlv_in *hap.TLV8Container) (*h
     return &tlv_out, nil
 }
 
-func (c *VerifyController) reset() {
+func (c *VerifyServerController) reset() {
     c.curSeq = WaitingForRequest
 }
