@@ -12,14 +12,16 @@ import(
 type SetupClientController struct {
     context *hap.Context
     accessory *hap.Accessory
+    username string
     session *SetupClientSession
 }
 
-func NewSetupClientController(context *hap.Context, accessory *hap.Accessory) (*SetupClientController) {
+func NewSetupClientController(context *hap.Context, accessory *hap.Accessory, username string) (*SetupClientController) {
     
     session := NewSetupClientSession("Pair-Setup", accessory.Password)
     
     controller := SetupClientController{
+                                    username: username,
                                     context: context,
                                     accessory: accessory,
                                     session: session,
@@ -159,7 +161,7 @@ func (c *SetupClientController) handlePairVerifyRespond(tlv_in *hap.TLV8Containe
     H, err := hap.HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
     material := make([]byte, 0)
     material = append(material, H[:]...)
-    material = append(material, c.session.Name...)
+    material = append(material, c.username...)
     material = append(material, c.session.LTPK...)
     
     signature, err := hap.ED25519Signature(c.session.LTSK, material)
@@ -168,7 +170,7 @@ func (c *SetupClientController) handlePairVerifyRespond(tlv_in *hap.TLV8Containe
     }
     
     tlvPairKeyExchange := hap.TLV8Container{}
-    tlvPairKeyExchange.SetBytes(hap.TLVType_Username, c.session.Name)
+    tlvPairKeyExchange.SetString(hap.TLVType_Username, c.username)
     tlvPairKeyExchange.SetBytes(hap.TLVType_PublicKey, []byte(c.session.LTPK))
     tlvPairKeyExchange.SetBytes(hap.TLVType_Ed25519Signature, []byte(signature))
     

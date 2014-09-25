@@ -18,7 +18,7 @@ func TestPairingIntegration(t *testing.T) {
     controller, err := NewSetupServerController(context, accessory)
     assert.Nil(t, err)
     
-    client_controller := NewSetupClientController(context, accessory)
+    client_controller := NewSetupClientController(context, accessory, "HomeKit Client")
     pairStartRequest := client_controller.InitialPairingRequest()
     
     // 1) C -> S

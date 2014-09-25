@@ -91,19 +91,18 @@ func (c *VerifyServerController) handlePairVerifyStart(tlv_in *hap.TLV8Container
     if len(clientPublicKey) != 32 {
         return nil, hap.NewErrorf("Invalid client public key size %d", len(clientPublicKey))
     }
+    
     var otherPublicKey [32]byte
     copy(otherPublicKey[:], clientPublicKey)
     
-    c.session.GenerateKeysWithOtherPublicKey(otherPublicKey)
+    c.session.GenerateSharedKeyWithOtherPublicKey(otherPublicKey)
+    c.session.SetupEncryptionKey([]byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
     
     material := make([]byte, 0)
     material = append(material, c.session.publicKey[:]...)
     material = append(material, c.accessory.Name...)
     material = append(material, clientPublicKey...)
     signature, _ := hap.ED25519Signature(c.accessory.SecretKey, material)
-    
-    K, _ := hap.HKDF_SHA512(c.session.sharedKey[:], []byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
-    c.session.encryptionKey = K
     
     // Encrypt
     tlv_encrypt := hap.TLV8Container{}
@@ -117,9 +116,10 @@ func (c *VerifyServerController) handlePairVerifyStart(tlv_in *hap.TLV8Container
     tlv_out.SetBytes(hap.TLVType_PublicKey, c.session.publicKey[:])
     tlv_out.SetBytes(hap.TLVType_EncryptedData, append(encrypted, mac[:]...))
     
-    fmt.Println("       K:", hex.EncodeToString(K[:]))
+    fmt.Println("       K:", hex.EncodeToString(c.session.encryptionKey[:]))
     fmt.Println("       B:", hex.EncodeToString(c.session.publicKey[:]))
     fmt.Println("       S:", hex.EncodeToString(c.session.secretKey[:]))
+    fmt.Println("  Shared:", hex.EncodeToString(c.session.sharedKey[:]))
     
     fmt.Println("<-     B:", hex.EncodeToString(tlv_out.GetBytes(hap.TLVType_PublicKey)))
     
@@ -182,11 +182,11 @@ func (c *VerifyServerController) handlePairVerifyFinish(tlv_in *hap.TLV8Containe
         material = append(material, c.session.publicKey[:]...)
         
         if hap.ValidateED25519Signature(client.PublicKey, material, signature) == false {
-            fmt.Println("[Failed] ed25519 signature is invalid")
+            fmt.Println("[Failed] signature is invalid")
             c.reset()
             tlv_out.SetByte(hap.TLVType_ErrorCode, hap.TLVStatus_UnkownPeerError) // return error 4
         } else {
-            fmt.Println("[Success] ed25519 signature is valid")
+            fmt.Println("[Success] signature is valid")
         }
     }
     
