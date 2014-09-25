@@ -8,16 +8,6 @@ import(
     "bytes"
 )
 
-const (
-    SequenceWaitingForRequest  = 0x00
-    SequenceStartRequest       = 0x01
-    SequenceStartRespond       = 0x02
-    SequenceVerifyRequest      = 0x03
-    SequenceVerifyRespond      = 0x04
-    SequenceKeyExchangeRequest = 0x05
-    SequenceKeyExchangeRepond  = 0x06
-)
-
 type SetupServerController struct {
     context *hap.Context
     accessory *hap.Accessory
@@ -36,7 +26,7 @@ func NewSetupServerController(context *hap.Context, accessory *hap.Accessory) (*
                                     context: context,
                                     accessory: accessory,
                                     session: session,
-                                    curSeq: SequenceWaitingForRequest,
+                                    curSeq: WaitingForRequest,
                                 }
     
     return &controller, nil
@@ -63,22 +53,22 @@ func (c *SetupServerController) Handle(r io.Reader) (io.Reader, error) {
     fmt.Println("->     Seq:", seq)
     
     switch seq {
-    case SequenceStartRequest:
-        if c.curSeq != SequenceWaitingForRequest {
+    case PairStartRequest:
+        if c.curSeq != WaitingForRequest {
             c.reset()
             return nil, hap.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
         tlv_out, err = c.handlePairStart(tlv_in)
-    case SequenceVerifyRequest:
-        if c.curSeq != SequenceStartRespond {
+    case PairVerifyRequest:
+        if c.curSeq != PairStartRespond {
             c.reset()
             return nil, hap.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
         tlv_out, err = c.handlePairVerify(tlv_in)
-    case SequenceKeyExchangeRequest:        
-        if c.curSeq != SequenceVerifyRespond {
+    case PairKeyExchangeRequest:        
+        if c.curSeq != PairVerifyRespond {
             c.reset()
             return nil, hap.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
@@ -106,7 +96,7 @@ func (c *SetupServerController) Handle(r io.Reader) (io.Reader, error) {
 // - s: salt
 func (c *SetupServerController) handlePairStart(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
     tlv_out := hap.TLV8Container{}
-    c.curSeq = SequenceStartRespond
+    c.curSeq = PairStartRespond
     
     tlv_out.SetByte(hap.TLVType_SequenceNumber, c.curSeq)
     tlv_out.SetBytes(hap.TLVType_PublicKey, c.session.publicKey)
@@ -128,7 +118,7 @@ func (c *SetupServerController) handlePairStart(tlv_in *hap.TLV8Container) (*hap
 // - auth error
 func (c *SetupServerController) handlePairVerify(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
     tlv_out := hap.TLV8Container{}
-    c.curSeq = SequenceVerifyRespond
+    c.curSeq = PairVerifyRespond
     
     tlv_out.SetByte(hap.TLVType_SequenceNumber, c.curSeq)
     
@@ -179,7 +169,7 @@ func (c *SetupServerController) handlePairVerify(tlv_in *hap.TLV8Container) (*ha
 func (c *SetupServerController) handleKeyExchange(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
     tlv_out := hap.TLV8Container{}
     
-    c.curSeq = SequenceKeyExchangeRepond
+    c.curSeq = PairKeyExchangeRespond
     
     tlv_out.SetByte(hap.TLVType_SequenceNumber, c.curSeq)
     
@@ -251,7 +241,7 @@ func (c *SetupServerController) handleKeyExchange(tlv_in *hap.TLV8Container) (*h
             
             encrypted, mac, _ := hap.Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)    
             tlv_out.SetByte(hap.TLVType_AuthMethod, 0)
-            tlv_out.SetByte(hap.TLVType_SequenceNumber, SequenceKeyExchangeRequest)
+            tlv_out.SetByte(hap.TLVType_SequenceNumber, PairKeyExchangeRequest)
             tlv_out.SetBytes(hap.TLVType_EncryptedData, append(encrypted, mac[:]...))
         }
     }
@@ -260,6 +250,6 @@ func (c *SetupServerController) handleKeyExchange(tlv_in *hap.TLV8Container) (*h
 }
 
 func (c *SetupServerController) reset() {
-    c.curSeq = SequenceWaitingForRequest
+    c.curSeq = WaitingForRequest
     // TODO: reset session
 }

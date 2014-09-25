@@ -8,18 +8,10 @@ import(
     "bytes"
 )
 
-const (
-    WaitingForRequest   = 0x00
-    VerifyStartRequest  = 0x01
-    VerifyStartRespond  = 0x02
-    VerifyFinishRequest = 0x03
-    VerifyFinishRespond = 0x04
-)
-
 type VerifyServerController struct {
     context *hap.Context
     accessory *hap.Accessory
-    session *VerifyServerSession
+    session *VerifySession
     curSeq byte
 }
 
@@ -27,7 +19,7 @@ func NewVerifyServerController(context *hap.Context, accessory *hap.Accessory) (
     controller := VerifyServerController{
                                     context: context,
                                     accessory: accessory,
-                                    session: NewVerifyServerSession(),
+                                    session: NewVerifySession(),
                                     curSeq: WaitingForRequest,
                                 }
     

@@ -2,44 +2,14 @@ package pair
 
 import(
     "github.com/brutella/hap"
-    "crypto/sha512"
-    "github.com/tadglines/go-pkgs/crypto/srp"
 )
-
-type HAPPairSetupClient struct {
-    Name string
-    Password string
-    PublicKey []byte
-    SecretKey []byte
-    srp *srp.SRP
-    Session *srp.ClientSession
-}
-
-func NewHAPPairSetupClient(username string, password string) *HAPPairSetupClient {
-    srp_username := []byte("Pair-Setup")
-    rp, _ := srp.NewSRP(SRPGroup, sha512.New, KeyDerivativeFuncRFC2945(sha512.New, srp_username))
-    
-    client := rp.NewClientSession(srp_username, []byte(password))
-    LTPK, LTSK, _ := hap.ED25519GenerateKey(username)
-    
-    hap := HAPPairSetupClient{
-                Name: username, 
-                Password: password, 
-                PublicKey: LTPK, 
-                SecretKey: LTSK, 
-                srp: rp, 
-                Session: client,
-            }
-            
-    return &hap
-}
 
 type HAPPairVerifyClient struct {
     Name string
     Password string
     PublicKey []byte
     SecretKey []byte
-    Session *VerifyServerSession
+    Session *VerifySession
 }
 
 func NewHAPPairVerifyClient(username string, password string) *HAPPairVerifyClient {
@@ -48,7 +18,7 @@ func NewHAPPairVerifyClient(username string, password string) *HAPPairVerifyClie
     // Client session keys
     secretKey := hap.Curve25519_GenerateSecretKey()
     publicKey := hap.Curve25519_PublicKey(secretKey)
-    session := NewVerifyServerSession()
+    session := NewVerifySession()
     session.publicKey = publicKey
     session.secretKey = secretKey
     
