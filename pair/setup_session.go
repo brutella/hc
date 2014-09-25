@@ -1,14 +1,14 @@
-package hap
+package pair
 
 import (
     "github.com/brutella/hap"
     "crypto/sha512"
     
     // Do not use because of https://github.com/tadglines/go-pkgs/issues/2
-    // "github.com/tadglines/go-pkgs/crypto/srp"
+    "github.com/tadglines/go-pkgs/crypto/srp"
     
     // This is actually a fork of the SRP library above
-    "github.com/theojulienne/go-srp/crypto/srp"
+    // "github.com/theojulienne/go-srp/crypto/srp"
     
     "errors"
 )

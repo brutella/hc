@@ -1,4 +1,4 @@
-package hap
+package pair
 
 import(
     "github.com/brutella/hap"
@@ -72,9 +72,14 @@ func (c *VerifyController) Handle(r io.Reader) (io.Reader, error) {
         return nil, hap.NewErrorf("Cannot handle sequence number %d", seq)
     }
     
-    fmt.Println("<-     Seq:", tlv_out.GetByte(hap.TLVType_SequenceNumber))
-    fmt.Println("-------------")
-    return tlv_out.BytesBuffer(), err
+    if err != nil {
+        fmt.Println("[ERROR]", err)
+        return nil, err
+    } else {
+        fmt.Println("<-     Seq:", tlv_out.GetByte(hap.TLVType_SequenceNumber))
+        fmt.Println("-------------")
+        return tlv_out.BytesBuffer(), nil
+    }
 }
 
 // Client -> Server

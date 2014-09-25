@@ -1,8 +1,7 @@
-package hap
+package pair
 
 import(
     "github.com/brutella/hap"
-    
     "io"
     "fmt"
     "encoding/hex"

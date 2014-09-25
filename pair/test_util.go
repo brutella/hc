@@ -1,10 +1,10 @@
-package hap
+package pair
 
 import(
     "github.com/brutella/hap"
     "crypto/sha512"
-    // "github.com/tadglines/go-pkgs/crypto/srp"
-    "github.com/theojulienne/go-srp/crypto/srp"
+    "github.com/tadglines/go-pkgs/crypto/srp"
+    //"github.com/theojulienne/go-srp/crypto/srp"
 )
 
 type HAPPairSetupClient struct {
