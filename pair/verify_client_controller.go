@@ -10,20 +10,20 @@ import(
 
 type VerifyClientController struct {
     context *hap.Context
-    accessory *hap.Accessory
+    bridge *hap.Bridge
     session *VerifySession
     username string
     LTPK []byte
     LTSK []byte
 }
 
-func NewVerifyClientController(context *hap.Context, accessory *hap.Accessory, username string) *VerifyClientController {    
+func NewVerifyClientController(context *hap.Context, bridge *hap.Bridge, username string) *VerifyClientController {    
     LTPK, LTSK, _ := hap.ED25519GenerateKey(username)
         
     controller := VerifyClientController{
                                     username: username,
                                     context: context,
-                                    accessory: accessory,
+                                    bridge: bridge,
                                     session: NewVerifySession(),
                                     LTPK: LTPK,
                                     LTSK: LTSK,
@@ -145,7 +145,7 @@ func (c *VerifyClientController) handlePairVerifyRespond(tlv_in *hap.TLV8Contain
     material = append(material, username...)
     material = append(material, c.session.publicKey[:]...)
     
-    LTPK := c.context.PublicKeyForAccessory(c.accessory)
+    LTPK := c.context.PublicKeyForAccessory(c.bridge)
     
     if hap.ValidateED25519Signature(LTPK, material, signature) == false {
         return nil, hap.NewErrorf("Could not validate signature")

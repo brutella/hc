@@ -10,15 +10,15 @@ import(
 
 type VerifyServerController struct {
     context *hap.Context
-    accessory *hap.Accessory
+    bridge *hap.Bridge
     session *VerifySession
     curSeq byte
 }
 
-func NewVerifyServerController(context *hap.Context, accessory *hap.Accessory) (*VerifyServerController, error) {    
+func NewVerifyServerController(context *hap.Context, bridge *hap.Bridge) (*VerifyServerController, error) {    
     controller := VerifyServerController{
                                     context: context,
-                                    accessory: accessory,
+                                    bridge: bridge,
                                     session: NewVerifySession(),
                                     curSeq: WaitingForRequest,
                                 }
@@ -98,17 +98,17 @@ func (c *VerifyServerController) handlePairVerifyStart(tlv_in *hap.TLV8Container
     c.session.GenerateSharedKeyWithOtherPublicKey(otherPublicKey)
     c.session.SetupEncryptionKey([]byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
     
-    LTSK := c.context.SecretKeyForAccessory(c.accessory)
+    LTSK := c.context.SecretKeyForAccessory(c.bridge)
     
     material := make([]byte, 0)
     material = append(material, c.session.publicKey[:]...)
-    material = append(material, c.accessory.Name...)
+    material = append(material, c.bridge.Name...)
     material = append(material, clientPublicKey...)
     signature, _ := hap.ED25519Signature(LTSK, material)
     
     // Encrypt
     tlv_encrypt := hap.TLV8Container{}
-    tlv_encrypt.SetString(hap.TLVType_Username, c.accessory.Name)
+    tlv_encrypt.SetString(hap.TLVType_Username, c.bridge.Name)
     tlv_encrypt.SetBytes(hap.TLVType_Ed25519Signature, signature)
     
     encrypted, mac, _ := hap.Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PV-Msg02"), tlv_encrypt.BytesBuffer().Bytes(), nil)

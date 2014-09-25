@@ -11,19 +11,19 @@ import(
 
 type SetupClientController struct {
     context *hap.Context
-    accessory *hap.Accessory
+    bridge *hap.Bridge
     username string
     session *SetupClientSession
 }
 
-func NewSetupClientController(context *hap.Context, accessory *hap.Accessory, username string) (*SetupClientController) {
+func NewSetupClientController(context *hap.Context, bridge *hap.Bridge, username string) (*SetupClientController) {
     
-    session := NewSetupClientSession("Pair-Setup", accessory.Password)
+    session := NewSetupClientSession("Pair-Setup", bridge.Password)
     
     controller := SetupClientController{
                                     username: username,
                                     context: context,
-                                    accessory: accessory,
+                                    bridge: bridge,
                                     session: session,
                                 }
     return &controller
@@ -198,7 +198,7 @@ func (c *SetupClientController) handlePairVerifyRespond(tlv_in *hap.TLV8Containe
 // - Read and store client LTPK and name
 // 
 // Server -> Client
-// - encrpyted tlv8: accessory LTPK, accessory name, signature (of H2, accessory name, LTPK)
+// - encrpyted tlv8: bridge LTPK, bridge name, signature (of H2, bridge name, LTPK)
 func (c *SetupClientController) handleKeyExchange(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
     data := tlv_in.GetBytes(hap.TLVType_EncryptedData)    
     message := data[:(len(data) - 16)]

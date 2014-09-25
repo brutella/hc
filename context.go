@@ -36,12 +36,12 @@ func (c *Context) SaveClient(client *Client) {
     c.storage.Set(client.Name + ".ltpk", client.PublicKey)
 }
 
-func (c *Context) PublicKeyForAccessory(a *Accessory) []byte {
-    return a.publicKey
+func (c *Context) PublicKeyForAccessory(b *Bridge) []byte {
+    return b.PublicKey
 }
 
-func (c *Context) SecretKeyForAccessory(a *Accessory) []byte {
-    return a.secretKey
+func (c *Context) SecretKeyForAccessory(b *Bridge) []byte {
+    return b.SecretKey
 }
 
 func (c *Context) GenerateEncryptionKeysWithSharedkey(sharedKey [32]byte) error {

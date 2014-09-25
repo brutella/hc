@@ -10,21 +10,21 @@ import(
 
 type SetupServerController struct {
     context *hap.Context
-    accessory *hap.Accessory
+    bridge *hap.Bridge
     session *SetupServerSession
     curSeq byte
 }
 
-func NewSetupServerController(context *hap.Context, accessory *hap.Accessory) (*SetupServerController, error) {
+func NewSetupServerController(context *hap.Context, bridge *hap.Bridge) (*SetupServerController, error) {
     
-    session, err := NewSetupServerSession("Pair-Setup", accessory.Password)
+    session, err := NewSetupServerSession("Pair-Setup", bridge.Password)
     if err != nil {
         return nil, err
     }
     
     controller := SetupServerController{
                                     context: context,
-                                    accessory: accessory,
+                                    bridge: bridge,
                                     session: session,
                                     curSeq: WaitingForRequest,
                                 }
@@ -165,7 +165,7 @@ func (c *SetupServerController) handlePairVerify(tlv_in *hap.TLV8Container) (*ha
 // - Read and store client LTPK and name
 // 
 // Server -> Client
-// - encrpyted tlv8: accessory LTPK, accessory name, signature (of H2, accessory name, LTPK)
+// - encrpyted tlv8: bridge LTPK, bridge name, signature (of H2, bridge name, LTPK)
 func (c *SetupServerController) handleKeyExchange(tlv_in *hap.TLV8Container) (*hap.TLV8Container, error) {
     tlv_out := hap.TLV8Container{}
     
@@ -218,14 +218,14 @@ func (c *SetupServerController) handleKeyExchange(tlv_in *hap.TLV8Container) (*h
             c.context.SaveClient(client)
             fmt.Printf("[Storage] Stored LTPK '%s' for client '%s'\n", hex.EncodeToString(ltpk), username)
             
-            LTPK := c.context.PublicKeyForAccessory(c.accessory)
-            LTSK := c.context.SecretKeyForAccessory(c.accessory)
+            LTPK := c.context.PublicKeyForAccessory(c.bridge)
+            LTSK := c.context.SecretKeyForAccessory(c.bridge)
             
             // Send username, LTPK, signature as encrypted message
             H2, err := hap.HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
             material = make([]byte, 0)
             material = append(material, H2[:]...)
-            material = append(material, []byte(c.accessory.Name)...)
+            material = append(material, []byte(c.bridge.Name)...)
             material = append(material, LTPK...)
 
             signature, err := hap.ED25519Signature(LTSK, material)
@@ -234,7 +234,7 @@ func (c *SetupServerController) handleKeyExchange(tlv_in *hap.TLV8Container) (*h
             }
             
             tlvPairKeyExchange := hap.TLV8Container{}
-            tlvPairKeyExchange.SetString(hap.TLVType_Username, c.accessory.Name)
+            tlvPairKeyExchange.SetString(hap.TLVType_Username, c.bridge.Name)
             tlvPairKeyExchange.SetBytes(hap.TLVType_PublicKey, LTPK)
             tlvPairKeyExchange.SetBytes(hap.TLVType_Ed25519Signature, []byte(signature))
             

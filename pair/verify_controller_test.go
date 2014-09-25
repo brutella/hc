@@ -9,17 +9,17 @@ import (
 
 // Tests the pairing key verification
 func TestPairVerifyIntegration(t *testing.T) {
-    accessory, err := hap.NewAccessory("HAP Test", "123-45-678")
+    bridge, err := hap.NewBridge("HAP Test", "123-45-678")
     assert.Nil(t, err)
     
     storage, err := hap.NewFileStorage(os.TempDir())
     assert.Nil(t, err)
     context := hap.NewContext(storage)
-    controller, err := NewVerifyServerController(context, accessory)
+    controller, err := NewVerifyServerController(context, bridge)
     assert.Nil(t, err)
     
     name := "UnitTest"
-    client_controller := NewVerifyClientController(context, accessory, name)
+    client_controller := NewVerifyClientController(context, bridge, name)
     context.SaveClient(hap.NewClient(name,client_controller.LTPK)) // make LTPK available to server
     
     tlvVerifyStartRequest := client_controller.InitialKeyVerifyRequest()

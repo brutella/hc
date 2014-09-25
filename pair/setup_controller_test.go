@@ -10,16 +10,16 @@ import (
 
 // Tests the pairing setup
 func TestPairingIntegration(t *testing.T) {
-    accessory, err := hap.NewAccessory("HAP Test", "123-45-678")
+    bridge, err := hap.NewBridge("HAP Test", "123-45-678")
     assert.Nil(t, err)
     
     storage, err := hap.NewFileStorage(os.TempDir())
     assert.Nil(t, err)
     context := hap.NewContext(storage)
-    controller, err := NewSetupServerController(context, accessory)
+    controller, err := NewSetupServerController(context, bridge)
     assert.Nil(t, err)
     
-    client_controller := NewSetupClientController(context, accessory, "HomeKit Client")
+    client_controller := NewSetupClientController(context, bridge, "HomeKit Client")
     pairStartRequest := client_controller.InitialPairingRequest()
     
     // 1) C -> S
