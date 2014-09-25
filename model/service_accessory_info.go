@@ -10,7 +10,7 @@ func NewAccessoryInfoService(serialNumber, modelName, manufacturerName, accessor
     model           := NewModelCharacteristic(modelName)
     manufacturer    := NewManufacturerCharacteristic(manufacturerName)
     name            := NewNameCharacteristic(accessoryName)
-    // characteristics := []interface{}{identify, serial, model, manufacturer, name}
+    
     service := NewService()
     service.Type = ServiceTypeAccessoryInfo
     service.AddCharacteristic(identify.Characteristic)

@@ -1,4 +1,4 @@
-package hap
+package pair
 
 import (
 	"testing"

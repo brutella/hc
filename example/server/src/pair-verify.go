@@ -4,6 +4,7 @@ import(
     "net/http"
     "fmt"
     "github.com/brutella/hap/pair"
+    "github.com/brutella/hap"
     "io/ioutil"
 )
 
@@ -22,7 +23,7 @@ func NewPairVerifyHandler(c *pair.VerifyServerController) *PairVerifyHandler {
 
 func (handler *PairVerifyHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
     fmt.Println("Pair-Verify request")
-    response.Header().Set("Content-Type", "application/pairing+tlv8")
+    response.Header().Set("Content-Type", hap.HTTPContentTypePairingTLV8)
     
     res, err := handler.controller.Handle(request.Body)
     

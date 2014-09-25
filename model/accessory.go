@@ -16,6 +16,7 @@ func NewAccessory() *Accessory {
     }
 }
 
+// Adds a service to the accessory and updates the ids of the service and the corresponding characteristics
 func (a *Accessory) AddService(s *Service) {
     s.Id = a.idCount
     a.idCount += 1

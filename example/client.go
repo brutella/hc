@@ -10,7 +10,7 @@ import(
 )
 
 func sendTLV8(b io.Reader) (io.Reader, error){
-    resp, err := http.Post("http://127.0.0.1:50239/pair-setup", "application/pairing+tlv8", b)
+    resp, err := http.Post("http://127.0.0.1:50239/pair-setup", hap.HTTPContentTypePairingTLV8, b)
     return resp.Body, err
 }
 
