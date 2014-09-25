@@ -2,7 +2,6 @@ package pair
 
 import(
     "github.com/tadglines/go-pkgs/crypto/srp"
-    // "github.com/theojulienne/go-srp/crypto/srp"
 )
 
 // Main SRP algorithm is described in http://srp.stanford.edu/design.html
