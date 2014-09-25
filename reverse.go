@@ -1,5 +1,6 @@
 package hap
 
+// Currently not used
 type ByteSequence []byte
 
 func (s ByteSequence) Len() int {
