@@ -27,7 +27,7 @@ func NewAccessoriesHandler(c *model.ModelController, context *hap.Context) *Acce
 
 func (handler *AccessoriesHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
     fmt.Println("Get Accessories Request")
-    response.Header().Set("Content-Type", "application/hap+json")
+    response.Header().Set("Content-Type", hap.HTTPContentTypeHAPJson)
     
     decrypted, err := crypto.Decrypt(request.Body, handler.context)
     
