@@ -7,7 +7,7 @@ type SerialNumberCharacteristic struct {
 func NewSerialNumberCharacteristic(serial string) *SerialNumberCharacteristic {
     str := NewStringCharacteristic(serial)
     str.Type = CharTypeSerialNumber
-    str.Permissions = []string{PermRead}
+    str.Permissions = PermsRead()
     
     return &SerialNumberCharacteristic{str}
 }

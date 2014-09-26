@@ -7,7 +7,7 @@ type NameCharacteristic struct {
 func NewNameCharacteristic(name string) *NameCharacteristic {
     str := NewStringCharacteristic(name)
     str.Type = CharTypeName
-    str.Permissions = []string{PermRead}
+    str.Permissions = PermsRead()
     
     return &NameCharacteristic{str}
 }

@@ -7,7 +7,7 @@ type ModelCharacteristic struct {
 func NewModelCharacteristic(model string) *ModelCharacteristic {
     str := NewStringCharacteristic(model)
     str.Type = CharTypeModel
-    str.Permissions = []string{PermRead}
+    str.Permissions = PermsReadOnly()
     
     return &ModelCharacteristic{str}
 }

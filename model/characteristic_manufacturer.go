@@ -7,7 +7,7 @@ type ManufacturerCharacteristic struct {
 func NewManufacturerCharacteristic(manufacturerName string) *ManufacturerCharacteristic {
     str := NewStringCharacteristic(manufacturerName)
     str.Type = CharTypeManufacturer
-    str.Permissions = []string{PermRead}
+    str.Permissions = PermsReadOnly()
     
     return &ManufacturerCharacteristic{str}
 }

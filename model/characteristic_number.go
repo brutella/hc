@@ -5,7 +5,12 @@ type NumberCharacteristic struct {
 }
 
 func NewNumberCharacteristic(value, min, max, step interface{}, format string) *NumberCharacteristic {    
-    return &NumberCharacteristic{NewCharacteristic(value, format, CharTypeUnknown, nil)}
+    c := NumberCharacteristic{NewCharacteristic(value, format, CharTypeUnknown, nil)}
+    c.MinValue = min
+    c.MaxValue = max
+    c.MinStep = step
+    
+    return &c
 }
 
 type BoolCharacteristic struct {
@@ -17,7 +22,7 @@ func NewBoolCharacteristic(value bool) *BoolCharacteristic {
     if value == true {
         integer = 1
     }
-    number := NewNumberCharacteristic(integer, 0, 0, 0, FormatBool, )
+    number := NewNumberCharacteristic(integer, nil, nil, nil, FormatBool, )
     return &BoolCharacteristic{number}
 }
 
@@ -25,7 +30,12 @@ type FloatCharacteristic struct {
     *NumberCharacteristic
 }
 
-func NewFloatCharacteristic(value, min, max, steps float64) *FloatCharacteristic {
+func NewFloatCharacteristic(value float64) *FloatCharacteristic {
+    number := NewNumberCharacteristic(value, nil, nil, nil, FormatFloat)
+    return &FloatCharacteristic{number}
+}
+
+func NewFloatCharacteristicMinMaxSteps(value, min, max, steps float64) *FloatCharacteristic {
     number := NewNumberCharacteristic(value, min, max, steps, FormatFloat)
     return &FloatCharacteristic{number}
 }
@@ -37,4 +47,18 @@ type IntCharacteristic struct {
 func NewIntCharacteristic(value, min, max, steps int) *IntCharacteristic {
     number := NewNumberCharacteristic(value, min, max, steps, FormatInt)
     return &IntCharacteristic{number}
+}
+
+type ByteCharacteristic struct {
+    *NumberCharacteristic
+}
+
+func NewByteCharacteristic(value byte) *ByteCharacteristic {
+    number := NewNumberCharacteristic(value, nil, nil, nil, FormatByte)
+    return &ByteCharacteristic{number}
+}
+
+func NewByteCharacteristicMinMaxSteps(value, min, max, steps byte) *ByteCharacteristic {
+    number := NewNumberCharacteristic(value, min, max, steps, FormatByte)
+    return &ByteCharacteristic{number}
 }

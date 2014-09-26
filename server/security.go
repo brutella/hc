@@ -54,10 +54,11 @@ func (con *tcpHAPConnection) SecureWrite(b []byte) (n int, err error) {
 // Decrypts incoming data
 func (con *tcpHAPConnection) SecureRead(b []byte) (n int, err error) {
     if con.decryptedBuffer == nil {
-        sec_conn := bufio.NewReader(con.connection)
-        decrypted, err := con.context.SecSession.Decrypt(sec_conn)
+        buffered_reader := bufio.NewReader(con.connection)
+        decrypted, err := con.context.SecSession.Decrypt(buffered_reader)
         if err != nil {
             fmt.Println("Decryption failed", err)
+            
             return 0, err
         }
         
