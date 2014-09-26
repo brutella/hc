@@ -25,7 +25,14 @@ func NewVerifyServerController(context *hap.Context, bridge *hap.Bridge) (*Verif
     
     return &controller, nil
 }
+func (c *VerifyServerController) VerifiedSharedKey() [32]byte {
+    return c.session.sharedKey
+}
 
+func (c *VerifyServerController) KeyVerificationCompleted() bool {
+    return c.curSeq == VerifyFinishRespond
+} 
+    
 func (c *VerifyServerController) Handle(r io.Reader) (io.Reader, error) {
     var tlv_out *TLV8Container
     var err error
@@ -188,8 +195,6 @@ func (c *VerifyServerController) handlePairVerifyFinish(tlv_in *TLV8Container) (
             tlv_out.SetByte(TLVType_ErrorCode, TLVStatus_UnkownPeerError) // return error 4
         } else {
             fmt.Println("[Success] signature is valid")
-            // Verification is done now generation incoming and outgoing encryption keys
-            c.context.GenerateEncryptionKeysWithSharedkey(c.session.sharedKey)
         }
     }
     

@@ -3,6 +3,7 @@ package hapserver
 import(
     "net/http"
     "fmt"
+    "github.com/brutella/hap/crypto"
     "github.com/brutella/hap/pair"
     "github.com/brutella/hap"
     "io/ioutil"
@@ -11,11 +12,13 @@ import(
 type PairVerifyHandler struct {
     http.Handler
     controller *pair.VerifyServerController
+    context *hap.Context
 }
 
-func NewPairVerifyHandler(c *pair.VerifyServerController) *PairVerifyHandler {
+func NewPairVerifyHandler(controller *pair.VerifyServerController, context *hap.Context) *PairVerifyHandler {
     handler := PairVerifyHandler{
-                controller: c,
+                controller: controller,
+                context: context,
             }
     
     return &handler
@@ -33,5 +36,19 @@ func (handler *PairVerifyHandler) ServeHTTP(response http.ResponseWriter, reques
     } else {
         bytes, _ := ioutil.ReadAll(res)
         response.Write(bytes)
+    }
+    
+    if handler.controller.KeyVerificationCompleted() == true {
+        // Verification is done
+        // Switch to secure session
+        secSession, err := crypto.NewSecureSessionFromSharedKey(handler.controller.VerifiedSharedKey())
+        if err != nil {
+            fmt.Println("Could not setup secure session.", err)
+        } else {
+            fmt.Println("Setup secure session")
+        }
+        handler.context.SetSecureSession(secSession) 
+    } else {
+        handler.context.SetSecureSession(nil)
     }
 }

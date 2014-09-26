@@ -32,7 +32,7 @@ func TestPairVerifyIntegration(t *testing.T) {
     // 3) C -> S
     tlvFinishRespond, err := controller.Handle(tlvFinishRequest)
     assert.Nil(t, err)
-    assert.True(t, len(context.SharedKey) > 0)
+    assert.NotNil(t, controller.VerifiedSharedKey())
     
     // 4) S -> C 
     response, err := client_controller.Handle(tlvFinishRespond)

@@ -5,7 +5,6 @@ import(
     "fmt"
     "github.com/brutella/hap"
     "github.com/brutella/hap/model"
-    "github.com/brutella/hap/crypto"
     "io/ioutil"
 )
 
@@ -29,27 +28,13 @@ func (handler *AccessoriesHandler) ServeHTTP(response http.ResponseWriter, reque
     fmt.Println("Get Accessories Request")
     response.Header().Set("Content-Type", hap.HTTPContentTypeHAPJson)
     
-    decrypted, err := crypto.Decrypt(request.Body, handler.context)
-    
-    if err != nil {
-        fmt.Println("Decryption failed", err)
-        response.WriteHeader(http.StatusInternalServerError)
-    }
-    
-    res, err := handler.controller.HandleGetAccessories(decrypted)
+    res, err := handler.controller.HandleGetAccessories(request.Body)
     
     if err != nil {
         fmt.Println(err)
         response.WriteHeader(http.StatusInternalServerError)
     } else {
-        encrypted, err := crypto.Encrypt(res, handler.context)
-        
-        if err != nil {
-            fmt.Println("Encryption failed", err)
-            response.WriteHeader(http.StatusInternalServerError)
-        }
-        
-        bytes, _ := ioutil.ReadAll(encrypted)
+        bytes, _ := ioutil.ReadAll(res)
         response.Write(bytes)
     }
 }
