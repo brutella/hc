@@ -34,6 +34,26 @@ func NewSecureSessionFromSharedKey(sharedKey [32]byte) (*secureSession, error) {
     return s, err
 }
 
+// Only used for tests
+func NewSecureClientSessionFromSharedKey(sharedKey [32]byte) (*secureSession, error) {
+    salt := []byte("Control-Salt")
+    info_out := []byte("Control-Write-Encryption-Key")
+    info_in := []byte("Control-Read-Encryption-Key")
+    
+    var s = new(secureSession)
+    var err error
+    s.encryptKey, err = hap.HKDF_SHA512(sharedKey[:], salt, info_out)
+    s.encryptCount = 0
+    if err != nil {
+        return nil, err
+    }
+    
+    s.decryptKey, err = hap.HKDF_SHA512(sharedKey[:], salt, info_in)
+    s.decryptCount = 0
+    
+    return s, err
+}
+
 // Encrypts the data by splitting it into packets
 //  [ length (2 bytes)] [ data ] [ auth (16 bytes)]
 func (s *secureSession) Encrypt(r io.Reader) (io.Reader, error){

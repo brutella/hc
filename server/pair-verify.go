@@ -1,4 +1,4 @@
-package hapserver
+package server
 
 import(
     "net/http"
@@ -8,22 +8,23 @@ import(
     "io/ioutil"
 )
 
-type PairSetupHandler struct {
+type PairVerifyHandler struct {
     http.Handler
-    
-    controller *pair.SetupServerController
+    controller *pair.VerifyServerController
+    context *hap.Context
 }
 
-func NewPairSetupHandler(c *pair.SetupServerController) *PairSetupHandler {
-    handler := PairSetupHandler{
-                controller: c,
+func NewPairVerifyHandler(controller *pair.VerifyServerController, context *hap.Context) *PairVerifyHandler {
+    handler := PairVerifyHandler{
+                controller: controller,
+                context: context,
             }
     
     return &handler
 }
 
-func (handler *PairSetupHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-    fmt.Println("Pair-Setup request")
+func (handler *PairVerifyHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
+    fmt.Println("POST /pair-verify")
     response.Header().Set("Content-Type", hap.HTTPContentTypePairingTLV8)
     
     res, err := handler.controller.Handle(request.Body)

@@ -1,4 +1,4 @@
-package hapserver
+package server
 
 import(
     "net/http"
@@ -25,7 +25,7 @@ func NewAccessoriesHandler(c *model.ModelController, context *hap.Context) *Acce
 }
 
 func (handler *AccessoriesHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-    fmt.Println("Get Accessories Request")
+    fmt.Println("GET /accessories")
     response.Header().Set("Content-Type", hap.HTTPContentTypeHAPJson)
     
     res, err := handler.controller.HandleGetAccessories(request.Body)
@@ -35,6 +35,7 @@ func (handler *AccessoriesHandler) ServeHTTP(response http.ResponseWriter, reque
         response.WriteHeader(http.StatusInternalServerError)
     } else {
         bytes, _ := ioutil.ReadAll(res)
+        fmt.Println("<-  JSON:", string(bytes))
         response.Write(bytes)
     }
 }

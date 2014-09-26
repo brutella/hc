@@ -2,6 +2,7 @@ package pair
 
 import(
     "github.com/brutella/hap"
+    "github.com/brutella/hap/crypto"
     "io"
     "fmt"
     "encoding/hex"
@@ -25,13 +26,6 @@ func NewVerifyServerController(context *hap.Context, bridge *hap.Bridge) (*Verif
     
     return &controller, nil
 }
-func (c *VerifyServerController) VerifiedSharedKey() [32]byte {
-    return c.session.sharedKey
-}
-
-func (c *VerifyServerController) KeyVerificationCompleted() bool {
-    return c.curSeq == VerifyFinishRespond
-} 
     
 func (c *VerifyServerController) Handle(r io.Reader) (io.Reader, error) {
     var tlv_out *TLV8Container
@@ -195,6 +189,16 @@ func (c *VerifyServerController) handlePairVerifyFinish(tlv_in *TLV8Container) (
             tlv_out.SetByte(TLVType_ErrorCode, TLVStatus_UnkownPeerError) // return error 4
         } else {
             fmt.Println("[Success] signature is valid")
+            
+            // Verification is done
+            // Switch to secure session
+            secSession, err := crypto.NewSecureSessionFromSharedKey(c.session.sharedKey)
+            if err != nil {
+                fmt.Println("Could not setup secure session.", err)
+            } else {
+                fmt.Println("Setup secure session")
+            }
+            c.context.SetSecureSession(secSession)
         }
     }
     
