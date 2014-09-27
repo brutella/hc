@@ -246,6 +246,8 @@ func (c *SetupServerController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8C
             tlv_out.SetByte(TLVType_AuthMethod, 0)
             tlv_out.SetByte(TLVType_SequenceNumber, PairKeyExchangeRequest)
             tlv_out.SetBytes(TLVType_EncryptedData, append(encrypted, mac[:]...))
+            
+            c.reset()
         }
     }
     

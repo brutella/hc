@@ -33,6 +33,10 @@ func PermsReadOnly() []string {
     return []string{PermRead}
 }
 
+func PermsWriteOnly() []string {
+    return []string{PermWrite}
+}
+
 const (
     FormatString    = "string"  // maxLen appears
     FormatBool      = "bool"    // on|off

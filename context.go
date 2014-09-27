@@ -48,6 +48,9 @@ func (c *Context) SecretKeyForAccessory(b *Bridge) []byte {
     return b.SecretKey
 }
 
+func (c *Context) SecureSessionClosed() {
+    c.SetSecureSession(nil)
+}
 func (c *Context) SetSecureSession(secSession SecureSession) {
     c.SecSession = secSession
 }

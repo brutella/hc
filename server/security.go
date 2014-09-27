@@ -58,7 +58,8 @@ func (con *tcpHAPConnection) SecureRead(b []byte) (n int, err error) {
         decrypted, err := con.context.SecSession.Decrypt(buffered_reader)
         if err != nil {
             fmt.Println("Decryption failed", err)
-            
+            // End communication
+            err = con.connection.Close()
             return 0, err
         }
         
@@ -90,17 +91,16 @@ func (con *tcpHAPConnection) Write(b []byte) (n int, err error) {
 
 func (con *tcpHAPConnection) Read(b []byte) (n int, err error) {
     if con.context.SecSession != nil {
-        // Decrypt request and ecrypt responds
+        // Encryption from now on
         con.isEncrypted = true
         return con.SecureRead(b)
     }
-    
-    con.isEncrypted = false
     
     return con.connection.Read(b)
 }
 
 func (con *tcpHAPConnection) Close() error {
+    con.context.SecureSessionClosed()
     return con.connection.Close()
 }
 

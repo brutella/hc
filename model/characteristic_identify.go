@@ -7,7 +7,7 @@ type IdentifyCharacteristic struct {
 func NewIdentifyCharacteristic(identify bool) *IdentifyCharacteristic {
     b := NewBoolCharacteristic(identify)
     b.Type = CharTypeIdentify
-    b.Permissions = PermsAll()
+    b.Permissions = PermsWriteOnly()
     
     return &IdentifyCharacteristic{b}
 }

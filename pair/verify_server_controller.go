@@ -199,6 +199,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(tlv_in *TLV8Container) (
                 fmt.Println("Setup secure session")
             }
             c.context.SetSecureSession(secSession)
+            c.reset()
         }
     }
     

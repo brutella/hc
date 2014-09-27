@@ -18,11 +18,7 @@ type BoolCharacteristic struct {
 }
 
 func NewBoolCharacteristic(value bool) *BoolCharacteristic {
-    integer := 0
-    if value == true {
-        integer = 1
-    }
-    number := NewNumberCharacteristic(integer, nil, nil, nil, FormatBool, )
+    number := NewNumberCharacteristic(value, nil, nil, nil, FormatBool, )
     return &BoolCharacteristic{number}
 }
 
