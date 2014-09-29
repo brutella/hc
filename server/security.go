@@ -6,6 +6,8 @@ import(
     "time"
     "bytes"
     "io"
+    "os"
+    "os/signal"
     "net/http"
     "io/ioutil"
     "bufio"
@@ -63,7 +65,12 @@ func (con *tcpHAPConnection) SecureRead(b []byte) (n int, err error) {
             return 0, err
         }
         
-        con.decryptedBuffer = decrypted
+        b, _ := ioutil.ReadAll(decrypted)
+        fmt.Println(string(b))
+        
+        var decryptedBuffer bytes.Buffer
+        decryptedBuffer.Write(b)
+        con.decryptedBuffer = &decryptedBuffer
     }
     
     n, err = con.decryptedBuffer.Read(b)
@@ -100,6 +107,7 @@ func (con *tcpHAPConnection) Read(b []byte) (n int, err error) {
 }
 
 func (con *tcpHAPConnection) Close() error {
+    fmt.Println("Secure Close")
     con.context.SecureSessionClosed()
     return con.connection.Close()
 }
@@ -141,5 +149,18 @@ func (l *TCPHAPListener) Accept() (c net.Conn, err error) {
         return
     }
     
-    return &tcpHAPConnection{connection: con, context: l.context}, nil
+    hapConn, err := &tcpHAPConnection{connection: con, context: l.context}, nil
+    if err == nil {
+    	c := make(chan os.Signal, 1)
+    	signal.Notify(c, os.Interrupt)
+    	go func() {
+    		for _ = range c {
+    			fmt.Println("Close", hapConn)
+                hapConn.Close()
+    			os.Exit(0)
+    		}
+    	}()
+    }
+    
+    return hapConn, err
 }

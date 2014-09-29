@@ -18,7 +18,7 @@ type SetupClientController struct {
 
 func NewSetupClientController(context *hap.Context, bridge *hap.Bridge, username string) (*SetupClientController) {
     
-    session := NewSetupClientSession("Pair-Setup", bridge.Password)
+    session := NewSetupClientSession("Pair-Setup", bridge.Password())
     
     controller := SetupClientController{
                                     username: username,

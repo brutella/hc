@@ -18,15 +18,15 @@ const (
 )
 
 func PermsAll() []string {
-    return []string{PermRead, PermWrite, PermEvents}
+    return []string{PermRead, PermWrite}
 }
 
 func PermsRead() []string {
-    return []string{PermRead, PermEvents}
+    return []string{PermRead}
 }
 
 func PermsWrite() []string {
-    return []string{PermWrite, PermEvents}
+    return []string{PermWrite}
 }
 
 func PermsReadOnly() []string {

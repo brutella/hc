@@ -17,7 +17,7 @@ type SetupServerController struct {
 
 func NewSetupServerController(context *hap.Context, bridge *hap.Bridge) (*SetupServerController, error) {
     
-    session, err := NewSetupServerSession("Pair-Setup", bridge.Password)
+    session, err := NewSetupServerSession("Pair-Setup", bridge.Password())
     if err != nil {
         return nil, err
     }
@@ -225,7 +225,7 @@ func (c *SetupServerController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8C
             H2, err := hap.HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
             material = make([]byte, 0)
             material = append(material, H2[:]...)
-            material = append(material, []byte(c.bridge.Name)...)
+            material = append(material, []byte(c.bridge.Name())...)
             material = append(material, LTPK...)
 
             signature, err := hap.ED25519Signature(LTSK, material)
@@ -234,7 +234,7 @@ func (c *SetupServerController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8C
             }
             
             tlvPairKeyExchange := TLV8Container{}
-            tlvPairKeyExchange.SetString(TLVType_Username, c.bridge.Name)
+            tlvPairKeyExchange.SetString(TLVType_Username, c.bridge.Name())
             tlvPairKeyExchange.SetBytes(TLVType_PublicKey, LTPK)
             tlvPairKeyExchange.SetBytes(TLVType_Ed25519Signature, []byte(signature))
             
