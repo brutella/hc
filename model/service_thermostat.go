@@ -1,4 +1,4 @@
-package hk
+package model
 
 type ThermostatService struct {
     *Service

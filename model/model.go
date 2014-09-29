@@ -1,4 +1,4 @@
-package hk
+package model
 
 type Model struct {
     Accessories []*Accessory `json:"accessories"`

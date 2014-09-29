@@ -1,4 +1,4 @@
-package hk
+package model
 
 type ByteCharacteristic struct {
     *NumberCharacteristic

@@ -4,19 +4,18 @@ import(
     "net/http"
     "fmt"
     "github.com/brutella/hap"
-    "github.com/brutella/hap/model"
     "io/ioutil"
 )
 
-type AccessoriesHandler struct {
+type CharacteristicsHandler struct {
     http.Handler
     
-    controller *model.ModelController
+    controller *CharacteristicController
     context *hap.Context
 }
 
-func NewAccessoriesHandler(c *model.ModelController, context *hap.Context) *AccessoriesHandler {
-    handler := AccessoriesHandler{
+func NewCharacteristicsHandler(c *CharacteristicController, context *hap.Context) *CharacteristicsHandler {
+    handler := CharacteristicsHandler{
                 controller: c,
                 context: context,
             }
@@ -24,11 +23,12 @@ func NewAccessoriesHandler(c *model.ModelController, context *hap.Context) *Acce
     return &handler
 }
 
-func (handler *AccessoriesHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-    fmt.Println("GET /accessories")
+func (handler *CharacteristicsHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
+    fmt.Println("GET /characteristics")
+    fmt.Println("id = ", request.FormValue("id"))
     response.Header().Set("Content-Type", hap.HTTPContentTypeHAPJson)
     
-    res, err := handler.controller.HandleGetAccessories(request.Body)
+    res, err := handler.controller.HandleGetCharacteristics(request.Form)
     
     if err != nil {
         fmt.Println(err)
