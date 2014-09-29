@@ -1,4 +1,4 @@
-package model
+package hk
 
 type IdentifyCharacteristic struct {
     *BoolCharacteristic
@@ -10,4 +10,12 @@ func NewIdentifyCharacteristic(identify bool) *IdentifyCharacteristic {
     b.Permissions = PermsWriteOnly()
     
     return &IdentifyCharacteristic{b}
+}
+
+func (c *IdentifyCharacteristic) SetIdentify(identify bool) {
+    c.SetBool(identify)
+}
+
+func (c *IdentifyCharacteristic) Identify() bool {
+    return c.Bool()
 }

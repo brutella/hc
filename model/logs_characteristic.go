@@ -1,4 +1,4 @@
-package model
+package hk
 
 type LogsCharacteristic struct {
     *TLV8Characteristic
@@ -10,4 +10,13 @@ func NewLogsCharacteristic(logs string) *LogsCharacteristic {
     str.Permissions = PermsAll()
     
     return &LogsCharacteristic{str}
+}
+
+func (c *LogsCharacteristic) SetLogs(logs string) {
+    // TODO
+}
+
+func (c *LogsCharacteristic) Logs() string {
+    // TODO
+    return ""
 }

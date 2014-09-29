@@ -1,10 +1,10 @@
-package model
+package hk
 
 type AccessoryInfoService struct {
     *Service
 }
 
-func NewAccessoryInfoService(serialNumber, modelName, manufacturerName, accessoryName string) *AccessoryInfoService {
+func NewAccessoryInfoService(accessoryName, serialNumber, manufacturerName, modelName string) *AccessoryInfoService {
     identify        := NewIdentifyCharacteristic(false)
     serial          := NewSerialNumberCharacteristic(serialNumber)
     model           := NewModelCharacteristic(modelName)

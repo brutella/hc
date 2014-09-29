@@ -1,4 +1,4 @@
-package model
+package hk
 
 type NameCharacteristic struct {
     *StringCharacteristic
@@ -10,4 +10,12 @@ func NewNameCharacteristic(name string) *NameCharacteristic {
     str.Permissions = PermsRead()
     
     return &NameCharacteristic{str}
+}
+
+func (c *NameCharacteristic) SetName(name string) {
+    c.SetString(name)
+}
+
+func (c *NameCharacteristic) Name() string{
+    return c.String()
 }

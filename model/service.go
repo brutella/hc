@@ -1,4 +1,4 @@
-package model
+package hk
 
 type Service struct {
     Id int `json:"iid"`

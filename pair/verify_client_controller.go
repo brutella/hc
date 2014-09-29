@@ -41,7 +41,7 @@ func (c *VerifyClientController) Handle(r io.Reader) (io.Reader, error) {
         return nil, err
     }
     
-    method := tlv_in.GetByte(TLVType_AuthMethod)
+    method := tlv_in.Byte(TLVType_AuthMethod)
     
     // It is valid that method is not sent
     // If method is sent then it must be 0x00
@@ -49,7 +49,7 @@ func (c *VerifyClientController) Handle(r io.Reader) (io.Reader, error) {
         return nil, hap.NewErrorf("Cannot handle auth method %b", method)
     }
     
-    seq := tlv_in.GetByte(TLVType_SequenceNumber)
+    seq := tlv_in.Byte(TLVType_SequenceNumber)
     fmt.Println("->     Seq:", seq)
     
     switch seq {
@@ -68,7 +68,7 @@ func (c *VerifyClientController) Handle(r io.Reader) (io.Reader, error) {
         fmt.Println("KEY VERIFICATION FINISHED")
         return nil, nil
     } else {
-        fmt.Println("<-     Seq:", tlv_out.GetByte(TLVType_SequenceNumber))
+        fmt.Println("<-     Seq:", tlv_out.Byte(TLVType_SequenceNumber))
     }
     
     fmt.Println("-------------")
@@ -84,7 +84,7 @@ func (c *VerifyClientController) InitialKeyVerifyRequest() (io.Reader) {
     tlv_out.SetByte(TLVType_SequenceNumber, VerifyStartRequest)
     tlv_out.SetBytes(TLVType_PublicKey, c.session.publicKey[:])
     
-    fmt.Println("<-     A:", hex.EncodeToString(tlv_out.GetBytes(TLVType_PublicKey)))
+    fmt.Println("<-     A:", hex.EncodeToString(tlv_out.Bytes(TLVType_PublicKey)))
     
     return tlv_out.BytesBuffer()
 }
@@ -100,7 +100,7 @@ func (c *VerifyClientController) InitialKeyVerifyRequest() (io.Reader) {
 //      - username
 //      - signature: from client session public key, server name, server session public key,
 func (c *VerifyClientController) handlePairVerifyRespond(tlv_in *TLV8Container) (*TLV8Container, error) {        
-    serverPublicKey := tlv_in.GetBytes(TLVType_PublicKey)
+    serverPublicKey := tlv_in.Bytes(TLVType_PublicKey)
     if len(serverPublicKey) != 32 {
         return nil, hap.NewErrorf("Invalid server public key size %d", len(serverPublicKey))
     }
@@ -117,7 +117,7 @@ func (c *VerifyClientController) handlePairVerifyRespond(tlv_in *TLV8Container) 
     fmt.Println("     K:", hex.EncodeToString(c.session.encryptionKey[:]))
     
     // Decrypt
-    data := tlv_in.GetBytes(TLVType_EncryptedData)
+    data := tlv_in.Bytes(TLVType_EncryptedData)
     message := data[:(len(data) - 16)]
     var mac [16]byte
     copy(mac[:], data[len(message):]) // 16 byte (MAC)    
@@ -133,8 +133,8 @@ func (c *VerifyClientController) handlePairVerifyRespond(tlv_in *TLV8Container) 
         return nil, err
     }
     
-    username  := tlv_decrypted.GetString(TLVType_Username)
-    signature := tlv_decrypted.GetBytes(TLVType_Ed25519Signature)
+    username  := tlv_decrypted.String(TLVType_Username)
+    signature := tlv_decrypted.Bytes(TLVType_Ed25519Signature)
     
     fmt.Println("    Username:", username)
     fmt.Println("   Signature:", hex.EncodeToString(signature))
@@ -180,7 +180,7 @@ func (c *VerifyClientController) handlePairVerifyRespond(tlv_in *TLV8Container) 
 // Server -> Client
 // - only error ocde (optional)
 func (c *VerifyClientController) handlePairVerifyFinishRespond(tlv_in *TLV8Container) (*TLV8Container, error) {    
-    err_code := tlv_in.GetByte(TLVStatus_NoError)
+    err_code := tlv_in.Byte(TLVStatus_NoError)
     if err_code != 0x00 {
         fmt.Println("Unexpected error %d", err_code)
     }
