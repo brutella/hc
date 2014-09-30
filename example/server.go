@@ -39,8 +39,10 @@ func main() {
     bridge_accessory := model.NewAccessory()
     bridge_accessory.AddService(bridge_info.Service)
     
-    thermostat_info := model.NewAccessoryInfoService("Raumtemperatur", "000-000-001", "Matthias H.", "Thermostat")        
-    thermostat_service := model.NewThermostatService("Thermostat", 22.1, 0.0, 100.0,  0.1)
+    thermostat_name := "Temperaturregler"
+    thermostat_serial := hap.GetSerialNumberForAccessoryName(thermostat_name, storage)
+    thermostat_info := model.NewAccessoryInfoService(thermostat_name, thermostat_serial, "Matthias H.", "Model1a")        
+    thermostat_service := model.NewThermostatService("Temperatur", 20.9, 0.0, 100.0,  0.1)
     thermostat_accessory := model.NewAccessory()
     thermostat_accessory.AddService(thermostat_info.Service)
     thermostat_accessory.AddService(thermostat_service.Service)
