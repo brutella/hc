@@ -7,6 +7,7 @@ import(
     "net/url"
     "bytes"
     "io"
+    "io/ioutil"
     "fmt"
     "strings"
     "strconv"
@@ -18,17 +19,17 @@ type Characteristic struct {
     Value interface{} `json:"value"`
 }
 
-type CharacteristicsResponse struct {
+type Characteristics struct {
     Characteristics []Characteristic `json:"characteristics"`
 }
 
-func NewCharacteristicsResponse() *CharacteristicsResponse {
-    return &CharacteristicsResponse{
+func NewCharacteristics() *Characteristics {
+    return &Characteristics{
         Characteristics: make([]Characteristic, 0),
     }
 }
 
-func (r *CharacteristicsResponse) AddCharacteristic(c Characteristic) {
+func (r *Characteristics) AddCharacteristic(c Characteristic) {
     r.Characteristics = append(r.Characteristics, c)
 }
 
@@ -47,13 +48,13 @@ func (controller *CharacteristicController) HandleGetCharacteristics(form url.Va
         return nil, err
     }
     
-    value := controller.ValueForCharacteristics(aid, cid)
-    if value == nil {
+    modelChar := controller.GetCharacteristic(aid, cid)
+    if modelChar == nil {
         fmt.Printf("[WARNING] No characteristic found with aid %d and iid %d\n", aid, cid)
     }
     
-    chars := NewCharacteristicsResponse()
-    char := Characteristic{AccessoryId: aid, Id: cid, Value: value}
+    chars := NewCharacteristics()
+    char := Characteristic{AccessoryId: aid, Id: cid, Value: modelChar.Value}
     chars.AddCharacteristic(char)
     
     result, err := json.Marshal(chars)
@@ -63,13 +64,35 @@ func (controller *CharacteristicController) HandleGetCharacteristics(form url.Va
     return &b, err
 }
 
-func (c *CharacteristicController) ValueForCharacteristics(accessoryId int, characteristicId int) interface{} {
+func (controller *CharacteristicController) HandlePutCharacteristics(r io.Reader) error {
+    bytes, _ := ioutil.ReadAll(r)
+    var chars Characteristics
+    err := json.Unmarshal(bytes, &chars)
+    
+    if err != nil {
+        fmt.Println("Could not unmarshal to json", err)
+        return err
+    }
+    
+    for _, c := range chars.Characteristics {
+        modelChar := controller.GetCharacteristic(c.AccessoryId, c.Id)
+        if modelChar == nil {
+            fmt.Printf("[WARNING] Could not find characteristic with aid %d and iid %d\n", c.AccessoryId, c.Id)
+            continue
+        }
+        modelChar.SetValueFromRemote(c.Value)
+    }
+    
+    return nil
+}
+
+func (c *CharacteristicController) GetCharacteristic(accessoryId int, characteristicId int) *model.Characteristic {
     for _, a := range c.model.Accessories {
         if a.Id == accessoryId {
             for _, s := range a.Services {
                 for _, c :=  range s.Characteristics {
                     if c.Id == characteristicId {
-                        return c.Value
+                        return c
                     }
                 }
             }

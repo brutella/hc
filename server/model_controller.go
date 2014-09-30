@@ -1,16 +1,17 @@
-package model
+package server
 
 import(
+    "github.com/brutella/hap/model"
     "encoding/json"
     "bytes"
     "io"
 )
 
 type ModelController struct {
-    model *Model
+    model *model.Model
 }
 
-func NewModelController(m *Model) *ModelController {
+func NewModelController(m *model.Model) *ModelController {
     return &ModelController{model: m}
 }
 

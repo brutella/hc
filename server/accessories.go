@@ -4,18 +4,17 @@ import(
     "net/http"
     "fmt"
     "github.com/brutella/hap"
-    "github.com/brutella/hap/model"
     "io/ioutil"
 )
 
 type AccessoriesHandler struct {
     http.Handler
     
-    controller *model.ModelController
+    controller *ModelController
     context *hap.Context
 }
 
-func NewAccessoriesHandler(c *model.ModelController, context *hap.Context) *AccessoriesHandler {
+func NewAccessoriesHandler(c *ModelController, context *hap.Context) *AccessoriesHandler {
     handler := AccessoriesHandler{
                 controller: c,
                 context: context,

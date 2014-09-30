@@ -1,7 +1,8 @@
-package model
+package server
 
 import (
 	"testing"
+    "github.com/brutella/hap/model"
     "github.com/stretchr/testify/assert"
     "bytes"
     "fmt"
@@ -9,10 +10,10 @@ import (
 )
 
 func TestGetAccessories(t *testing.T) {
-    info_service := NewAccessoryInfoService("123-456-789", "Rev1", "Matthias H.", "My Bridge")
-    accessory := NewAccessory()
+    info_service := model.NewAccessoryInfoService("123-456-789", "Rev1", "Matthias H.", "My Bridge")
+    accessory := model.NewAccessory()
     accessory.AddService(info_service.Service)
-    model := NewModel()
+    model := model.NewModel()
     model.AddAccessory(accessory)
     
     controller := NewModelController(model)

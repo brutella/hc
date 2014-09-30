@@ -5,10 +5,9 @@ import (
     "github.com/stretchr/testify/assert"
 )
 
-// Tests the pairing key verification
-func TestParseAccessoryAndCharacterId(t *testing.T) {
-    aid, cid, err := ParseAccessoryAndCharacterId("10.1")
+func TestParseID(t *testing.T) {
+    aid, cid, err := ParseAccessoryAndCharacterId("3.9")
     assert.Nil(t, err)
-    assert.Equal(t, aid, 10)
-    assert.Equal(t, cid, 1)
+    assert.Equal(t, aid, 3)
+    assert.Equal(t, cid, 9)
 }

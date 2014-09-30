@@ -11,7 +11,7 @@ import(
     "github.com/brutella/hap/server"
 )
 
-var API_PORT int = 1235
+var API_PORT int = 1236
 
 // Announce service _hap._tcp via dns-sd
 // dns-sd -R GoBridge _hap local 1234 pv=1.0 id=a1:42:90:21:73:9d c#=1 s#=1 sf=1 ff=0 md=GoBridge
@@ -47,11 +47,20 @@ func main() {
     thermostat_accessory.AddService(thermostat_info.Service)
     thermostat_accessory.AddService(thermostat_service.Service)
     
+    switch_name := "Smart Strom"
+    switch_serial := hap.GetSerialNumberForAccessoryName(switch_name, storage)
+    switch_info := model.NewAccessoryInfoService(switch_name, switch_serial, "Matthias H.", "Model1a")        
+    switch_service := model.NewSwitchService("Strom", true)
+    switch_accessory := model.NewAccessory()
+    switch_accessory.AddService(switch_info.Service)
+    switch_accessory.AddService(switch_service.Service)
+    
     m := model.NewModel()
     m.AddAccessory(bridge_accessory)
     m.AddAccessory(thermostat_accessory)
+    m.AddAccessory(switch_accessory)
     
-    model_controller := model.NewModelController(m)
+    model_controller := server.NewModelController(m)
     characteristics_controller := server.NewCharacteristicController(m)
     
     setup, _    := pair.NewSetupServerController(context, bridge)
