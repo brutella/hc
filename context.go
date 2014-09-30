@@ -40,6 +40,11 @@ func (c *Context) SaveClient(client *Client) {
     c.storage.Set(client.Name + ".ltpk", client.PublicKey)
 }
 
+func (c *Context) DeleteClient(client *Client) {
+    c.storage.Delete(client.Name + ".ltpk")
+}
+
+
 func (c *Context) PublicKeyForAccessory(b *Bridge) []byte {
     return b.PublicKey
 }

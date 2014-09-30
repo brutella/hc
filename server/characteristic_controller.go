@@ -64,14 +64,14 @@ func (controller *CharacteristicController) HandleGetCharacteristics(form url.Va
     return &b, err
 }
 
-func (controller *CharacteristicController) HandlePutCharacteristics(r io.Reader) error {
-    bytes, _ := ioutil.ReadAll(r)
+func (controller *CharacteristicController) HandlePutCharacteristics(r io.Reader) (io.Reader, error) {
+    b, _ := ioutil.ReadAll(r)
     var chars Characteristics
-    err := json.Unmarshal(bytes, &chars)
+    err := json.Unmarshal(b, &chars)
     
     if err != nil {
         fmt.Println("Could not unmarshal to json", err)
-        return err
+        return nil, err
     }
     
     for _, c := range chars.Characteristics {
@@ -83,7 +83,10 @@ func (controller *CharacteristicController) HandlePutCharacteristics(r io.Reader
         modelChar.SetValueFromRemote(c.Value)
     }
     
-    return nil
+    // request = response
+    var buffer bytes.Buffer
+    buffer.Write(b)
+    return &buffer, nil
 }
 
 func (c *CharacteristicController) GetCharacteristic(accessoryId int, characteristicId int) *model.Characteristic {
