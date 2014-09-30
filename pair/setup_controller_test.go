@@ -10,7 +10,8 @@ import (
 
 // Tests the pairing setup
 func TestPairingIntegration(t *testing.T) {
-    bridge, err := hap.NewBridge("HAP Test", "123-45-678")
+    info := hap.NewBridgeInfo("Macbook Bridge", "001-02-003", "0001", "Matthias H.")
+    bridge, err := hap.NewBridge(info)
     assert.Nil(t, err)
     
     storage, err := hap.NewFileStorage(os.TempDir())

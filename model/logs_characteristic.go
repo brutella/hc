@@ -11,3 +11,12 @@ func NewLogsCharacteristic(logs string) *LogsCharacteristic {
     
     return &LogsCharacteristic{str}
 }
+
+func (c *LogsCharacteristic) SetLogs(logs string) {
+    // TODO
+}
+
+func (c *LogsCharacteristic) Logs() string {
+    // TODO
+    return ""
+}

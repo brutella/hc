@@ -18,15 +18,15 @@ const (
 )
 
 func PermsAll() []string {
-    return []string{PermRead, PermWrite, PermEvents}
+    return []string{PermRead, PermWrite}
 }
 
 func PermsRead() []string {
-    return []string{PermRead, PermEvents}
+    return []string{PermRead}
 }
 
 func PermsWrite() []string {
-    return []string{PermWrite, PermEvents}
+    return []string{PermWrite}
 }
 
 func PermsReadOnly() []string {
@@ -71,25 +71,38 @@ type CharType string
 const (
     CharTypeUnknown                         = "0" // not specified in HAP
     
+    // name service
     CharTypeName                            = "23" // 13
+    
+    // info service
     CharTypeModel                           = "21" // 1
     CharTypeManufacturer                    = "20" // 1
     CharTypeSerialNumber                    = "30" // 1
+    CharTypeIdentify                        = "14" // 2
+    
     CharTypeLogs                            = "1F" // 15
     CharTypeVersion                         = "37" // 2
-    CharTypeIdentify                        = "14" // 2
     CharTypeAdministratorOnlyAccesss        = "1" // 15
     
+    // Light bulb service
     CharTypeBrightness                      = "8"  // 15
     CharTypeHue                             = "13" // 15
     CharTypeSaturation                      = "2F" // 15
     
+    // switch service
     CharTypeOn                              = "25" // 15
+    
     CharTypeOutletInUse                     = "26" // 13
     CharTypeAudioFeedback                   = "5" // 15
     
+    // garage door opener
+    CharTypeObstructionDetected             = "24" // 13
     CharTypeDoorStateTarget                 = "32" // 15
     CharTypeDoorStateCurrent                = "E" // 13
+    CharTypeLockMechanismTargetState        = "1E" // 15
+    CharTypeLockMechanismCurrentState       = "1D" // 13
+    CharTypeLockMechanismLastKnownAction    = "1C" // 13
+    CharTypeLockManagementControlPoint      = "19" // 2
     
     CharTypeTemperatureUnits                = "36" // 15
     CharTypeTemperatureTarget               = "35" // 15
@@ -102,13 +115,7 @@ const (
     CharTypeCoolingThreshold                = "D"  // 15
     CharTypeHeatingCoolingModeTarget        = "33" // 15
     CharTypeHeatingCoolingModeCurrent       = "F" // 13
-
-    CharTypeLockMechanismTargetState        = "1E" // 15
-    CharTypeLockMechanismLastKnownAction    = "1C" // 13
-    CharTypeLockMechanismCurrentState       = "1D" // 13
-    CharTypeLockManagementControlPoint      = "19" // 2
     
-    CharTypeObstructionDetected             = "24" // 13
     CharTypeMotionDetected                  = "22" // 13
 )
 

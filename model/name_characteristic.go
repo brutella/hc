@@ -11,3 +11,11 @@ func NewNameCharacteristic(name string) *NameCharacteristic {
     
     return &NameCharacteristic{str}
 }
+
+func (c *NameCharacteristic) SetName(name string) {
+    c.SetString(name)
+}
+
+func (c *NameCharacteristic) Name() string{
+    return c.String()
+}

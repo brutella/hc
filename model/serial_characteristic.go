@@ -11,3 +11,11 @@ func NewSerialNumberCharacteristic(serial string) *SerialNumberCharacteristic {
     
     return &SerialNumberCharacteristic{str}
 }
+
+func (c *SerialNumberCharacteristic) SetSerialNumber(serialNumber string) {
+    c.SetString(serialNumber)
+}
+
+func (c *SerialNumberCharacteristic) SerialNumber() string {
+    return c.String()
+}

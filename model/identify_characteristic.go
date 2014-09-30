@@ -11,3 +11,11 @@ func NewIdentifyCharacteristic(identify bool) *IdentifyCharacteristic {
     
     return &IdentifyCharacteristic{b}
 }
+
+func (c *IdentifyCharacteristic) SetIdentify(identify bool) {
+    c.SetBool(identify)
+}
+
+func (c *IdentifyCharacteristic) Identify() bool {
+    return c.Bool()
+}

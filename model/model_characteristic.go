@@ -11,3 +11,11 @@ func NewModelCharacteristic(model string) *ModelCharacteristic {
     
     return &ModelCharacteristic{str}
 }
+
+func (c *ModelCharacteristic) SetModel(model string) {
+    c.SetString(model)
+}
+
+func (c *ModelCharacteristic) Model() string {
+    return c.String()
+}
