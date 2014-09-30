@@ -103,13 +103,13 @@ func (c *VerifyServerController) handlePairVerifyStart(tlv_in *TLV8Container) (*
     
     material := make([]byte, 0)
     material = append(material, c.session.publicKey[:]...)
-    material = append(material, c.bridge.Name()...)
+    material = append(material, c.bridge.Id()...)
     material = append(material, clientPublicKey...)
     signature, _ := hap.ED25519Signature(LTSK, material)
     
     // Encrypt
     tlv_encrypt := TLV8Container{}
-    tlv_encrypt.SetString(TLVType_Username, c.bridge.Name())
+    tlv_encrypt.SetString(TLVType_Username, c.bridge.Id())
     tlv_encrypt.SetBytes(TLVType_Ed25519Signature, signature)
     
     encrypted, mac, _ := hap.Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PV-Msg02"), tlv_encrypt.BytesBuffer().Bytes(), nil)

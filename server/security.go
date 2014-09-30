@@ -85,12 +85,15 @@ func (con *tcpHAPConnection) SecureRead(b []byte) (n int, err error) {
 func (con *tcpHAPConnection) Write(b []byte) (n int, err error) {
     // Only encrypt outgoing data when incoming data was secured too
     if con.isEncrypted == true {
+        fmt.Println("Secure Write")
         if con.context.SecSession == nil {
             err := hap.NewError("[ERROR] Can not write to secured connection without crypto keys")
             fmt.Println(err)
             return 0, err
         }
         return con.SecureWrite(b)
+    } else {
+        fmt.Println("Write")
     }
     
     return con.connection.Write(b)
@@ -98,16 +101,19 @@ func (con *tcpHAPConnection) Write(b []byte) (n int, err error) {
 
 func (con *tcpHAPConnection) Read(b []byte) (n int, err error) {
     if con.context.SecSession != nil {
+        fmt.Println("Secure Read")
         // Encryption from now on
         con.isEncrypted = true
         return con.SecureRead(b)
+    } else {
+        fmt.Println("Read")
     }
     
     return con.connection.Read(b)
 }
 
 func (con *tcpHAPConnection) Close() error {
-    fmt.Println("Secure Close")
+    fmt.Println("Closed")
     con.context.SecureSessionClosed()
     return con.connection.Close()
 }
@@ -155,7 +161,7 @@ func (l *TCPHAPListener) Accept() (c net.Conn, err error) {
     	signal.Notify(c, os.Interrupt)
     	go func() {
     		for _ = range c {
-    			fmt.Println("Close", hapConn)
+    			fmt.Println("Closing...")
                 hapConn.Close()
     			os.Exit(0)
     		}

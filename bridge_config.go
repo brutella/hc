@@ -2,8 +2,8 @@ package hap
 
 import(
     "os"
-    "crypto/md5"
     "encoding/hex"
+    "crypto/md5"
 )
 
 type BridgeInfo struct {
@@ -14,21 +14,23 @@ type BridgeInfo struct {
     Manufacturer string
 }
 
-func NewBridgeInfo(name, password, serialNumber, manufacturer string) BridgeInfo {
+func NewBridgeInfo(name, password, manufacturer string, storage Storage) BridgeInfo {
+    serial := GetSerialNumberForAccessoryName(name, storage)
+    
     return BridgeInfo{
-        SerialNumber: serialNumber,
+        SerialNumber: serial,
         Password: password,
         Name: name,
-        Id: IEEE802Id(),
+        Id: IEEE802Id(serial),
         Manufacturer: manufacturer,
     }
 }
 
 // Returns the bridge id as MAC-48 address
 // Is used as TXT record `id`
-func IEEE802Id() string {
+func IEEE802Id(input string) string {
     h := md5.New()
-    h.Write([]byte(Hostname()))
+    h.Write([]byte(input))
     result := h.Sum(nil)
     
     bytes := result[:6]

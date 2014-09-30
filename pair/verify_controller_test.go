@@ -9,13 +9,13 @@ import (
 
 // Tests the pairing key verification
 func TestPairVerifyIntegration(t *testing.T) {
-    info := hap.NewBridgeInfo("Macbook Bridge", "001-02-003", "0001", "Matthias H.")
-    bridge, err := hap.NewBridge(info)
-    assert.Nil(t, err)
-    
     storage, err := hap.NewFileStorage(os.TempDir())
     assert.Nil(t, err)
     context := hap.NewContext(storage)
+    info := hap.NewBridgeInfo("Macbook Bridge", "001-02-003", "Matthias H.", storage)
+    bridge, err := hap.NewBridge(info)
+    assert.Nil(t, err)
+    
     controller, err := NewVerifyServerController(context, bridge)
     assert.Nil(t, err)
     

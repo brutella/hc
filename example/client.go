@@ -10,14 +10,16 @@ import(
 )
 
 func sendTLV8(b io.Reader) (io.Reader, error){
-    resp, err := http.Post("http://127.0.0.1:50239/pair-setup", hap.HTTPContentTypePairingTLV8, b)
+    resp, err := http.Post("http://127.0.0.1:55036/pair-setup", hap.HTTPContentTypePairingTLV8, b)
     return resp.Body, err
 }
 
 func main() {    
-    bridge, err := hap.NewBridge("id=87:4b:e6:d6:b7:71", "224-83-651")    
     storage, err := hap.NewFileStorage(os.TempDir())
     context := hap.NewContext(storage)
+    info := hap.NewBridgeInfo("Test Bridge", "719-47-107", "Matthias H.", storage)
+    info.Id = "42:cd:02:57:0d:40"
+    bridge, err := hap.NewBridge(info)
     
     client := pair.NewSetupClientController(context, bridge, "HomeKit Client")
     pairStartRequest := client.InitialPairingRequest()
