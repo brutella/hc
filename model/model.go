@@ -18,3 +18,21 @@ func (m *Model) AddAccessory(a *Accessory) {
     m.idCount += 1
     m.Accessories = append(m.Accessories, a)
 }
+
+func (m *Model) Equal(other interface{}) bool {
+    if model, ok := other.(*Model); ok == true {
+        if len(m.Accessories) != len(model.Accessories) {
+            return false
+        }
+        
+        for i, a := range m.Accessories {
+            if a.Equal(model.Accessories[i]) == false {
+                return false
+            }
+        }
+        
+        return true
+    }
+    
+    return false
+}

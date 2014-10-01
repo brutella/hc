@@ -3,12 +3,12 @@ package model
 type ThermostatService struct {
     *Service
     
-    name *NameCharacteristic
-    unit *TemperatureUnitCharacteristic
-    temp *TemperatureCharacteristic
-    targetTemp *TemperatureCharacteristic
-    mode *HeatingCoolingModeCharacteristic
-    targetMode *HeatingCoolingModeCharacteristic
+    Name *NameCharacteristic
+    Unit *TemperatureUnitCharacteristic
+    Temp *TemperatureCharacteristic
+    TargetTemp *TemperatureCharacteristic
+    Mode *HeatingCoolingModeCharacteristic
+    TargetMode *HeatingCoolingModeCharacteristic
 }
 
 func NewThermostatService(name string, temperature, min, max, steps float64) *ThermostatService {

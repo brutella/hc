@@ -11,6 +11,7 @@ type CharacteristicDelegate interface {
 
 type ValueChangedFunc func(CharacteristicChange)
 type Characteristic struct {
+    Compareable
     Id int                  `json:"iid"` // managed by accessory
     Type CharType           `json:"type"`
     Permissions []string    `json:"perms"`
@@ -82,6 +83,16 @@ func (c *Characteristic) AddRemoteChangeDelegate(d CharacteristicDelegate) {
     c.remoteDelegates = append(c.remoteDelegates, d)
 }
 
+// Compareable
+func (c *Characteristic) Equal(other interface{}) bool {
+    if characteristic, ok := other.(*Characteristic); ok == true {
+        return c.Value == characteristic.Value && c.Id == characteristic.Id && c.Type == characteristic.Type && len(c.Permissions) == len(characteristic.Permissions) && c.Description == characteristic.Description && c.Format == characteristic.Format && c.Unit == characteristic.Unit && c.MaxLen == characteristic.MaxLen && c.MaxValue == characteristic.MaxValue && c.MinValue == characteristic.MinValue && c.MinStep == characteristic.MinStep && c.Events == characteristic.Events && c.Bonjour == characteristic.Bonjour
+    }
+    
+    return false
+}
+
+// Private
 
 func (c *Characteristic) setValue(value interface{}, remote bool) {
     old := c.Value

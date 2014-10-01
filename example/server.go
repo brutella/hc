@@ -80,9 +80,9 @@ func main() {
     characteristics_handler := server.NewCharacteristicsHandler(characteristics_controller, context)
     mux.Handle("/characteristics", characteristics_handler)
     
-    // pairing_controller := server.NewPairingController(context)
-    // pairing_handler := server.NewPairingHandler(pairing_controller, context)
-    // mux.Handle("/pairings", pairing_handler)
+    pairing_controller := pair.NewPairingController(context)
+    pairing_handler := server.NewPairingHandler(pairing_controller, context)
+    mux.Handle("/pairings", pairing_handler)
     
     addr := ":" + strconv.Itoa(API_PORT)
     fmt.Println("Running at", addr)

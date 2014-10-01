@@ -1,7 +1,7 @@
 package pair
 
 const (
-    TLVType_AuthMethod       = 0x00 // integer, either 0x00 (uncertified) or 0x01 (MFi compliant)
+    TLVType_Method           = 0x00 // integer, either 0x00 (uncertified) or 0x01 (MFi compliant)
     TLVType_Username         = 0x01 // string
     TLVType_Salt             = 0x02 // 16 bytes
     TLVType_PublicKey        = 0x03 // either SRP client public key (384 bytes) or ED25519 LTPK (32 bytes)
@@ -13,6 +13,13 @@ const (
     
     TLVType_MFiCertificate   = 0x09
     TLVType_MFiSignature     = 0x0A
+)
+
+const (
+    TLVType_Method_PairingDefault= 0x00
+    TLVType_Method_PairingMFi    = 0x01
+    TLVType_Method_PairingAdd    = 0x03
+    TLVType_Method_PairingDelete = 0x04
 )
 
 const (

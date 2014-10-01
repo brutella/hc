@@ -41,7 +41,7 @@ func (c *SetupServerController) Handle(r io.Reader) (io.Reader, error) {
         return nil, err
     }
     
-    method := tlv_in.Byte(TLVType_AuthMethod)
+    method := tlv_in.Byte(TLVType_Method)
     
     // It is valid that method is not sent
     // If method is sent then it must be 0x00
@@ -243,7 +243,7 @@ func (c *SetupServerController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8C
             fmt.Println("<-     Signature:", hex.EncodeToString(tlvPairKeyExchange.Bytes(TLVType_Ed25519Signature)))
             
             encrypted, mac, _ := hap.Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)    
-            tlv_out.SetByte(TLVType_AuthMethod, 0)
+            tlv_out.SetByte(TLVType_Method, 0)
             tlv_out.SetByte(TLVType_SequenceNumber, PairKeyExchangeRequest)
             tlv_out.SetBytes(TLVType_EncryptedData, append(encrypted, mac[:]...))
             

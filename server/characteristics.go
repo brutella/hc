@@ -6,6 +6,8 @@ import(
     "github.com/brutella/hap"
     "io"
     "io/ioutil"
+    "encoding/json"
+    "bytes"
 )
 
 type CharacteristicsHandler struct {
@@ -25,19 +27,34 @@ func NewCharacteristicsHandler(c *CharacteristicController, context *hap.Context
 }
 
 func (handler *CharacteristicsHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-    response.Header().Set("Content-Type", hap.HTTPContentTypeHAPJson)
-    
     var res io.Reader
     var err error
     switch request.Method {
     case MethodGET:
         fmt.Println("GET /characteristics")
         request.ParseForm()
-        res, err = handler.controller.HandleGetCharacteristics(request.Form)
+        aid, cid, err := ParseAccessoryAndCharacterId(request.Form.Get("id"))
+        chars := handler.controller.HandleGetCharacteristics(aid, cid)
+        result, err := json.Marshal(chars)
+        if err != nil {
+            fmt.Println(err)
+        }
+        
+        var b bytes.Buffer
+        b.Write(result)
+        res = &b
     case MethodPUT:
         fmt.Println("PUT /characteristics")
-        // no response
-        res, err = handler.controller.HandlePutCharacteristics(request.Body)
+        
+        b, _ := ioutil.ReadAll(request.Body)
+        var chars Characteristics
+        err := json.Unmarshal(b, &chars)
+    
+        if err != nil {
+            fmt.Println("Could not unmarshal to json", err)
+        } else {
+            err = handler.controller.HandlePutCharacteristics(chars)
+        }
     default:
         fmt.Println("Cannot handle HTTP method", request.Method)
     }
@@ -48,7 +65,12 @@ func (handler *CharacteristicsHandler) ServeHTTP(response http.ResponseWriter, r
         response.WriteHeader(http.StatusInternalServerError)
     } else {
         bytes, _ := ioutil.ReadAll(res)
-        fmt.Println("<-  JSON:", string(bytes))
-        response.Write(bytes)
+        if len(bytes) > 0 {
+            response.Header().Set("Content-Type", hap.HTTPContentTypeHAPJson)
+            fmt.Println("<-  JSON:", string(bytes))
+            response.Write(bytes)
+        } else {
+            response.WriteHeader(http.StatusNoContent)
+        }
     }
 }

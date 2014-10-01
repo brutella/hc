@@ -4,6 +4,7 @@ import(
 )
 
 type Accessory struct {
+    Compareable
     Id int `json:"aid"`
     Services []*Service `json:"services"`
     
@@ -27,4 +28,22 @@ func (a *Accessory) AddService(s *Service) {
     }
     
     a.Services = append(a.Services, s)
+}
+
+func (a *Accessory) Equal(other interface{}) bool {
+    if accessory, ok := other.(*Accessory); ok == true {
+        if len(a.Services) != len(accessory.Services) {
+            return false
+        }
+        
+        for i, s := range a.Services {
+            if s.Equal(accessory.Services[i]) == false {
+                return false
+            }
+        }
+        
+        return a.Id == accessory.Id
+    }
+    
+    return false
 }

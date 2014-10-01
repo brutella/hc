@@ -4,17 +4,17 @@ import(
     "net/http"
     "fmt"
     "github.com/brutella/hap"
-    "io"
+    "github.com/brutella/hap/pair"
     "io/ioutil"
 )
 
 type PairingHandler struct {
     http.Handler
-    controller *PairingController
+    controller *pair.PairingController
     context *hap.Context
 }
 
-func NewPairingHandler(controller *PairingController, context *hap.Context) *PairingHandler {
+func NewPairingHandler(controller *pair.PairingController, context *hap.Context) *PairingHandler {
     handler := PairingHandler{
                 controller: controller,
                 context: context,
@@ -23,26 +23,18 @@ func NewPairingHandler(controller *PairingController, context *hap.Context) *Pai
     return &handler
 }
 
-func (handler *PairingHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {    
-    var res io.Reader
-    var err error
-    switch request.Method {
-    case MethodDEL:
-        fmt.Println("DEL /pairings")
-        res, err = handler.controller.HandleDeletePairings(request.Body)
-    case MethodPOST:
-        fmt.Println("POST /pairings")
-        res, err = handler.controller.HandlePostPairings(request.Body)
-    default:
-        fmt.Println("Cannot handle HTTP method", request.Method)
+func (handler *PairingHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
+    fmt.Println("POST /pairings")
+    
+    tlv8, err := pair.ReadTLV8(request.Body)
+    if err == nil {
+        err = handler.controller.Handle(tlv8)
     }
     
     if err != nil {
         fmt.Println(err)
         response.WriteHeader(http.StatusInternalServerError)
     } else {
-        bytes, _ := ioutil.ReadAll(res)
-        fmt.Println("<-  JSON:", string(bytes))
-        response.Write(bytes)
+        response.WriteHeader(http.StatusNoContent)
     }
 }

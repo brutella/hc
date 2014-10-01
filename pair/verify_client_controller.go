@@ -41,7 +41,7 @@ func (c *VerifyClientController) Handle(r io.Reader) (io.Reader, error) {
         return nil, err
     }
     
-    method := tlv_in.Byte(TLVType_AuthMethod)
+    method := tlv_in.Byte(TLVType_Method)
     
     // It is valid that method is not sent
     // If method is sent then it must be 0x00
@@ -80,7 +80,7 @@ func (c *VerifyClientController) Handle(r io.Reader) (io.Reader, error) {
 // - Public key `A`
 func (c *VerifyClientController) InitialKeyVerifyRequest() (io.Reader) {
     tlv_out := TLV8Container{}
-    tlv_out.SetByte(TLVType_AuthMethod, 0)
+    tlv_out.SetByte(TLVType_Method, 0)
     tlv_out.SetByte(TLVType_SequenceNumber, VerifyStartRequest)
     tlv_out.SetBytes(TLVType_PublicKey, c.session.publicKey[:])
     
@@ -152,7 +152,7 @@ func (c *VerifyClientController) handlePairVerifyRespond(tlv_in *TLV8Container) 
     }
     
     tlv_out := TLV8Container{}
-    tlv_out.SetByte(TLVType_AuthMethod, 0)
+    tlv_out.SetByte(TLVType_Method, 0)
     tlv_out.SetByte(TLVType_SequenceNumber, VerifyFinishRequest)
     
     tlv_encrypt := TLV8Container{}

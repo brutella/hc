@@ -31,7 +31,7 @@ func NewSetupClientController(context *hap.Context, bridge *hap.Bridge, username
 
 func (c *SetupClientController) InitialPairingRequest() (io.Reader) {
     tlvPairStart := TLV8Container{}
-    tlvPairStart.SetByte(TLVType_AuthMethod, 0)
+    tlvPairStart.SetByte(TLVType_Method, 0)
     tlvPairStart.SetByte(TLVType_SequenceNumber, PairStartRequest)
     
     return tlvPairStart.BytesBuffer()
@@ -46,7 +46,7 @@ func (c *SetupClientController) Handle(r io.Reader) (io.Reader, error) {
         return nil, err
     }
     
-    method := tlv_in.Byte(TLVType_AuthMethod)
+    method := tlv_in.Byte(TLVType_Method)
     
     // It is valid that method is not sent
     // If method is sent then it must be 0x00
@@ -126,7 +126,7 @@ func (c *SetupClientController) handlePairStartRespond(tlv_in *TLV8Container) (*
     fmt.Println("<-     M1:", hex.EncodeToString(proof))
     
     tlv_out := TLV8Container{}
-    tlv_out.SetByte(TLVType_AuthMethod, 0)
+    tlv_out.SetByte(TLVType_Method, 0)
     tlv_out.SetByte(TLVType_SequenceNumber, PairVerifyRequest)
     tlv_out.SetBytes(TLVType_PublicKey, publicKey)
     tlv_out.SetBytes(TLVType_Proof, proof)
@@ -180,7 +180,7 @@ func (c *SetupClientController) handlePairVerifyRespond(tlv_in *TLV8Container) (
     }
     
     tlv_out := TLV8Container{}
-    tlv_out.SetByte(TLVType_AuthMethod, 0)
+    tlv_out.SetByte(TLVType_Method, 0)
     tlv_out.SetByte(TLVType_SequenceNumber, PairKeyExchangeRequest)
     tlv_out.SetBytes(TLVType_EncryptedData, append(encrypted, tag[:]...))
     

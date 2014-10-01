@@ -5,18 +5,18 @@ import (
     "github.com/brutella/hap/model"
     "github.com/stretchr/testify/assert"
     "bytes"
-    "fmt"
     "io/ioutil"
+    "encoding/json"
 )
 
 func TestGetAccessories(t *testing.T) {
     info_service := model.NewAccessoryInfoService("123-456-789", "Rev1", "Matthias H.", "My Bridge")
-    accessory := model.NewAccessory()
-    accessory.AddService(info_service.Service)
-    model := model.NewModel()
-    model.AddAccessory(accessory)
+    a := model.NewAccessory()
+    a.AddService(info_service.Service)
+    m := model.NewModel()
+    m.AddAccessory(a)
     
-    controller := NewModelController(model)
+    controller := NewModelController(m)
     
     var b bytes.Buffer
     r, err := controller.HandleGetAccessories(&b)
@@ -24,5 +24,8 @@ func TestGetAccessories(t *testing.T) {
     assert.NotNil(t, r)
     
     bytes, _ := ioutil.ReadAll(r)
-    fmt.Println(string(bytes))
+    var returnedModel model.Model
+    err = json.Unmarshal(bytes, &returnedModel)
+    assert.Nil(t, err)
+    assert.True(t, returnedModel.Equal(m))
 }

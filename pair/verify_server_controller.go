@@ -36,7 +36,7 @@ func (c *VerifyServerController) Handle(r io.Reader) (io.Reader, error) {
         return nil, err
     }
     
-    method := tlv_in.Byte(TLVType_AuthMethod)
+    method := tlv_in.Byte(TLVType_Method)
     
     // It is valid that method is not sent
     // If method is sent then it must be 0x00

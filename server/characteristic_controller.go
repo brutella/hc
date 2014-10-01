@@ -3,11 +3,6 @@ package server
 import(
     "github.com/brutella/hap"
     "github.com/brutella/hap/model"
-    "encoding/json"
-    "net/url"
-    "bytes"
-    "io"
-    "io/ioutil"
     "fmt"
     "strings"
     "strconv"
@@ -41,13 +36,7 @@ func NewCharacteristicController(m *model.Model) *CharacteristicController {
     return &CharacteristicController{model: m}
 }
 
-func (controller *CharacteristicController) HandleGetCharacteristics(form url.Values) (io.Reader, error) {
-    // todo parse
-    aid, cid, err := ParseAccessoryAndCharacterId(form.Get("id"))
-    if err != nil {
-        return nil, err
-    }
-    
+func (controller *CharacteristicController) HandleGetCharacteristics(aid, cid int) *Characteristics {    
     modelChar := controller.GetCharacteristic(aid, cid)
     if modelChar == nil {
         fmt.Printf("[WARNING] No characteristic found with aid %d and iid %d\n", aid, cid)
@@ -57,23 +46,10 @@ func (controller *CharacteristicController) HandleGetCharacteristics(form url.Va
     char := Characteristic{AccessoryId: aid, Id: cid, Value: modelChar.Value}
     chars.AddCharacteristic(char)
     
-    result, err := json.Marshal(chars)
-    var b bytes.Buffer
-    b.Write(result)
-    
-    return &b, err
+    return chars
 }
 
-func (controller *CharacteristicController) HandlePutCharacteristics(r io.Reader) (io.Reader, error) {
-    b, _ := ioutil.ReadAll(r)
-    var chars Characteristics
-    err := json.Unmarshal(b, &chars)
-    
-    if err != nil {
-        fmt.Println("Could not unmarshal to json", err)
-        return nil, err
-    }
-    
+func (controller *CharacteristicController) HandlePutCharacteristics(chars Characteristics) error {
     for _, c := range chars.Characteristics {
         modelChar := controller.GetCharacteristic(c.AccessoryId, c.Id)
         if modelChar == nil {
@@ -83,10 +59,7 @@ func (controller *CharacteristicController) HandlePutCharacteristics(r io.Reader
         modelChar.SetValueFromRemote(c.Value)
     }
     
-    // request = response
-    var buffer bytes.Buffer
-    buffer.Write(b)
-    return &buffer, nil
+    return nil
 }
 
 func (c *CharacteristicController) GetCharacteristic(accessoryId int, characteristicId int) *model.Characteristic {
