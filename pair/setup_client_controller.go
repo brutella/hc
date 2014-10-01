@@ -37,15 +37,30 @@ func (c *SetupClientController) InitialPairingRequest() (io.Reader) {
     return tlvPairStart.BytesBuffer()
 }
 
-func (c *SetupClientController) Handle(r io.Reader) (io.Reader, error) {
-    var tlv_out *TLV8Container
-    var err error
-    
+func (c *SetupClientController) HandleReader(r io.Reader) (io.Reader, error) {
     tlv_in, err := ReadTLV8(r)
     if err != nil {
         return nil, err
     }
+    fmt.Println("->     Seq:", tlv_in.Byte(TLVType_SequenceNumber))
     
+    tlv_out, err := c.Handle(tlv_in)
+    
+    if err != nil {
+        fmt.Println("[ERROR]", err)
+        return nil, err
+    } else {
+        if tlv_out != nil {
+            fmt.Println("<-     Seq:", tlv_out.Byte(TLVType_SequenceNumber))
+            fmt.Println("-------------")
+            return tlv_out.BytesBuffer(), nil
+        }
+    }
+    
+    return nil, err
+}
+
+func (c *SetupClientController) Handle(tlv_in *TLV8Container) (*TLV8Container, error) {
     method := tlv_in.Byte(TLVType_Method)
     
     // It is valid that method is not sent
@@ -62,6 +77,9 @@ func (c *SetupClientController) Handle(r io.Reader) (io.Reader, error) {
     seq := tlv_in.Byte(TLVType_SequenceNumber)
     fmt.Println("->     Seq:", seq)
     
+    var tlv_out *TLV8Container
+    var err error
+    
     switch seq {
     case PairStartRespond:        
         tlv_out, err = c.handlePairStartRespond(tlv_in)
@@ -72,20 +90,8 @@ func (c *SetupClientController) Handle(r io.Reader) (io.Reader, error) {
     default:
         return nil, hap.NewErrorf("Cannot handle sequence number %d", seq)
     }
-    
-    if err != nil {
-        fmt.Println("[ERROR]", err)
-        return nil, err
-    } else if tlv_out == nil {
-        fmt.Println("PAIRING FINISHED")
-        return nil, nil
-    } else {
-        fmt.Println("<-     Seq:", tlv_out.Byte(TLVType_SequenceNumber))
-    }
-    
-    fmt.Println("-------------")
-    
-    return tlv_out.BytesBuffer(), nil
+        
+    return tlv_out, err
 }
 
 // Server -> Client

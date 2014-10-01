@@ -25,27 +25,27 @@ func TestPairingIntegration(t *testing.T) {
     pairStartRequest := client_controller.InitialPairingRequest()
     
     // 1) C -> S
-    pairStartRespond, err := controller.Handle(pairStartRequest)
+    pairStartRespond, err := controller.HandleReader(pairStartRequest)
     assert.Nil(t, err)
     
     // 2) S -> C
-    pairVerifyRequest, err := client_controller.Handle(pairStartRespond)
+    pairVerifyRequest, err := client_controller.HandleReader(pairStartRespond)
     assert.Nil(t, err)
     
     // 3) C -> S
-    pairVerifyRespond, err := controller.Handle(pairVerifyRequest)
+    pairVerifyRespond, err := controller.HandleReader(pairVerifyRequest)
     assert.Nil(t, err)
     
     // 4) S -> C
-    pairKeyRequest, err := client_controller.Handle(pairVerifyRespond)
+    pairKeyRequest, err := client_controller.HandleReader(pairVerifyRespond)
     assert.Nil(t, err)
     
     // 5) C -> S
-    pairKeyRespond, err := controller.Handle(pairKeyRequest)
+    pairKeyRespond, err := controller.HandleReader(pairKeyRequest)
     assert.Nil(t, err)
     
     // 6) S -> C
-    request, err := client_controller.Handle(pairKeyRespond)
+    request, err := client_controller.HandleReader(pairKeyRespond)
     assert.Nil(t, err)
     assert.Nil(t, request)
 }  

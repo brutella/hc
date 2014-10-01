@@ -25,18 +25,18 @@ func TestPairVerifyIntegration(t *testing.T) {
     
     tlvVerifyStartRequest := client_controller.InitialKeyVerifyRequest()
     // 1) C -> S
-    tlvVerifyStartRespond, err := controller.Handle(tlvVerifyStartRequest)
+    tlvVerifyStartRespond, err := controller.HandleReader(tlvVerifyStartRequest)
     assert.Nil(t, err)
     // 2) S -> C
-    tlvFinishRequest, err := client_controller.Handle(tlvVerifyStartRespond)
+    tlvFinishRequest, err := client_controller.HandleReader(tlvVerifyStartRespond)
     assert.Nil(t, err)
     // 3) C -> S
-    tlvFinishRespond, err := controller.Handle(tlvFinishRequest)
+    tlvFinishRespond, err := controller.HandleReader(tlvFinishRequest)
     assert.Nil(t, err)
     assert.NotNil(t, context.SecSession) // secure session is established
     
     // 4) S -> C 
-    response, err := client_controller.Handle(tlvFinishRespond)
+    response, err := client_controller.HandleReader(tlvFinishRespond)
     assert.Nil(t, err)
     assert.Nil(t, response)
 } 

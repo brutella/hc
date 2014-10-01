@@ -32,14 +32,32 @@ func NewVerifyClientController(context *hap.Context, bridge *hap.Bridge, usernam
     return &controller
 }
 
-func (c *VerifyClientController) Handle(r io.Reader) (io.Reader, error) {
-    var tlv_out *TLV8Container
-    var err error
-    
+func (c *VerifyClientController) HandleReader(r io.Reader) (io.Reader, error) {
     tlv_in, err := ReadTLV8(r)
     if err != nil {
         return nil, err
     }
+    
+    fmt.Println("->     Seq:", tlv_in.Byte(TLVType_SequenceNumber))
+    
+    tlv_out, err := c.Handle(tlv_in)
+    if err != nil {
+        fmt.Println("[ERROR]", err)
+        return nil, err
+    } else {
+        if tlv_out != nil {
+            fmt.Println("<-     Seq:", tlv_out.Byte(TLVType_SequenceNumber))
+            fmt.Println("-------------")
+            return tlv_out.BytesBuffer(), nil
+        }
+    }
+    
+    return nil, err
+}
+    
+func (c *VerifyClientController) Handle(tlv_in *TLV8Container) (*TLV8Container, error) {
+    var tlv_out *TLV8Container
+    var err error
     
     method := tlv_in.Byte(TLVType_Method)
     
@@ -50,8 +68,6 @@ func (c *VerifyClientController) Handle(r io.Reader) (io.Reader, error) {
     }
     
     seq := tlv_in.Byte(TLVType_SequenceNumber)
-    fmt.Println("->     Seq:", seq)
-    
     switch seq {
     case VerifyStartRespond:
         tlv_out, err = c.handlePairVerifyRespond(tlv_in)
@@ -61,19 +77,7 @@ func (c *VerifyClientController) Handle(r io.Reader) (io.Reader, error) {
         return nil, hap.NewErrorf("Cannot handle sequence number %d", seq)
     }
     
-    if err != nil {
-        fmt.Println("[ERROR]", err)
-        return nil, err
-    } else if tlv_out == nil {
-        fmt.Println("KEY VERIFICATION FINISHED")
-        return nil, nil
-    } else {
-        fmt.Println("<-     Seq:", tlv_out.Byte(TLVType_SequenceNumber))
-    }
-    
-    fmt.Println("-------------")
-    
-    return tlv_out.BytesBuffer(), nil
+    return tlv_out, err
 }
 
 // Client -> Server

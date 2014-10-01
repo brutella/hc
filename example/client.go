@@ -30,7 +30,7 @@ func main() {
     }
     
     // 2) S -> C
-    pairVerifyRequest, err := client.Handle(pairStartRespond)
+    pairVerifyRequest, err := client.HandleReader(pairStartRespond)
     if err != nil {
         fmt.Println(err)
     }
@@ -42,7 +42,7 @@ func main() {
     }
     
     // 4) S -> C
-    pairKeyRequest, err := client.Handle(pairVerifyRespond)
+    pairKeyRequest, err := client.HandleReader(pairVerifyRespond)
     if err != nil {
         fmt.Println(err)
     }
@@ -54,7 +54,7 @@ func main() {
     }
     
     // 6) S -> C
-    request, err := client.Handle(pairKeyRespond)
+    request, err := client.HandleReader(pairKeyRespond)
     if err != nil {
         fmt.Println(err)
     }
