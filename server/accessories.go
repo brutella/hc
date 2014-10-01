@@ -28,7 +28,6 @@ func (handler *AccessoriesHandler) ServeHTTP(response http.ResponseWriter, reque
     response.Header().Set("Content-Type", hap.HTTPContentTypeHAPJson)
     
     res, err := handler.controller.HandleGetAccessories(request.Body)
-    
     if err != nil {
         fmt.Println(err)
         response.WriteHeader(http.StatusInternalServerError)

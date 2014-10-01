@@ -3,7 +3,6 @@ package pair
 import(
     "github.com/brutella/hap"
     "github.com/brutella/hap/crypto"
-    "io"
     "fmt"
     "encoding/hex"
     "bytes"
@@ -26,34 +25,12 @@ func NewVerifyServerController(context *hap.Context, bridge *hap.Bridge) (*Verif
     
     return &controller, nil
 }
-
-func (c *VerifyServerController) HandleReader(r io.Reader) (io.Reader, error) {
-    tlv_in, err := NewTLV8ContainerFromReader(r)
-    if err != nil {
-        return nil, err
-    }
-    fmt.Println("->     Seq:", tlv_in.GetByte(TLVType_SequenceNumber))
     
-    tlv_out, err := c.Handle(tlv_in)
-    if err != nil {
-        fmt.Println("[ERROR]", err)
-        return nil, err
-    } else {
-        if tlv_out != nil {
-            fmt.Println("<-     Seq:", tlv_out.GetByte(TLVType_SequenceNumber))
-            fmt.Println("-------------")
-            return tlv_out.BytesBuffer(), nil
-        }
-    }
-    
-    return nil, err
-}
-    
-func (c *VerifyServerController) Handle(tlv_in Container) (Container, error) {
-    var tlv_out Container
+func (c *VerifyServerController) Handle(cont_in Container) (Container, error) {
+    var cont_out Container
     var err error
     
-    method := tlv_in.GetByte(TLVType_Method)
+    method := cont_in.GetByte(TLVType_Method)
     
     // It is valid that method is not sent
     // If method is sent then it must be 0x00
@@ -61,7 +38,7 @@ func (c *VerifyServerController) Handle(tlv_in Container) (Container, error) {
         return nil, hap.NewErrorf("Cannot handle auth method %b", method)
     }
     
-    seq := tlv_in.GetByte(TLVType_SequenceNumber)
+    seq := cont_in.GetByte(TLVType_SequenceNumber)
     
     switch seq {
     case VerifyStartRequest:
@@ -69,19 +46,19 @@ func (c *VerifyServerController) Handle(tlv_in Container) (Container, error) {
             c.reset()
             return nil, hap.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
-        tlv_out, err = c.handlePairVerifyStart(tlv_in)
+        cont_out, err = c.handlePairVerifyStart(cont_in)
     case VerifyFinishRequest:
         if c.curSeq != VerifyStartRespond {
             c.reset()
             return nil, hap.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
-        tlv_out, err = c.handlePairVerifyFinish(tlv_in)
+        cont_out, err = c.handlePairVerifyFinish(cont_in)
     default:
         return nil, hap.NewErrorf("Cannot handle sequence number %d", seq)
     }
     
-    return tlv_out, err
+    return cont_out, err
 }
 
 // Client -> Server
@@ -93,10 +70,10 @@ func (c *VerifyServerController) Handle(tlv_in Container) (Container, error) {
 // Server -> Client
 // - B: server public key
 // - signature: from server session public key, server name, client session public key
-func (c *VerifyServerController) handlePairVerifyStart(tlv_in Container) (Container, error) {
+func (c *VerifyServerController) handlePairVerifyStart(cont_in Container) (Container, error) {
     c.curSeq = VerifyStartRespond
     
-    clientPublicKey := tlv_in.GetBytes(TLVType_PublicKey)
+    clientPublicKey := cont_in.GetBytes(TLVType_PublicKey)
     fmt.Println("->     A:", hex.EncodeToString(clientPublicKey))
     if len(clientPublicKey) != 32 {
         return nil, hap.NewErrorf("Invalid client public key size %d", len(clientPublicKey))
@@ -123,19 +100,19 @@ func (c *VerifyServerController) handlePairVerifyStart(tlv_in Container) (Contai
     
     encrypted, mac, _ := hap.Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PV-Msg02"), tlv_encrypt.BytesBuffer().Bytes(), nil)
     
-    tlv_out := NewTLV8Container()    
-    tlv_out.SetByte(TLVType_SequenceNumber, c.curSeq)
-    tlv_out.SetBytes(TLVType_PublicKey, c.session.publicKey[:])
-    tlv_out.SetBytes(TLVType_EncryptedData, append(encrypted, mac[:]...))
+    cont_out := NewTLV8Container()    
+    cont_out.SetByte(TLVType_SequenceNumber, c.curSeq)
+    cont_out.SetBytes(TLVType_PublicKey, c.session.publicKey[:])
+    cont_out.SetBytes(TLVType_EncryptedData, append(encrypted, mac[:]...))
     
     fmt.Println("       K:", hex.EncodeToString(c.session.encryptionKey[:]))
     fmt.Println("       B:", hex.EncodeToString(c.session.publicKey[:]))
     fmt.Println("       S:", hex.EncodeToString(c.session.secretKey[:]))
     fmt.Println("  Shared:", hex.EncodeToString(c.session.sharedKey[:]))
     
-    fmt.Println("<-     B:", hex.EncodeToString(tlv_out.GetBytes(TLVType_PublicKey)))
+    fmt.Println("<-     B:", hex.EncodeToString(cont_out.GetBytes(TLVType_PublicKey)))
     
-    return tlv_out, nil
+    return cont_out, nil
 }
 
 // Client -> Server
@@ -146,10 +123,10 @@ func (c *VerifyServerController) handlePairVerifyStart(tlv_in Container) (Contai
 // Server -> Client
 // - only sequence number
 // - error code (optional)
-func (c *VerifyServerController) handlePairVerifyFinish(tlv_in Container) (Container, error) {
+func (c *VerifyServerController) handlePairVerifyFinish(cont_in Container) (Container, error) {
     c.curSeq = VerifyFinishRespond
     
-    data := tlv_in.GetBytes(TLVType_EncryptedData)
+    data := cont_in.GetBytes(TLVType_EncryptedData)
     message := data[:(len(data) - 16)]
     var mac [16]byte
     copy(mac[:], data[len(message):]) // 16 byte (MAC)
@@ -158,22 +135,22 @@ func (c *VerifyServerController) handlePairVerifyFinish(tlv_in Container) (Conta
     
     decrypted, err := hap.Chacha20DecryptAndPoly1305Verify(c.session.encryptionKey[:], []byte("PV-Msg03"), message, mac, nil)
     
-    tlv_out := NewTLV8Container()    
-    tlv_out.SetByte(TLVType_SequenceNumber, c.curSeq)
+    cont_out := NewTLV8Container()    
+    cont_out.SetByte(TLVType_SequenceNumber, c.curSeq)
     
     if err != nil {
         c.reset()
         fmt.Println(err)
-        tlv_out.SetByte(TLVType_ErrorCode, TLVStatus_AuthError) // return error 2
+        cont_out.SetByte(TLVType_ErrorCode, TLVStatus_AuthError) // return error 2
     } else {
         decrypted_buffer := bytes.NewBuffer(decrypted)
-        tlv_in, err := NewTLV8ContainerFromReader(decrypted_buffer)
+        cont_in, err := NewTLV8ContainerFromReader(decrypted_buffer)
         if err != nil {
             return nil, err
         }
         
-        username  := tlv_in.GetString(TLVType_Username)
-        signature := tlv_in.GetBytes(TLVType_Ed25519Signature)
+        username  := cont_in.GetString(TLVType_Username)
+        signature := cont_in.GetBytes(TLVType_Ed25519Signature)
         fmt.Println("    client:", username)
         fmt.Println(" signature:", hex.EncodeToString(signature))
         
@@ -195,7 +172,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(tlv_in Container) (Conta
         if hap.ValidateED25519Signature(client.PublicKey, material, signature) == false {
             fmt.Println("[Failed] signature is invalid")
             c.reset()
-            tlv_out.SetByte(TLVType_ErrorCode, TLVStatus_UnkownPeerError) // return error 4
+            cont_out.SetByte(TLVType_ErrorCode, TLVStatus_UnkownPeerError) // return error 4
         } else {
             fmt.Println("[Success] signature is valid")
             
@@ -212,7 +189,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(tlv_in Container) (Conta
         }
     }
     
-    return tlv_out, nil
+    return cont_out, nil
 }
 
 func (c *VerifyServerController) reset() {

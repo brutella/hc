@@ -27,7 +27,7 @@ func (handler *PairVerifyHandler) ServeHTTP(response http.ResponseWriter, reques
     fmt.Println("POST /pair-verify")
     response.Header().Set("Content-Type", hap.HTTPContentTypePairingTLV8)
     
-    res, err := handler.controller.HandleReader(request.Body)
+    res, err := pair.HandleReaderForHandler(request.Body, handler.controller)
     
     if err != nil {
         fmt.Println(err)

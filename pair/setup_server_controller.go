@@ -2,7 +2,6 @@ package pair
 
 import(
     "github.com/brutella/hap"
-    "io"
     "fmt"
     "encoding/hex"
     "bytes"
@@ -33,34 +32,11 @@ func NewSetupServerController(context *hap.Context, bridge *hap.Bridge) (*SetupS
     return &controller, nil
 }
 
-func (c *SetupServerController) HandleReader(r io.Reader) (io.Reader, error) {
-    tlv_in, err := NewTLV8ContainerFromReader(r)
-    if err != nil {
-        return nil, err
-    }
-    fmt.Println("->     Seq:", tlv_in.GetByte(TLVType_SequenceNumber))
-    
-    tlv_out, err := c.Handle(tlv_in)
-    
-    if err != nil {
-        fmt.Println("[ERROR]", err)
-        return nil, err
-    } else {
-        if tlv_out != nil {
-            fmt.Println("<-     Seq:", tlv_out.GetByte(TLVType_SequenceNumber))
-            fmt.Println("-------------")
-            return tlv_out.BytesBuffer(), nil
-        }
-    }
-    
-    return nil, err
-}
-
-func (c *SetupServerController) Handle(tlv_in Container) (Container, error) {
-    var tlv_out Container
+func (c *SetupServerController) Handle(cont_in Container) (Container, error) {
+    var cont_out Container
     var err error
     
-    method := tlv_in.GetByte(TLVType_Method)
+    method := cont_in.GetByte(TLVType_Method)
     
     // It is valid that method is not sent
     // If method is sent then it must be 0x00
@@ -68,7 +44,7 @@ func (c *SetupServerController) Handle(tlv_in Container) (Container, error) {
         return nil, hap.NewErrorf("Cannot handle auth method %b", method)
     }
     
-    seq := tlv_in.GetByte(TLVType_SequenceNumber)
+    seq := cont_in.GetByte(TLVType_SequenceNumber)
     
     switch seq {
     case PairStartRequest:
@@ -77,26 +53,26 @@ func (c *SetupServerController) Handle(tlv_in Container) (Container, error) {
             return nil, hap.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
-        tlv_out, err = c.handlePairStart(tlv_in)
+        cont_out, err = c.handlePairStart(cont_in)
     case PairVerifyRequest:
         if c.curSeq != PairStartRespond {
             c.reset()
             return nil, hap.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
-        tlv_out, err = c.handlePairVerify(tlv_in)
+        cont_out, err = c.handlePairVerify(cont_in)
     case PairKeyExchangeRequest:        
         if c.curSeq != PairVerifyRespond {
             c.reset()
             return nil, hap.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
-        tlv_out, err = c.handleKeyExchange(tlv_in)
+        cont_out, err = c.handleKeyExchange(cont_in)
     default:
         return nil, hap.NewErrorf("Cannot handle sequence number %d", seq)
     }
     
-    return tlv_out, err
+    return cont_out, err
 }
 
 // Client -> Server
@@ -105,18 +81,18 @@ func (c *SetupServerController) Handle(tlv_in Container) (Container, error) {
 // Server -> Client
 // - B: server public key
 // - s: salt
-func (c *SetupServerController) handlePairStart(tlv_in Container) (Container, error) {
-    tlv_out := NewTLV8Container()
+func (c *SetupServerController) handlePairStart(cont_in Container) (Container, error) {
+    cont_out := NewTLV8Container()
     c.curSeq = PairStartRespond
     
-    tlv_out.SetByte(TLVType_SequenceNumber, c.curSeq)
-    tlv_out.SetBytes(TLVType_PublicKey, c.session.publicKey)
-    tlv_out.SetBytes(TLVType_Salt, c.session.salt)
+    cont_out.SetByte(TLVType_SequenceNumber, c.curSeq)
+    cont_out.SetBytes(TLVType_PublicKey, c.session.publicKey)
+    cont_out.SetBytes(TLVType_Salt, c.session.salt)
     
-    fmt.Println("<-     B:", hex.EncodeToString(tlv_out.GetBytes(TLVType_PublicKey)))
-    fmt.Println("<-     s:", hex.EncodeToString(tlv_out.GetBytes(TLVType_Salt)))
+    fmt.Println("<-     B:", hex.EncodeToString(cont_out.GetBytes(TLVType_PublicKey)))
+    fmt.Println("<-     s:", hex.EncodeToString(cont_out.GetBytes(TLVType_Salt)))
     
-    return tlv_out, nil
+    return cont_out, nil
 }
 
 // Client -> Server
@@ -127,13 +103,13 @@ func (c *SetupServerController) handlePairStart(tlv_in Container) (Container, er
 // - M2: proof
 // or
 // - auth error
-func (c *SetupServerController) handlePairVerify(tlv_in Container) (Container, error) {
-    tlv_out := NewTLV8Container()
+func (c *SetupServerController) handlePairVerify(cont_in Container) (Container, error) {
+    cont_out := NewTLV8Container()
     c.curSeq = PairVerifyRespond
     
-    tlv_out.SetByte(TLVType_SequenceNumber, c.curSeq)
+    cont_out.SetByte(TLVType_SequenceNumber, c.curSeq)
     
-    cpublicKey := tlv_in.GetBytes(TLVType_PublicKey)
+    cpublicKey := cont_in.GetBytes(TLVType_PublicKey)
     fmt.Println("->     A:", hex.EncodeToString(cpublicKey))
     
     err := c.session.SetupSecretKeyFromClientPublicKey(cpublicKey)
@@ -141,14 +117,14 @@ func (c *SetupServerController) handlePairVerify(tlv_in Container) (Container, e
         return nil, err
     }
     
-    cproof := tlv_in.GetBytes(TLVType_Proof)
+    cproof := cont_in.GetBytes(TLVType_Proof)
     fmt.Println("->     M1:", hex.EncodeToString(cproof))
     
     sproof, err := c.session.ProofFromClientProof(cproof)
     if err != nil || len(sproof) == 0 { // proof `M1` is wrong
         fmt.Println("[Failed] Proof M1 is wrong")
         c.reset()
-        tlv_out.SetByte(TLVType_ErrorCode, TLVStatus_AuthError) // return error 2
+        cont_out.SetByte(TLVType_ErrorCode, TLVStatus_AuthError) // return error 2
     } else {
         fmt.Println("[Success] Proof M1 is valid")
         err := c.session.SetupEncryptionKey([]byte("Pair-Setup-Encrypt-Salt"), []byte("Pair-Setup-Encrypt-Info"))
@@ -157,14 +133,14 @@ func (c *SetupServerController) handlePairVerify(tlv_in Container) (Container, e
         }
         
         // Return proof `M1`
-        tlv_out.SetBytes(TLVType_Proof, sproof)
+        cont_out.SetBytes(TLVType_Proof, sproof)
     }
     
-    fmt.Println("<-     M2:", hex.EncodeToString(tlv_out.GetBytes(TLVType_Proof)))
+    fmt.Println("<-     M2:", hex.EncodeToString(cont_out.GetBytes(TLVType_Proof)))
     fmt.Println("        S:", hex.EncodeToString(c.session.secretKey))
     fmt.Println("        K:", hex.EncodeToString(c.session.encryptionKey[:]))
     
-    return tlv_out, nil
+    return cont_out, nil
 }
 
 // Client -> Server
@@ -177,14 +153,14 @@ func (c *SetupServerController) handlePairVerify(tlv_in Container) (Container, e
 // 
 // Server -> Client
 // - encrpyted tlv8: bridge LTPK, bridge name, signature (of H2, bridge name, LTPK)
-func (c *SetupServerController) handleKeyExchange(tlv_in Container) (Container, error) {
-    tlv_out := NewTLV8Container()
+func (c *SetupServerController) handleKeyExchange(cont_in Container) (Container, error) {
+    cont_out := NewTLV8Container()
     
     c.curSeq = PairKeyExchangeRespond
     
-    tlv_out.SetByte(TLVType_SequenceNumber, c.curSeq)
+    cont_out.SetByte(TLVType_SequenceNumber, c.curSeq)
     
-    data := tlv_in.GetBytes(TLVType_EncryptedData)    
+    data := cont_in.GetBytes(TLVType_EncryptedData)    
     message := data[:(len(data) - 16)]
     var mac [16]byte
     copy(mac[:], data[len(message):]) // 16 byte (MAC)
@@ -196,17 +172,17 @@ func (c *SetupServerController) handleKeyExchange(tlv_in Container) (Container, 
     if err != nil {
         c.reset()
         fmt.Println(err)
-        tlv_out.SetByte(TLVType_ErrorCode, TLVStatus_UnkownError) // return error 1
+        cont_out.SetByte(TLVType_ErrorCode, TLVStatus_UnkownError) // return error 1
     } else {
         decrypted_buffer := bytes.NewBuffer(decrypted)
-        tlv_in, err := NewTLV8ContainerFromReader(decrypted_buffer)
+        cont_in, err := NewTLV8ContainerFromReader(decrypted_buffer)
         if err != nil {
             return nil, err
         }
         
-        username  := tlv_in.GetString(TLVType_Username)
-        ltpk      := tlv_in.GetBytes(TLVType_PublicKey)
-        signature := tlv_in.GetBytes(TLVType_Ed25519Signature)
+        username  := cont_in.GetString(TLVType_Username)
+        ltpk      := cont_in.GetBytes(TLVType_PublicKey)
+        signature := cont_in.GetBytes(TLVType_Ed25519Signature)
         fmt.Println("->     Username:", username)
         fmt.Println("->     LTPK:", hex.EncodeToString(ltpk))
         fmt.Println("->     Signature:", hex.EncodeToString(signature))
@@ -221,7 +197,7 @@ func (c *SetupServerController) handleKeyExchange(tlv_in Container) (Container, 
         if hap.ValidateED25519Signature(ltpk, material, signature) == false {
             fmt.Println("[Failed] ed25519 signature is invalid")
             c.reset()
-            tlv_out.SetByte(TLVType_ErrorCode, TLVStatus_AuthError) // return error 2
+            cont_out.SetByte(TLVType_ErrorCode, TLVStatus_AuthError) // return error 2
         } else {
             fmt.Println("[Success] ed25519 signature is valid")
             // Store client LTPK and name
@@ -254,15 +230,15 @@ func (c *SetupServerController) handleKeyExchange(tlv_in Container) (Container, 
             fmt.Println("<-     Signature:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TLVType_Ed25519Signature)))
             
             encrypted, mac, _ := hap.Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)    
-            tlv_out.SetByte(TLVType_Method, 0)
-            tlv_out.SetByte(TLVType_SequenceNumber, PairKeyExchangeRequest)
-            tlv_out.SetBytes(TLVType_EncryptedData, append(encrypted, mac[:]...))
+            cont_out.SetByte(TLVType_Method, 0)
+            cont_out.SetByte(TLVType_SequenceNumber, PairKeyExchangeRequest)
+            cont_out.SetBytes(TLVType_EncryptedData, append(encrypted, mac[:]...))
             
             c.reset()
         }
     }
     
-    return tlv_out, nil
+    return cont_out, nil
 }
 
 func (c *SetupServerController) reset() {

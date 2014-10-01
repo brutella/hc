@@ -30,7 +30,7 @@ func main() {
     }
     
     // 2) S -> C
-    pairVerifyRequest, err := client.HandleReader(pairStartRespond)
+    pairVerifyRequest, err := pair.HandleReaderForHandler(pairStartRespond, client)
     if err != nil {
         fmt.Println(err)
     }
@@ -42,7 +42,7 @@ func main() {
     }
     
     // 4) S -> C
-    pairKeyRequest, err := client.HandleReader(pairVerifyRespond)
+    pairKeyRequest, err := pair.HandleReaderForHandler(pairVerifyRespond, client)
     if err != nil {
         fmt.Println(err)
     }
@@ -54,7 +54,7 @@ func main() {
     }
     
     // 6) S -> C
-    request, err := client.HandleReader(pairKeyRespond)
+    request, err := pair.HandleReaderForHandler(pairKeyRespond, client)
     if err != nil {
         fmt.Println(err)
     }
@@ -76,7 +76,7 @@ func main() {
     }
 
     // 2) S -> C
-    verifyFinishRequest, err := verify.Handle(verifyStartRespond)
+    verifyFinishRequest, err := pair.HandleReaderForHandler(verifyStartRespond, verify)
     if err != nil {
         fmt.Println(err)
     }
@@ -88,7 +88,7 @@ func main() {
     }
     
     // 4) S -> C 
-    last_request, err := verify.Handle(verifyFinishRespond)
+    last_request, err := pair.HandleReaderForHandler(verifyFinishRespond, verify)
     if err != nil {
         fmt.Println(err)
     }
