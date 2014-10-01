@@ -25,7 +25,7 @@ func NewPairVerifyHandler(controller *pair.VerifyServerController, context *hap.
 
 func (handler *PairVerifyHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
     fmt.Println("POST /pair-verify")
-    response.Header().Set("Content-Type", hap.HTTPContentTypePairingTLV8)
+    response.Header().Set("Content-Type", HTTPContentTypePairingTLV8)
     
     res, err := pair.HandleReaderForHandler(request.Body, handler.controller)
     

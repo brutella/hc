@@ -66,7 +66,7 @@ func (handler *CharacteristicsHandler) ServeHTTP(response http.ResponseWriter, r
     } else {
         if res != nil {
             bytes, _ := ioutil.ReadAll(res)
-            response.Header().Set("Content-Type", hap.HTTPContentTypeHAPJson)
+            response.Header().Set("Content-Type", HTTPContentTypeHAPJson)
             fmt.Println("<-  JSON:", string(bytes))
             response.Write(bytes)
         } else {

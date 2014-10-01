@@ -1,10 +1,10 @@
 package server
 
-import(
-    "net/http"
-    "fmt"
+import(   
     "github.com/brutella/hap"
+    "net/http"
     "io/ioutil"
+    "fmt"
 )
 
 type AccessoriesHandler struct {
@@ -25,7 +25,7 @@ func NewAccessoriesHandler(c *ModelController, context *hap.Context) *Accessorie
 
 func (handler *AccessoriesHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
     fmt.Println("GET /accessories")
-    response.Header().Set("Content-Type", hap.HTTPContentTypeHAPJson)
+    response.Header().Set("Content-Type", HTTPContentTypeHAPJson)
     
     res, err := handler.controller.HandleGetAccessories(request.Body)
     if err != nil {

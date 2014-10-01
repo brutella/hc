@@ -5,12 +5,13 @@ import(
     "net/http"
     "github.com/brutella/hap"
     "github.com/brutella/hap/pair"
+    "github.com/brutella/hap/server"
     "io"
     "os"
 )
 
 func sendTLV8(b io.Reader) (io.Reader, error){
-    resp, err := http.Post("http://127.0.0.1:55036/pair-setup", hap.HTTPContentTypePairingTLV8, b)
+    resp, err := http.Post("http://127.0.0.1:55036/pair-setup", server.HTTPContentTypePairingTLV8, b)
     return resp.Body, err
 }
 
