@@ -46,7 +46,7 @@ func TestPutCharacteristic(t *testing.T) {
     chars := Characteristics{Characteristics:slice}
     
     controller := NewCharacteristicController(m)
-    err := controller.HandlePutCharacteristics(chars)
+    err := controller.HandleUpdateCharacteristics(chars)
     assert.Nil(t, err)
     assert.Equal(t, info_service.Name.Value, "My")
 }

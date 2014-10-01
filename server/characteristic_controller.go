@@ -49,7 +49,7 @@ func (controller *CharacteristicController) HandleGetCharacteristics(aid, cid in
     return chars
 }
 
-func (controller *CharacteristicController) HandlePutCharacteristics(chars Characteristics) error {
+func (controller *CharacteristicController) HandleUpdateCharacteristics(chars Characteristics) error {
     for _, c := range chars.Characteristics {
         modelChar := controller.GetCharacteristic(c.AccessoryId, c.Id)
         if modelChar == nil {

@@ -5,7 +5,6 @@ import(
     "fmt"
     "github.com/brutella/hap"
     "github.com/brutella/hap/pair"
-    "io/ioutil"
 )
 
 type PairingHandler struct {

@@ -53,7 +53,7 @@ func (handler *CharacteristicsHandler) ServeHTTP(response http.ResponseWriter, r
         if err != nil {
             fmt.Println("Could not unmarshal to json", err)
         } else {
-            err = handler.controller.HandlePutCharacteristics(chars)
+            err = handler.controller.HandleUpdateCharacteristics(chars)
         }
     default:
         fmt.Println("Cannot handle HTTP method", request.Method)
