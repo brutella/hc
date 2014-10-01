@@ -5,9 +5,9 @@ import (
     "github.com/stretchr/testify/assert"
 )
 
-func TestBoolCharacteristic(t *testing.T) {
-    b := NewBoolCharacteristic(true)
-    assert.True(t, b.Bool())
+func TestBool(t *testing.T) {
+    b := NewBool(true)
+    assert.True(t, b.BoolValue())
     b.SetBool(false)
-    assert.False(t, b.Bool())
+    assert.False(t, b.BoolValue())
 }

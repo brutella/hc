@@ -1,21 +1,21 @@
 package characteristic
 
-type NameCharacteristic struct {
-    *StringCharacteristic
+type Name struct {
+    *String
 }
 
-func NewNameCharacteristic(name string) *NameCharacteristic {
-    str := NewStringCharacteristic(name)
+func NewName(name string) *Name {
+    str := NewString(name)
     str.Type = CharTypeName
     str.Permissions = PermsRead()
     
-    return &NameCharacteristic{str}
+    return &Name{str}
 }
 
-func (c *NameCharacteristic) SetName(name string) {
+func (c *Name) SetName(name string) {
     c.SetString(name)
 }
 
-func (c *NameCharacteristic) Name() string{
-    return c.String()
+func (c *Name) Name() string{
+    return c.StringValue()
 }

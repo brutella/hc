@@ -5,19 +5,19 @@ import (
     "github.com/stretchr/testify/assert"
 )
 
-func TestHeatingCoolingModeCharacteristic(t *testing.T) {
-    b := NewCurrentHeatingCoolingModeCharacteristic(ModeOff)
+func TestHeatingCoolingMode(t *testing.T) {
+    b := NewCurrentHeatingCoolingMode(ModeOff)
     assert.Equal(t, b.HeatingCoolingMode(), ModeOff)
     b.SetHeatingCoolingMode(ModeHeating)
     assert.Equal(t, b.HeatingCoolingMode(), ModeHeating)
 }
 
-func TestCurrentHeatingCoolingModeCharacteristic(t *testing.T) {
-    b := NewCurrentHeatingCoolingModeCharacteristic(ModeOff)
+func TestCurrentHeatingCoolingMode(t *testing.T) {
+    b := NewCurrentHeatingCoolingMode(ModeOff)
     assert.Equal(t, b.Type, CharTypeHeatingCoolingModeCurrent)
 }
 
-func TestTargetHeatingCoolingModeCharacteristic(t *testing.T) {
-    b := NewTargetHeatingCoolingModeCharacteristic(ModeOff)
+func TestTargetHeatingCoolingMode(t *testing.T) {
+    b := NewTargetHeatingCoolingMode(ModeOff)
     assert.Equal(t, b.Type, CharTypeHeatingCoolingModeTarget)
 }

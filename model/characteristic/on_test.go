@@ -5,8 +5,8 @@ import (
     "github.com/stretchr/testify/assert"
 )
 
-func TestOnCharacteristic(t *testing.T) {
-    b := NewOnCharacteristic(true)
+func TestOn(t *testing.T) {
+    b := NewOn(true)
     assert.True(t, b.On())
     b.SetOn(false)
     assert.False(t, b.On())

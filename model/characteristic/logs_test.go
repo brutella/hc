@@ -5,7 +5,7 @@ import (
     "github.com/stretchr/testify/assert"
 )
 
-func TestLogsCharacteristic(t *testing.T) {
-    n := NewLogsCharacteristic("Test")
+func TestLogs(t *testing.T) {
+    n := NewLogs("Test")
     assert.Equal(t, n.Type, CharTypeLogs)
 }

@@ -1,22 +1,22 @@
 package characteristic
 
-type LogsCharacteristic struct {
-    *TLV8Characteristic
+type Logs struct {
+    *TLV8
 }
 
-func NewLogsCharacteristic(logs string) *LogsCharacteristic {
-    str := NewTLV8Characteristic([]byte(logs))
+func NewLogs(logs string) *Logs {
+    str := NewTLV8([]byte(logs))
     str.Type = CharTypeLogs
     str.Permissions = PermsAll()
     
-    return &LogsCharacteristic{str}
+    return &Logs{str}
 }
 
-func (c *LogsCharacteristic) SetLogs(logs string) {
+func (c *Logs) SetLogs(logs string) {
     // TODO
 }
 
-func (c *LogsCharacteristic) Logs() string {
+func (c *Logs) Logs() string {
     // TODO
     return ""
 }

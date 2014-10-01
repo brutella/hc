@@ -1,21 +1,21 @@
 package characteristic
 
-type IdentifyCharacteristic struct {
-    *BoolCharacteristic
+type Identify struct {
+    *Bool
 }
 
-func NewIdentifyCharacteristic(identify bool) *IdentifyCharacteristic {
-    b := NewBoolCharacteristic(identify)
+func NewIdentify(identify bool) *Identify {
+    b := NewBool(identify)
     b.Type = CharTypeIdentify
     b.Permissions = PermsWriteOnly()
     
-    return &IdentifyCharacteristic{b}
+    return &Identify{b}
 }
 
-func (c *IdentifyCharacteristic) SetIdentify(identify bool) {
+func (c *Identify) SetIdentify(identify bool) {
     c.SetBool(identify)
 }
 
-func (c *IdentifyCharacteristic) Identify() bool {
-    return c.Bool()
+func (c *Identify) Identify() bool {
+    return c.BoolValue()
 }

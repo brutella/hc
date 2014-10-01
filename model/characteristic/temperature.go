@@ -1,12 +1,12 @@
 package characteristic
 
 type TemperatureCharacteristic struct {
-    *FloatCharacteristic
+    *Float
     value float64
 }
 
 func NewTemperatureTemperatureCharacteristic(value, min, max, steps float64, unit string, charType CharType, permissions []string) *TemperatureCharacteristic {
-    c := TemperatureCharacteristic{NewFloatCharacteristicMinMaxSteps(value, min, max, steps), value}
+    c := TemperatureCharacteristic{NewFloatMinMaxSteps(value, min, max, steps), value}
     c.Unit = unit
     c.Type = charType
     c.Permissions = permissions
@@ -27,7 +27,7 @@ func (c *TemperatureCharacteristic) SetTemperature(value float64) {
 }
 
 func (c *TemperatureCharacteristic) Temperature() float64 {
-    return c.Float()
+    return c.FloatValue()
 }
 
 func (c *TemperatureCharacteristic) MinTemperature() float64 {

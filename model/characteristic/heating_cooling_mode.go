@@ -1,83 +1,83 @@
 package characteristic
 
-type HeatingCoolingMode byte
+type ThermostatHeatingCoolingMode byte
 
 const (
     // TODO verify the values
-    ModeOff = HeatingCoolingMode(0x00)
-    ModeHeating = HeatingCoolingMode(0x01)
-    ModeCooling = HeatingCoolingMode(0x02)
+    ModeOff = ThermostatHeatingCoolingMode(0x00)
+    ModeHeating = ThermostatHeatingCoolingMode(0x01)
+    ModeCooling = ThermostatHeatingCoolingMode(0x02)
 )
 
-type HeatingCoolingModeCharacteristic struct {
+type HeatingCoolingMode struct {
     *ByteCharacteristic
 }
 
-func NewHeatingCoolingModeCharacteristic(current HeatingCoolingMode, charType CharType, permissions []string) *HeatingCoolingModeCharacteristic {
-    c := HeatingCoolingModeCharacteristic{NewByteCharacteristic(byte(current))}
+func NewHeatingCoolingMode(current ThermostatHeatingCoolingMode, charType CharType, permissions []string) *HeatingCoolingMode {
+    c := HeatingCoolingMode{NewByteCharacteristic(byte(current))}
     c.Type = charType
     c.Permissions = permissions
     return &c
 }
 
-func NewCurrentHeatingCoolingModeCharacteristic(current HeatingCoolingMode) *HeatingCoolingModeCharacteristic {
-    return NewHeatingCoolingModeCharacteristic(current, CharTypeHeatingCoolingModeCurrent, PermsRead())
+func NewCurrentHeatingCoolingMode(current ThermostatHeatingCoolingMode) *HeatingCoolingMode {
+    return NewHeatingCoolingMode(current, CharTypeHeatingCoolingModeCurrent, PermsRead())
 }
 
-func NewTargetHeatingCoolingModeCharacteristic(current HeatingCoolingMode) *HeatingCoolingModeCharacteristic {
-    return NewHeatingCoolingModeCharacteristic(current, CharTypeHeatingCoolingModeTarget, PermsRead())
+func NewTargetHeatingCoolingMode(current ThermostatHeatingCoolingMode) *HeatingCoolingMode {
+    return NewHeatingCoolingMode(current, CharTypeHeatingCoolingModeTarget, PermsRead())
 }
 
-func (c *HeatingCoolingModeCharacteristic) SetHeatingCoolingMode(mode HeatingCoolingMode) {
+func (c *HeatingCoolingMode) SetHeatingCoolingMode(mode ThermostatHeatingCoolingMode) {
     c.SetByte(byte(mode))
 }
 
 
-func (c *HeatingCoolingModeCharacteristic) HeatingCoolingMode() HeatingCoolingMode {
-    return HeatingCoolingMode(c.Byte())
+func (c *HeatingCoolingMode) HeatingCoolingMode() ThermostatHeatingCoolingMode {
+    return ThermostatHeatingCoolingMode(c.Byte())
 }
 
 // type CurrentRelativeHumidityCharacteristic struct {
-//     *FloatCharacteristic
+//     *Float
 //     humidity float64
 // }
 //
 // func NewCurrentRelativeHumidityCharacteristic(value float64) *CurrentRelativeHumidityCharacteristic {
-//     c := CurrentRelativeHumidityCharacteristic{NewFloatCharacteristic(value), value}
+//     c := CurrentRelativeHumidityCharacteristic{NewFloat(value), value}
 //     c.Type = CharTypeRelativeHumidityCurrent
 //     c.Permissions = PermsRead()
 //     return &c
 // }
 //
 // type TargetRelativeHumidityCharacteristic struct {
-//     *FloatCharacteristic
+//     *Float
 //     target float64
 // }
 //
 // func NewTargetRelativeHumidityCharacteristic(value, min, max, steps float64) *TargetRelativeHumidityCharacteristic {
-//     c := TargetRelativeHumidityCharacteristic{NewFloatCharacteristicMinMaxSteps(value, min, max, steps), value}
+//     c := TargetRelativeHumidityCharacteristic{NewFloatMinMaxSteps(value, min, max, steps), value}
 //     c.Type = CharTypeRelativeHumidityTarget
 //     c.Permissions = PermsAll()
 //     return &c
 // }
 //
 // type CoolingThresholdTemperatureCharacteristic struct {
-//     *FloatCharacteristic
+//     *Float
 // }
 //
 // func NewCoolingThresholdTemperatureCharacteristic(value, min, max, steps float64) *CoolingThresholdTemperatureCharacteristic {
-//     c := CoolingThresholdTemperatureCharacteristic{NewFloatCharacteristicMinMaxSteps(value, min, max, steps), value}
+//     c := CoolingThresholdTemperatureCharacteristic{NewFloatMinMaxSteps(value, min, max, steps), value}
 //     c.Type = CharTypeCoolingThreshold
 //     c.Permissions = PermsAll()
 //     return &c
 // }
 //
 // type HeatingThresholdTemperatureCharacteristic struct {
-//     *FloatCharacteristic
+//     *Float
 // }
 //
 // func NewHeatingThresholdTemperatureCharacteristic(value, min, max, steps float64) *HeatingThresholdTemperatureCharacteristic {
-//     c := HeatingThresholdTemperatureCharacteristic{NewFloatCharacteristicMinMaxSteps(value, min, max, steps), value}
+//     c := HeatingThresholdTemperatureCharacteristic{NewFloatMinMaxSteps(value, min, max, steps), value}
 //     c.Type = CharTypeHeatingThreshold
 //     c.Permissions = PermsAll()
 //     return &c

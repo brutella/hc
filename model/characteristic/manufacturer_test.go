@@ -5,8 +5,8 @@ import (
     "github.com/stretchr/testify/assert"
 )
 
-func TestManufacturerCharacteristic(t *testing.T) {
-    m := NewManufacturerCharacteristic("Apple")
+func TestManufacturer(t *testing.T) {
+    m := NewManufacturer("Apple")
     assert.Equal(t, m.Type, CharTypeManufacturer)
     assert.Equal(t, m.Manufacturer(), "Apple")
     m.SetManufacturer("Google")

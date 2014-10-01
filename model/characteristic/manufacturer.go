@@ -1,21 +1,21 @@
 package characteristic
 
-type ManufacturerCharacteristic struct {
-    *StringCharacteristic
+type Manufacturer struct {
+    *String
 }
 
-func NewManufacturerCharacteristic(name string) *ManufacturerCharacteristic {
-    str := NewStringCharacteristic(name)
+func NewManufacturer(name string) *Manufacturer {
+    str := NewString(name)
     str.Type = CharTypeManufacturer
     str.Permissions = PermsReadOnly()
     
-    return &ManufacturerCharacteristic{str}
+    return &Manufacturer{str}
 }
 
-func (c *ManufacturerCharacteristic) SetManufacturer(name string) {
+func (c *Manufacturer) SetManufacturer(name string) {
     c.SetString(name)
 }
 
-func (c *ManufacturerCharacteristic) Manufacturer() string {
-    return c.String()
+func (c *Manufacturer) Manufacturer() string {
+    return c.StringValue()
 }

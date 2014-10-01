@@ -6,7 +6,7 @@ import (
 )
 
 func TestSerialCharacteristic(t *testing.T) {
-    str := NewSerialNumberCharacteristic("001002")
+    str := NewSerialNumber("001002")
     assert.Equal(t, str.Type, CharTypeSerialNumber)
     assert.Equal(t, str.SerialNumber(), "001002")
     str.SetSerialNumber("001003")

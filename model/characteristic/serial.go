@@ -1,21 +1,21 @@
 package characteristic
 
-type SerialNumberCharacteristic struct {
-    *StringCharacteristic
+type SerialNumber struct {
+    *String
 }
 
-func NewSerialNumberCharacteristic(serial string) *SerialNumberCharacteristic {
-    str := NewStringCharacteristic(serial)
+func NewSerialNumber(serial string) *SerialNumber {
+    str := NewString(serial)
     str.Type = CharTypeSerialNumber
     str.Permissions = PermsReadOnly()
     
-    return &SerialNumberCharacteristic{str}
+    return &SerialNumber{str}
 }
 
-func (c *SerialNumberCharacteristic) SetSerialNumber(serialNumber string) {
+func (c *SerialNumber) SetSerialNumber(serialNumber string) {
     c.SetString(serialNumber)
 }
 
-func (c *SerialNumberCharacteristic) SerialNumber() string {
-    return c.String()
+func (c *SerialNumber) SerialNumber() string {
+    return c.StringValue()
 }

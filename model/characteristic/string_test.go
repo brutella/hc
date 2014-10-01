@@ -5,9 +5,9 @@ import (
     "github.com/stretchr/testify/assert"
 )
 
-func TestStringCharacteristic(t *testing.T) {
-    str := NewStringCharacteristic("A String")
-    assert.Equal(t, str.String(), "A String")
+func TestString(t *testing.T) {
+    str := NewString("A String")
+    assert.Equal(t, str.StringValue(), "A String")
     str.SetString("My String")
-    assert.Equal(t, str.String(), "My String")
+    assert.Equal(t, str.StringValue(), "My String")
 }

@@ -1,21 +1,21 @@
 package characteristic
 
-type ModelCharacteristic struct {
-    *StringCharacteristic
+type Model struct {
+    *String
 }
 
-func NewModelCharacteristic(model string) *ModelCharacteristic {
-    str := NewStringCharacteristic(model)
+func NewModel(model string) *Model {
+    str := NewString(model)
     str.Type = CharTypeModel
     str.Permissions = PermsReadOnly()
     
-    return &ModelCharacteristic{str}
+    return &Model{str}
 }
 
-func (c *ModelCharacteristic) SetModel(model string) {
+func (c *Model) SetModel(model string) {
     c.SetString(model)
 }
 
-func (c *ModelCharacteristic) Model() string {
-    return c.String()
+func (c *Model) Model() string {
+    return c.StringValue()
 }

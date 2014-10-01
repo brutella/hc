@@ -1,18 +1,18 @@
 package characteristic
 
-type BoolCharacteristic struct {
-    *NumberCharacteristic
+type Bool struct {
+    *Number
 }
 
-func NewBoolCharacteristic(value bool) *BoolCharacteristic {
-    number := NewNumberCharacteristic(value, nil, nil, nil, FormatBool, )
-    return &BoolCharacteristic{number}
+func NewBool(value bool) *Bool {
+    number := NewNumber(value, nil, nil, nil, FormatBool, )
+    return &Bool{number}
 }
 
-func (c *BoolCharacteristic) SetBool(value bool) {
+func (c *Bool) SetBool(value bool) {
     c.SetValue(value)
 }
 
-func (c *BoolCharacteristic) Bool() bool {
+func (c *Bool) BoolValue() bool {
     return c.GetValue().(bool)
 }

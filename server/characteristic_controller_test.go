@@ -17,7 +17,7 @@ func TestParseID(t *testing.T) {
 }
 
 func TestGetCharacteristic(t *testing.T) {
-    info_service := service.NewAccessoryInfoService( "My Bridge", "123-456-789", "Rev1", "Matthias H.")
+    info_service := service.NewAccessoryInfo( "My Bridge", "123-456-789", "Rev1", "Matthias H.")
     a := accessory.NewAccessory()
     a.AddService(info_service.Service)
     m := model.NewModel()
@@ -34,7 +34,7 @@ func TestGetCharacteristic(t *testing.T) {
 }
 
 func TestPutCharacteristic(t *testing.T) {
-    info_service := service.NewAccessoryInfoService( "My Bridge", "123-456-789", "Rev1", "Matthias H.")
+    info_service := service.NewAccessoryInfo( "My Bridge", "123-456-789", "Rev1", "Matthias H.")
     a := accessory.NewAccessory()
     a.AddService(info_service.Service)
     m := model.NewModel()

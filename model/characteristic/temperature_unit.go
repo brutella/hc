@@ -1,17 +1,17 @@
 package characteristic
 
-type TemperatureUnitCharacteristic struct {
+type TemperatureUnit struct {
     *ByteCharacteristic
 }
 
-func NewTemperatureUnitCharacteristic(unit string) *TemperatureUnitCharacteristic {
+func NewTemperatureUnit(unit string) *TemperatureUnit {
     b := ByteFromUnit(unit)
-    c := TemperatureUnitCharacteristic{NewByteCharacteristic(b)}
+    c := TemperatureUnit{NewByteCharacteristic(b)}
     c.Type = CharTypeTemperatureUnits
     c.Permissions = PermsAll()
     return &c
 }
 
-func (c *TemperatureUnitCharacteristic) Unit() byte {
+func (c *TemperatureUnit) Unit() byte {
     return c.Byte()
 }

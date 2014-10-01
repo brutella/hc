@@ -1,10 +1,10 @@
 package characteristic
 
 type IntCharacteristic struct {
-    *NumberCharacteristic
+    *Number
 }
 
 func NewIntCharacteristic(value, min, max, steps int) *IntCharacteristic {
-    number := NewNumberCharacteristic(value, min, max, steps, FormatInt)
+    number := NewNumber(value, min, max, steps, FormatInt)
     return &IntCharacteristic{number}
 }

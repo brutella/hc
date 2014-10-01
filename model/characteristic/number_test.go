@@ -5,8 +5,8 @@ import (
     "github.com/stretchr/testify/assert"
 )
 
-func TestNumberCharacteristic(t *testing.T) {
-    number := NewNumberCharacteristic(20.2, 0, 100, 0.1, FormatFloat)
+func TestNumber(t *testing.T) {
+    number := NewNumber(20.2, 0, 100, 0.1, FormatFloat)
     assert.Equal(t, number.Format, FormatFloat)
     assert.Equal(t, number.GetValue(), 20.2)
     assert.Equal(t, number.GetMinValue(), 0)

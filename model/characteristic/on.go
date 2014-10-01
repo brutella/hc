@@ -1,19 +1,19 @@
 package characteristic
 
-type OnCharacteristic struct {
-    *BoolCharacteristic
+type On struct {
+    *Bool
 }
 
-func NewOnCharacteristic(value bool) *OnCharacteristic {
-    char := NewBoolCharacteristic(value)
+func NewOn(value bool) *On {
+    char := NewBool(value)
     char.Type = CharTypeOn
-    return &OnCharacteristic{char}
+    return &On{char}
 }
 
-func (c *OnCharacteristic) SetOn(value bool) {
+func (c *On) SetOn(value bool) {
     c.SetBool(value)
 }
 
-func (c *OnCharacteristic) On() bool {
-    return c.Bool()
+func (c *On) On() bool {
+    return c.BoolValue()
 }

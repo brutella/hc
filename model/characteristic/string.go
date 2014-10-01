@@ -1,17 +1,17 @@
 package characteristic
 
-type StringCharacteristic struct {
+type String struct {
     *Characteristic
 }
 
-func NewStringCharacteristic(value string) *StringCharacteristic {
-    return &StringCharacteristic{NewCharacteristic(value, FormatString, CharTypeUnknown, nil)}
+func NewString(value string) *String {
+    return &String{NewCharacteristic(value, FormatString, CharTypeUnknown, nil)}
 }
 
-func (c *StringCharacteristic) SetString(str string) {
+func (c *String) SetString(str string) {
     c.SetValue(str)
 }
 
-func (c *StringCharacteristic) String() string {
+func (c *String) StringValue() string {
     return c.Value.(string)
 }

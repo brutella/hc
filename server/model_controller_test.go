@@ -14,7 +14,7 @@ import (
 )
 
 func TestGetAccessories(t *testing.T) {
-    info_service := service.NewAccessoryInfoService("123-456-789", "Rev1", "Matthias H.", "My Bridge")
+    info_service := service.NewAccessoryInfo("123-456-789", "Rev1", "Matthias H.", "My Bridge")
     a := accessory.NewAccessory()
     a.AddService(info_service.Service)
     m := model.NewModel()

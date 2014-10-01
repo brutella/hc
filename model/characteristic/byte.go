@@ -1,11 +1,11 @@
 package characteristic
 
 type ByteCharacteristic struct {
-    *NumberCharacteristic
+    *Number
 }
 
 func NewByteCharacteristic(value byte) *ByteCharacteristic {
-    number := NewNumberCharacteristic(value, nil, nil, nil, FormatByte)
+    number := NewNumber(value, nil, nil, nil, FormatByte)
     return &ByteCharacteristic{number}
 }
 

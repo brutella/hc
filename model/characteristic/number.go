@@ -1,11 +1,11 @@
 package characteristic
 
-type NumberCharacteristic struct {
+type Number struct {
     *Characteristic
 }
 
-func NewNumberCharacteristic(value, min, max, step interface{}, format string) *NumberCharacteristic {    
-    c := NumberCharacteristic{NewCharacteristic(value, format, CharTypeUnknown, nil)}
+func NewNumber(value, min, max, step interface{}, format string) *Number {    
+    c := Number{NewCharacteristic(value, format, CharTypeUnknown, nil)}
     c.MinValue = min
     c.MaxValue = max
     c.MinStep = step
@@ -13,34 +13,34 @@ func NewNumberCharacteristic(value, min, max, step interface{}, format string) *
     return &c
 }
 
-func (c *NumberCharacteristic) SetValue(value interface{}) {
+func (c *Number) SetValue(value interface{}) {
     c.Value = value
 }
 
-func (c *NumberCharacteristic) SetMinValue(value interface{}) {
+func (c *Number) SetMinValue(value interface{}) {
     c.MinValue = value
 }
 
-func (c *NumberCharacteristic) SetMaxValue(value interface{}) {
+func (c *Number) SetMaxValue(value interface{}) {
     c.MaxValue = value
 }
 
-func (c *NumberCharacteristic) SetMinStepValue(value interface{}) {
+func (c *Number) SetMinStepValue(value interface{}) {
     c.MinStep = value
 }
 
-func (c *NumberCharacteristic) GetValue() interface{} {
+func (c *Number) GetValue() interface{} {
     return c.Value
 }
 
-func (c *NumberCharacteristic) GetMinValue() interface{} {
+func (c *Number) GetMinValue() interface{} {
     return c.MinValue
 }
 
-func (c *NumberCharacteristic) GetMaxValue() interface{} {
+func (c *Number) GetMaxValue() interface{} {
     return c.MaxValue
 }
 
-func (c *NumberCharacteristic) GetMinStepValue() interface{} {
+func (c *Number) GetMinStepValue() interface{} {
     return c.MinStep
 }

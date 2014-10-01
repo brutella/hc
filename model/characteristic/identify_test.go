@@ -5,8 +5,8 @@ import (
     "github.com/stretchr/testify/assert"
 )
 
-func TestIdentifyCharacteristic(t *testing.T) {
-    i := NewIdentifyCharacteristic(true)
+func TestIdentify(t *testing.T) {
+    i := NewIdentify(true)
     assert.Equal(t, i.Type, CharTypeIdentify)
     assert.True(t, i.Identify())
     i.SetIdentify(false)
