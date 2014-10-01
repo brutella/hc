@@ -1,8 +1,11 @@
 package server
 
 import (
-    "testing"
     "github.com/brutella/hap/model"
+    "github.com/brutella/hap/model/accessory"
+    "github.com/brutella/hap/model/service"
+    
+    "testing"
     "github.com/stretchr/testify/assert"
 )
 
@@ -14,8 +17,8 @@ func TestParseID(t *testing.T) {
 }
 
 func TestGetCharacteristic(t *testing.T) {
-    info_service := model.NewAccessoryInfoService( "My Bridge", "123-456-789", "Rev1", "Matthias H.")
-    a := model.NewAccessory()
+    info_service := service.NewAccessoryInfoService( "My Bridge", "123-456-789", "Rev1", "Matthias H.")
+    a := accessory.NewAccessory()
     a.AddService(info_service.Service)
     m := model.NewModel()
     m.AddAccessory(a)
@@ -31,8 +34,8 @@ func TestGetCharacteristic(t *testing.T) {
 }
 
 func TestPutCharacteristic(t *testing.T) {
-    info_service := model.NewAccessoryInfoService( "My Bridge", "123-456-789", "Rev1", "Matthias H.")
-    a := model.NewAccessory()
+    info_service := service.NewAccessoryInfoService( "My Bridge", "123-456-789", "Rev1", "Matthias H.")
+    a := accessory.NewAccessory()
     a.AddService(info_service.Service)
     m := model.NewModel()
     m.AddAccessory(a)

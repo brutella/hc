@@ -1,6 +1,7 @@
 package server
 
 import(
+    "github.com/brutella/hap/model/characteristic"
     "github.com/brutella/hap/model"
     "github.com/brutella/hap/common"
     
@@ -63,7 +64,7 @@ func (controller *CharacteristicController) HandleUpdateCharacteristics(chars Ch
     return nil
 }
 
-func (c *CharacteristicController) GetCharacteristic(accessoryId int, characteristicId int) *model.Characteristic {
+func (c *CharacteristicController) GetCharacteristic(accessoryId int, characteristicId int) *characteristic.Characteristic {
     for _, a := range c.model.Accessories {
         if a.Id == accessoryId {
             for _, s := range a.Services {
