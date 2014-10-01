@@ -9,7 +9,7 @@ import(
 )
 
 type VerifyClientController struct {
-    PairingHandler
+    Handler
     context *hap.Context
     bridge *hap.Bridge
     session *VerifySession

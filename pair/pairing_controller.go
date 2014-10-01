@@ -17,7 +17,7 @@ type Pairing struct {
 }
 
 type PairingController struct {
-    PairingHandler
+    Handler
     context *hap.Context
 }
 

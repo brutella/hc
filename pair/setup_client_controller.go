@@ -10,7 +10,7 @@ import(
 )
 
 type SetupClientController struct {
-    PairingHandler
+    Handler
     context *hap.Context
     bridge *hap.Bridge
     username string

@@ -5,11 +5,11 @@ import(
     "fmt"
 )
 
-type PairingHandler interface {
+type Handler interface {
     Handle(Container) (Container, error)
 }
 
-func HandleReaderForHandler(r io.Reader, h PairingHandler) (r_out io.Reader, err error) {
+func HandleReaderForHandler(r io.Reader, h Handler) (r_out io.Reader, err error) {
     cont_in, err := NewTLV8ContainerFromReader(r)
     if err != nil {
         return nil, err

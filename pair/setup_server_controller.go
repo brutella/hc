@@ -8,7 +8,7 @@ import(
 )
 
 type SetupServerController struct {
-    PairingHandler
+    Handler
     context *hap.Context
     bridge *hap.Bridge
     session *SetupServerSession
