@@ -1,5 +1,9 @@
 package hap
 
+import(
+    "github.com/brutella/hap/crypto"
+)
+
 type Bridge struct {
     name string
     password string
@@ -13,7 +17,7 @@ type Bridge struct {
 // The long-term public and secret key are based on the serial number which should be unique for every bridge
 func NewBridge(info BridgeInfo) (*Bridge, error){
     b := Bridge{info: info}
-    public, secret, err := ED25519GenerateKey(b.info.SerialNumber)
+    public, secret, err := crypto.ED25519GenerateKey(b.info.SerialNumber)
     b.PublicKey = public
     b.SecretKey = secret
     

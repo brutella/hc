@@ -2,6 +2,9 @@ package pair
 
 import(
     "github.com/brutella/hap"
+    "github.com/brutella/hap/crypto"
+    "github.com/brutella/hap/common"
+    
     "fmt"
     "encoding/hex"
     "bytes"
@@ -41,7 +44,7 @@ func (c *SetupServerController) Handle(cont_in Container) (Container, error) {
     // It is valid that method is not sent
     // If method is sent then it must be 0x00
     if method != 0x00 {
-        return nil, hap.NewErrorf("Cannot handle auth method %b", method)
+        return nil, common.NewErrorf("Cannot handle auth method %b", method)
     }
     
     seq := cont_in.GetByte(TLVType_SequenceNumber)
@@ -50,26 +53,26 @@ func (c *SetupServerController) Handle(cont_in Container) (Container, error) {
     case PairStartRequest:
         if c.curSeq != WaitingForRequest {
             c.reset()
-            return nil, hap.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
+            return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
         cont_out, err = c.handlePairStart(cont_in)
     case PairVerifyRequest:
         if c.curSeq != PairStartRespond {
             c.reset()
-            return nil, hap.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
+            return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
         cont_out, err = c.handlePairVerify(cont_in)
     case PairKeyExchangeRequest:        
         if c.curSeq != PairVerifyRespond {
             c.reset()
-            return nil, hap.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
+            return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
         cont_out, err = c.handleKeyExchange(cont_in)
     default:
-        return nil, hap.NewErrorf("Cannot handle sequence number %d", seq)
+        return nil, common.NewErrorf("Cannot handle sequence number %d", seq)
     }
     
     return cont_out, err
@@ -167,7 +170,7 @@ func (c *SetupServerController) handleKeyExchange(cont_in Container) (Container,
     fmt.Println("->     Message:", hex.EncodeToString(message))
     fmt.Println("->     MAC:", hex.EncodeToString(mac[:]))
     
-    decrypted, err := hap.Chacha20DecryptAndPoly1305Verify(c.session.encryptionKey[:], []byte("PS-Msg05"), message, mac, nil)
+    decrypted, err := crypto.Chacha20DecryptAndPoly1305Verify(c.session.encryptionKey[:], []byte("PS-Msg05"), message, mac, nil)
     
     if err != nil {
         c.reset()
@@ -188,13 +191,13 @@ func (c *SetupServerController) handleKeyExchange(cont_in Container) (Container,
         fmt.Println("->     Signature:", hex.EncodeToString(signature))
         
         // Calculate `H`
-        H, _ := hap.HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
+        H, _ := crypto.HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
         material := make([]byte, 0)
         material = append(material, H[:]...)
         material = append(material, []byte(username)...)
         material = append(material, ltpk...)
         
-        if hap.ValidateED25519Signature(ltpk, material, signature) == false {
+        if crypto.ValidateED25519Signature(ltpk, material, signature) == false {
             fmt.Println("[Failed] ed25519 signature is invalid")
             c.reset()
             cont_out.SetByte(TLVType_ErrorCode, TLVStatus_AuthError) // return error 2
@@ -209,13 +212,13 @@ func (c *SetupServerController) handleKeyExchange(cont_in Container) (Container,
             LTSK := c.context.SecretKeyForAccessory(c.bridge)
             
             // Send username, LTPK, signature as encrypted message
-            H2, err := hap.HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
+            H2, err := crypto.HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
             material = make([]byte, 0)
             material = append(material, H2[:]...)
             material = append(material, []byte(c.bridge.Id())...)
             material = append(material, LTPK...)
 
-            signature, err := hap.ED25519Signature(LTSK, material)
+            signature, err := crypto.ED25519Signature(LTSK, material)
             if err != nil {
                 return nil, err
             }
@@ -229,7 +232,7 @@ func (c *SetupServerController) handleKeyExchange(cont_in Container) (Container,
             fmt.Println("<-     LTPK:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TLVType_PublicKey)))
             fmt.Println("<-     Signature:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TLVType_Ed25519Signature)))
             
-            encrypted, mac, _ := hap.Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)    
+            encrypted, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)    
             cont_out.SetByte(TLVType_Method, 0)
             cont_out.SetByte(TLVType_SequenceNumber, PairKeyExchangeRequest)
             cont_out.SetBytes(TLVType_EncryptedData, append(encrypted, mac[:]...))

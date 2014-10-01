@@ -1,9 +1,9 @@
-package hap
+package crypto
 
 import(
+    "io"
     "crypto/sha512"
     "github.com/tonnerre/golang-go.crypto/hkdf"
-    "io"
 )
 
 // Returns a 256-bit key

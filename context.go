@@ -2,6 +2,8 @@ package hap
 
 import(
     "io"
+    
+    "github.com/brutella/hap/common"
 )
 
 type SecureSession interface {
@@ -38,7 +40,7 @@ func (c *Context) ClientForName(name string) (*Client) {
 // Stores the long-term public key of the client as {client-name}.ltpk
 func (c *Context) SaveClient(client *Client) error {
     if len(client.PublicKey) == 0 {
-        return NewErrorf("No public key to save for client%s\n", client.Name)
+        return common.NewErrorf("No public key to save for client%s\n", client.Name)
     }
     
     return c.storage.Set(client.Name + ".ltpk", client.PublicKey)

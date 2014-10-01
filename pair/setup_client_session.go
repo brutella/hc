@@ -1,7 +1,8 @@
 package pair
 
-import (
-    "github.com/brutella/hap"
+import (    
+    "github.com/brutella/hap/crypto"
+    
     "crypto/sha512"
     "github.com/tadglines/go-pkgs/crypto/srp"
 )
@@ -22,7 +23,7 @@ func NewSetupClientSession(username string, password string) (*SetupClientSessio
     rp, _ := srp.NewSRP(SRPGroup, sha512.New, KeyDerivativeFuncRFC2945(sha512.New, []byte(username)))
     
     client := rp.NewClientSession([]byte(username), []byte(password))
-    LTPK, LTSK, _ := hap.ED25519GenerateKey(username)
+    LTPK, LTSK, _ := crypto.ED25519GenerateKey(username)
     
     hap := SetupClientSession{
                 Name: []byte(username),
@@ -55,7 +56,7 @@ func (s *SetupClientSession) IsServerProofValid(proof []byte) bool {
 //
 // Only 32 bytes are used from HKDF-SHA512
 func (p *SetupClientSession) SetupEncryptionKey(salt []byte, info []byte) (error) {
-    key, err := hap.HKDF_SHA512(p.secretKey, salt, info)
+    key, err := crypto.HKDF_SHA512(p.secretKey, salt, info)
     if err == nil {
         p.encryptionKey = key
     }

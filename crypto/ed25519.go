@@ -1,8 +1,10 @@
-package hap
+package crypto
 
 import(
     "bytes"
     "github.com/agl/ed25519"
+    
+    "github.com/brutella/hap/common"
 )
 
 func ValidateED25519Signature(key, data, signature []byte) bool {
@@ -21,7 +23,7 @@ func ValidateED25519Signature(key, data, signature []byte) bool {
 // Signs (ED25519) data based on public and secret key
 func ED25519Signature(key, data []byte) ([]byte, error) {
     if len(key) != ed25519.PrivateKeySize {
-        return nil, NewErrorf("Invalid size of key (%d)\n", len(key))
+        return nil, common.NewErrorf("Invalid size of key (%d)\n", len(key))
     }
     
     var k [ed25519.PrivateKeySize]byte

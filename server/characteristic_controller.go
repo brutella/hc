@@ -1,8 +1,9 @@
 package server
 
 import(
-    "github.com/brutella/hap"
     "github.com/brutella/hap/model"
+    "github.com/brutella/hap/common"
+    
     "fmt"
     "strings"
     "strconv"
@@ -81,7 +82,7 @@ func (c *CharacteristicController) GetCharacteristic(accessoryId int, characteri
 func ParseAccessoryAndCharacterId(str string) (int, int, error) {
     ids := strings.Split(str, ".")
     if len(ids) != 2 {
-        return 0, 0, hap.NewErrorf("Could not parse uid %s", str)
+        return 0, 0, common.NewErrorf("Could not parse uid %s", str)
     }
     
     aid, err := strconv.Atoi(ids[0])

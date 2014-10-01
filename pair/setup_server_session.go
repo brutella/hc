@@ -1,7 +1,8 @@
 package pair
 
 import (
-    "github.com/brutella/hap"
+    "github.com/brutella/hap/crypto"
+    
     "crypto/sha512"
     "github.com/tadglines/go-pkgs/crypto/srp"
     
@@ -62,7 +63,7 @@ func (p *SetupServerSession) SetupSecretKeyFromClientPublicKey(key []byte) (erro
 //
 // Only 32 bytes are used from HKDF-SHA512
 func (p *SetupServerSession) SetupEncryptionKey(salt []byte, info []byte) (error) {
-    key, err := hap.HKDF_SHA512(p.secretKey, salt, info)
+    key, err := crypto.HKDF_SHA512(p.secretKey, salt, info)
     if err == nil {
         p.encryptionKey = key
     }

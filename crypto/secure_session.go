@@ -2,9 +2,10 @@ package crypto
 
 import(
     "io"
-    "github.com/brutella/hap"
     "encoding/binary"
     "bytes"
+    
+    "github.com/brutella/hap/common"
 )
 
 type secureSession struct {
@@ -22,13 +23,13 @@ func NewSecureSessionFromSharedKey(sharedKey [32]byte) (*secureSession, error) {
     
     var s = new(secureSession)
     var err error
-    s.encryptKey, err = hap.HKDF_SHA512(sharedKey[:], salt, info_out)
+    s.encryptKey, err = HKDF_SHA512(sharedKey[:], salt, info_out)
     s.encryptCount = 0
     if err != nil {
         return nil, err
     }
     
-    s.decryptKey, err = hap.HKDF_SHA512(sharedKey[:], salt, info_in)
+    s.decryptKey, err = HKDF_SHA512(sharedKey[:], salt, info_in)
     s.decryptCount = 0
     
     return s, err
@@ -42,13 +43,13 @@ func NewSecureClientSessionFromSharedKey(sharedKey [32]byte) (*secureSession, er
     
     var s = new(secureSession)
     var err error
-    s.encryptKey, err = hap.HKDF_SHA512(sharedKey[:], salt, info_out)
+    s.encryptKey, err = HKDF_SHA512(sharedKey[:], salt, info_out)
     s.encryptCount = 0
     if err != nil {
         return nil, err
     }
     
-    s.decryptKey, err = hap.HKDF_SHA512(sharedKey[:], salt, info_in)
+    s.decryptKey, err = HKDF_SHA512(sharedKey[:], salt, info_in)
     s.decryptCount = 0
     
     return s, err
@@ -67,7 +68,7 @@ func (s *secureSession) Encrypt(r io.Reader) (io.Reader, error){
         length_bytes := make([]byte, 2)
         binary.LittleEndian.PutUint16(length_bytes, uint16(p.length))
         
-        encrypted, mac, err := hap.Chacha20EncryptAndPoly1305Seal(s.encryptKey[:], nonce_bytes[:], p.value, length_bytes[:])
+        encrypted, mac, err := Chacha20EncryptAndPoly1305Seal(s.encryptKey[:], nonce_bytes[:], p.value, length_bytes[:])
         if err != nil {
             return nil, err
         }
@@ -93,7 +94,7 @@ func (s *secureSession) Decrypt(r io.Reader) (io.Reader, error){
         }
         
         if length > 1024 {
-            return nil, hap.NewErrorf("Packet size too big %d", length)
+            return nil, common.NewErrorf("Packet size too big %d", length)
         }
         
         var buffer = make([]byte, length)
@@ -113,10 +114,10 @@ func (s *secureSession) Decrypt(r io.Reader) (io.Reader, error){
         length_bytes := make([]byte, 2)
         binary.LittleEndian.PutUint16(length_bytes, uint16(length))
         
-        decrypted, err := hap.Chacha20DecryptAndPoly1305Verify(s.decryptKey[:], nonce_bytes[:], buffer, mac, length_bytes)
+        decrypted, err := Chacha20DecryptAndPoly1305Verify(s.decryptKey[:], nonce_bytes[:], buffer, mac, length_bytes)
         
         if err != nil {
-            return nil, hap.NewErrorf("Data encryption failed %s", err)
+            return nil, common.NewErrorf("Data encryption failed %s", err)
         }
         
         b.Write(decrypted)

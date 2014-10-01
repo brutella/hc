@@ -1,6 +1,9 @@
 package server
 
 import(
+    "github.com/brutella/hap/common"
+    "github.com/brutella/hap"
+    
     "net"
     "fmt"
     "time"
@@ -11,7 +14,6 @@ import(
     "net/http"
     "io/ioutil"
     "bufio"
-    "github.com/brutella/hap"
 )
 
 // Creates a server which handles tcp connection based on HAP protocol
@@ -86,7 +88,7 @@ func (con *tcpHAPConnection) Write(b []byte) (n int, err error) {
     // Only encrypt outgoing data when incoming data was secured too
     if con.isEncrypted == true {
         if con.context.SecSession == nil {
-            err := hap.NewError("[ERROR] Can not write to secured connection without crypto keys")
+            err := common.NewError("[ERROR] Can not write to secured connection without crypto keys")
             fmt.Println(err)
             return 0, err
         }

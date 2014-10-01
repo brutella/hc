@@ -1,4 +1,4 @@
-package hap
+package crypto
 
 import (
     "crypto/rand"

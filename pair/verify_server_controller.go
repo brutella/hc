@@ -3,6 +3,8 @@ package pair
 import(
     "github.com/brutella/hap"
     "github.com/brutella/hap/crypto"
+    "github.com/brutella/hap/common"
+    
     "fmt"
     "encoding/hex"
     "bytes"
@@ -35,7 +37,7 @@ func (c *VerifyServerController) Handle(cont_in Container) (Container, error) {
     // It is valid that method is not sent
     // If method is sent then it must be 0x00
     if method != 0x00 {
-        return nil, hap.NewErrorf("Cannot handle auth method %b", method)
+        return nil, common.NewErrorf("Cannot handle auth method %b", method)
     }
     
     seq := cont_in.GetByte(TLVType_SequenceNumber)
@@ -44,18 +46,18 @@ func (c *VerifyServerController) Handle(cont_in Container) (Container, error) {
     case VerifyStartRequest:
         if c.curSeq != WaitingForRequest {
             c.reset()
-            return nil, hap.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
+            return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         cont_out, err = c.handlePairVerifyStart(cont_in)
     case VerifyFinishRequest:
         if c.curSeq != VerifyStartRespond {
             c.reset()
-            return nil, hap.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
+            return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
         cont_out, err = c.handlePairVerifyFinish(cont_in)
     default:
-        return nil, hap.NewErrorf("Cannot handle sequence number %d", seq)
+        return nil, common.NewErrorf("Cannot handle sequence number %d", seq)
     }
     
     return cont_out, err
@@ -76,7 +78,7 @@ func (c *VerifyServerController) handlePairVerifyStart(cont_in Container) (Conta
     clientPublicKey := cont_in.GetBytes(TLVType_PublicKey)
     fmt.Println("->     A:", hex.EncodeToString(clientPublicKey))
     if len(clientPublicKey) != 32 {
-        return nil, hap.NewErrorf("Invalid client public key size %d", len(clientPublicKey))
+        return nil, common.NewErrorf("Invalid client public key size %d", len(clientPublicKey))
     }
     
     var otherPublicKey [32]byte
@@ -91,14 +93,14 @@ func (c *VerifyServerController) handlePairVerifyStart(cont_in Container) (Conta
     material = append(material, c.session.publicKey[:]...)
     material = append(material, c.bridge.Id()...)
     material = append(material, clientPublicKey...)
-    signature, _ := hap.ED25519Signature(LTSK, material)
+    signature, _ := crypto.ED25519Signature(LTSK, material)
     
     // Encrypt
     tlv_encrypt := NewTLV8Container()
     tlv_encrypt.SetString(TLVType_Username, c.bridge.Id())
     tlv_encrypt.SetBytes(TLVType_Ed25519Signature, signature)
     
-    encrypted, mac, _ := hap.Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PV-Msg02"), tlv_encrypt.BytesBuffer().Bytes(), nil)
+    encrypted, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PV-Msg02"), tlv_encrypt.BytesBuffer().Bytes(), nil)
     
     cont_out := NewTLV8Container()    
     cont_out.SetByte(TLVType_SequenceNumber, c.curSeq)
@@ -133,7 +135,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in Container) (Cont
     fmt.Println("->     Message:", hex.EncodeToString(message))
     fmt.Println("->     MAC:", hex.EncodeToString(mac[:]))
     
-    decrypted, err := hap.Chacha20DecryptAndPoly1305Verify(c.session.encryptionKey[:], []byte("PV-Msg03"), message, mac, nil)
+    decrypted, err := crypto.Chacha20DecryptAndPoly1305Verify(c.session.encryptionKey[:], []byte("PV-Msg03"), message, mac, nil)
     
     cont_out := NewTLV8Container()    
     cont_out.SetByte(TLVType_SequenceNumber, c.curSeq)
@@ -156,11 +158,11 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in Container) (Cont
         
         client := c.context.ClientForName(username)
         if client == nil {
-            return nil, hap.NewErrorf("Client %s is unknown", username)
+            return nil, common.NewErrorf("Client %s is unknown", username)
         }
         
         if len(client.PublicKey) == 0 {
-            return nil, hap.NewErrorf("No LTPK available for client %s", username)
+            return nil, common.NewErrorf("No LTPK available for client %s", username)
         }
         
         material := make([]byte, 0)
@@ -169,7 +171,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in Container) (Cont
         material = append(material, []byte(username)...)
         material = append(material, c.session.publicKey[:]...)
         
-        if hap.ValidateED25519Signature(client.PublicKey, material, signature) == false {
+        if crypto.ValidateED25519Signature(client.PublicKey, material, signature) == false {
             fmt.Println("[Failed] signature is invalid")
             c.reset()
             cont_out.SetByte(TLVType_ErrorCode, TLVStatus_UnkownPeerError) // return error 4

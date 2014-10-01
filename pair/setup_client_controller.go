@@ -2,6 +2,8 @@ package pair
 
 import(
     "github.com/brutella/hap"
+    "github.com/brutella/hap/crypto"
+    "github.com/brutella/hap/common"
     
     "io"
     "fmt"
@@ -44,12 +46,12 @@ func (c *SetupClientController) Handle(cont_in Container) (Container, error) {
     // It is valid that method is not sent
     // If method is sent then it must be 0x00
     if method != 0x00 {
-        return nil, hap.NewErrorf("Cannot handle auth method %b", method)
+        return nil, common.NewErrorf("Cannot handle auth method %b", method)
     }
     
     err_code := cont_in.GetByte(TLVType_ErrorCode)
     if err_code != 0x00 {
-        return nil, hap.NewErrorf("Received error %d", err_code)
+        return nil, common.NewErrorf("Received error %d", err_code)
     }
     
     seq := cont_in.GetByte(TLVType_SequenceNumber)
@@ -66,7 +68,7 @@ func (c *SetupClientController) Handle(cont_in Container) (Container, error) {
     case PairKeyExchangeRespond:        
         cont_out, err = c.handleKeyExchange(cont_in)
     default:
-        return nil, hap.NewErrorf("Cannot handle sequence number %d", seq)
+        return nil, common.NewErrorf("Cannot handle sequence number %d", seq)
     }
         
     return cont_out, err
@@ -84,11 +86,11 @@ func (c *SetupClientController) handlePairStartRespond(cont_in Container) (Conta
     serverPublicKey := cont_in.GetBytes(TLVType_PublicKey)
     
     if len(salt) != 16 {
-        return nil, hap.NewErrorf("Salt is invalid (%d bytes)", len(salt))
+        return nil, common.NewErrorf("Salt is invalid (%d bytes)", len(salt))
     }
     
     if len(serverPublicKey) != 384 {
-        return nil, hap.NewErrorf("B is invalid (%d bytes)", len(serverPublicKey))
+        return nil, common.NewErrorf("B is invalid (%d bytes)", len(serverPublicKey))
     }
     
     fmt.Println("->     B:", hex.EncodeToString(serverPublicKey))
@@ -131,7 +133,7 @@ func (c *SetupClientController) handlePairVerifyRespond(cont_in Container) (Cont
     fmt.Println("->     M2:", hex.EncodeToString(serverProof))
     
     if c.session.IsServerProofValid(serverProof) == false {
-        return nil, hap.NewErrorf("M2 %s is invalid", hex.EncodeToString(serverProof))
+        return nil, common.NewErrorf("M2 %s is invalid", hex.EncodeToString(serverProof))
     }
     
     err := c.session.SetupEncryptionKey([]byte("Pair-Setup-Encrypt-Salt"), []byte("Pair-Setup-Encrypt-Info"))
@@ -142,13 +144,13 @@ func (c *SetupClientController) handlePairVerifyRespond(cont_in Container) (Cont
     fmt.Println("        K:", hex.EncodeToString(c.session.encryptionKey[:]))
     
     // 2) Send username, LTPK, signature as encrypted message
-    H, err := hap.HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
+    H, err := crypto.HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
     material := make([]byte, 0)
     material = append(material, H[:]...)
     material = append(material, c.username...)
     material = append(material, c.session.LTPK...)
     
-    signature, err := hap.ED25519Signature(c.session.LTSK, material)
+    signature, err := crypto.ED25519Signature(c.session.LTSK, material)
     if err != nil {
         return nil, err
     }
@@ -158,7 +160,7 @@ func (c *SetupClientController) handlePairVerifyRespond(cont_in Container) (Cont
     tlvPairKeyExchange.SetBytes(TLVType_PublicKey, []byte(c.session.LTPK))
     tlvPairKeyExchange.SetBytes(TLVType_Ed25519Signature, []byte(signature))
     
-    encrypted, tag, err := hap.Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PS-Msg05"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)
+    encrypted, tag, err := crypto.Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PS-Msg05"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)
     if err != nil {
         return nil, err
     }
@@ -191,7 +193,7 @@ func (c *SetupClientController) handleKeyExchange(cont_in Container) (Container,
     fmt.Println("->     Message:", hex.EncodeToString(message))
     fmt.Println("->     MAC:", hex.EncodeToString(mac[:]))
     
-    decrypted, err := hap.Chacha20DecryptAndPoly1305Verify(c.session.encryptionKey[:], []byte("PS-Msg06"), message, mac, nil)
+    decrypted, err := crypto.Chacha20DecryptAndPoly1305Verify(c.session.encryptionKey[:], []byte("PS-Msg06"), message, mac, nil)
     
     if err != nil {
         fmt.Println(err)

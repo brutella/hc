@@ -1,7 +1,7 @@
 package pair
 
 import(
-    "github.com/brutella/hap"
+    "github.com/brutella/hap/crypto"
 )
 
 type VerifySession struct {
@@ -13,8 +13,8 @@ type VerifySession struct {
 }
 
 func NewVerifySession() (*VerifySession) {
-    secretKey := hap.Curve25519_GenerateSecretKey()
-    publicKey := hap.Curve25519_PublicKey(secretKey)
+    secretKey := crypto.Curve25519_GenerateSecretKey()
+    publicKey := crypto.Curve25519_PublicKey(secretKey)
     
     return &VerifySession{
         publicKey: publicKey,
@@ -25,7 +25,7 @@ func NewVerifySession() (*VerifySession) {
 // Generate Curve25519 shared key for a specified other public key
 // The other public key is also stored for further use in `otherPublicKey` property
 func (s *VerifySession) GenerateSharedKeyWithOtherPublicKey(otherPublicKey [32]byte) {    
-    sharedKey := hap.Curve25519_SharedSecret(s.secretKey, otherPublicKey)
+    sharedKey := crypto.Curve25519_SharedSecret(s.secretKey, otherPublicKey)
     
     s.otherPublicKey = otherPublicKey
     s.sharedKey = sharedKey
@@ -33,7 +33,7 @@ func (s *VerifySession) GenerateSharedKeyWithOtherPublicKey(otherPublicKey [32]b
 
 // Generates encryption based on shared key, salt and info
 func (s *VerifySession) SetupEncryptionKey(salt []byte, info []byte) (error) {
-    key, err := hap.HKDF_SHA512(s.sharedKey[:], salt, info)
+    key, err := crypto.HKDF_SHA512(s.sharedKey[:], salt, info)
     if err == nil {
         s.encryptionKey = key
     }
