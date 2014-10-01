@@ -25,9 +25,9 @@ func NewThermostatService(name string, temperature, min, max, steps float64) *Th
     service.AddCharacteristic(name_char.Characteristic)
     service.AddCharacteristic(unit_char.Characteristic)
     service.AddCharacteristic(temp.Characteristic)
-    // service.AddCharacteristic(targetTemp.Characteristic)
-    // service.AddCharacteristic(mode.Characteristic)
-    // service.AddCharacteristic(targetMode.Characteristic)
+    service.AddCharacteristic(targetTemp.Characteristic)
+    service.AddCharacteristic(mode.Characteristic)
+    service.AddCharacteristic(targetMode.Characteristic)
     
     return &ThermostatService{service, name_char, unit_char, temp, targetTemp, mode, targetMode}
 }

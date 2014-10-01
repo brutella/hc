@@ -1,5 +1,9 @@
 package model
 
+import(
+    "fmt"
+)
+
 type CharacteristicChange struct {
     OldValue interface{}
     NewValue interface{}
@@ -85,7 +89,12 @@ func (c *Characteristic) AddRemoteChangeDelegate(d CharacteristicDelegate) {
 // Compareable
 func (c *Characteristic) Equal(other interface{}) bool {
     if characteristic, ok := other.(*Characteristic); ok == true {
-        return c.Value == characteristic.Value && c.Id == characteristic.Id && c.Type == characteristic.Type && len(c.Permissions) == len(characteristic.Permissions) && c.Description == characteristic.Description && c.Format == characteristic.Format && c.Unit == characteristic.Unit && c.MaxLen == characteristic.MaxLen && c.MaxValue == characteristic.MaxValue && c.MinValue == characteristic.MinValue && c.MinStep == characteristic.MinStep && c.Events == characteristic.Events && c.Bonjour == characteristic.Bonjour
+        // The value type (e.g. float32, bool,...) of property `Value` may be different even though
+        // they look the same. They are equal when they have the same string representation.
+        value := fmt.Sprintf("%+v", c.Value)
+        otherValue := fmt.Sprintf("%+v", characteristic.Value)
+        
+        return value == otherValue && c.Id == characteristic.Id && c.Type == characteristic.Type && len(c.Permissions) == len(characteristic.Permissions) && c.Description == characteristic.Description && c.Format == characteristic.Format && c.Unit == characteristic.Unit && c.MaxLen == characteristic.MaxLen && c.MaxValue == characteristic.MaxValue && c.MinValue == characteristic.MinValue && c.MinStep == characteristic.MinStep && c.Events == characteristic.Events && c.Bonjour == characteristic.Bonjour
     }
     
     return false

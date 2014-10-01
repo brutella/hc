@@ -7,6 +7,7 @@ import (
     "bytes"
     "io/ioutil"
     "encoding/json"
+    "fmt"
 )
 
 func TestGetAccessories(t *testing.T) {
@@ -24,6 +25,7 @@ func TestGetAccessories(t *testing.T) {
     assert.NotNil(t, r)
     
     bytes, _ := ioutil.ReadAll(r)
+    fmt.Println(string(bytes))
     var returnedModel model.Model
     err = json.Unmarshal(bytes, &returnedModel)
     assert.Nil(t, err)

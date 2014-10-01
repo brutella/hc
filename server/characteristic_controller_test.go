@@ -24,7 +24,7 @@ func TestGetCharacteristic(t *testing.T) {
     cid := info_service.Name.Id
     
     controller := NewCharacteristicController(m)
-    chars := controller.HandleGetCharacteristics(aid, cid)
+    chars := controller.HandleGetCharacteristics(aid, cid)    
     for _, c := range chars.Characteristics {
         assert.Equal(t, c.Value, "My Bridge")
     }

@@ -17,11 +17,13 @@ func (s *Service) AddCharacteristic(c *Characteristic) {
 func (s *Service) Equal(other interface{}) bool {
     if service, ok := other.(*Service); ok == true {
         if len(s.Characteristics) != len(service.Characteristics) {
+            println("Number of chars wrong")
             return false
         }
         
         for i, c := range s.Characteristics {
-            if c.Equal(service.Characteristics[i]) == false {
+            other := service.Characteristics[i]
+            if c.Equal(other) == false {
                 return false
             }
         }

@@ -53,3 +53,9 @@ func TestRemoveDelegate(t *testing.T) {
     assert.Nil(t, d.oldValue)
     assert.Nil(t, d.newValue)
 }
+
+func TestEqual(t *testing.T) {
+   c1 := NewCharacteristic(5, FormatInt, CharTypeOn, nil)
+   c2 := NewCharacteristic(5, FormatInt, CharTypeOn, nil) 
+   assert.True(t, c1.Equal(c2))
+}
