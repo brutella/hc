@@ -51,6 +51,13 @@ func main() {
     switch_serial := hap.GetSerialNumberForAccessoryName(switch_name, storage)
     switch_info := model.NewAccessoryInfoService(switch_name, switch_serial, "Matthias H.", "Model1a")        
     switch_service := model.NewSwitchService("Switch", true)
+    switch_service.OnStateChanged(func(on bool){
+        if on == true {
+            fmt.Println("Switch is on")
+        } else {
+            fmt.Println("Switch is off")
+        }
+    })
     switch_accessory := model.NewAccessory()
     switch_accessory.AddService(switch_info.Service)
     switch_accessory.AddService(switch_service.Service)

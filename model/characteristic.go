@@ -102,7 +102,7 @@ func (c *Characteristic) Equal(other interface{}) bool {
 
 // Private
 
-func (c *Characteristic) setValue(value interface{}, remote bool) {
+func (c *Characteristic) setValue(value interface{}, remote bool) {    
     old := c.Value
     c.Value = value
 
