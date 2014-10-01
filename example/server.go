@@ -10,9 +10,9 @@ import(
     "github.com/brutella/hap/model"
     "github.com/brutella/hap/model/accessory"
     "github.com/brutella/hap/model/service"
-    "github.com/brutella/hap/server"
-    "github.com/brutella/hap/server/handler"
-    "github.com/brutella/hap/server/controller"
+    "github.com/brutella/hap/netio"
+    "github.com/brutella/hap/netio/handler"
+    "github.com/brutella/hap/netio/controller"
 )
 
 var API_PORT int = 1237
@@ -31,6 +31,7 @@ var API_PORT int = 1237
 func main() {
     storage, _  := hap.NewFileStorage("./data")
     context     := hap.NewContext(storage)
+    sessionContext := server.NewContext()
     config      := hap.NewBridgeInfo("GoBridge", "001-02-003", "Matthias H.", storage)
     bridge, _   := hap.NewBridge(config)
     fmt.Println("Run bridge")
@@ -62,6 +63,7 @@ func main() {
             fmt.Println("Switch is off")
         }
     })
+    
     switch_accessory := accessory.NewAccessory()
     switch_accessory.AddService(switch_info.Service)
     switch_accessory.AddService(switch_service.Service)
@@ -69,13 +71,13 @@ func main() {
     m := model.NewModel()
     m.AddAccessory(bridge_accessory)
     m.AddAccessory(thermostat_accessory)
-    m.AddAccessory(switch_accessory)
+    // m.AddAccessory(switch_accessory)
     
     model_controller            := controller.NewModelController(m)
     characteristics_controller  := controller.NewCharacteristicController(m)
     
-    setup, _    := pair.NewSetupServerController(context, bridge)
-    verify, _   := pair.NewVerifyServerController(context, bridge)
+    setup, _    := pair.NewSetupServerController(context, sessionContext, bridge)
+    verify, _   := pair.NewVerifyServerController(context, sessionContext, bridge)
     
     mux :=  http.NewServeMux()
     
@@ -99,6 +101,6 @@ func main() {
     fmt.Println("Running at", addr)
     fmt.Println("Publish service")
     fmt.Printf("    dns-sd -P %s _hap local %s macbookpro.local 192.168.0.14 pv=1.0 id=%s c#=1 s#=1 sf=1 ff=0 md=%s\n", bridge.Name(), strconv.Itoa(API_PORT), bridge.Id(), bridge.Name())
-    err := server.ListenAndServe(addr, mux, context)
+    err := server.ListenAndServe(addr, mux, sessionContext)
     fmt.Println(err)
 }

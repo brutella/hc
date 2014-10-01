@@ -4,6 +4,7 @@ import(
     "github.com/brutella/hap"
     "github.com/brutella/hap/crypto"
     "github.com/brutella/hap/common"
+    "github.com/brutella/hap/netio"
     
     "fmt"
     "encoding/hex"
@@ -12,21 +13,23 @@ import(
 
 type SetupServerController struct {
     Handler
-    context *hap.Context
+    dbContext *hap.Context
+    sessionContext *netio.Context
     bridge *hap.Bridge
-    session *SetupServerSession
+    session *netio.PairSetupServerSession
     curSeq byte
 }
 
-func NewSetupServerController(context *hap.Context, bridge *hap.Bridge) (*SetupServerController, error) {
+func NewSetupServerController(dbContext *hap.Context, sessionContext *netio.Context, bridge *hap.Bridge) (*SetupServerController, error) {
     
-    session, err := NewSetupServerSession("Pair-Setup", bridge.Password())
+    session, err := netio.NewPairSetupServerSession("Pair-Setup", bridge.Password())
     if err != nil {
         return nil, err
     }
     
     controller := SetupServerController{
-                                    context: context,
+                                    dbContext: dbContext,
+                                    sessionContext: sessionContext,
                                     bridge: bridge,
                                     session: session,
                                     curSeq: WaitingForRequest,
@@ -35,8 +38,8 @@ func NewSetupServerController(context *hap.Context, bridge *hap.Bridge) (*SetupS
     return &controller, nil
 }
 
-func (c *SetupServerController) Handle(cont_in Container) (Container, error) {
-    var cont_out Container
+func (c *SetupServerController) Handle(cont_in common.Container) (common.Container, error) {
+    var cont_out common.Container
     var err error
     
     method := cont_in.GetByte(TLVType_Method)
@@ -84,13 +87,13 @@ func (c *SetupServerController) Handle(cont_in Container) (Container, error) {
 // Server -> Client
 // - B: server public key
 // - s: salt
-func (c *SetupServerController) handlePairStart(cont_in Container) (Container, error) {
-    cont_out := NewTLV8Container()
+func (c *SetupServerController) handlePairStart(cont_in common.Container) (common.Container, error) {
+    cont_out := common.NewTLV8Container()
     c.curSeq = PairStartRespond
     
     cont_out.SetByte(TLVType_SequenceNumber, c.curSeq)
-    cont_out.SetBytes(TLVType_PublicKey, c.session.publicKey)
-    cont_out.SetBytes(TLVType_Salt, c.session.salt)
+    cont_out.SetBytes(TLVType_PublicKey, c.session.PublicKey)
+    cont_out.SetBytes(TLVType_Salt, c.session.Salt)
     
     fmt.Println("<-     B:", hex.EncodeToString(cont_out.GetBytes(TLVType_PublicKey)))
     fmt.Println("<-     s:", hex.EncodeToString(cont_out.GetBytes(TLVType_Salt)))
@@ -106,8 +109,8 @@ func (c *SetupServerController) handlePairStart(cont_in Container) (Container, e
 // - M2: proof
 // or
 // - auth error
-func (c *SetupServerController) handlePairVerify(cont_in Container) (Container, error) {
-    cont_out := NewTLV8Container()
+func (c *SetupServerController) handlePairVerify(cont_in common.Container) (common.Container, error) {
+    cont_out := common.NewTLV8Container()
     c.curSeq = PairVerifyRespond
     
     cont_out.SetByte(TLVType_SequenceNumber, c.curSeq)
@@ -140,8 +143,8 @@ func (c *SetupServerController) handlePairVerify(cont_in Container) (Container, 
     }
     
     fmt.Println("<-     M2:", hex.EncodeToString(cont_out.GetBytes(TLVType_Proof)))
-    fmt.Println("        S:", hex.EncodeToString(c.session.secretKey))
-    fmt.Println("        K:", hex.EncodeToString(c.session.encryptionKey[:]))
+    fmt.Println("        S:", hex.EncodeToString(c.session.SecretKey))
+    fmt.Println("        K:", hex.EncodeToString(c.session.EncryptionKey[:]))
     
     return cont_out, nil
 }
@@ -156,8 +159,8 @@ func (c *SetupServerController) handlePairVerify(cont_in Container) (Container, 
 // 
 // Server -> Client
 // - encrpyted tlv8: bridge LTPK, bridge name, signature (of H2, bridge name, LTPK)
-func (c *SetupServerController) handleKeyExchange(cont_in Container) (Container, error) {
-    cont_out := NewTLV8Container()
+func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (common.Container, error) {
+    cont_out := common.NewTLV8Container()
     
     c.curSeq = PairKeyExchangeRespond
     
@@ -170,7 +173,7 @@ func (c *SetupServerController) handleKeyExchange(cont_in Container) (Container,
     fmt.Println("->     Message:", hex.EncodeToString(message))
     fmt.Println("->     MAC:", hex.EncodeToString(mac[:]))
     
-    decrypted, err := crypto.Chacha20DecryptAndPoly1305Verify(c.session.encryptionKey[:], []byte("PS-Msg05"), message, mac, nil)
+    decrypted, err := crypto.Chacha20DecryptAndPoly1305Verify(c.session.EncryptionKey[:], []byte("PS-Msg05"), message, mac, nil)
     
     if err != nil {
         c.reset()
@@ -178,7 +181,7 @@ func (c *SetupServerController) handleKeyExchange(cont_in Container) (Container,
         cont_out.SetByte(TLVType_ErrorCode, TLVStatus_UnkownError) // return error 1
     } else {
         decrypted_buffer := bytes.NewBuffer(decrypted)
-        cont_in, err := NewTLV8ContainerFromReader(decrypted_buffer)
+        cont_in, err := common.NewTLV8ContainerFromReader(decrypted_buffer)
         if err != nil {
             return nil, err
         }
@@ -191,7 +194,7 @@ func (c *SetupServerController) handleKeyExchange(cont_in Container) (Container,
         fmt.Println("->     Signature:", hex.EncodeToString(signature))
         
         // Calculate `H`
-        H, _ := crypto.HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
+        H, _ := crypto.HKDF_SHA512(c.session.SecretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
         material := make([]byte, 0)
         material = append(material, H[:]...)
         material = append(material, []byte(username)...)
@@ -205,14 +208,14 @@ func (c *SetupServerController) handleKeyExchange(cont_in Container) (Container,
             fmt.Println("[Success] ed25519 signature is valid")
             // Store client LTPK and name
             client := hap.NewClient(username, ltpk)
-            c.context.SaveClient(client)
+            c.dbContext.SaveClient(client)
             fmt.Printf("[Storage] Stored LTPK '%s' for client '%s'\n", hex.EncodeToString(ltpk), username)
             
-            LTPK := c.context.PublicKeyForAccessory(c.bridge)
-            LTSK := c.context.SecretKeyForAccessory(c.bridge)
+            LTPK := c.sessionContext.PublicKeyForAccessory(c.bridge)
+            LTSK := c.sessionContext.SecretKeyForAccessory(c.bridge)
             
             // Send username, LTPK, signature as encrypted message
-            H2, err := crypto.HKDF_SHA512(c.session.secretKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
+            H2, err := crypto.HKDF_SHA512(c.session.SecretKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
             material = make([]byte, 0)
             material = append(material, H2[:]...)
             material = append(material, []byte(c.bridge.Id())...)
@@ -223,7 +226,7 @@ func (c *SetupServerController) handleKeyExchange(cont_in Container) (Container,
                 return nil, err
             }
             
-            tlvPairKeyExchange := NewTLV8Container()
+            tlvPairKeyExchange := common.NewTLV8Container()
             tlvPairKeyExchange.SetString(TLVType_Username, c.bridge.Id())
             tlvPairKeyExchange.SetBytes(TLVType_PublicKey, LTPK)
             tlvPairKeyExchange.SetBytes(TLVType_Ed25519Signature, []byte(signature))
@@ -232,7 +235,7 @@ func (c *SetupServerController) handleKeyExchange(cont_in Container) (Container,
             fmt.Println("<-     LTPK:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TLVType_PublicKey)))
             fmt.Println("<-     Signature:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TLVType_Ed25519Signature)))
             
-            encrypted, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)    
+            encrypted, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(c.session.EncryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)    
             cont_out.SetByte(TLVType_Method, 0)
             cont_out.SetByte(TLVType_SequenceNumber, PairKeyExchangeRequest)
             cont_out.SetBytes(TLVType_EncryptedData, append(encrypted, mac[:]...))

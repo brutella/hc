@@ -3,7 +3,7 @@ package handler
 import(
     "github.com/brutella/hap"
     "github.com/brutella/hap/pair"
-    "github.com/brutella/hap/server"
+    "github.com/brutella/hap/netio"
     
     "net/http"
     "fmt"

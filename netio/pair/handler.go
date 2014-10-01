@@ -1,16 +1,18 @@
 package pair
 
 import(
+    "github.com/brutella/hap/common"
+    
     "io"
     "fmt"
 )
 
 type Handler interface {
-    Handle(Container) (Container, error)
+    Handle(common.Container) (common.Container, error)
 }
 
 func HandleReaderForHandler(r io.Reader, h Handler) (r_out io.Reader, err error) {
-    cont_in, err := NewTLV8ContainerFromReader(r)
+    cont_in, err := common.NewTLV8ContainerFromReader(r)
     if err != nil {
         return nil, err
     }

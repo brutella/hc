@@ -2,6 +2,7 @@ package pair
 
 import (
     "github.com/brutella/hap"
+    "github.com/brutella/hap/common"
 
     "testing"
     "github.com/stretchr/testify/assert"
@@ -9,7 +10,7 @@ import (
 )
 
 func TestAddPairing(t *testing.T) {
-    tlv8 := NewTLV8Container()
+    tlv8 := common.NewTLV8Container()
     tlv8.SetByte(TLVType_Method, TLVType_Method_PairingAdd)
     tlv8.SetByte(TLVType_SequenceNumber, 0x01)
     tlv8.SetString(TLVType_Username, "Unit Test")
@@ -31,7 +32,7 @@ func TestDeletePairing(t *testing.T) {
     context     := hap.NewContext(storage)
     context.SaveClient(client)
     
-    tlv8 := NewTLV8Container()
+    tlv8 := common.NewTLV8Container()
     tlv8.SetByte(TLVType_Method, TLVType_Method_PairingDelete)
     tlv8.SetByte(TLVType_SequenceNumber, 0x01)
     tlv8.SetString(TLVType_Username, username)

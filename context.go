@@ -1,20 +1,11 @@
 package hap
 
 import(
-    "io"
-    
     "github.com/brutella/hap/common"
 )
 
-type SecureSession interface {
-    Encrypt(r io.Reader) (io.Reader, error);
-    Decrypt(r io.Reader) (io.Reader, error);
-}
-
 type Context struct {
     storage Storage
-    
-    SecSession SecureSession
 }
 
 func NewContext(storage Storage) *Context {
@@ -48,20 +39,4 @@ func (c *Context) SaveClient(client *Client) error {
 
 func (c *Context) DeleteClient(client *Client) {
     c.storage.Delete(client.Name + ".ltpk")
-}
-
-
-func (c *Context) PublicKeyForAccessory(b *Bridge) []byte {
-    return b.PublicKey
-}
-
-func (c *Context) SecretKeyForAccessory(b *Bridge) []byte {
-    return b.SecretKey
-}
-
-func (c *Context) SecureSessionClosed() {
-    c.SetSecureSession(nil)
-}
-func (c *Context) SetSecureSession(secSession SecureSession) {
-    c.SecSession = secSession
 }

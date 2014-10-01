@@ -2,6 +2,7 @@ package pair
 
 import (
     "github.com/brutella/hap"
+    "github.com/brutella/hap/netio"
 
     "testing"
     "github.com/stretchr/testify/assert"
@@ -13,12 +14,13 @@ func TestPairingIntegration(t *testing.T) {
     storage, err := hap.NewFileStorage(os.TempDir())
     assert.Nil(t, err)
     context := hap.NewContext(storage)
+    sessionContext := netio.NewContext()
     
     info := hap.NewBridgeInfo("Macbook Bridge", "001-02-003", "Matthias H.", storage)
     bridge, err := hap.NewBridge(info)
     assert.Nil(t, err)
     
-    controller, err := NewSetupServerController(context, bridge)
+    controller, err := NewSetupServerController(context, sessionContext, bridge)
     assert.Nil(t, err)
     
     client_controller := NewSetupClientController(context, bridge, "HomeKit Client")

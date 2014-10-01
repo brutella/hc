@@ -1,4 +1,4 @@
-package pair
+package netio
 
 import (
     "github.com/brutella/hap/crypto"
@@ -9,16 +9,16 @@ import (
     "errors"
 )
 
-type SetupServerSession struct {
+type PairSetupServerSession struct {
     srp *srp.SRP
     session *srp.ServerSession
-    salt []byte // s
-    publicKey []byte // B
-    secretKey []byte // S
-    encryptionKey [32]byte // K
+    Salt []byte // s
+    PublicKey []byte // B
+    SecretKey []byte // S
+    EncryptionKey [32]byte // K
 }
 
-func NewSetupServerSession(username string, password string) (*SetupServerSession, error) {
+func NewPairSetupServerSession(username string, password string) (*PairSetupServerSession, error) {
     var err error
     
     srp, err := srp.NewSRP(SRPGroup, sha512.New, KeyDerivativeFuncRFC2945(sha512.New, []byte(username)))
@@ -27,11 +27,11 @@ func NewSetupServerSession(username string, password string) (*SetupServerSessio
         salt, v, err := srp.ComputeVerifier([]byte(password))
         if err == nil {
             session := srp.NewServerSession([]byte(username), salt, v)
-            pairing := SetupServerSession{
+            pairing := PairSetupServerSession{
                         srp: srp, 
                         session: session, 
-                        salt: salt,
-                        publicKey: session.GetB(),
+                        Salt: salt,
+                        PublicKey: session.GetB(),
                     }
             return &pairing, nil
         }
@@ -41,7 +41,7 @@ func NewSetupServerSession(username string, password string) (*SetupServerSessio
 }
 
 // Validates `M1` from client
-func (p *SetupServerSession) ProofFromClientProof(clientProof []byte) ([]byte, error) {
+func (p *PairSetupServerSession) ProofFromClientProof(clientProof []byte) ([]byte, error) {
 	if !p.session.VerifyClientAuthenticator(clientProof) { // Validates M1 based on S and A
 		return nil, errors.New("Client proof is not valid")
 	}
@@ -50,10 +50,10 @@ func (p *SetupServerSession) ProofFromClientProof(clientProof []byte) ([]byte, e
 }
 
 // Calculates secret key `S` based on client public key `A`
-func (p *SetupServerSession) SetupSecretKeyFromClientPublicKey(key []byte) (error) {
+func (p *PairSetupServerSession) SetupSecretKeyFromClientPublicKey(key []byte) (error) {
 	key, err := p.session.ComputeKey(key) // S
     if err == nil {
-        p.secretKey = key
+        p.SecretKey = key
     }
     
     return err
@@ -62,10 +62,10 @@ func (p *SetupServerSession) SetupSecretKeyFromClientPublicKey(key []byte) (erro
 // Calculates encryption key `K` based on salt and info
 //
 // Only 32 bytes are used from HKDF-SHA512
-func (p *SetupServerSession) SetupEncryptionKey(salt []byte, info []byte) (error) {
-    key, err := crypto.HKDF_SHA512(p.secretKey, salt, info)
+func (p *PairSetupServerSession) SetupEncryptionKey(salt []byte, info []byte) (error) {
+    key, err := crypto.HKDF_SHA512(p.SecretKey, salt, info)
     if err == nil {
-        p.encryptionKey = key
+        p.EncryptionKey = key
     }
     
     return err

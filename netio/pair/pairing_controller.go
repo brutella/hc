@@ -2,6 +2,8 @@ package pair
 
 import(
     "github.com/brutella/hap"
+    "github.com/brutella/hap/common"
+    
     "fmt"
 )
 
@@ -29,7 +31,7 @@ func NewPairingController(context *hap.Context) *PairingController {
     return &c
 }
 
-func (c *PairingController) Handle(tlv8 Container) (Container, error) {
+func (c *PairingController) Handle(tlv8 common.Container) (common.Container, error) {
     method      := tlv8.GetByte(TLVType_Method)
     username    := tlv8.GetString(TLVType_Username)
     publicKey   := tlv8.GetBytes(TLVType_PublicKey)

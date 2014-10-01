@@ -14,6 +14,8 @@ type secureSession struct {
     
     encryptCount uint64
     decryptCount uint64
+    
+    readEncrypted bool
 }
 
 func NewSecureSessionFromSharedKey(sharedKey [32]byte) (*secureSession, error) {
@@ -53,6 +55,10 @@ func NewSecureClientSessionFromSharedKey(sharedKey [32]byte) (*secureSession, er
     s.decryptCount = 0
     
     return s, err
+}
+
+func (s *secureSession) EncryptionEnabled() bool {
+    return true
 }
 
 // Encrypts the data by splitting it into packets

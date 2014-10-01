@@ -2,7 +2,7 @@ package handler
 
 import(
     "github.com/brutella/hap/pair"
-    "github.com/brutella/hap/server"
+    "github.com/brutella/hap/netio"
         
     "io/ioutil"
     "net/http"

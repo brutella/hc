@@ -5,7 +5,7 @@ import(
     "net/http"
     "github.com/brutella/hap"
     "github.com/brutella/hap/pair"
-    "github.com/brutella/hap/server"
+    "github.com/brutella/hap/netio"
     "io"
     "os"
 )
@@ -18,6 +18,7 @@ func sendTLV8(b io.Reader) (io.Reader, error){
 func main() {    
     storage, err := hap.NewFileStorage(os.TempDir())
     context := hap.NewContext(storage)
+    sessionContext := server.NewContext()
     info := hap.NewBridgeInfo("Test Bridge", "719-47-107", "Matthias H.", storage)
     info.Id = "42:cd:02:57:0d:40"
     bridge, err := hap.NewBridge(info)
@@ -67,7 +68,7 @@ func main() {
     fmt.Println("*** Pairing done ***")
     
     name := "UnitTest"
-    verify := pair.NewVerifyClientController(context, bridge, name)
+    verify := pair.NewVerifyClientController(sessionContext, bridge, name)
     
     verifyStartRequest := verify.InitialKeyVerifyRequest()
     // 1) C -> S

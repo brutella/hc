@@ -2,8 +2,8 @@ package handler
 
 import(   
     "github.com/brutella/hap"
-    "github.com/brutella/hap/server"
-    "github.com/brutella/hap/server/controller"
+    "github.com/brutella/hap/netio"
+    "github.com/brutella/hap/netio/controller"
     
     "net/http"
     "io/ioutil"

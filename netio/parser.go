@@ -1,4 +1,4 @@
-package server
+package netio
 
 import(
     "strings"

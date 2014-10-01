@@ -1,4 +1,4 @@
-package pair
+package netio
 
 import(
     "github.com/tadglines/go-pkgs/crypto/srp"
