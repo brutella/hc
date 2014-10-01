@@ -1,5 +1,10 @@
 package pair
 
+import(
+    "bytes"
+)
+
+// The Container is used to read and write bytes (strings)
 type Container interface {
     SetByte(key, value byte)
     SetBytes(key byte, value []byte)
@@ -8,4 +13,6 @@ type Container interface {
     GetByte(key byte) byte
     GetBytes(key byte) []byte
     GetString(key byte) string
+    
+    BytesBuffer() *bytes.Buffer
 }

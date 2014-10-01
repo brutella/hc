@@ -8,18 +8,18 @@ import (
 )
 
 func TestTLV8SetByte(t *testing.T) {
-    container := TLV8Container{}
+    container := NewTLV8Container()
     container.SetByte(1, 0xF)
-    assert.Equal(t, container.Byte(1), byte(0xF))
+    assert.Equal(t, container.GetByte(1), byte(0xF))
 }
 
 func TestTLV8Bytes(t *testing.T) {
     data := "0102AFFA"
     rawMessage, _ := hex.DecodeString(data)    
     message := bytes.NewBuffer(rawMessage)
-    container, err := ReadTLV8(message)
+    container, err := NewTLV8ContainerFromReader(message)
     assert.Nil(t, err)
-    assert.Equal(t, container.Bytes(1), []byte{0xAF, 0xFA})
+    assert.Equal(t, container.GetBytes(1), []byte{0xAF, 0xFA})
 }
 
 func TestTLV8BytesFromMultipleSource(t *testing.T) {
@@ -27,13 +27,13 @@ func TestTLV8BytesFromMultipleSource(t *testing.T) {
     rawMessage, _ := hex.DecodeString(data)
     
     message := bytes.NewBuffer(rawMessage)
-    container, err := ReadTLV8(message)
+    container, err := NewTLV8ContainerFromReader(message)
     assert.Nil(t, err)
-    assert.Equal(t, container.Bytes(1), []byte{0xAF, 0xFA, 0xBF, 0xFB, 0xAA})
+    assert.Equal(t, container.GetBytes(1), []byte{0xAF, 0xFA, 0xBF, 0xFB, 0xAA})
 }
 
 func TestTLV8SetMoreThanMaxBytes(t *testing.T) {
-    container := &TLV8Container{}
+    container := NewTLV8Container()
     data := "00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF" // 384 bytes
     bytes, _ := hex.DecodeString(data)
     assert.Equal(t, len(bytes), 384)
@@ -48,21 +48,21 @@ func TestTLV8SetMoreThanMaxBytes(t *testing.T) {
 }
 
 func TestTLV8SetBytes(t *testing.T) {
-    container := &TLV8Container{}
+    container := NewTLV8Container()
     container.SetBytes(1, []byte{0xAF, 0xFA})
-    assert.Equal(t, container.Bytes(1), []byte{0xAF, 0xFA})
+    assert.Equal(t, container.GetBytes(1), []byte{0xAF, 0xFA})
 }
 
 func TestTLV8BytesBuffer(t *testing.T) {
-    container := &TLV8Container{}
+    container := NewTLV8Container()
     container.SetBytes(1, []byte{0xAF, 0xFA})
     
     assert.Equal(t, container.BytesBuffer().Bytes(), []byte{0x01, 0x02, 0xAF, 0xFA})
 }
 
 func TestTLV8String(t *testing.T) {
-    container := &TLV8Container{}
+    container := NewTLV8Container()
     container.SetString(1, "Hello World")
     
-    assert.Equal(t, container.String(1), "Hello World")
+    assert.Equal(t, container.GetString(1), "Hello World")
 }

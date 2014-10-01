@@ -9,6 +9,7 @@ import(
 )
 
 type SetupServerController struct {
+    PairingHandler
     context *hap.Context
     bridge *hap.Bridge
     session *SetupServerSession
@@ -33,11 +34,11 @@ func NewSetupServerController(context *hap.Context, bridge *hap.Bridge) (*SetupS
 }
 
 func (c *SetupServerController) HandleReader(r io.Reader) (io.Reader, error) {
-    tlv_in, err := ReadTLV8(r)
+    tlv_in, err := NewTLV8ContainerFromReader(r)
     if err != nil {
         return nil, err
     }
-    fmt.Println("->     Seq:", tlv_in.Byte(TLVType_SequenceNumber))
+    fmt.Println("->     Seq:", tlv_in.GetByte(TLVType_SequenceNumber))
     
     tlv_out, err := c.Handle(tlv_in)
     
@@ -46,7 +47,7 @@ func (c *SetupServerController) HandleReader(r io.Reader) (io.Reader, error) {
         return nil, err
     } else {
         if tlv_out != nil {
-            fmt.Println("<-     Seq:", tlv_out.Byte(TLVType_SequenceNumber))
+            fmt.Println("<-     Seq:", tlv_out.GetByte(TLVType_SequenceNumber))
             fmt.Println("-------------")
             return tlv_out.BytesBuffer(), nil
         }
@@ -55,11 +56,11 @@ func (c *SetupServerController) HandleReader(r io.Reader) (io.Reader, error) {
     return nil, err
 }
 
-func (c *SetupServerController) Handle(tlv_in *TLV8Container) (*TLV8Container, error) {
-    var tlv_out *TLV8Container
+func (c *SetupServerController) Handle(tlv_in Container) (Container, error) {
+    var tlv_out Container
     var err error
     
-    method := tlv_in.Byte(TLVType_Method)
+    method := tlv_in.GetByte(TLVType_Method)
     
     // It is valid that method is not sent
     // If method is sent then it must be 0x00
@@ -67,7 +68,7 @@ func (c *SetupServerController) Handle(tlv_in *TLV8Container) (*TLV8Container, e
         return nil, hap.NewErrorf("Cannot handle auth method %b", method)
     }
     
-    seq := tlv_in.Byte(TLVType_SequenceNumber)
+    seq := tlv_in.GetByte(TLVType_SequenceNumber)
     
     switch seq {
     case PairStartRequest:
@@ -104,18 +105,18 @@ func (c *SetupServerController) Handle(tlv_in *TLV8Container) (*TLV8Container, e
 // Server -> Client
 // - B: server public key
 // - s: salt
-func (c *SetupServerController) handlePairStart(tlv_in *TLV8Container) (*TLV8Container, error) {
-    tlv_out := TLV8Container{}
+func (c *SetupServerController) handlePairStart(tlv_in Container) (Container, error) {
+    tlv_out := NewTLV8Container()
     c.curSeq = PairStartRespond
     
     tlv_out.SetByte(TLVType_SequenceNumber, c.curSeq)
     tlv_out.SetBytes(TLVType_PublicKey, c.session.publicKey)
     tlv_out.SetBytes(TLVType_Salt, c.session.salt)
     
-    fmt.Println("<-     B:", hex.EncodeToString(tlv_out.Bytes(TLVType_PublicKey)))
-    fmt.Println("<-     s:", hex.EncodeToString(tlv_out.Bytes(TLVType_Salt)))
+    fmt.Println("<-     B:", hex.EncodeToString(tlv_out.GetBytes(TLVType_PublicKey)))
+    fmt.Println("<-     s:", hex.EncodeToString(tlv_out.GetBytes(TLVType_Salt)))
     
-    return &tlv_out, nil
+    return tlv_out, nil
 }
 
 // Client -> Server
@@ -126,13 +127,13 @@ func (c *SetupServerController) handlePairStart(tlv_in *TLV8Container) (*TLV8Con
 // - M2: proof
 // or
 // - auth error
-func (c *SetupServerController) handlePairVerify(tlv_in *TLV8Container) (*TLV8Container, error) {
-    tlv_out := TLV8Container{}
+func (c *SetupServerController) handlePairVerify(tlv_in Container) (Container, error) {
+    tlv_out := NewTLV8Container()
     c.curSeq = PairVerifyRespond
     
     tlv_out.SetByte(TLVType_SequenceNumber, c.curSeq)
     
-    cpublicKey := tlv_in.Bytes(TLVType_PublicKey)
+    cpublicKey := tlv_in.GetBytes(TLVType_PublicKey)
     fmt.Println("->     A:", hex.EncodeToString(cpublicKey))
     
     err := c.session.SetupSecretKeyFromClientPublicKey(cpublicKey)
@@ -140,7 +141,7 @@ func (c *SetupServerController) handlePairVerify(tlv_in *TLV8Container) (*TLV8Co
         return nil, err
     }
     
-    cproof := tlv_in.Bytes(TLVType_Proof)
+    cproof := tlv_in.GetBytes(TLVType_Proof)
     fmt.Println("->     M1:", hex.EncodeToString(cproof))
     
     sproof, err := c.session.ProofFromClientProof(cproof)
@@ -159,11 +160,11 @@ func (c *SetupServerController) handlePairVerify(tlv_in *TLV8Container) (*TLV8Co
         tlv_out.SetBytes(TLVType_Proof, sproof)
     }
     
-    fmt.Println("<-     M2:", hex.EncodeToString(tlv_out.Bytes(TLVType_Proof)))
+    fmt.Println("<-     M2:", hex.EncodeToString(tlv_out.GetBytes(TLVType_Proof)))
     fmt.Println("        S:", hex.EncodeToString(c.session.secretKey))
     fmt.Println("        K:", hex.EncodeToString(c.session.encryptionKey[:]))
     
-    return &tlv_out, nil
+    return tlv_out, nil
 }
 
 // Client -> Server
@@ -176,14 +177,14 @@ func (c *SetupServerController) handlePairVerify(tlv_in *TLV8Container) (*TLV8Co
 // 
 // Server -> Client
 // - encrpyted tlv8: bridge LTPK, bridge name, signature (of H2, bridge name, LTPK)
-func (c *SetupServerController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8Container, error) {
-    tlv_out := TLV8Container{}
+func (c *SetupServerController) handleKeyExchange(tlv_in Container) (Container, error) {
+    tlv_out := NewTLV8Container()
     
     c.curSeq = PairKeyExchangeRespond
     
     tlv_out.SetByte(TLVType_SequenceNumber, c.curSeq)
     
-    data := tlv_in.Bytes(TLVType_EncryptedData)    
+    data := tlv_in.GetBytes(TLVType_EncryptedData)    
     message := data[:(len(data) - 16)]
     var mac [16]byte
     copy(mac[:], data[len(message):]) // 16 byte (MAC)
@@ -198,14 +199,14 @@ func (c *SetupServerController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8C
         tlv_out.SetByte(TLVType_ErrorCode, TLVStatus_UnkownError) // return error 1
     } else {
         decrypted_buffer := bytes.NewBuffer(decrypted)
-        tlv_in, err := ReadTLV8(decrypted_buffer)
+        tlv_in, err := NewTLV8ContainerFromReader(decrypted_buffer)
         if err != nil {
             return nil, err
         }
         
-        username  := tlv_in.String(TLVType_Username)
-        ltpk      := tlv_in.Bytes(TLVType_PublicKey)
-        signature := tlv_in.Bytes(TLVType_Ed25519Signature)
+        username  := tlv_in.GetString(TLVType_Username)
+        ltpk      := tlv_in.GetBytes(TLVType_PublicKey)
+        signature := tlv_in.GetBytes(TLVType_Ed25519Signature)
         fmt.Println("->     Username:", username)
         fmt.Println("->     LTPK:", hex.EncodeToString(ltpk))
         fmt.Println("->     Signature:", hex.EncodeToString(signature))
@@ -243,14 +244,14 @@ func (c *SetupServerController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8C
                 return nil, err
             }
             
-            tlvPairKeyExchange := TLV8Container{}
+            tlvPairKeyExchange := NewTLV8Container()
             tlvPairKeyExchange.SetString(TLVType_Username, c.bridge.Id())
             tlvPairKeyExchange.SetBytes(TLVType_PublicKey, LTPK)
             tlvPairKeyExchange.SetBytes(TLVType_Ed25519Signature, []byte(signature))
             
-            fmt.Println("<-     Username:", tlvPairKeyExchange.String(TLVType_Username))
-            fmt.Println("<-     LTPK:", hex.EncodeToString(tlvPairKeyExchange.Bytes(TLVType_PublicKey)))
-            fmt.Println("<-     Signature:", hex.EncodeToString(tlvPairKeyExchange.Bytes(TLVType_Ed25519Signature)))
+            fmt.Println("<-     Username:", tlvPairKeyExchange.GetString(TLVType_Username))
+            fmt.Println("<-     LTPK:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TLVType_PublicKey)))
+            fmt.Println("<-     Signature:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TLVType_Ed25519Signature)))
             
             encrypted, mac, _ := hap.Chacha20EncryptAndPoly1305Seal(c.session.encryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)    
             tlv_out.SetByte(TLVType_Method, 0)
@@ -261,7 +262,7 @@ func (c *SetupServerController) handleKeyExchange(tlv_in *TLV8Container) (*TLV8C
         }
     }
     
-    return &tlv_out, nil
+    return tlv_out, nil
 }
 
 func (c *SetupServerController) reset() {

@@ -26,7 +26,7 @@ func (handler *PairSetupHandler) ServeHTTP(response http.ResponseWriter, request
     fmt.Println("POST /pair-setup")
     response.Header().Set("Content-Type", hap.HTTPContentTypePairingTLV8)
     
-    res, err := handler.controller.Handle(request.Body)
+    res, err := handler.controller.HandleReader(request.Body)
     
     if err != nil {
         fmt.Println(err)

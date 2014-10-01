@@ -6,13 +6,19 @@ import(
     "io"
 )
 
-type TLV8Container struct {
+type tlv8Container struct {
+    Container
     Items []tlv8
 }
+func NewTLV8Container() Container {
+    return &tlv8Container{
+        Items:make([]tlv8, 0, 1),
+    }
+}
 
-func ReadTLV8(r io.Reader) (*TLV8Container, error) {
+func NewTLV8ContainerFromReader(r io.Reader) (Container, error) {
     var items = make([]tlv8, 0, 1)
-    for {
+    for (r != nil) {
         var item tlv8
         if err := binary.Read(r, binary.LittleEndian, &item.tag); err != nil {
             if err == io.EOF {
@@ -34,10 +40,12 @@ func ReadTLV8(r io.Reader) (*TLV8Container, error) {
         items = append(items, item)
     }
     
-    return &TLV8Container{Items:items}, nil
+    return &tlv8Container{
+        Items:items,
+    }, nil
 }
 
-func (t *TLV8Container) Buffer(tag uint8) *bytes.Buffer {
+func (t *tlv8Container) GetBuffer(tag uint8) *bytes.Buffer {
     var b bytes.Buffer
     for _, item := range t.Items {
         if item.tag == tag {
@@ -48,25 +56,25 @@ func (t *TLV8Container) Buffer(tag uint8) *bytes.Buffer {
     return &b
 }
 
-func (t *TLV8Container) String(tag uint8) string {
-    return string(t.Bytes(tag))
+func (t *tlv8Container) GetString(tag uint8) string {
+    return string(t.GetBytes(tag))
 }
 
-func (t *TLV8Container) Bytes(tag uint8) []byte {
-    return t.Buffer(tag).Bytes()
+func (t *tlv8Container) GetBytes(tag uint8) []byte {
+    return t.GetBuffer(tag).Bytes()
 }
 
-func (t *TLV8Container) Byte(tag uint8) byte {
-    buffer := t.Buffer(tag)
+func (t *tlv8Container) GetByte(tag uint8) byte {
+    buffer := t.GetBuffer(tag)
     b, _ := buffer.ReadByte()
     return b
 }
 
-func (t *TLV8Container) SetString(tag uint8, value string) {
+func (t *tlv8Container) SetString(tag uint8, value string) {
     t.SetBytes(tag, []byte(value))
 }
 
-func (t *TLV8Container) SetBytes(tag uint8, value []byte) {
+func (t *tlv8Container) SetBytes(tag uint8, value []byte) {
     r := bytes.NewBuffer(value)
     
     for {
@@ -88,11 +96,11 @@ func (t *TLV8Container) SetBytes(tag uint8, value []byte) {
     }
 }
 
-func (t *TLV8Container) SetByte(tag uint8, b byte) {
+func (t *tlv8Container) SetByte(tag uint8, b byte) {
     t.SetBytes(tag, []byte{b})
 }
 
-func (t *TLV8Container) BytesBuffer() *bytes.Buffer {
+func (t *tlv8Container) BytesBuffer() *bytes.Buffer {
     var b bytes.Buffer
     for _, item := range t.Items {
         // Since we are using just 1 byte for tag and length, the byte order does not matter
