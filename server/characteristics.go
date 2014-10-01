@@ -64,8 +64,8 @@ func (handler *CharacteristicsHandler) ServeHTTP(response http.ResponseWriter, r
         fmt.Println(err)
         response.WriteHeader(http.StatusInternalServerError)
     } else {
-        bytes, _ := ioutil.ReadAll(res)
-        if len(bytes) > 0 {
+        if res != nil {
+            bytes, _ := ioutil.ReadAll(res)
             response.Header().Set("Content-Type", hap.HTTPContentTypeHAPJson)
             fmt.Println("<-  JSON:", string(bytes))
             response.Write(bytes)
