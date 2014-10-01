@@ -9,7 +9,7 @@ type PairingHandler interface {
     Handle(Container) (Container, error)
 }
 
-func HandleReaderForHandler(r io.Reader, h PairingHandler) (io.Reader, error) {
+func HandleReaderForHandler(r io.Reader, h PairingHandler) (r_out io.Reader, err error) {
     cont_in, err := NewTLV8ContainerFromReader(r)
     if err != nil {
         return nil, err
@@ -21,14 +21,13 @@ func HandleReaderForHandler(r io.Reader, h PairingHandler) (io.Reader, error) {
     
     if err != nil {
         fmt.Println("[ERROR]", err)
-        return nil, err
     } else {
         if cont_out != nil {
             fmt.Println("<-     Seq:", cont_out.GetByte(TLVType_SequenceNumber))
-            fmt.Println("-------------")
-            return cont_out.BytesBuffer(), nil
+            r_out = cont_out.BytesBuffer()
         }
     }
+    fmt.Println("--------------------------")
     
-    return nil, err
+    return r_out, err
 }
