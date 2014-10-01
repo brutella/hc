@@ -4,8 +4,7 @@ import(
 )
 
 type Accessory struct {
-    Compareable
-    Id int `json:"aid"`
+    Id int              `json:"aid"`
     Services []*Service `json:"services"`
     
     idCount int

@@ -11,7 +11,6 @@ type CharacteristicDelegate interface {
 
 type ValueChangedFunc func(CharacteristicChange)
 type Characteristic struct {
-    Compareable
     Id int                  `json:"iid"` // managed by accessory
     Type CharType           `json:"type"`
     Permissions []string    `json:"perms"`

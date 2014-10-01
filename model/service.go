@@ -1,9 +1,8 @@
 package model
 
 type Service struct {
-    Compareable
-    Id int `json:"iid"`
-    Type ServiceType `json:"type"`
+    Id int                            `json:"iid"`
+    Type ServiceType                  `json:"type"`
     Characteristics []*Characteristic `json:"characteristics"`
 }
 
