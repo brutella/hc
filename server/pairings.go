@@ -25,10 +25,7 @@ func NewPairingHandler(controller *pair.PairingController, context *hap.Context)
 func (handler *PairingHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
     fmt.Println("POST /pairings")
     
-    tlv8, err := pair.NewTLV8ContainerFromReader(request.Body)
-    if err == nil {
-        _, err = handler.controller.Handle(tlv8)
-    }
+    _, err := pair.HandleReaderForHandler(request.Body, handler.controller)
     
     if err != nil {
         fmt.Println(err)

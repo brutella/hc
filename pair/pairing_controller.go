@@ -30,12 +30,10 @@ func NewPairingController(context *hap.Context) *PairingController {
 }
 
 func (c *PairingController) Handle(tlv8 Container) (Container, error) {
-    seq         := tlv8.GetByte(TLVType_SequenceNumber)
     method      := tlv8.GetByte(TLVType_Method)
     username    := tlv8.GetString(TLVType_Username)
     publicKey   := tlv8.GetBytes(TLVType_PublicKey)
     
-    fmt.Println("->      Seq:", seq)
     fmt.Println("->   Method:", method)
     fmt.Println("-> Username:", username)
     fmt.Println("->     LTPK:", publicKey)
