@@ -1,13 +1,10 @@
-package server
+package controller
 
 import(
     "github.com/brutella/hap/model/characteristic"
     "github.com/brutella/hap/model"
-    "github.com/brutella/hap/common"
     
     "fmt"
-    "strings"
-    "strconv"
 )
 
 type Characteristic struct {
@@ -77,17 +74,4 @@ func (c *CharacteristicController) GetCharacteristic(accessoryId int, characteri
         }
     }
     return nil
-}
-
-// string must be in format <accessory id>.<characteristic id>
-func ParseAccessoryAndCharacterId(str string) (int, int, error) {
-    ids := strings.Split(str, ".")
-    if len(ids) != 2 {
-        return 0, 0, common.NewErrorf("Could not parse uid %s", str)
-    }
-    
-    aid, err := strconv.Atoi(ids[0])
-    cid, err := strconv.Atoi(ids[1])
-    
-    return aid, cid, err
 }

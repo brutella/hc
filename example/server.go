@@ -11,6 +11,8 @@ import(
     "github.com/brutella/hap/model/accessory"
     "github.com/brutella/hap/model/service"
     "github.com/brutella/hap/server"
+    "github.com/brutella/hap/server/handler"
+    "github.com/brutella/hap/server/controller"
 )
 
 var API_PORT int = 1237
@@ -69,28 +71,28 @@ func main() {
     m.AddAccessory(thermostat_accessory)
     m.AddAccessory(switch_accessory)
     
-    model_controller            := server.NewModelController(m)
-    characteristics_controller  := server.NewCharacteristicController(m)
+    model_controller            := controller.NewModelController(m)
+    characteristics_controller  := controller.NewCharacteristicController(m)
     
     setup, _    := pair.NewSetupServerController(context, bridge)
     verify, _   := pair.NewVerifyServerController(context, bridge)
     
     mux :=  http.NewServeMux()
     
-    setup_handler := server.NewPairSetupHandler(setup)
+    setup_handler := handler.NewPairSetupHandler(setup)
     mux.Handle("/pair-setup", setup_handler)
     
-    verify_handler := server.NewPairVerifyHandler(verify, context)
+    verify_handler := handler.NewPairVerifyHandler(verify, context)
     mux.Handle("/pair-verify", verify_handler)
     
-    accessories_handler := server.NewAccessoriesHandler(model_controller, context)
+    accessories_handler := handler.NewAccessoriesHandler(model_controller, context)
     mux.Handle("/accessories", accessories_handler)
     
-    characteristics_handler := server.NewCharacteristicsHandler(characteristics_controller, context)
+    characteristics_handler := handler.NewCharacteristicsHandler(characteristics_controller, context)
     mux.Handle("/characteristics", characteristics_handler)
     
     pairing_controller := pair.NewPairingController(context)
-    pairing_handler := server.NewPairingHandler(pairing_controller, context)
+    pairing_handler := handler.NewPairingHandler(pairing_controller, context)
     mux.Handle("/pairings", pairing_handler)
     
     addr := ":" + strconv.Itoa(API_PORT)

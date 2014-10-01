@@ -1,10 +1,12 @@
-package server
+package handler
 
 import(
+    "github.com/brutella/hap"
+    "github.com/brutella/hap/pair"
+    "github.com/brutella/hap/server"
+    
     "net/http"
     "fmt"
-    "github.com/brutella/hap/pair"
-    "github.com/brutella/hap"
     "io/ioutil"
 )
 
@@ -25,7 +27,7 @@ func NewPairVerifyHandler(controller *pair.VerifyServerController, context *hap.
 
 func (handler *PairVerifyHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
     fmt.Println("POST /pair-verify")
-    response.Header().Set("Content-Type", HTTPContentTypePairingTLV8)
+    response.Header().Set("Content-Type", server.HTTPContentTypePairingTLV8)
     
     res, err := pair.HandleReaderForHandler(request.Body, handler.controller)
     

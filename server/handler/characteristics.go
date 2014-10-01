@@ -1,9 +1,12 @@
-package server
+package handler
 
 import(
+    "github.com/brutella/hap"
+    "github.com/brutella/hap/server"
+    "github.com/brutella/hap/server/controller"
+    
     "net/http"
     "fmt"
-    "github.com/brutella/hap"
     "io"
     "io/ioutil"
     "encoding/json"
@@ -13,11 +16,11 @@ import(
 type CharacteristicsHandler struct {
     http.Handler
     
-    controller *CharacteristicController
+    controller *controller.CharacteristicController
     context *hap.Context
 }
 
-func NewCharacteristicsHandler(c *CharacteristicController, context *hap.Context) *CharacteristicsHandler {
+func NewCharacteristicsHandler(c *controller.CharacteristicController, context *hap.Context) *CharacteristicsHandler {
     handler := CharacteristicsHandler{
                 controller: c,
                 context: context,
@@ -30,10 +33,10 @@ func (handler *CharacteristicsHandler) ServeHTTP(response http.ResponseWriter, r
     var res io.Reader
     var err error
     switch request.Method {
-    case MethodGET:
+    case server.MethodGET:
         fmt.Println("GET /characteristics")
         request.ParseForm()
-        aid, cid, err := ParseAccessoryAndCharacterId(request.Form.Get("id"))
+        aid, cid, err := server.ParseAccessoryAndCharacterId(request.Form.Get("id"))
         chars := handler.controller.HandleGetCharacteristics(aid, cid)
         result, err := json.Marshal(chars)
         if err != nil {
@@ -43,11 +46,11 @@ func (handler *CharacteristicsHandler) ServeHTTP(response http.ResponseWriter, r
         var b bytes.Buffer
         b.Write(result)
         res = &b
-    case MethodPUT:
+    case server.MethodPUT:
         fmt.Println("PUT /characteristics")
         
         b, _ := ioutil.ReadAll(request.Body)
-        var chars Characteristics
+        var chars controller.Characteristics
         err := json.Unmarshal(b, &chars)
     
         if err != nil {
@@ -66,7 +69,7 @@ func (handler *CharacteristicsHandler) ServeHTTP(response http.ResponseWriter, r
     } else {
         if res != nil {
             bytes, _ := ioutil.ReadAll(res)
-            response.Header().Set("Content-Type", HTTPContentTypeHAPJson)
+            response.Header().Set("Content-Type", server.HTTPContentTypeHAPJson)
             fmt.Println("<-  JSON:", string(bytes))
             response.Write(bytes)
         } else {
