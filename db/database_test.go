@@ -6,6 +6,12 @@ import (
     "os"
 )
 
+func TestLoadUndefinedClient(t *testing.T) {
+    db, _ := NewDatabase(os.TempDir())
+    client := db.ClientWithName("My Name")
+    assert.Nil(t, client)
+}
+
 func TestLoadClient(t *testing.T) {
     db, _ := NewDatabase(os.TempDir())
     
