@@ -1,4 +1,4 @@
-package hap
+package common
 
 import(
     "os"
@@ -7,7 +7,6 @@ import(
 )
 
 type fileStorage struct {
-    Storage
     dir_path string
 }
 
@@ -15,7 +14,7 @@ type fileStorage struct {
 // Any folders are created if necessary
 //
 // Every key-value pair is stored in seperate file
-func NewFileStorage(dir string) (Storage, error) {
+func NewFileStorage(dir string) (*fileStorage, error) {
     path, err := filepath.Abs(dir)
     if err != nil {
         return nil, err

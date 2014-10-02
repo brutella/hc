@@ -1,7 +1,7 @@
 package pair
 
 import (
-    "github.com/brutella/hap"
+    "github.com/brutella/hap/common"
     "github.com/brutella/hap/db"
     "github.com/brutella/hap/netio"
     
@@ -12,9 +12,9 @@ import (
 
 // Tests the pairing key verification
 func TestPairVerifyIntegration(t *testing.T) {
-    storage, err := hap.NewFileStorage(os.TempDir())
+    storage, err := common.NewFileStorage(os.TempDir())
     assert.Nil(t, err)
-    database := db.NewManager(storage)
+    database := db.NewDatabaseWithStorage(storage)
     context := netio.NewContext()
     
     info := netio.NewBridgeInfo("Macbook Bridge", "001-02-003", "Matthias H.", storage)

@@ -5,12 +5,21 @@ import(
     "github.com/brutella/hap/common"
 )
 
-type Manager struct {
+type Database struct {
     storage hap.Storage
 }
 
-func NewManager(storage hap.Storage) *Manager {
-    c := Manager{storage: storage}
+func NewDatabase(path string) (*Database, error) {
+    storage, err := common.NewFileStorage(path)
+    if err != nil {
+        return nil, err
+    }
+    
+    return NewDatabaseWithStorage(storage), nil
+}
+
+func NewDatabaseWithStorage(storage hap.Storage) *Database {
+    c := Database{storage: storage}
     
     return &c
 }
@@ -18,7 +27,7 @@ func NewManager(storage hap.Storage) *Manager {
 // Returns the client for a specific name
 //
 // Loads the ltpk from disk and returns initialized client object
-func (m *Manager) ClientForName(name string) (*Client) {
+func (m *Database) ClientWithName(name string) (*Client) {
     data, err := m.storage.Get(name + ".ltpk")
     
     if len(data) > 0 && err == nil{
@@ -30,7 +39,7 @@ func (m *Manager) ClientForName(name string) (*Client) {
 }
 
 // Stores the long-term public key of the client as {client-name}.ltpk
-func (m *Manager) SaveClient(client *Client) error {
+func (m *Database) SaveClient(client *Client) error {
     if len(client.PublicKey) == 0 {
         return common.NewErrorf("No public key to save for client%s\n", client.Name)
     }
@@ -38,58 +47,6 @@ func (m *Manager) SaveClient(client *Client) error {
     return m.storage.Set(client.Name + ".ltpk", client.PublicKey)
 }
 
-func (m *Manager) DeleteClient(client *Client) {
+func (m *Database) DeleteClient(client *Client) {
     m.storage.Delete(client.Name + ".ltpk")
-}
-
-
-// Returns the party for a specific name
-//
-// Loads the ltpk, ltsk and serial number from disk
-func (m *Manager) PartyWithName(name string) (*Party) {
-    serial, _ := m.storage.Get(name + ".serial")
-    ltpk, _ := m.storage.Get(name + ".ltpk")
-    ltsk, _ := m.storage.Get(name + ".ltsk")
-    
-    return NewParty(name, string(serial), ltpk, ltsk)
-}
-
-// Stores the long-term public key of the party as {client-name}.ltpk
-// Stores the long-term secrekt key of the party as {client-name}.ltsk
-// Stores the serial number of the party as {client-name}.serial
-func (m *Manager) SaveParty(p *Party) error {
-    if len(p.PublicKey) > 0 {
-        err := m.storage.Set(p.Name + ".ltpk", p.PublicKey)
-        if err != nil {
-            return err
-        }
-    } else {
-        m.storage.Delete(p.Name + ".ltpk")
-    }
-    
-    if len(p.SerialNumber) > 0 {
-        err := m.storage.Set(p.Name + ".serial", []byte(p.SerialNumber))
-        if err != nil {
-            return err
-        }
-    } else {
-        m.storage.Delete(p.Name + ".serial")
-    }
-    
-    if len(p.SecretKey) > 0 {
-        err := m.storage.Set(p.Name + ".ltsk", p.SecretKey)
-        if err != nil {
-            return err
-        }
-    } else {
-        m.storage.Delete(p.Name + ".ltsk")
-    }
-    
-    return nil
-}
-
-func (m *Manager) DeleteParty(p *Party) {
-    m.storage.Delete(p.Name + ".serial")
-    m.storage.Delete(p.Name + ".ltpk")
-    m.storage.Delete(p.Name + ".ltsk")
 }

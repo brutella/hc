@@ -3,7 +3,7 @@ package main
 import(
     "fmt"
     "net/http"
-    "github.com/brutella/hap"
+    "github.com/brutella/hap/common"
     "github.com/brutella/hap/db"
     "github.com/brutella/hap/netio"
     "github.com/brutella/hap/netio/pair"
@@ -17,9 +17,9 @@ func sendTLV8(b io.Reader) (io.Reader, error){
 }
 
 func main() {    
-    storage, err := hap.NewFileStorage(os.TempDir())
+    storage, err := common.NewFileStorage(os.TempDir())
     context := netio.NewContext()
-    database := db.NewManager(storage)
+    database := db.NewDatabaseWithStorage(storage)
     info := netio.NewBridgeInfo("Test Bridge", "719-47-107", "Matthias H.", storage)
     info.Id = "42:cd:02:57:0d:40"
     bridge, err := netio.NewBridge(info)

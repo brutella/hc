@@ -7,6 +7,7 @@ import(
     
     "github.com/brutella/hap"
     "github.com/brutella/hap/db"
+    "github.com/brutella/hap/common"
     "github.com/brutella/hap/model"
     "github.com/brutella/hap/model/accessory"
     "github.com/brutella/hap/model/service"
@@ -30,9 +31,9 @@ var API_PORT int = 1237
 // ff – feature flags. If bit 0 is set, device is considered MFi-compliant, and additional verification is performed, otherwise a warning about non-compliant device is shown before PIN code request.
 
 func main() {
-    storage, _  := hap.NewFileStorage("./data")
+    storage, _  := common.NewFileStorage("./data")
     context     := netio.NewContext()
-    database := db.NewManager(storage)
+    database    := db.NewDatabaseWithStorage(storage)
     config      := netio.NewBridgeInfo("GoBridge", "001-02-003", "Matthias H.", storage)
     bridge, _   := netio.NewBridge(config)
     context.Set("bridge", bridge)

@@ -1,35 +1,26 @@
 package db
 
-import (
-    "github.com/brutella/hap"
-    
+import (    
 	"testing"
     "github.com/stretchr/testify/assert"
     "os"
 )
 
-func TestSaveAndLoadParty(t *testing.T) {
-    storage, _ := hap.NewFileStorage(os.TempDir())
-    db := NewManager(storage)
+func TestLoadClient(t *testing.T) {
+    db, _ := NewDatabase(os.TempDir())
     
-    party := NewParty("My Name", "My Serial", []byte{0x01}, []byte{0x02})
-    db.SaveParty(party)
-    loaded_party := db.PartyWithName("My Name")
-    assert.NotNil(t, loaded_party)
-    assert.Equal(t, loaded_party.SerialNumber, "My Serial")
-    assert.Equal(t, loaded_party.PublicKey, []byte{0x01})
-    assert.Equal(t, loaded_party.SecretKey, []byte{0x02})
+    db.SaveClient(NewClient("My Name", []byte{0x01}))
+    client := db.ClientWithName("My Name")
+    assert.NotNil(t, client)
+    assert.Equal(t, client.PublicKey, []byte{0x01})
 }
 
-func TestSaveAndLoadRemoteParty(t *testing.T) {
-    storage, _ := hap.NewFileStorage(os.TempDir())
-    db := NewManager(storage)
+func TestDeleteClient(t *testing.T) {
+    db, _ := NewDatabase(os.TempDir())
     
-    party := NewParty("My Name", "", []byte{0x01}, nil)
-    db.SaveParty(party)
-    loaded_party := db.PartyWithName("My Name")
-    assert.NotNil(t, loaded_party)
-    assert.Equal(t, loaded_party.SerialNumber, "")
-    assert.Equal(t, loaded_party.PublicKey, []byte{0x01})
-    assert.Nil(t, loaded_party.SecretKey)
+    c := NewClient("My Name", []byte{0x01})
+    db.SaveClient(c)
+    db.DeleteClient(c)
+    client := db.ClientWithName("My Name")
+    assert.Nil(t, client)
 }

@@ -1,4 +1,4 @@
-package hap
+package common
 
 import (
 	"testing"
@@ -21,11 +21,6 @@ func TestFileStorage(t *testing.T) {
     
     assert.Nil(t, storage.Delete("test"))
 }
-
-// func TestCreatingDirectory (t *testing.T) {
-//     dir := filepath.Join(".", "testing")
-//     assert.Nil(t, os.MkdirAll(dir, 0666))
-// }
 
 func TestStoreInSubdirectory (t *testing.T){
     dir, _ := filepath.Abs(filepath.Join(os.TempDir(), "hap"))

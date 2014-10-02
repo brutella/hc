@@ -13,13 +13,13 @@ import(
 )
 
 type VerifyServerController struct {
-    database *db.Manager
+    database *db.Database
     context netio.Context
     session *PairVerifySession
     curSeq byte
 }
 
-func NewVerifyServerController(database *db.Manager, context netio.Context) *VerifyServerController {    
+func NewVerifyServerController(database *db.Database, context netio.Context) *VerifyServerController {    
     controller := VerifyServerController{
                                     database: database,
                                     context: context,
@@ -165,7 +165,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
         fmt.Println("    client:", username)
         fmt.Println(" signature:", hex.EncodeToString(signature))
         
-        client := c.database.ClientForName(username)
+        client := c.database.ClientWithName(username)
         if client == nil {
             return nil, common.NewErrorf("Client %s is unknown", username)
         }
