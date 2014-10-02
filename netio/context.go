@@ -3,7 +3,6 @@ package netio
 import(
     "net"
     "net/http"
-    "fmt"
 )
 
 // Provides variables in global has accessible via a connection or request
