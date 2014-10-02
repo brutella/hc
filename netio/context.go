@@ -58,7 +58,6 @@ func (ctx *context) GetConnectionKey(r *http.Request) interface{} {
 
 func (ctx *context) Set(key, val interface{}) {
     ctx.storage[key] = val
-    fmt.Println("storage = ", ctx.storage)
 }
 
 func (ctx *context) Get(key interface{}) (interface{}) {
@@ -67,7 +66,6 @@ func (ctx *context) Get(key interface{}) (interface{}) {
 
 func (ctx *context) Delete(key interface{}){
     delete(ctx.storage, key)
-    fmt.Println("storage = ", ctx.storage)
 }
 
 // HAP Context
