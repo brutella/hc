@@ -35,8 +35,6 @@ func NewTLV8ContainerFromReader(r io.Reader) (Container, error) {
             return nil, err
         }
         
-        // Reverse
-        // sort.Sort(sort.Reverse(ByteSequence(item.value)))
         items = append(items, item)
     }
     

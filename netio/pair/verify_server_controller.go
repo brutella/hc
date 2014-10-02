@@ -1,7 +1,6 @@
 package pair
 
 import(
-    _"github.com/brutella/hap"
     "github.com/brutella/hap/crypto"
     "github.com/brutella/hap/common"
     "github.com/brutella/hap/netio"

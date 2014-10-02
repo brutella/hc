@@ -1,7 +1,6 @@
 package endpoint
 
 import(   
-    _"github.com/brutella/hap"
     "github.com/brutella/hap/netio"
     "github.com/brutella/hap/netio/controller"
     

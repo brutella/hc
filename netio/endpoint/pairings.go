@@ -3,7 +3,6 @@ package endpoint
 import(
     "net/http"
     "fmt"
-    _"github.com/brutella/hap"
     "github.com/brutella/hap/netio/pair"
 )
 
