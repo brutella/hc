@@ -34,7 +34,7 @@ func NewDatabaseWithStorage(storage hap.Storage) *database {
 //
 // Loads the ltpk from disk and returns initialized client object
 func (m *database) ClientWithName(name string) (Client) {
-    data, err := m.storage.Get(name + ".ltpk")
+    data, err := m.storage.Get(keyForClientName(name))
     
     if len(data) > 0 && err == nil{
         client := NewClient(name, data)
@@ -50,9 +50,18 @@ func (m *database) SaveClient(client Client) error {
         return common.NewErrorf("No public key to save for client%s\n", client.Name())
     }
     
-    return m.storage.Set(client.Name() + ".ltpk", client.PublicKey())
+    return m.storage.Set(keyForClient(client), client.PublicKey())
 }
 
+// Returns they key for which the client is saved in the database
 func (m *database) DeleteClient(client Client) {
-    m.storage.Delete(client.Name() + ".ltpk")
+    m.storage.Delete(keyForClient(client))
+}
+
+func keyForClientName(name string) string {
+    return name + ".ltpk"
+}
+
+func keyForClient(client Client) string {
+    return keyForClientName(client.Name())
 }
