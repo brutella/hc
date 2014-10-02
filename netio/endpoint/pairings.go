@@ -1,4 +1,4 @@
-package handler
+package endpoint
 
 import(
     "net/http"
@@ -7,21 +7,21 @@ import(
     "github.com/brutella/hap/netio/pair"
 )
 
-type PairingHandler struct {
+type Pairing struct {
     http.Handler
     
     controller *pair.PairingController
 }
 
-func NewPairingHandler(controller *pair.PairingController) *PairingHandler {
-    handler := PairingHandler{
+func NewPairing(controller *pair.PairingController) *Pairing {
+    handler := Pairing{
                 controller: controller,
             }
     
     return &handler
 }
 
-func (handler *PairingHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
+func (handler *Pairing) ServeHTTP(response http.ResponseWriter, request *http.Request) {
     fmt.Println("POST /pairings")
     
     _, err := pair.HandleReaderForHandler(request.Body, handler.controller)

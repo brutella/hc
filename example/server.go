@@ -12,7 +12,7 @@ import(
     "github.com/brutella/hap/model/service"
     "github.com/brutella/hap/netio"
     "github.com/brutella/hap/netio/pair"
-    "github.com/brutella/hap/netio/handler"
+    "github.com/brutella/hap/netio/endpoint"
     "github.com/brutella/hap/netio/controller"
 )
 
@@ -81,19 +81,19 @@ func main() {
     
     mux :=  http.NewServeMux()
     
-    setup_handler := handler.NewPairSetupHandler(bridge, database, context)
+    setup_handler := endpoint.NewPairSetup(bridge, database, context)
     mux.Handle("/pair-setup", setup_handler)
     
-    verify_handler := handler.NewPairVerifyHandler(context, database)
+    verify_handler := endpoint.NewPairVerify(context, database)
     mux.Handle("/pair-verify", verify_handler)
     
-    accessories_handler := handler.NewAccessoriesHandler(model_controller, context)
+    accessories_handler := endpoint.NewAccessories(model_controller, context)
     mux.Handle("/accessories", accessories_handler)
     
-    characteristics_handler := handler.NewCharacteristicsHandler(characteristics_controller, context)
+    characteristics_handler := endpoint.NewCharacteristics(characteristics_controller, context)
     mux.Handle("/characteristics", characteristics_handler)
     
-    pairing_handler := handler.NewPairingHandler(pairing_controller)
+    pairing_handler := endpoint.NewPairing(pairing_controller)
     mux.Handle("/pairings", pairing_handler)
     
     addr := ":" + strconv.Itoa(API_PORT)

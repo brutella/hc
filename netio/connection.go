@@ -80,7 +80,6 @@ func (con *tcpHAPConnection) DecryptedRead(b []byte) (int, error) {
     }
     
     n, err := con.readBuffer.Read(b)
-    fmt.Println(string(b))
     
     if n < len(b) || err == io.EOF {
         con.readBuffer = nil

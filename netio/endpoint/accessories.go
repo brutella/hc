@@ -1,4 +1,4 @@
-package handler
+package endpoint
 
 import(   
     _"github.com/brutella/hap"
@@ -10,15 +10,15 @@ import(
     "fmt"
 )
 
-type AccessoriesHandler struct {
+type Accessories struct {
     http.Handler
     
     controller *controller.ModelController
     context netio.Context
 }
 
-func NewAccessoriesHandler(c *controller.ModelController, context netio.Context) *AccessoriesHandler {
-    handler := AccessoriesHandler{
+func NewAccessories(c *controller.ModelController, context netio.Context) *Accessories {
+    handler := Accessories{
                 controller: c,
                 context: context,
             }
@@ -26,7 +26,7 @@ func NewAccessoriesHandler(c *controller.ModelController, context netio.Context)
     return &handler
 }
 
-func (handler *AccessoriesHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
+func (handler *Accessories) ServeHTTP(response http.ResponseWriter, request *http.Request) {
     fmt.Println("GET /accessories")
     response.Header().Set("Content-Type", netio.HTTPContentTypeHAPJson)
     

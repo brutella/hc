@@ -1,4 +1,4 @@
-package handler
+package endpoint
 
 import(
     _"github.com/brutella/hap"
@@ -12,14 +12,14 @@ import(
     "io/ioutil"
 )
 
-type PairVerifyHandler struct {
+type PairVerify struct {
     http.Handler
     context netio.Context
     database *db.Manager
 }
 
-func NewPairVerifyHandler(context netio.Context, database *db.Manager) *PairVerifyHandler {
-    handler := PairVerifyHandler{
+func NewPairVerify(context netio.Context, database *db.Manager) *PairVerify {
+    handler := PairVerify{
                 context: context,
                 database: database,
             }
@@ -27,7 +27,7 @@ func NewPairVerifyHandler(context netio.Context, database *db.Manager) *PairVeri
     return &handler
 }
 
-func (handler *PairVerifyHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
+func (handler *PairVerify) ServeHTTP(response http.ResponseWriter, request *http.Request) {
     fmt.Println("POST /pair-verify")
     response.Header().Set("Content-Type", netio.HTTPContentTypePairingTLV8)
     

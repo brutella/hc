@@ -1,4 +1,4 @@
-package handler
+package endpoint
 
 import(
     "github.com/brutella/hap/netio"
@@ -10,15 +10,15 @@ import(
     "io/ioutil"
 )
 
-type CharacteristicsHandler struct {
+type Characteristics struct {
     http.Handler
     
     controller *controller.CharacteristicController
     context netio.Context
 }
 
-func NewCharacteristicsHandler(c *controller.CharacteristicController, context netio.Context) *CharacteristicsHandler {
-    handler := CharacteristicsHandler{
+func NewCharacteristics(c *controller.CharacteristicController, context netio.Context) *Characteristics {
+    handler := Characteristics{
                 controller: c,
                 context: context,
             }
@@ -26,7 +26,7 @@ func NewCharacteristicsHandler(c *controller.CharacteristicController, context n
     return &handler
 }
 
-func (handler *CharacteristicsHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
+func (handler *Characteristics) ServeHTTP(response http.ResponseWriter, request *http.Request) {
     var res io.Reader
     var err error
     switch request.Method {

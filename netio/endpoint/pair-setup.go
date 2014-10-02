@@ -1,4 +1,4 @@
-package handler
+package endpoint
 
 import(
     "github.com/brutella/hap/db"
@@ -10,7 +10,7 @@ import(
     "fmt"
 )
 
-type PairSetupHandler struct {
+type PairSetup struct {
     http.Handler
     
     bridge *netio.Bridge
@@ -18,8 +18,8 @@ type PairSetupHandler struct {
     context netio.Context
 }
 
-func NewPairSetupHandler(bridge *netio.Bridge, database *db.Manager, context netio.Context) *PairSetupHandler {
-    handler := PairSetupHandler{
+func NewPairSetup(bridge *netio.Bridge, database *db.Manager, context netio.Context) *PairSetup {
+    handler := PairSetup{
                 bridge: bridge,
                 database: database,
                 context: context,
@@ -28,7 +28,7 @@ func NewPairSetupHandler(bridge *netio.Bridge, database *db.Manager, context net
     return &handler
 }
 
-func (handler *PairSetupHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
+func (handler *PairSetup) ServeHTTP(response http.ResponseWriter, request *http.Request) {
     fmt.Println("POST /pair-setup")
     response.Header().Set("Content-Type", netio.HTTPContentTypePairingTLV8)
     
