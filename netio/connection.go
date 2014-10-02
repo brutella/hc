@@ -85,7 +85,7 @@ func (con *tcpHAPConnection) Read(b []byte) (int, error) {
 }
 
 func (con *tcpHAPConnection) Close() error {
-    fmt.Println("Closed Connection")
+    fmt.Println("Close connection and remove session")
     
     // Delete the session for the connetion
     key := con.context.GetKey(con.connection)
@@ -130,10 +130,12 @@ func (l *TCPHAPListener) Accept() (c net.Conn, err error) {
     if err != nil {
         return
     }
-    // Setup cryptographer
+    
     session := NewSession()
     key := l.context.GetKey(con)
     l.context.Set(key, session)
+    
+    fmt.Println("***** New session")
     
     hapConn, err := &tcpHAPConnection{connection: con, context: l.context}, nil
     if err == nil {
