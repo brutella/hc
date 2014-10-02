@@ -14,13 +14,11 @@ import (
 func TestPairVerifyIntegration(t *testing.T) {
     storage, err := common.NewFileStorage(os.TempDir())
     assert.Nil(t, err)
-    database := db.NewDatabaseWithStorage(storage)
-    context := netio.NewContext()
-    
+    database := db.NewDatabaseWithStorage(storage)    
     info := netio.NewBridgeInfo("Macbook Bridge", "001-02-003", "Matthias H.", storage)
     bridge, err := netio.NewBridge(info)
     assert.Nil(t, err)
-    context.Set("bridge", bridge)
+    context := netio.NewContextForBridge(bridge)
     
     controller := NewVerifyServerController(database, context)
     

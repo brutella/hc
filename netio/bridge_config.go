@@ -1,7 +1,7 @@
 package netio
 
 import(
-    "github.com/brutella/hap"
+    "github.com/brutella/hap/common"
     "os"
     "encoding/hex"
     "crypto/md5"
@@ -15,8 +15,8 @@ type BridgeInfo struct {
     Manufacturer string
 }
 
-func NewBridgeInfo(name, password, manufacturer string, storage hap.Storage) BridgeInfo {
-    serial := hap.GetSerialNumberForAccessoryName(name, storage)
+func NewBridgeInfo(name, password, manufacturer string, storage common.Storage) BridgeInfo {
+    serial := common.GetSerialNumberForAccessoryName(name, storage)
     
     return BridgeInfo{
         SerialNumber: serial,

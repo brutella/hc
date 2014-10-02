@@ -14,12 +14,12 @@ import(
 
 type VerifyServerController struct {
     database db.Database
-    context netio.Context
+    context netio.HAPContext
     session *PairVerifySession
     curSeq byte
 }
 
-func NewVerifyServerController(database db.Database, context netio.Context) *VerifyServerController {    
+func NewVerifyServerController(database db.Database, context netio.HAPContext) *VerifyServerController {    
     controller := VerifyServerController{
                                     database: database,
                                     context: context,
@@ -197,6 +197,5 @@ func (c *VerifyServerController) Reset() {
 }
 
 func (c *VerifyServerController) bridge() *netio.Bridge {
-    val := c.context.Get("bridge")
-    return val.(*netio.Bridge)
+    return c.context.GetBridge()
 }

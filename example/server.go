@@ -5,7 +5,6 @@ import(
     "strconv"
     "net/http"
     
-    "github.com/brutella/hap"
     "github.com/brutella/hap/db"
     "github.com/brutella/hap/common"
     "github.com/brutella/hap/model"
@@ -32,11 +31,11 @@ var API_PORT int = 1237
 
 func main() {
     storage, _  := common.NewFileStorage("./data")
-    context     := netio.NewContext()
     database    := db.NewDatabaseWithStorage(storage)
     config      := netio.NewBridgeInfo("GoBridge", "001-02-003", "Matthias H.", storage)
     bridge, _   := netio.NewBridge(config)
-    context.Set("bridge", bridge)
+    context     := netio.NewContextForBridge(bridge)
+    
     fmt.Println("Run bridge")
     fmt.Println("            Name:", config.Name)
     fmt.Println("        Password:", config.Password)
@@ -48,7 +47,7 @@ func main() {
     bridge_accessory.AddService(bridge_info.Service)
     
     thermostat_name := "Thermostat"
-    thermostat_serial := hap.GetSerialNumberForAccessoryName(thermostat_name, storage)
+    thermostat_serial := common.GetSerialNumberForAccessoryName(thermostat_name, storage)
     thermostat_info := service.NewAccessoryInfo(thermostat_name, thermostat_serial, "Matthias H.", "Model1a")        
     thermostat_service := service.NewThermostat("Temperature", 20.9, 0.0, 100.0,  0.1)
     thermostat_accessory := accessory.NewAccessory()
@@ -56,7 +55,7 @@ func main() {
     thermostat_accessory.AddService(thermostat_service.Service)
     
     switch_name := "Smart Switch"
-    switch_serial := hap.GetSerialNumberForAccessoryName(switch_name, storage)
+    switch_serial := common.GetSerialNumberForAccessoryName(switch_name, storage)
     switch_info := service.NewAccessoryInfo(switch_name, switch_serial, "Matthias H.", "Model1a")        
     switch_service := service.NewSwitch("Switch", true)
     switch_service.OnStateChanged(func(on bool){

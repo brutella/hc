@@ -15,10 +15,10 @@ type PairSetup struct {
     
     bridge *netio.Bridge
     database db.Database
-    context netio.Context
+    context netio.HAPContext
 }
 
-func NewPairSetup(bridge *netio.Bridge, database db.Database, context netio.Context) *PairSetup {
+func NewPairSetup(bridge *netio.Bridge, database db.Database, context netio.HAPContext) *PairSetup {
     handler := PairSetup{
                 bridge: bridge,
                 database: database,

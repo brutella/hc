@@ -14,10 +14,10 @@ type Accessories struct {
     http.Handler
     
     controller *controller.ModelController
-    context netio.Context
+    context netio.HAPContext
 }
 
-func NewAccessories(c *controller.ModelController, context netio.Context) *Accessories {
+func NewAccessories(c *controller.ModelController, context netio.HAPContext) *Accessories {
     handler := Accessories{
                 controller: c,
                 context: context,

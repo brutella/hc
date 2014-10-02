@@ -1,4 +1,4 @@
-package hap
+package common
 
 type Storage interface {
     Set(key string, value []byte) error

@@ -3,10 +3,7 @@ package netio
 import(
     "fmt"
     "time"
-    "os"
-    "os/signal"
     "net"
-    "net/http"
     "bytes"
     
     "io/ioutil"
@@ -14,38 +11,42 @@ import(
     "bufio"
 )
 
-// Creates a server which handles tcp connection based on HAP protocol
-// The tcp connection is secured after the crypto keys are verified
-// Currently both IPv4 and v6 connections are accepted (use tcp4 for IPv4 only)
-func ListenAndServe(addr string, handler http.Handler, context Context) error {
-    server := http.Server{Addr: addr, Handler:handler}
-    ln, err := net.Listen("tcp", server.Addr)
-    if err != nil {
-        return err
-    }
-    
-    listener := NewTCPHAPListener(ln.(*net.TCPListener), context)
-    
-    return server.Serve(listener)
-}
-
 // TCP connection based on HAP protocol
-// Crypto is done based on session state
+//
+// The connections creates a new session in the context to support simultaneous encrypted connections.
+//
+// The sessions' Encrypter and Decrypter are used to encrypt and decrypt data if possible. If no
+// Encrypter and Decrypter are availabe, the connection is handles as plain.
+//
+// When the connection is closed, the session is removed from the context.
 type tcpHAPConnection struct {
     connection net.Conn
-    context Context
+    context HAPContext
+    
+    // Read buffer when data should be decrypted
     readBuffer io.Reader
 }
 
+func NewHAPConnection(connection net.Conn, context HAPContext) *tcpHAPConnection {
+    // Setup new session
+    session := NewSession()
+    context.SetSessionForConnection(session, connection)
+    
+    c := tcpHAPConnection{
+        connection: connection,
+        context: context,
+    }
+    
+    return &c
+}
+
 func (c *tcpHAPConnection) GetEncrypter() Encrypter {
-    key     := c.context.GetKey(c.connection)    
-    session  := c.context.Get(key).(Session)
+    session  := c.context.GetSessionForConnection(c.connection)
     return session.Encrypter()
 }
 
 func (c *tcpHAPConnection) GetDecrypter() Decrypter {
-    key     := c.context.GetKey(c.connection)    
-    session  := c.context.Get(key).(Session)
+    session  := c.context.GetSessionForConnection(c.connection)
     return session.Decrypter()
 }
 
@@ -108,8 +109,7 @@ func (con *tcpHAPConnection) Close() error {
     fmt.Println("[INFO] Close connection and remove session")
     
     // Delete the session for the connetion
-    key := con.context.GetKey(con.connection)
-    con.context.Delete(key)
+    con.context.DeleteSessionForConnection(con.connection)
     
     return con.connection.Close()
 }
@@ -132,43 +132,4 @@ func (con *tcpHAPConnection) SetReadDeadline(t time.Time) error {
 
 func (con *tcpHAPConnection) SetWriteDeadline(t time.Time) error {
     return con.connection.SetWriteDeadline(t)
-}
-
-// TCP listener which creates a tcp HAP connection which uses a secured session
-// to communicate securily
-type TCPHAPListener struct {
-    *net.TCPListener
-    context Context
-}
-
-func NewTCPHAPListener(l *net.TCPListener, context Context) *TCPHAPListener {
-    return &TCPHAPListener{l, context}
-}
-
-func (l *TCPHAPListener) Accept() (c net.Conn, err error) {
-    con, err := l.AcceptTCP()
-    if err != nil {
-        return
-    }
-    
-    session := NewSession()
-    key := l.context.GetKey(con)
-    l.context.Set(key, session)
-    hapConn, err := &tcpHAPConnection{connection: con, context: l.context}, nil
-    if err == nil {
-        closeConnectionOnExit(hapConn)
-    }
-    
-    return hapConn, err
-}
-
-func closeConnectionOnExit(connection *tcpHAPConnection) {
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	go func() {
-		for _ = range c {
-            connection.Close()
-			os.Exit(0)
-		}
-	}()
 }

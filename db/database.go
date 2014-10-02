@@ -1,7 +1,6 @@
 package db
 
 import(
-    "github.com/brutella/hap"
     "github.com/brutella/hap/common"
 )
 
@@ -12,7 +11,7 @@ type Database interface {
 }
 
 type database struct {
-    storage hap.Storage
+    storage common.Storage
 }
 
 func NewDatabase(path string) (*database, error) {
@@ -24,7 +23,7 @@ func NewDatabase(path string) (*database, error) {
     return NewDatabaseWithStorage(storage), nil
 }
 
-func NewDatabaseWithStorage(storage hap.Storage) *database {
+func NewDatabaseWithStorage(storage common.Storage) *database {
     c := database{storage: storage}
     
     return &c
