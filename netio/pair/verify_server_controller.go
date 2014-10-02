@@ -32,6 +32,10 @@ func NewVerifyServerController(database *db.Manager, context netio.Context) *Ver
 func (c *VerifyServerController) SharedKey() ([32]byte) {
     return c.session.SharedKey
 }
+
+func (c *VerifyServerController) KeyVerified() bool {
+    return c.curSeq == VerifyFinishRespond
+}
         
 func (c *VerifyServerController) Handle(cont_in common.Container) (common.Container, error) {
     var cont_out common.Container

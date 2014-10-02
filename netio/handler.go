@@ -13,6 +13,7 @@ type ContainerHandler interface {
 type PairVerifyHandler interface {
     ContainerHandler
     SharedKey() [32]byte
+    KeyVerified() bool
 }
 
 type AccessoriesHandler interface {

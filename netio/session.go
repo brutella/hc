@@ -24,9 +24,7 @@ type session struct {
 }
 
 func NewSession() *session {
-    s := session{
-        cryptographer: NewDummyCryptographer(),
-    }
+    s := session{}
     
     return &s
 }
@@ -53,11 +51,7 @@ func (s *session) PairVerifyHandler() PairVerifyHandler {
 }
 
 func (s *session) SetCryptographer(c Cryptographer) {
-    if s.cryptographer != nil {
-        s.nextCryptographer = c
-    }
-    
-    s.cryptographer = c    
+    s.nextCryptographer = c
 }
 func (s *session) SetPairStartHandler(c ContainerHandler) {
     s.pairStartHandler = c

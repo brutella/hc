@@ -48,12 +48,14 @@ func (c *tcpHAPConnection) GetDecrypter() Decrypter {
     return session.Decrypter()
 }
 
-func (con *tcpHAPConnection) Write(b []byte) (int, error) {    
+func (con *tcpHAPConnection) EncryptedWrite(b []byte) (int, error) {
+    fmt.Println("EncryptedWrite")
     var buffer bytes.Buffer
     buffer.Write(b)
     encrypted, err := con.GetEncrypter().Encrypt(&buffer)
     
     if err != nil {
+        fmt.Println("[error] Encryption failed", err)
         err = con.connection.Close()
         return 0, err
     }
@@ -64,11 +66,14 @@ func (con *tcpHAPConnection) Write(b []byte) (int, error) {
     return n, err
 }
 
-func (con *tcpHAPConnection) Read(b []byte) (int, error) {
+func (con *tcpHAPConnection) DecryptedRead(b []byte) (int, error) {
+    fmt.Println("DecryptedRead")    
     if con.readBuffer == nil {
+        fmt.Println("Read into buffer")
         buffered := bufio.NewReader(con.connection)
         decrypted, err := con.GetDecrypter().Decrypt(buffered)
         if err != nil {
+            fmt.Println("[error] Decryption failed", err)
             err = con.connection.Close()
             return 0, err
         }
@@ -77,11 +82,30 @@ func (con *tcpHAPConnection) Read(b []byte) (int, error) {
     }
     
     n, err := con.readBuffer.Read(b)
+    fmt.Println(string(b))
+    
     if n < len(b) || err == io.EOF {
+        fmt.Println("Reset buffer")
         con.readBuffer = nil
     }
-        
+    
     return n, err
+}
+
+func (con *tcpHAPConnection) Write(b []byte) (int, error) {    
+    if con.GetEncrypter() != nil {
+        return con.EncryptedWrite(b)
+    }
+    
+    return con.connection.Write(b)
+}
+
+func (con *tcpHAPConnection) Read(b []byte) (int, error) {
+    if con.GetDecrypter() != nil {
+        return con.DecryptedRead(b)
+    }
+    
+    return con.connection.Read(b)
 }
 
 func (con *tcpHAPConnection) Close() error {

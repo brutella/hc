@@ -50,11 +50,10 @@ func (handler *PairVerifyHandler) ServeHTTP(response http.ResponseWriter, reques
         response.Write(bytes)
         
         // Setup secure session
-        sharedKey := controller.SharedKey()
-        if len(sharedKey) > 0 {
+        if controller.KeyVerified() == true {
             // Verification is done
             // Switch to secure session
-            secureSession, err := crypto.NewSecureSessionFromSharedKey(sharedKey)
+            secureSession, err := crypto.NewSecureSessionFromSharedKey(controller.SharedKey())
             if err != nil {
                 fmt.Println("Could not setup secure session.", err)
             } else {
