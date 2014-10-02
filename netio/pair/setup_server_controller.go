@@ -17,10 +17,10 @@ type SetupServerController struct {
     bridge *netio.Bridge
     session *PairSetupServerSession
     curSeq byte
-    database *db.Database
+    database db.Database
 }
 
-func NewSetupServerController(bridge *netio.Bridge, database *db.Database) (*SetupServerController, error) {
+func NewSetupServerController(bridge *netio.Bridge, database db.Database) (*SetupServerController, error) {
     
     session, err := NewPairSetupServerSession(bridge.Id(), bridge.Password())
     if err != nil {

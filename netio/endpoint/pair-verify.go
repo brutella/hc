@@ -15,10 +15,10 @@ import(
 type PairVerify struct {
     http.Handler
     context netio.Context
-    database *db.Database
+    database db.Database
 }
 
-func NewPairVerify(context netio.Context, database *db.Database) *PairVerify {
+func NewPairVerify(context netio.Context, database db.Database) *PairVerify {
     handler := PairVerify{
                 context: context,
                 database: database,

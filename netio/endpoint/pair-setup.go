@@ -14,11 +14,11 @@ type PairSetup struct {
     http.Handler
     
     bridge *netio.Bridge
-    database *db.Database
+    database db.Database
     context netio.Context
 }
 
-func NewPairSetup(bridge *netio.Bridge, database *db.Database, context netio.Context) *PairSetup {
+func NewPairSetup(bridge *netio.Bridge, database db.Database, context netio.Context) *PairSetup {
     handler := PairSetup{
                 bridge: bridge,
                 database: database,

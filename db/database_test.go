@@ -18,7 +18,7 @@ func TestLoadClient(t *testing.T) {
     db.SaveClient(NewClient("My Name", []byte{0x01}))
     client := db.ClientWithName("My Name")
     assert.NotNil(t, client)
-    assert.Equal(t, client.PublicKey, []byte{0x01})
+    assert.Equal(t, client.PublicKey(), []byte{0x01})
 }
 
 func TestDeleteClient(t *testing.T) {

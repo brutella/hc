@@ -5,11 +5,17 @@ import(
     "github.com/brutella/hap/common"
 )
 
-type Database struct {
+type Database interface {
+    ClientWithName(name string) Client
+    SaveClient(client Client) error
+    DeleteClient(client Client)
+}
+
+type database struct {
     storage hap.Storage
 }
 
-func NewDatabase(path string) (*Database, error) {
+func NewDatabase(path string) (*database, error) {
     storage, err := common.NewFileStorage(path)
     if err != nil {
         return nil, err
@@ -18,8 +24,8 @@ func NewDatabase(path string) (*Database, error) {
     return NewDatabaseWithStorage(storage), nil
 }
 
-func NewDatabaseWithStorage(storage hap.Storage) *Database {
-    c := Database{storage: storage}
+func NewDatabaseWithStorage(storage hap.Storage) *database {
+    c := database{storage: storage}
     
     return &c
 }
@@ -27,7 +33,7 @@ func NewDatabaseWithStorage(storage hap.Storage) *Database {
 // Returns the client for a specific name
 //
 // Loads the ltpk from disk and returns initialized client object
-func (m *Database) ClientWithName(name string) (*Client) {
+func (m *database) ClientWithName(name string) (Client) {
     data, err := m.storage.Get(name + ".ltpk")
     
     if len(data) > 0 && err == nil{
@@ -39,14 +45,14 @@ func (m *Database) ClientWithName(name string) (*Client) {
 }
 
 // Stores the long-term public key of the client as {client-name}.ltpk
-func (m *Database) SaveClient(client *Client) error {
-    if len(client.PublicKey) == 0 {
-        return common.NewErrorf("No public key to save for client%s\n", client.Name)
+func (m *database) SaveClient(client Client) error {
+    if len(client.PublicKey()) == 0 {
+        return common.NewErrorf("No public key to save for client%s\n", client.Name())
     }
     
-    return m.storage.Set(client.Name + ".ltpk", client.PublicKey)
+    return m.storage.Set(client.Name() + ".ltpk", client.PublicKey())
 }
 
-func (m *Database) DeleteClient(client *Client) {
-    m.storage.Delete(client.Name + ".ltpk")
+func (m *database) DeleteClient(client Client) {
+    m.storage.Delete(client.Name() + ".ltpk")
 }

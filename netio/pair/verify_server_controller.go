@@ -13,13 +13,13 @@ import(
 )
 
 type VerifyServerController struct {
-    database *db.Database
+    database db.Database
     context netio.Context
     session *PairVerifySession
     curSeq byte
 }
 
-func NewVerifyServerController(database *db.Database, context netio.Context) *VerifyServerController {    
+func NewVerifyServerController(database db.Database, context netio.Context) *VerifyServerController {    
     controller := VerifyServerController{
                                     database: database,
                                     context: context,
@@ -170,7 +170,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
             return nil, common.NewErrorf("Client %s is unknown", username)
         }
         
-        if len(client.PublicKey) == 0 {
+        if len(client.PublicKey()) == 0 {
             return nil, common.NewErrorf("No LTPK available for client %s", username)
         }
         
@@ -180,7 +180,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
         material = append(material, []byte(username)...)
         material = append(material, c.session.PublicKey[:]...)
         
-        if crypto.ValidateED25519Signature(client.PublicKey, material, signature) == false {
+        if crypto.ValidateED25519Signature(client.PublicKey(), material, signature) == false {
             fmt.Println("[Failed] signature is invalid")
             c.Reset()
             cont_out.SetByte(TLVType_ErrorCode, TLVStatus_UnkownPeerError) // return error 4

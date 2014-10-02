@@ -20,10 +20,10 @@ type Pairing struct {
 }
 
 type PairingController struct {
-    database *db.Database
+    database db.Database
 }
 
-func NewPairingController(database *db.Database) *PairingController {
+func NewPairingController(database db.Database) *PairingController {
     c := PairingController{
         database: database,
     }
