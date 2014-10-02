@@ -14,17 +14,6 @@ import(
 
 var API_PORT int = 1237
 
-// Announce service _hap._tcp via dns-sd
-// dns-sd -R GoBridge _hap local 1234 pv=1.0 id=a1:42:90:21:73:9d c#=1 s#=1 sf=1 ff=0 md=GoBridge
-//
-// md – accessory model name (GoBridge)
-// pv – protocol version, "1.0";
-// id – identifier of device (accessory username, see below); (BBB = Beaglebone Black)
-// c# – configuration number, incremented every time services for accessory are updated;
-// s# – state number (seems to be unused, usually matches highest service number);
-// sf – status flags (seems to be unused, always "1");
-// ff – feature flags. If bit 0 is set, device is considered MFi-compliant, and additional verification is performed, otherwise a warning about non-compliant device is shown before PIN code request.
-
 func main() {
     storage, _  := common.NewFileStorage("./data")
     database    := db.NewDatabaseWithStorage(storage)
