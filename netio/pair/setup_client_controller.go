@@ -13,7 +13,6 @@ import(
 )
 
 type SetupClientController struct {
-    Handler
     username string
     session *PairSetupClientSession
 }

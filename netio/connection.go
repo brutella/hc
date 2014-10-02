@@ -16,9 +16,10 @@ import(
 
 // Creates a server which handles tcp connection based on HAP protocol
 // The tcp connection is secured after the crypto keys are verified
+// Currently both IPv4 and v6 connections are accepted (use tcp4 for IPv4 only)
 func ListenAndServe(addr string, handler http.Handler, context Context) error {
     server := http.Server{Addr: addr, Handler:handler}
-    ln, err := net.Listen("tcp4", server.Addr)
+    ln, err := net.Listen("tcp", server.Addr)
     if err != nil {
         return err
     }
@@ -29,7 +30,7 @@ func ListenAndServe(addr string, handler http.Handler, context Context) error {
 }
 
 // TCP connection based on HAP protocol
-// The connection in secured after a secured session is set up
+// Crypto is done based on session state
 type tcpHAPConnection struct {
     connection net.Conn
     context Context
@@ -49,13 +50,12 @@ func (c *tcpHAPConnection) GetDecrypter() Decrypter {
 }
 
 func (con *tcpHAPConnection) EncryptedWrite(b []byte) (int, error) {
-    fmt.Println("EncryptedWrite")
     var buffer bytes.Buffer
     buffer.Write(b)
     encrypted, err := con.GetEncrypter().Encrypt(&buffer)
     
     if err != nil {
-        fmt.Println("[error] Encryption failed", err)
+        fmt.Println("[ERROR] Encryption failed:", err)
         err = con.connection.Close()
         return 0, err
     }
@@ -67,13 +67,11 @@ func (con *tcpHAPConnection) EncryptedWrite(b []byte) (int, error) {
 }
 
 func (con *tcpHAPConnection) DecryptedRead(b []byte) (int, error) {
-    fmt.Println("DecryptedRead")    
     if con.readBuffer == nil {
-        fmt.Println("Read into buffer")
         buffered := bufio.NewReader(con.connection)
         decrypted, err := con.GetDecrypter().Decrypt(buffered)
         if err != nil {
-            fmt.Println("[error] Decryption failed", err)
+            fmt.Println("[ERROR] Decryption failed:", err)
             err = con.connection.Close()
             return 0, err
         }
@@ -85,7 +83,6 @@ func (con *tcpHAPConnection) DecryptedRead(b []byte) (int, error) {
     fmt.Println(string(b))
     
     if n < len(b) || err == io.EOF {
-        fmt.Println("Reset buffer")
         con.readBuffer = nil
     }
     
@@ -109,7 +106,7 @@ func (con *tcpHAPConnection) Read(b []byte) (int, error) {
 }
 
 func (con *tcpHAPConnection) Close() error {
-    fmt.Println("Close connection and remove session")
+    fmt.Println("[INFO] Close connection and remove session")
     
     // Delete the session for the connetion
     key := con.context.GetKey(con.connection)
@@ -158,9 +155,6 @@ func (l *TCPHAPListener) Accept() (c net.Conn, err error) {
     session := NewSession()
     key := l.context.GetKey(con)
     l.context.Set(key, session)
-    
-    fmt.Println("***** New session")
-    
     hapConn, err := &tcpHAPConnection{connection: con, context: l.context}, nil
     if err == nil {
         closeConnectionOnExit(hapConn)
@@ -174,7 +168,6 @@ func closeConnectionOnExit(connection *tcpHAPConnection) {
 	signal.Notify(c, os.Interrupt)
 	go func() {
 		for _ = range c {
-			fmt.Println("Closing...")
             connection.Close()
 			os.Exit(0)
 		}

@@ -77,12 +77,11 @@ func main() {
     
     model_controller            := controller.NewModelController(m)
     characteristics_controller  := controller.NewCharacteristicController(m)
-    setup, _                    := pair.NewSetupServerController(bridge, database)
     pairing_controller          := pair.NewPairingController(database)
     
     mux :=  http.NewServeMux()
     
-    setup_handler := handler.NewPairSetupHandler(setup, context)
+    setup_handler := handler.NewPairSetupHandler(bridge, database, context)
     mux.Handle("/pair-setup", setup_handler)
     
     verify_handler := handler.NewPairVerifyHandler(context, database)

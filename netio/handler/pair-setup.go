@@ -1,6 +1,7 @@
 package handler
 
 import(
+    "github.com/brutella/hap/db"
     "github.com/brutella/hap/netio/pair"
     "github.com/brutella/hap/netio"
         
@@ -12,13 +13,15 @@ import(
 type PairSetupHandler struct {
     http.Handler
     
-    controller *pair.SetupServerController
+    bridge *netio.Bridge
+    database *db.Manager
     context netio.Context
 }
 
-func NewPairSetupHandler(c *pair.SetupServerController, context netio.Context) *PairSetupHandler {
+func NewPairSetupHandler(bridge *netio.Bridge, database *db.Manager, context netio.Context) *PairSetupHandler {
     handler := PairSetupHandler{
-                controller: c,
+                bridge: bridge,
+                database: database,
                 context: context,
             }
     
@@ -29,7 +32,21 @@ func (handler *PairSetupHandler) ServeHTTP(response http.ResponseWriter, request
     fmt.Println("POST /pair-setup")
     response.Header().Set("Content-Type", netio.HTTPContentTypePairingTLV8)
     
-    res, err := pair.HandleReaderForHandler(request.Body, handler.controller)
+    key := handler.context.GetConnectionKey(request)
+    session := handler.context.Get(key).(netio.Session)
+    controller := session.PairSetupHandler()
+    if controller == nil {
+        fmt.Println("Create new pair setup controller")
+        var err error
+        controller, err = pair.NewSetupServerController(handler.bridge, handler.database)
+        if err != nil {
+            fmt.Println(err)
+        }
+        
+        session.SetPairSetupHandler(controller)
+    }
+    
+    res, err := pair.HandleReaderForHandler(request.Body, controller)
     
     if err != nil {
         fmt.Println(err)

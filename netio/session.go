@@ -4,14 +4,17 @@ import(
 )
 
 type Session interface {
+    // For decrypting incoming data, may be nil
     Decrypter() Decrypter
+    
+    // For encrypting outgoing data, may be nil
     Encrypter() Encrypter
     
-    PairStartHandler() ContainerHandler
+    PairSetupHandler() ContainerHandler
     PairVerifyHandler() PairVerifyHandler
     
     SetCryptographer(c Cryptographer)
-    SetPairStartHandler(c ContainerHandler)
+    SetPairSetupHandler(c ContainerHandler)
     SetPairVerifyHandler(c PairVerifyHandler)
 }
 
@@ -30,6 +33,8 @@ func NewSession() *session {
 }
 
 func (s *session) Decrypter() Decrypter {
+    // Return the next cryptographer when possible
+    // This allows sessions to switch encryption
     if s.nextCryptographer != nil {
         s.cryptographer = s.nextCryptographer
         s.nextCryptographer = nil
@@ -42,7 +47,7 @@ func (s *session) Encrypter() Encrypter {
     return s.cryptographer
 }
 
-func (s *session) PairStartHandler() ContainerHandler {
+func (s *session) PairSetupHandler() ContainerHandler {
     return s.pairStartHandler
 }
 
@@ -53,7 +58,7 @@ func (s *session) PairVerifyHandler() PairVerifyHandler {
 func (s *session) SetCryptographer(c Cryptographer) {
     s.nextCryptographer = c
 }
-func (s *session) SetPairStartHandler(c ContainerHandler) {
+func (s *session) SetPairSetupHandler(c ContainerHandler) {
     s.pairStartHandler = c
 }
 

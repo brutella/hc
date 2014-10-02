@@ -2,16 +2,13 @@ package pair
 
 import(
     "github.com/brutella/hap/common"
+    "github.com/brutella/hap/netio"
     
     "io"
     "fmt"
 )
 
-type Handler interface {
-    Handle(common.Container) (common.Container, error)
-}
-
-func HandleReaderForHandler(r io.Reader, h Handler) (r_out io.Reader, err error) {
+func HandleReaderForHandler(r io.Reader, h netio.ContainerHandler) (r_out io.Reader, err error) {
     cont_in, err := common.NewTLV8ContainerFromReader(r)
     if err != nil {
         return nil, err
