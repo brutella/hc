@@ -2,18 +2,14 @@ package main
 
 import(
     "fmt"
-    "strconv"
-    "net/http"
     
     "github.com/brutella/hap/db"
     "github.com/brutella/hap/common"
     "github.com/brutella/hap/model"
     "github.com/brutella/hap/model/accessory"
     "github.com/brutella/hap/model/service"
+    "github.com/brutella/hap/server"
     "github.com/brutella/hap/netio"
-    "github.com/brutella/hap/netio/pair"
-    "github.com/brutella/hap/netio/endpoint"
-    "github.com/brutella/hap/netio/controller"
 )
 
 var API_PORT int = 1237
@@ -75,31 +71,10 @@ func main() {
     m.AddAccessory(thermostat_accessory)
     m.AddAccessory(switch_accessory)
     
-    model_controller            := controller.NewModelController(m)
-    characteristics_controller  := controller.NewCharacteristicController(m)
-    pairing_controller          := pair.NewPairingController(database)
+    s := server.NewServer(context, database, m, bridge, API_PORT)
     
-    mux :=  http.NewServeMux()
-    
-    setup_handler := endpoint.NewPairSetup(bridge, database, context)
-    mux.Handle("/pair-setup", setup_handler)
-    
-    verify_handler := endpoint.NewPairVerify(context, database)
-    mux.Handle("/pair-verify", verify_handler)
-    
-    accessories_handler := endpoint.NewAccessories(model_controller, context)
-    mux.Handle("/accessories", accessories_handler)
-    
-    characteristics_handler := endpoint.NewCharacteristics(characteristics_controller, context)
-    mux.Handle("/characteristics", characteristics_handler)
-    
-    pairing_handler := endpoint.NewPairing(pairing_controller)
-    mux.Handle("/pairings", pairing_handler)
-    
-    addr := ":" + strconv.Itoa(API_PORT)
-    fmt.Println("Running at", addr)
     fmt.Println("Publish service")
-    fmt.Printf("    dns-sd -P %s _hap local %s macbookpro.local 192.168.0.14 pv=1.0 id=%s c#=1 s#=1 sf=1 ff=0 md=%s\n", bridge.Name(), strconv.Itoa(API_PORT), bridge.Id(), bridge.Name())
-    err := netio.ListenAndServe(addr, mux, context)
+    fmt.Println("    ", s.DNSSDCommand())
+    err := s.ListenAndServe()
     fmt.Println(err)
 }

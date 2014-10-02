@@ -14,13 +14,11 @@ type Characteristics struct {
     http.Handler
     
     controller *controller.CharacteristicController
-    context netio.HAPContext
 }
 
-func NewCharacteristics(c *controller.CharacteristicController, context netio.HAPContext) *Characteristics {
+func NewCharacteristics(c *controller.CharacteristicController) *Characteristics {
     handler := Characteristics{
                 controller: c,
-                context: context,
             }
     
     return &handler
