@@ -1,4 +1,4 @@
-package hap
+package netio
 
 import(
     "github.com/brutella/hap/crypto"
@@ -28,6 +28,7 @@ func (b *Bridge) Name() string {
     return b.info.Name
 }
 
+// Used as username for pairing
 func (b *Bridge) Id() string {
     return b.info.Id
 }

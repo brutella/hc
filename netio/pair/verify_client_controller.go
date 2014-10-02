@@ -1,7 +1,7 @@
 package pair
 
 import(
-    "github.com/brutella/hap"
+    _"github.com/brutella/hap"
     "github.com/brutella/hap/crypto"
     "github.com/brutella/hap/common"
     "github.com/brutella/hap/netio"
@@ -13,23 +13,20 @@ import(
 )
 
 type VerifyClientController struct {
-    Handler
-    sessionContext *netio.Context
-    bridge *hap.Bridge
-    session *netio.PairVerifySession
+    bridge *netio.Bridge
+    session *PairVerifySession
     username string
     LTPK []byte
     LTSK []byte
 }
 
-func NewVerifyClientController(context *netio.Context, bridge *hap.Bridge, username string) *VerifyClientController {    
+func NewVerifyClientController(bridge *netio.Bridge, username string) *VerifyClientController {    
     LTPK, LTSK, _ := crypto.ED25519GenerateKey(username)
         
     controller := VerifyClientController{
                                     username: username,
-                                    sessionContext: context,
                                     bridge: bridge,
-                                    session: netio.NewPairVerifySession(),
+                                    session: NewPairVerifySession(),
                                     LTPK: LTPK,
                                     LTSK: LTSK,
                                 }
@@ -131,7 +128,7 @@ func (c *VerifyClientController) handlePairVerifyRespond(cont_in common.Containe
     material = append(material, username...)
     material = append(material, c.session.PublicKey[:]...)
     
-    LTPK := c.sessionContext.PublicKeyForAccessory(c.bridge)
+    LTPK := c.bridge.PublicKey
     
     if crypto.ValidateED25519Signature(LTPK, material, signature) == false {
         return nil, common.NewErrorf("Could not validate signature")

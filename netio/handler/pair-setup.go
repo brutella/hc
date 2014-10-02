@@ -1,7 +1,7 @@
 package handler
 
 import(
-    "github.com/brutella/hap/pair"
+    "github.com/brutella/hap/netio/pair"
     "github.com/brutella/hap/netio"
         
     "io/ioutil"
@@ -13,11 +13,13 @@ type PairSetupHandler struct {
     http.Handler
     
     controller *pair.SetupServerController
+    context netio.Context
 }
 
-func NewPairSetupHandler(c *pair.SetupServerController) *PairSetupHandler {
+func NewPairSetupHandler(c *pair.SetupServerController, context netio.Context) *PairSetupHandler {
     handler := PairSetupHandler{
                 controller: c,
+                context: context,
             }
     
     return &handler
@@ -25,7 +27,7 @@ func NewPairSetupHandler(c *pair.SetupServerController) *PairSetupHandler {
 
 func (handler *PairSetupHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
     fmt.Println("POST /pair-setup")
-    response.Header().Set("Content-Type", server.HTTPContentTypePairingTLV8)
+    response.Header().Set("Content-Type", netio.HTTPContentTypePairingTLV8)
     
     res, err := pair.HandleReaderForHandler(request.Body, handler.controller)
     

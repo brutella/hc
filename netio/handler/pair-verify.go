@@ -1,9 +1,11 @@
 package handler
 
 import(
-    "github.com/brutella/hap"
-    "github.com/brutella/hap/pair"
+    _"github.com/brutella/hap"
+    "github.com/brutella/hap/netio/pair"
     "github.com/brutella/hap/netio"
+    "github.com/brutella/hap/crypto"
+    "github.com/brutella/hap/db"
     
     "net/http"
     "fmt"
@@ -12,14 +14,14 @@ import(
 
 type PairVerifyHandler struct {
     http.Handler
-    controller *pair.VerifyServerController
-    context *hap.Context
+    context netio.Context
+    database *db.Manager
 }
 
-func NewPairVerifyHandler(controller *pair.VerifyServerController, context *hap.Context) *PairVerifyHandler {
+func NewPairVerifyHandler(context netio.Context, database *db.Manager) *PairVerifyHandler {
     handler := PairVerifyHandler{
-                controller: controller,
                 context: context,
+                database: database,
             }
     
     return &handler
@@ -27,9 +29,18 @@ func NewPairVerifyHandler(controller *pair.VerifyServerController, context *hap.
 
 func (handler *PairVerifyHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
     fmt.Println("POST /pair-verify")
-    response.Header().Set("Content-Type", server.HTTPContentTypePairingTLV8)
+    response.Header().Set("Content-Type", netio.HTTPContentTypePairingTLV8)
     
-    res, err := pair.HandleReaderForHandler(request.Body, handler.controller)
+    key := handler.context.GetConnectionKey(request)
+    session := handler.context.Get(key).(netio.Session)
+    controller := session.PairVerifyHandler()
+    if controller == nil {
+        fmt.Println("Create new pair verify controller")
+        controller = pair.NewVerifyServerController(handler.database, handler.context)
+        session.SetPairVerifyHandler(controller)
+    }
+    
+    res, err := pair.HandleReaderForHandler(request.Body, controller)
     
     if err != nil {
         fmt.Println(err)
@@ -37,5 +48,19 @@ func (handler *PairVerifyHandler) ServeHTTP(response http.ResponseWriter, reques
     } else {
         bytes, _ := ioutil.ReadAll(res)
         response.Write(bytes)
+        
+        // Setup secure session
+        sharedKey := controller.SharedKey()
+        if len(sharedKey) > 0 {
+            // Verification is done
+            // Switch to secure session
+            secureSession, err := crypto.NewSecureSessionFromSharedKey(sharedKey)
+            if err != nil {
+                fmt.Println("Could not setup secure session.", err)
+            } else {
+                fmt.Println("Setup secure session")
+            }
+            session.SetCryptographer(secureSession)
+        }
     }
 }

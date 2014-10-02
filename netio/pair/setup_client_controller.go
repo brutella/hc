@@ -1,7 +1,7 @@
 package pair
 
 import(
-    "github.com/brutella/hap"
+    _"github.com/brutella/hap"
     "github.com/brutella/hap/crypto"
     "github.com/brutella/hap/common"
     "github.com/brutella/hap/netio"
@@ -14,20 +14,16 @@ import(
 
 type SetupClientController struct {
     Handler
-    context *hap.Context
-    bridge *hap.Bridge
     username string
-    session *netio.PairSetupClientSession
+    session *PairSetupClientSession
 }
 
-func NewSetupClientController(context *hap.Context, bridge *hap.Bridge, username string) (*SetupClientController) {
+func NewSetupClientController(bridge *netio.Bridge, username string) (*SetupClientController) {
     
-    session := netio.NewPairSetupClientSession("Pair-Setup", bridge.Password())
+    session := NewPairSetupClientSession("Pair-Setup", bridge.Password())
     
     controller := SetupClientController{
                                     username: username,
-                                    context: context,
-                                    bridge: bridge,
                                     session: session,
                                 }
     return &controller

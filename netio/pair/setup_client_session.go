@@ -1,4 +1,4 @@
-package netio
+package pair
 
 import (    
     "github.com/brutella/hap/crypto"

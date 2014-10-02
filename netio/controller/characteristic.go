@@ -3,29 +3,16 @@ package controller
 import(
     "github.com/brutella/hap/model/characteristic"
     "github.com/brutella/hap/model"
+    "github.com/brutella/hap/netio/data"
     
     "fmt"
+    "encoding/json"
+    "bytes"
+
+    "net/url"
+    "io"
+    "io/ioutil"
 )
-
-type Characteristic struct {
-    AccessoryId int  `json:"aid"`
-    Id int           `json:"iid"`
-    Value interface{} `json:"value"`
-}
-
-type Characteristics struct {
-    Characteristics []Characteristic `json:"characteristics"`
-}
-
-func NewCharacteristics() *Characteristics {
-    return &Characteristics{
-        Characteristics: make([]Characteristic, 0),
-    }
-}
-
-func (r *Characteristics) AddCharacteristic(c Characteristic) {
-    r.Characteristics = append(r.Characteristics, c)
-}
 
 type CharacteristicController struct {
     model *model.Model
@@ -35,20 +22,39 @@ func NewCharacteristicController(m *model.Model) *CharacteristicController {
     return &CharacteristicController{model: m}
 }
 
-func (controller *CharacteristicController) HandleGetCharacteristics(aid, cid int) *Characteristics {    
+func (controller *CharacteristicController) HandleGetCharacteristics(form url.Values) (io.Reader, error) {    
+    aid, cid, err := ParseAccessoryAndCharacterId(form.Get("id"))
     modelChar := controller.GetCharacteristic(aid, cid)
     if modelChar == nil {
         fmt.Printf("[WARNING] No characteristic found with aid %d and iid %d\n", aid, cid)
     }
     
-    chars := NewCharacteristics()
-    char := Characteristic{AccessoryId: aid, Id: cid, Value: modelChar.Value}
+    chars := data.NewCharacteristics()
+    char := data.Characteristic{AccessoryId: aid, Id: cid, Value: modelChar.Value}
     chars.AddCharacteristic(char)
     
-    return chars
+    result, err := json.Marshal(chars)
+    if err != nil {
+        fmt.Println(err)
+    }
+    
+    var b bytes.Buffer
+    b.Write(result)
+    return &b, err
 }
 
-func (controller *CharacteristicController) HandleUpdateCharacteristics(chars Characteristics) error {
+func (controller *CharacteristicController) HandleUpdateCharacteristics(r io.Reader) error {
+    b, err := ioutil.ReadAll(r)
+    if err != nil {
+        return err
+    }
+    
+    var chars data.Characteristics
+    err = json.Unmarshal(b, &chars)
+    if err != nil {
+        return err
+    }
+    
     for _, c := range chars.Characteristics {
         modelChar := controller.GetCharacteristic(c.AccessoryId, c.Id)
         if modelChar == nil {
@@ -58,7 +64,7 @@ func (controller *CharacteristicController) HandleUpdateCharacteristics(chars Ch
         modelChar.SetValueFromRemote(c.Value)
     }
     
-    return nil
+    return err
 }
 
 func (c *CharacteristicController) GetCharacteristic(accessoryId int, characteristicId int) *characteristic.Characteristic {

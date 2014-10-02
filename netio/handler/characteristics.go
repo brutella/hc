@@ -1,7 +1,6 @@
 package handler
 
 import(
-    "github.com/brutella/hap"
     "github.com/brutella/hap/netio"
     "github.com/brutella/hap/netio/controller"
     
@@ -9,18 +8,16 @@ import(
     "fmt"
     "io"
     "io/ioutil"
-    "encoding/json"
-    "bytes"
 )
 
 type CharacteristicsHandler struct {
     http.Handler
     
     controller *controller.CharacteristicController
-    context *hap.Context
+    context netio.Context
 }
 
-func NewCharacteristicsHandler(c *controller.CharacteristicController, context *hap.Context) *CharacteristicsHandler {
+func NewCharacteristicsHandler(c *controller.CharacteristicController, context netio.Context) *CharacteristicsHandler {
     handler := CharacteristicsHandler{
                 controller: c,
                 context: context,
@@ -33,31 +30,13 @@ func (handler *CharacteristicsHandler) ServeHTTP(response http.ResponseWriter, r
     var res io.Reader
     var err error
     switch request.Method {
-    case server.MethodGET:
+    case netio.MethodGET:
         fmt.Println("GET /characteristics")
         request.ParseForm()
-        aid, cid, err := server.ParseAccessoryAndCharacterId(request.Form.Get("id"))
-        chars := handler.controller.HandleGetCharacteristics(aid, cid)
-        result, err := json.Marshal(chars)
-        if err != nil {
-            fmt.Println(err)
-        }
-        
-        var b bytes.Buffer
-        b.Write(result)
-        res = &b
-    case server.MethodPUT:
+        res, err = handler.controller.HandleGetCharacteristics(request.Form)
+    case netio.MethodPUT:
         fmt.Println("PUT /characteristics")
-        
-        b, _ := ioutil.ReadAll(request.Body)
-        var chars controller.Characteristics
-        err := json.Unmarshal(b, &chars)
-    
-        if err != nil {
-            fmt.Println("Could not unmarshal to json", err)
-        } else {
-            err = handler.controller.HandleUpdateCharacteristics(chars)
-        }
+        err = handler.controller.HandleUpdateCharacteristics(request.Body)
     default:
         fmt.Println("Cannot handle HTTP method", request.Method)
     }
@@ -69,7 +48,7 @@ func (handler *CharacteristicsHandler) ServeHTTP(response http.ResponseWriter, r
     } else {
         if res != nil {
             bytes, _ := ioutil.ReadAll(res)
-            response.Header().Set("Content-Type", server.HTTPContentTypeHAPJson)
+            response.Header().Set("Content-Type", netio.HTTPContentTypeHAPJson)
             fmt.Println("<-  JSON:", string(bytes))
             response.Write(bytes)
         } else {

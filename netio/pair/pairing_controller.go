@@ -1,8 +1,9 @@
 package pair
 
 import(
-    "github.com/brutella/hap"
+    _"github.com/brutella/hap"
     "github.com/brutella/hap/common"
+    "github.com/brutella/hap/db"
     
     "fmt"
 )
@@ -19,13 +20,12 @@ type Pairing struct {
 }
 
 type PairingController struct {
-    Handler
-    context *hap.Context
+    database *db.Manager
 }
 
-func NewPairingController(context *hap.Context) *PairingController {
+func NewPairingController(database *db.Manager) *PairingController {
     c := PairingController{
-        context: context,
+        database: database,
     }
     
     return &c
@@ -40,13 +40,13 @@ func (c *PairingController) Handle(tlv8 common.Container) (common.Container, err
     fmt.Println("-> Username:", username)
     fmt.Println("->     LTPK:", publicKey)
     
-    client := hap.NewClient(username, publicKey)
+    client := db.NewClient(username, publicKey)
     
     switch method {
     case TLVType_Method_PairingDelete:
-        c.context.DeleteClient(client)
+        c.database.DeleteClient(client)
     case TLVType_Method_PairingAdd:
-        err := c.context.SaveClient(client)
+        err := c.database.SaveClient(client)
         if err != nil {
             fmt.Println(err)
             return nil, err

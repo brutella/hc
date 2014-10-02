@@ -1,10 +1,11 @@
 package pair
 
 import(
-    "github.com/brutella/hap"
+    _"github.com/brutella/hap"
     "github.com/brutella/hap/crypto"
     "github.com/brutella/hap/common"
     "github.com/brutella/hap/netio"
+    "github.com/brutella/hap/db"
     
     "fmt"
     "encoding/hex"
@@ -12,25 +13,26 @@ import(
 )
 
 type VerifyServerController struct {
-    dbContext *hap.Context
-    sessionContext *netio.Context
-    bridge *hap.Bridge
-    session *netio.PairVerifySession
+    database *db.Manager
+    context netio.Context
+    session *PairVerifySession
     curSeq byte
 }
 
-func NewVerifyServerController(dbContext *hap.Context, sessionContext *netio.Context, bridge *hap.Bridge) (*VerifyServerController, error) {    
+func NewVerifyServerController(database *db.Manager, context netio.Context) *VerifyServerController {    
     controller := VerifyServerController{
-                                    dbContext: dbContext,
-                                    sessionContext: sessionContext,
-                                    bridge: bridge,
-                                    session: netio.NewPairVerifySession(),
+                                    database: database,
+                                    context: context,
+                                    session: NewPairVerifySession(),
                                     curSeq: WaitingForRequest,
                                 }
     
-    return &controller, nil
+    return &controller
 }
-    
+func (c *VerifyServerController) SharedKey() ([32]byte) {
+    return c.session.SharedKey
+}
+        
 func (c *VerifyServerController) Handle(cont_in common.Container) (common.Container, error) {
     var cont_out common.Container
     var err error
@@ -48,13 +50,13 @@ func (c *VerifyServerController) Handle(cont_in common.Container) (common.Contai
     switch seq {
     case VerifyStartRequest:
         if c.curSeq != WaitingForRequest {
-            c.reset()
+            c.Reset()
             return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         cont_out, err = c.handlePairVerifyStart(cont_in)
     case VerifyFinishRequest:
         if c.curSeq != VerifyStartRespond {
-            c.reset()
+            c.Reset()
             return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
         }
         
@@ -90,17 +92,17 @@ func (c *VerifyServerController) handlePairVerifyStart(cont_in common.Container)
     c.session.GenerateSharedKeyWithOtherPublicKey(otherPublicKey)
     c.session.SetupEncryptionKey([]byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
     
-    LTSK := c.sessionContext.SecretKeyForAccessory(c.bridge)
+    LTSK := c.bridge().SecretKey
     
     material := make([]byte, 0)
     material = append(material, c.session.PublicKey[:]...)
-    material = append(material, c.bridge.Id()...)
+    material = append(material, c.bridge().Id()...)
     material = append(material, clientPublicKey...)
     signature, _ := crypto.ED25519Signature(LTSK, material)
     
     // Encrypt
     tlv_encrypt := common.NewTLV8Container()
-    tlv_encrypt.SetString(TLVType_Username, c.bridge.Id())
+    tlv_encrypt.SetString(TLVType_Username, c.bridge().Id())
     tlv_encrypt.SetBytes(TLVType_Ed25519Signature, signature)
     
     encrypted, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(c.session.EncryptionKey[:], []byte("PV-Msg02"), tlv_encrypt.BytesBuffer().Bytes(), nil)
@@ -144,7 +146,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
     cont_out.SetByte(TLVType_SequenceNumber, c.curSeq)
     
     if err != nil {
-        c.reset()
+        c.Reset()
         fmt.Println(err)
         cont_out.SetByte(TLVType_ErrorCode, TLVStatus_AuthError) // return error 2
     } else {
@@ -159,7 +161,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
         fmt.Println("    client:", username)
         fmt.Println(" signature:", hex.EncodeToString(signature))
         
-        client := c.dbContext.ClientForName(username)
+        client := c.database.ClientForName(username)
         if client == nil {
             return nil, common.NewErrorf("Client %s is unknown", username)
         }
@@ -176,27 +178,21 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
         
         if crypto.ValidateED25519Signature(client.PublicKey, material, signature) == false {
             fmt.Println("[Failed] signature is invalid")
-            c.reset()
+            c.Reset()
             cont_out.SetByte(TLVType_ErrorCode, TLVStatus_UnkownPeerError) // return error 4
         } else {
             fmt.Println("[Success] signature is valid")
-            
-            // Verification is done
-            // Switch to secure session
-            session, err := crypto.NewSecureSessionFromSharedKey(c.session.SharedKey)
-            if err != nil {
-                fmt.Println("Could not setup secure session.", err)
-            } else {
-                fmt.Println("Setup secure session")
-            }
-            c.sessionContext.SetNextSession(session)
-            c.reset()
         }
     }
     
     return cont_out, nil
 }
 
-func (c *VerifyServerController) reset() {
+func (c *VerifyServerController) Reset() {
     c.curSeq = WaitingForRequest
+}
+
+func (c *VerifyServerController) bridge() *netio.Bridge {
+    val := c.context.Get("bridge")
+    return val.(*netio.Bridge)
 }

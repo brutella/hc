@@ -1,4 +1,4 @@
-package hap
+package db
 
 type Client struct {
     Name string

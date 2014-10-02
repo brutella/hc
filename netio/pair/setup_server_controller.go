@@ -1,10 +1,12 @@
 package pair
 
 import(
-    "github.com/brutella/hap"
+    _"github.com/brutella/hap"
+    "github.com/brutella/hap/db"
     "github.com/brutella/hap/crypto"
     "github.com/brutella/hap/common"
     "github.com/brutella/hap/netio"
+    
     
     "fmt"
     "encoding/hex"
@@ -12,26 +14,23 @@ import(
 )
 
 type SetupServerController struct {
-    Handler
-    dbContext *hap.Context
-    sessionContext *netio.Context
-    bridge *hap.Bridge
-    session *netio.PairSetupServerSession
+    bridge *netio.Bridge
+    session *PairSetupServerSession
     curSeq byte
+    database *db.Manager
 }
 
-func NewSetupServerController(dbContext *hap.Context, sessionContext *netio.Context, bridge *hap.Bridge) (*SetupServerController, error) {
+func NewSetupServerController(bridge *netio.Bridge, database *db.Manager) (*SetupServerController, error) {
     
-    session, err := netio.NewPairSetupServerSession("Pair-Setup", bridge.Password())
+    session, err := NewPairSetupServerSession(bridge.Id(), bridge.Password())
     if err != nil {
         return nil, err
     }
     
     controller := SetupServerController{
-                                    dbContext: dbContext,
-                                    sessionContext: sessionContext,
                                     bridge: bridge,
                                     session: session,
+                                    database: database,
                                     curSeq: WaitingForRequest,
                                 }
     
@@ -207,18 +206,18 @@ func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (com
         } else {
             fmt.Println("[Success] ed25519 signature is valid")
             // Store client LTPK and name
-            client := hap.NewClient(username, ltpk)
-            c.dbContext.SaveClient(client)
+            client := db.NewClient(username, ltpk)
+            c.database.SaveClient(client)
             fmt.Printf("[Storage] Stored LTPK '%s' for client '%s'\n", hex.EncodeToString(ltpk), username)
             
-            LTPK := c.sessionContext.PublicKeyForAccessory(c.bridge)
-            LTSK := c.sessionContext.SecretKeyForAccessory(c.bridge)
+            LTPK := c.bridge.PublicKey
+            LTSK := c.bridge.SecretKey
             
             // Send username, LTPK, signature as encrypted message
             H2, err := crypto.HKDF_SHA512(c.session.SecretKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
             material = make([]byte, 0)
             material = append(material, H2[:]...)
-            material = append(material, []byte(c.bridge.Id())...)
+            material = append(material, []byte(c.session.Username)...)
             material = append(material, LTPK...)
 
             signature, err := crypto.ED25519Signature(LTSK, material)
@@ -227,7 +226,7 @@ func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (com
             }
             
             tlvPairKeyExchange := common.NewTLV8Container()
-            tlvPairKeyExchange.SetString(TLVType_Username, c.bridge.Id())
+            tlvPairKeyExchange.SetBytes(TLVType_Username, c.session.Username)
             tlvPairKeyExchange.SetBytes(TLVType_PublicKey, LTPK)
             tlvPairKeyExchange.SetBytes(TLVType_Ed25519Signature, []byte(signature))
             

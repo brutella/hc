@@ -1,7 +1,7 @@
 package handler
 
 import(   
-    "github.com/brutella/hap"
+    _"github.com/brutella/hap"
     "github.com/brutella/hap/netio"
     "github.com/brutella/hap/netio/controller"
     
@@ -14,10 +14,10 @@ type AccessoriesHandler struct {
     http.Handler
     
     controller *controller.ModelController
-    context *hap.Context
+    context netio.Context
 }
 
-func NewAccessoriesHandler(c *controller.ModelController, context *hap.Context) *AccessoriesHandler {
+func NewAccessoriesHandler(c *controller.ModelController, context netio.Context) *AccessoriesHandler {
     handler := AccessoriesHandler{
                 controller: c,
                 context: context,
@@ -28,7 +28,7 @@ func NewAccessoriesHandler(c *controller.ModelController, context *hap.Context) 
 
 func (handler *AccessoriesHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
     fmt.Println("GET /accessories")
-    response.Header().Set("Content-Type", server.HTTPContentTypeHAPJson)
+    response.Header().Set("Content-Type", netio.HTTPContentTypeHAPJson)
     
     res, err := handler.controller.HandleGetAccessories(request.Body)
     if err != nil {

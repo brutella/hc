@@ -1,4 +1,4 @@
-package netio
+package pair
 
 import (
     "github.com/brutella/hap/crypto"
@@ -16,22 +16,24 @@ type PairSetupServerSession struct {
     PublicKey []byte // B
     SecretKey []byte // S
     EncryptionKey [32]byte // K
+    Username []byte
 }
 
-func NewPairSetupServerSession(username string, password string) (*PairSetupServerSession, error) {
+func NewPairSetupServerSession(username, password string) (*PairSetupServerSession, error) {
     var err error
-    
-    srp, err := srp.NewSRP(SRPGroup, sha512.New, KeyDerivativeFuncRFC2945(sha512.New, []byte(username)))
+    pair_name := []byte("Pair-Setup")
+    srp, err := srp.NewSRP(SRPGroup, sha512.New, KeyDerivativeFuncRFC2945(sha512.New, []byte(pair_name)))
     if err == nil {
         srp.SaltLength = 16
         salt, v, err := srp.ComputeVerifier([]byte(password))
         if err == nil {
-            session := srp.NewServerSession([]byte(username), salt, v)
+            session := srp.NewServerSession([]byte(pair_name), salt, v)
             pairing := PairSetupServerSession{
                         srp: srp, 
                         session: session, 
                         Salt: salt,
                         PublicKey: session.GetB(),
+                        Username: []byte(username),
                     }
             return &pairing, nil
         }

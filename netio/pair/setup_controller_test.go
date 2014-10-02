@@ -2,6 +2,7 @@ package pair
 
 import (
     "github.com/brutella/hap"
+    "github.com/brutella/hap/db"
     "github.com/brutella/hap/netio"
 
     "testing"
@@ -13,17 +14,16 @@ import (
 func TestPairingIntegration(t *testing.T) {
     storage, err := hap.NewFileStorage(os.TempDir())
     assert.Nil(t, err)
-    context := hap.NewContext(storage)
-    sessionContext := netio.NewContext()
+    database := db.NewManager(storage)
     
-    info := hap.NewBridgeInfo("Macbook Bridge", "001-02-003", "Matthias H.", storage)
-    bridge, err := hap.NewBridge(info)
+    info := netio.NewBridgeInfo("Macbook Bridge", "001-02-003", "Matthias H.", storage)
+    bridge, err := netio.NewBridge(info)
     assert.Nil(t, err)
     
-    controller, err := NewSetupServerController(context, sessionContext, bridge)
+    controller, err := NewSetupServerController(bridge, database)
     assert.Nil(t, err)
     
-    client_controller := NewSetupClientController(context, bridge, "HomeKit Client")
+    client_controller := NewSetupClientController(bridge, "HomeKit Client")
     pairStartRequest := client_controller.InitialPairingRequest()
     
     // 1) C -> S

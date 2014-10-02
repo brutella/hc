@@ -3,20 +3,19 @@ package handler
 import(
     "net/http"
     "fmt"
-    "github.com/brutella/hap"
-    "github.com/brutella/hap/pair"
+    _"github.com/brutella/hap"
+    "github.com/brutella/hap/netio/pair"
 )
 
 type PairingHandler struct {
     http.Handler
+    
     controller *pair.PairingController
-    context *hap.Context
 }
 
-func NewPairingHandler(controller *pair.PairingController, context *hap.Context) *PairingHandler {
+func NewPairingHandler(controller *pair.PairingController) *PairingHandler {
     handler := PairingHandler{
                 controller: controller,
-                context: context,
             }
     
     return &handler

@@ -4,26 +4,27 @@ import(
     "fmt"
     "net/http"
     "github.com/brutella/hap"
-    "github.com/brutella/hap/pair"
+    "github.com/brutella/hap/db"
     "github.com/brutella/hap/netio"
+    "github.com/brutella/hap/netio/pair"
     "io"
     "os"
 )
 
 func sendTLV8(b io.Reader) (io.Reader, error){
-    resp, err := http.Post("http://127.0.0.1:55036/pair-setup", server.HTTPContentTypePairingTLV8, b)
+    resp, err := http.Post("http://127.0.0.1:55036/pair-setup", netio.HTTPContentTypePairingTLV8, b)
     return resp.Body, err
 }
 
 func main() {    
     storage, err := hap.NewFileStorage(os.TempDir())
-    context := hap.NewContext(storage)
-    sessionContext := server.NewContext()
-    info := hap.NewBridgeInfo("Test Bridge", "719-47-107", "Matthias H.", storage)
+    context := netio.NewContext()
+    database := db.NewManager(storage)
+    info := netio.NewBridgeInfo("Test Bridge", "719-47-107", "Matthias H.", storage)
     info.Id = "42:cd:02:57:0d:40"
-    bridge, err := hap.NewBridge(info)
+    bridge, err := netio.NewBridge(info)
     
-    client := pair.NewSetupClientController(context, bridge, "HomeKit Client")
+    client := pair.NewSetupClientController(bridge, "HomeKit Client")
     pairStartRequest := client.InitialPairingRequest()
     
     pairStartRespond, err := sendTLV8(pairStartRequest)
@@ -68,7 +69,7 @@ func main() {
     fmt.Println("*** Pairing done ***")
     
     name := "UnitTest"
-    verify := pair.NewVerifyClientController(sessionContext, bridge, name)
+    verify := pair.NewVerifyClientController(bridge, name)
     
     verifyStartRequest := verify.InitialKeyVerifyRequest()
     // 1) C -> S

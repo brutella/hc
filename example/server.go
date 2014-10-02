@@ -6,11 +6,12 @@ import(
     "net/http"
     
     "github.com/brutella/hap"
-    "github.com/brutella/hap/pair"
+    "github.com/brutella/hap/db"
     "github.com/brutella/hap/model"
     "github.com/brutella/hap/model/accessory"
     "github.com/brutella/hap/model/service"
     "github.com/brutella/hap/netio"
+    "github.com/brutella/hap/netio/pair"
     "github.com/brutella/hap/netio/handler"
     "github.com/brutella/hap/netio/controller"
 )
@@ -30,10 +31,11 @@ var API_PORT int = 1237
 
 func main() {
     storage, _  := hap.NewFileStorage("./data")
-    context     := hap.NewContext(storage)
-    sessionContext := server.NewContext()
-    config      := hap.NewBridgeInfo("GoBridge", "001-02-003", "Matthias H.", storage)
-    bridge, _   := hap.NewBridge(config)
+    context     := netio.NewContext()
+    database := db.NewManager(storage)
+    config      := netio.NewBridgeInfo("GoBridge", "001-02-003", "Matthias H.", storage)
+    bridge, _   := netio.NewBridge(config)
+    context.Set("bridge", bridge)
     fmt.Println("Run bridge")
     fmt.Println("            Name:", config.Name)
     fmt.Println("        Password:", config.Password)
@@ -71,20 +73,19 @@ func main() {
     m := model.NewModel()
     m.AddAccessory(bridge_accessory)
     m.AddAccessory(thermostat_accessory)
-    // m.AddAccessory(switch_accessory)
+    m.AddAccessory(switch_accessory)
     
     model_controller            := controller.NewModelController(m)
     characteristics_controller  := controller.NewCharacteristicController(m)
-    
-    setup, _    := pair.NewSetupServerController(context, sessionContext, bridge)
-    verify, _   := pair.NewVerifyServerController(context, sessionContext, bridge)
+    setup, _                    := pair.NewSetupServerController(bridge, database)
+    pairing_controller          := pair.NewPairingController(database)
     
     mux :=  http.NewServeMux()
     
-    setup_handler := handler.NewPairSetupHandler(setup)
+    setup_handler := handler.NewPairSetupHandler(setup, context)
     mux.Handle("/pair-setup", setup_handler)
     
-    verify_handler := handler.NewPairVerifyHandler(verify, context)
+    verify_handler := handler.NewPairVerifyHandler(context, database)
     mux.Handle("/pair-verify", verify_handler)
     
     accessories_handler := handler.NewAccessoriesHandler(model_controller, context)
@@ -93,14 +94,13 @@ func main() {
     characteristics_handler := handler.NewCharacteristicsHandler(characteristics_controller, context)
     mux.Handle("/characteristics", characteristics_handler)
     
-    pairing_controller := pair.NewPairingController(context)
-    pairing_handler := handler.NewPairingHandler(pairing_controller, context)
+    pairing_handler := handler.NewPairingHandler(pairing_controller)
     mux.Handle("/pairings", pairing_handler)
     
     addr := ":" + strconv.Itoa(API_PORT)
     fmt.Println("Running at", addr)
     fmt.Println("Publish service")
     fmt.Printf("    dns-sd -P %s _hap local %s macbookpro.local 192.168.0.14 pv=1.0 id=%s c#=1 s#=1 sf=1 ff=0 md=%s\n", bridge.Name(), strconv.Itoa(API_PORT), bridge.Id(), bridge.Name())
-    err := server.ListenAndServe(addr, mux, sessionContext)
+    err := netio.ListenAndServe(addr, mux, context)
     fmt.Println(err)
 }
