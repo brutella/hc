@@ -14,7 +14,9 @@ type Bridge struct {
 }
 
 // Creates a new bridge based on the provided info
-// The long-term public and secret key are based on the serial number which should be unique for every bridge
+//
+// The long-term public and secret key are based on the serial
+// number which should be unique for every bridge
 func NewBridge(info BridgeInfo) (*Bridge, error){
     b := Bridge{info: info}
     public, secret, err := crypto.ED25519GenerateKey(b.info.SerialNumber)

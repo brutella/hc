@@ -9,6 +9,10 @@ import(
     "fmt"
 )
 
+// Handles the /accessories endpoint and returns all accessories as JSON
+//
+// This endpoint is not session based and the same for all connections because
+// the encryption/decryption is handled by the connection automatically.
 type Accessories struct {
     http.Handler
     

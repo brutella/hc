@@ -6,11 +6,11 @@ import(
 )
 
 // Provides variables in global has accessible via a connection or request
-//
-// The value returned by GetConnectionKey() is the same as GetKey()
-// if the request comes from the same connection
 type Context interface {
+    // Returns a key to uniquely identify the connection
     GetKey(c net.Conn) interface{}
+    
+    // Returns the same key as for the underlying connection
     GetConnectionKey(r *http.Request) interface{}
     
     Set(key, val interface{})
@@ -18,8 +18,8 @@ type Context interface {
     Delete(key interface{})
 }
 
-// Sits on top of a normal context and provides convenient methods to access
-// a session for a connection/request
+// Sits on top of a normal context and provides convenient 
+// methods to access a session for a connection/request
 type HAPContext interface {
     Context
     
@@ -29,7 +29,7 @@ type HAPContext interface {
     GetSessionForRequest(r *http.Request) Session
     DeleteSessionForConnection(c net.Conn)
     
-    // Setter and getter for global bridge
+    // Setter and getter for bridge
     SetBridge(b *Bridge)
     GetBridge() *Bridge
 }

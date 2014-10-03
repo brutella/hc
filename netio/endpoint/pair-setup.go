@@ -10,6 +10,11 @@ import(
     "fmt"
 )
 
+// Handles the /pair-setup endpoint and returns TLV8 encoded data
+//
+// This endoint is session based and handles requests based on their connections.
+// Which means that for every unique connection, there will be a new controller
+// set up. This is required to support simultaneous pairigin connections.
 type PairSetup struct {
     http.Handler
     

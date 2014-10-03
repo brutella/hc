@@ -6,7 +6,8 @@ import(
     "os/signal"
 )
 
-// TCP listener listens for new connection and creates a new HAP connection on new connections
+// TCP listener listens for new connection and creates 
+// a new TCP HAP connection for new connections
 type TCPHAPListener struct {
     *net.TCPListener
     context HAPContext

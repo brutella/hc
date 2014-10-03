@@ -10,6 +10,10 @@ import(
     "io/ioutil"
 )
 
+// Handles the /characteristics endpoint
+//
+// This endpoint is not session based and the same for all connections because
+// the encryption/decryption is handled by the connection automatically.
 type Characteristics struct {
     http.Handler
     

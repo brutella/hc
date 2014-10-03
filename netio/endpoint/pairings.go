@@ -6,6 +6,9 @@ import(
     "github.com/brutella/hap/netio/pair"
 )
 
+// Handles the /pairigns endpoint and returns either http status 204
+//
+// This endpoint is not session based and the same for all connections
 type Pairing struct {
     http.Handler
     

@@ -9,11 +9,11 @@ type Session interface {
     
     // For encrypting outgoing data, may be nil
     Encrypter() Encrypter
+    // Sets the cryptographer for encryption and decryption
+    SetCryptographer(c Cryptographer)
     
     PairSetupHandler() ContainerHandler
     PairVerifyHandler() PairVerifyHandler
-    
-    SetCryptographer(c Cryptographer)
     SetPairSetupHandler(c ContainerHandler)
     SetPairVerifyHandler(c PairVerifyHandler)
 }

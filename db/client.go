@@ -1,5 +1,6 @@
 package db
 
+// HomeKit client with a name and a long-term public key
 type Client interface {
     SetName(name string)
     Name() string

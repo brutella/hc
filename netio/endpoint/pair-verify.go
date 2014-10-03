@@ -11,6 +11,11 @@ import(
     "io/ioutil"
 )
 
+// Handles the /pair-verify endpoint and returns TLV8 encoded data
+//
+// This endoint is session based and handles requests based on their connections.
+// Which means that for every unique connection, there will be a new controller
+// set up. This is required to support simultaneous encrypted connections.
 type PairVerify struct {
     http.Handler
     context netio.HAPContext
