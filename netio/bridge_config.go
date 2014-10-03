@@ -2,9 +2,9 @@ package netio
 
 import(
     "github.com/brutella/hap/common"
-    "os"
     "encoding/hex"
     "crypto/md5"
+    "strings"
 )
 
 type BridgeInfo struct {
@@ -22,37 +22,28 @@ func NewBridgeInfo(name, password, manufacturer string, storage common.Storage) 
         SerialNumber: serial,
         Password: password,
         Name: name,
-        Id: IEEE802Id(serial),
+        Id: MAC48Address(serial),
         Manufacturer: manufacturer,
     }
 }
 
-// Returns the bridge id as MAC-48 address
-// Is used as TXT record `id`
-func IEEE802Id(input string) string {
+// Returns a MAC-48 address
+func MAC48Address(input string) string {
     h := md5.New()
     h.Write([]byte(input))
     result := h.Sum(nil)
     
-    bytes := result[:6]
-    str := ""
-    for i, b := range bytes {
-        if i > 0 {
-            str += ":"
-        }
-        str += hex.EncodeToString([]byte{b})
-    }
-    return str
+    c := make([]string, 0)
+    c = append(c, toHex(result[0]))
+    c = append(c, toHex(result[1]))
+    c = append(c, toHex(result[2]))
+    c = append(c, toHex(result[3]))
+    c = append(c, toHex(result[4]))
+    c = append(c, toHex(result[5]))
+    
+    return strings.Join(c, ":")
 }
 
-// Returns the bridge name which is displayed in the accessory browser in HomeKit
-// same as TXT record `md`
-func Hostname() string {
-    name, err := os.Hostname()
-    
-    if err != nil {
-        name = "Unnamed"
-    }
-    
-    return name
+func toHex(b byte) string {
+    return hex.EncodeToString([]byte{b})
 }
