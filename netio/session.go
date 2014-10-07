@@ -1,6 +1,7 @@
 package netio
 
 import(
+    "net"
 )
 
 type Session interface {
@@ -16,20 +17,29 @@ type Session interface {
     PairVerifyHandler() PairVerifyHandler
     SetPairSetupHandler(c ContainerHandler)
     SetPairVerifyHandler(c PairVerifyHandler)
+    
+    Connection() net.Conn
 }
 
 type session struct {
     cryptographer Cryptographer
     pairStartHandler ContainerHandler
     pairVerifyHandler PairVerifyHandler
+    connection net.Conn
     
     nextCryptographer Cryptographer
 }
 
-func NewSession() *session {
-    s := session{}
+func NewSession(connection net.Conn) *session {
+    s := session{
+        connection:connection,
+    }
     
     return &s
+}
+
+func (s *session) Connection() net.Conn {
+    return s.connection
 }
 
 func (s *session) Decrypter() Decrypter {

@@ -29,7 +29,7 @@ type tcpHAPConnection struct {
 
 func NewHAPConnection(connection net.Conn, context HAPContext) *tcpHAPConnection {
     // Setup new session for the connection
-    session := NewSession()
+    session := NewSession(connection)
     context.SetSessionForConnection(session, connection)
     
     c := tcpHAPConnection{

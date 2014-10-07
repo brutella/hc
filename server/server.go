@@ -11,6 +11,8 @@ import(
     "net/http"
     "fmt"
     "strconv"
+    "os"
+    "os/signal"
 )
 
 type Server interface {
@@ -41,11 +43,32 @@ func NewServer(c netio.HAPContext, d db.Database, m *model.Model, b *netio.Bridg
 }
 
 func (s *hkServer) ListenAndServe() error {
+    s.teardownOnExit()
     return netio.ListenAndServe(s.addrString(), s.mux, s.context)
+}
+
+func (s *hkServer) Teardown() {
+    for _, c := range s.context.ActiveConnection() {
+        c.Close()
+    }
 }
 
 func (s *hkServer) DNSSDCommand() string {
     return fmt.Sprintf("dns-sd -P %s _hap local %s macbookpro.local 192.168.0.14 pv=1.0 id=%s c#=1 s#=1 sf=1 ff=0 md=%s\n", s.bridge.Name(), s.portString(), s.bridge.Id(), s.bridge.Name())
+}
+
+func (s *hkServer) teardownOnExit() {
+    c := make(chan os.Signal, 1)
+    signal.Notify(c, os.Interrupt)
+    signal.Notify(c, os.Kill)
+    
+    go func() {
+        select {
+        case <- c:
+            s.Teardown()
+            os.Exit(1)
+        }
+	}()
 }
 
 func (s *hkServer) portString() string {

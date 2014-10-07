@@ -6,13 +6,7 @@ import(
 )
 
 // Provides variables in global has accessible via a connection or request
-type Context interface {
-    // Returns a key to uniquely identify the connection
-    GetKey(c net.Conn) interface{}
-    
-    // Returns the same key as for the underlying connection
-    GetConnectionKey(r *http.Request) interface{}
-    
+type Context interface {    
     Set(key, val interface{})
     Get(key interface{}) (interface{})
     Delete(key interface{})
@@ -23,11 +17,20 @@ type Context interface {
 type HAPContext interface {
     Context
     
+    // Returns a key to uniquely identify the connection
+    GetKey(c net.Conn) interface{}
+    
+    // Returns the same key as for the underlying connection
+    GetConnectionKey(r *http.Request) interface{}
+    
     // Setter and getter for session
     SetSessionForConnection(s Session, c net.Conn)
     GetSessionForConnection(c net.Conn) Session
     GetSessionForRequest(r *http.Request) Session
     DeleteSessionForConnection(c net.Conn)
+    
+    // Returns a list of active connections
+    ActiveConnection() []net.Conn
     
     // Setter and getter for bridge
     SetBridge(b *Bridge)
@@ -86,6 +89,19 @@ func (ctx *context) GetSessionForRequest(r *http.Request) Session {
 func (ctx *context) DeleteSessionForConnection(c net.Conn) {
     key := ctx.GetKey(c)
     ctx.Delete(key)
+}
+
+// Returns a list of active connections
+func (ctx *context) ActiveConnection() []net.Conn {
+    connections := make([]net.Conn, 0)
+    
+    for _, v := range ctx.storage {
+        if s, ok := v.(Session); ok == true {
+            connections = append(connections, s.Connection())
+        }
+    }
+    
+    return connections
 }
 
 func (ctx *context) SetBridge(b *Bridge) {
