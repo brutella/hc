@@ -54,7 +54,8 @@ func (s *hkServer) Teardown() {
 }
 
 func (s *hkServer) DNSSDCommand() string {
-    return fmt.Sprintf("dns-sd -P %s _hap local %s macbookpro.local 192.168.0.14 pv=1.0 id=%s c#=1 s#=1 sf=1 ff=0 md=%s\n", s.bridge.Name(), s.portString(), s.bridge.Id(), s.bridge.Name())
+    hostname, _ := os.Hostname()
+    return fmt.Sprintf("dns-sd -P %s _hap local %s %s 192.168.0.14 pv=1.0 id=%s c#=1 s#=1 sf=1 ff=0 md=%s\n", s.bridge.Name(), s.portString(), hostname, s.bridge.Id(), s.bridge.Name())
 }
 
 func (s *hkServer) teardownOnExit() {
