@@ -8,33 +8,39 @@ import(
     "github.com/brutella/hap/netio/endpoint"
     "github.com/brutella/hap/netio/controller"
     
+    "net"
     "net/http"
     "fmt"
-    "strconv"
     "os"
     "os/signal"
 )
 
-type Server interface {
+func RandomPort() int {
+    return 1234
 }
 
+type Server interface {
+    ListenAndServe() error
+}
+
+type ServerExitFunc func()
 type hkServer struct {
     model *model.Model
     context netio.HAPContext
     database db.Database
     bridge *netio.Bridge
     mux *http.ServeMux
-    port int
+    port string
+    exitFunc ServerExitFunc
 }
 
-func NewServer(c netio.HAPContext, d db.Database, m *model.Model, b *netio.Bridge, port int) *hkServer {
+func NewServer(c netio.HAPContext, d db.Database, m *model.Model, b *netio.Bridge) *hkServer {
     s := hkServer{
         context: c, 
         database: d, 
         model: m, 
         bridge: b,
         mux: http.NewServeMux(),
-        port: port,
     }
     
     s.setupEndpoints()
@@ -42,42 +48,65 @@ func NewServer(c netio.HAPContext, d db.Database, m *model.Model, b *netio.Bridg
     return &s
 }
 
-func (s *hkServer) ListenAndServe() error {
-    s.teardownOnExit()
-    return netio.ListenAndServe(s.addrString(), s.mux, s.context)
+func (s *hkServer) OnExit(fn ServerExitFunc) {
+    s.exitFunc = fn
 }
 
-func (s *hkServer) Teardown() {
+func (s *hkServer) ListenAndServe() error {
+    s.teardownOnExit()
+    
+    
+    return s.listenAndServe(s.addrString(), s.mux, s.context)
+}
+
+func (s *hkServer) Exit() {
     for _, c := range s.context.ActiveConnection() {
         c.Close()
     }
+    
+    if s.exitFunc != nil {
+        s.exitFunc()
+    }
 }
 
-func (s *hkServer) DNSSDCommand() string {
+func (s *hkServer) dnssdCommand() string {
     hostname, _ := os.Hostname()
-    return fmt.Sprintf("dns-sd -P %s _hap local %s %s 192.168.0.14 pv=1.0 id=%s c#=1 s#=1 sf=1 ff=0 md=%s\n", s.bridge.Name(), s.portString(), hostname, s.bridge.Id(), s.bridge.Name())
+    return fmt.Sprintf("dns-sd -P %s _hap local %s %s 192.168.0.14 pv=1.0 id=%s c#=1 s#=1 sf=1 ff=0 md=%s\n", s.bridge.Name(), s.port,  hostname, s.bridge.Id(), s.bridge.Name())
+}
+
+func (s *hkServer) listenAndServe(addr string, handler http.Handler, context netio.HAPContext) error {
+    server := http.Server{Addr: addr, Handler:handler}
+    // os gives us a free port when port is "" 
+    ln, err := net.Listen("tcp", "")
+    if err != nil {
+        return err
+    }
+    
+    listener := netio.NewTCPHAPListener(ln.(*net.TCPListener), context)
+    
+    s.port = ExtractPort(ln.Addr())
+    
+    fmt.Println(s.dnssdCommand())
+    
+    return server.Serve(listener)
 }
 
 func (s *hkServer) teardownOnExit() {
-    c := make(chan os.Signal, 1)
+    c := make(chan os.Signal)
     signal.Notify(c, os.Interrupt)
     signal.Notify(c, os.Kill)
     
     go func() {
         select {
         case <- c:
-            s.Teardown()
+            s.Exit()
             os.Exit(1)
         }
 	}()
 }
 
-func (s *hkServer) portString() string {
-    return strconv.Itoa(s.port)
-}
-
 func (s *hkServer) addrString() string {
-    return ":" + s.portString()
+    return ":" + s.port
 }
 
 func (s *hkServer) setupEndpoints() {

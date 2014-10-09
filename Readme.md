@@ -2,6 +2,15 @@
 
 This is an implementation of the **H**omeKit **A**ccessory **P**rotocol.
 
+## TODO
+
+- Create interfaces for models to hide implementation details
+- On server close, wait until connections are closed
+- Add test for new methods
+- Check invalid service and characteristics (e.g. temperature must not be smaller than min and bigger than max)
+- Check invalid request (aid or iid not found)
+- Do not allow value changes of read-only characteristics
+- Implement light bulb service
 
 ## IO with Virtual Devices
 

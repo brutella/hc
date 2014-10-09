@@ -17,7 +17,6 @@ type BridgeInfo struct {
 
 func NewBridgeInfo(name, password, manufacturer string, storage common.Storage) BridgeInfo {
     serial := common.GetSerialNumberForAccessoryName(name, storage)
-    
     return BridgeInfo{
         SerialNumber: serial,
         Password: password,

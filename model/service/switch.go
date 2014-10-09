@@ -4,12 +4,13 @@ import(
     "github.com/brutella/hap/model/characteristic"
 )
 
-type StateChangeFunc func(bool)
+type OnChangeFunc func(bool)
 type Switch struct {
     *Service
     On *characteristic.On
     Name *characteristic.Name
-    fn StateChangeFunc
+    
+    fn OnChangeFunc
 }
 
 func NewSwitch(name string, on bool) *Switch {
@@ -28,7 +29,7 @@ func NewSwitch(name string, on bool) *Switch {
     return s
 }
 
-func (s *Switch) OnStateChanged(fn StateChangeFunc){
+func (s *Switch) OnStateChanged(fn OnChangeFunc){
     s.fn = fn
 }
 
