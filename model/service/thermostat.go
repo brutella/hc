@@ -35,11 +35,11 @@ func NewThermostat(name string, temperature, min, max, steps float64) *Thermosta
     service.AddCharacteristic(mode.Characteristic)
     service.AddCharacteristic(targetMode.Characteristic)
     
-    t := &Thermostat{service, name_char, unit_char, temp, targetTemp, mode, targetMode, nil}
+    t := Thermostat{service, name_char, unit_char, temp, targetTemp, mode, targetMode, nil}
     
-    targetTemp.AddRemoteChangeDelegate(t)
+    targetTemp.AddRemoteChangeDelegate(&t)
     
-    return t
+    return &t
 }
 
 func (t *Thermostat) SetTemperature(value float64){
@@ -52,8 +52,7 @@ func (t *Thermostat) TargetTempChanged(fn TempChangeFunc){
 }
 
 func (t *Thermostat) CharactericDidChangeValue(c *characteristic.Characteristic, change characteristic.CharacteristicChange) {
-    switch c {
-    case t.TargetTemp.Characteristic:
+    if c.Equal(t.TargetTemp) {
         if t.targetTempChange != nil {
             t.targetTempChange(t.TargetTemp.Temperature())
         }

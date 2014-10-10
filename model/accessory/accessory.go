@@ -1,13 +1,15 @@
 package accessory
 
 import(
+    "github.com/brutella/hap/model"
     "github.com/brutella/hap/model/service"
 )
 
 type Accessory struct {
     Id int              `json:"aid"`
-    Services []*service.Service `json:"services"`
+    Services []model.Service `json:"services"`
     
+    info service.AccessoryInfo
     idCount int
 }
 
@@ -17,17 +19,49 @@ func NewAccessory() *Accessory {
     }
 }
 
+func (a *Accessory) SetId(id int) {
+    a.Id = id
+}
+
+func (a *Accessory) GetId()int {
+    return a.Id
+}
+
+func (a *Accessory) GetServices()[]model.Service {
+    return a.Services
+}
+
+func (a *Accessory) GetName() string {
+    return a.info.Name.Name()
+}
+
+func (a *Accessory) GetSerialNumber() string {
+    return a.info.Serial.SerialNumber()
+}
+
+func (a *Accessory) GetManufacturer() string {
+    return a.info.Manufacturer.Manufacturer()
+}
+
+func (a *Accessory) GetModel() string {
+    return a.info.Model.Model()
+}
+
 // Adds a service to the accessory and updates the ids of the service and the corresponding characteristics
-func (a *Accessory) AddService(s *service.Service) {
-    s.Id = a.idCount
+func (a *Accessory) AddService(s model.Service) {
+    s.SetId(a.idCount)
     a.idCount += 1
     
-    for _, c := range s.Characteristics {
-        c.Id = a.idCount
+    for _, c := range s.GetCharacteristics() {
+        c.SetId(a.idCount)
         a.idCount += 1
     }
     
     a.Services = append(a.Services, s)
+    
+    if info, ok := s.(service.AccessoryInfo); ok == true {
+        a.info = info
+    }
 }
 
 func (a *Accessory) Equal(other interface{}) bool {

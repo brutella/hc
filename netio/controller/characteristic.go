@@ -1,7 +1,6 @@
 package controller
 
 import(
-    "github.com/brutella/hap/model/characteristic"
     "github.com/brutella/hap/model"
     "github.com/brutella/hap/netio/data"
     
@@ -30,7 +29,7 @@ func (controller *CharacteristicController) HandleGetCharacteristics(form url.Va
     }
     
     chars := data.NewCharacteristics()
-    char := data.Characteristic{AccessoryId: aid, Id: cid, Value: modelChar.Value}
+    char := data.Characteristic{AccessoryId: aid, Id: cid, Value: modelChar.GetValue()}
     chars.AddCharacteristic(char)
     
     result, err := json.Marshal(chars)
@@ -67,12 +66,12 @@ func (controller *CharacteristicController) HandleUpdateCharacteristics(r io.Rea
     return err
 }
 
-func (c *CharacteristicController) GetCharacteristic(accessoryId int, characteristicId int) *characteristic.Characteristic {
+func (c *CharacteristicController) GetCharacteristic(accessoryId int, characteristicId int) model.Characteristic {
     for _, a := range c.model.Accessories {
-        if a.Id == accessoryId {
-            for _, s := range a.Services {
-                for _, c :=  range s.Characteristics {
-                    if c.Id == characteristicId {
+        if a.GetId() == accessoryId {
+            for _, s := range a.GetServices() {
+                for _, c :=  range s.GetCharacteristics() {
+                    if c.GetId() == characteristicId {
                         return c
                     }
                 }

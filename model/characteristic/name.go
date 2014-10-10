@@ -12,10 +12,10 @@ func NewName(name string) *Name {
     return &Name{str}
 }
 
-func (c *Name) SetName(name string) {
-    c.SetString(name)
+func (n *Name) SetName(name string) {
+    n.SetString(name)
 }
 
-func (c *Name) Name() string{
-    return c.StringValue()
+func (n *Name) Name() string{
+    return n.StringValue()
 }

@@ -19,14 +19,14 @@ func NewSwitch(name string, on bool) *Switch {
     
     service := NewService()
     service.Type = TypeSwitch
-    service.AddCharacteristic(on_char.Characteristic)
-    service.AddCharacteristic(name_char.Characteristic)
+    service.AddCharacteristic(on_char)
+    service.AddCharacteristic(name_char)
     
-    s := &Switch{service, on_char, name_char, nil}
+    s := Switch{service, on_char, name_char, nil}
     
-    on_char.AddRemoteChangeDelegate(s)
+    on_char.AddRemoteChangeDelegate(&s)
     
-    return s
+    return &s
 }
 
 func (s *Switch) OnStateChanged(fn OnChangeFunc){

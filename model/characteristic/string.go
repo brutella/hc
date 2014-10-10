@@ -8,10 +8,10 @@ func NewString(value string) *String {
     return &String{NewCharacteristic(value, FormatString, CharTypeUnknown, nil)}
 }
 
-func (c *String) SetString(str string) {
-    c.SetValue(str)
+func (s *String) SetString(str string) {
+    s.SetValue(str)
 }
 
-func (c *String) StringValue() string {
-    return c.Value.(string)
+func (s *String) StringValue() string {
+    return s.Value.(string)
 }

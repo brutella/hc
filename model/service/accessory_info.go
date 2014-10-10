@@ -23,11 +23,11 @@ func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName s
     
     service := NewService()
     service.Type = TypeAccessoryInfo
-    service.AddCharacteristic(identify.Characteristic)
-    service.AddCharacteristic(serial.Characteristic)
-    service.AddCharacteristic(model.Characteristic)
-    service.AddCharacteristic(manufacturer.Characteristic)
-    service.AddCharacteristic(name.Characteristic)
+    service.AddCharacteristic(identify)
+    service.AddCharacteristic(serial)
+    service.AddCharacteristic(model)
+    service.AddCharacteristic(manufacturer)
+    service.AddCharacteristic(name)
     
     return &AccessoryInfo{service, identify, serial, model, manufacturer, name}
 }

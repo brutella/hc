@@ -14,34 +14,34 @@ func NewFloatMinMaxSteps(value, min, max, min_step float64) *Float {
     return &Float{number}
 }
 
-func (c *Float) SetFloat(value float64) {
-    c.SetValue(value)
+func (f *Float) SetFloat(value float64) {
+    f.SetValue(value)
 }
 
-func (c *Float) SetMin(value float64) {
-    c.SetMinValue(value)
+func (f *Float) SetMin(value float64) {
+    f.SetMinValue(value)
 }
 
-func (c *Float) SetMax(value float64) {
-    c.SetMaxValue(value)
+func (f *Float) SetMax(value float64) {
+    f.SetMaxValue(value)
 }
 
-func (c *Float) SetMinStep(value float64) {
-    c.SetMinStepValue(value)
+func (f *Float) SetMinStep(value float64) {
+    f.SetMinStepValue(value)
 }
 
-func (c *Float) FloatValue() float64 {
-    return c.GetValue().(float64)
+func (f *Float) FloatValue() float64 {
+    return f.GetValue().(float64)
 }
 
-func (c *Float) Min() float64 {
-    return c.GetMinValue().(float64)
+func (f *Float) Min() float64 {
+    return f.GetMinValue().(float64)
 }
 
-func (c *Float) Max() float64 {
-    return c.GetMaxValue().(float64)
+func (f *Float) Max() float64 {
+    return f.GetMaxValue().(float64)
 }
 
-func (c *Float) MinStep() float64 {
-    return c.GetMinStepValue().(float64)
+func (f *Float) MinStep() float64 {
+    return f.GetMinStepValue().(float64)
 }

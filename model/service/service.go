@@ -1,23 +1,37 @@
 package service
 
 import(
-    "github.com/brutella/hap/model/characteristic"
+    "github.com/brutella/hap/model"
 )
 
 type Service struct {
     Id int                            `json:"iid"`
     Type ServiceType                  `json:"type"`
-    Characteristics []*characteristic.Characteristic `json:"characteristics"`
+    Characteristics []model.Characteristic `json:"characteristics"`
 }
 
 func NewService() *Service {
-    return &Service{}
+    s := Service{
+        Characteristics: []model.Characteristic{},
+    }
+    
+    return &s
 }
 
-func (s *Service) AddCharacteristic(c *characteristic.Characteristic) {
+func (s *Service) AddCharacteristic(c model.Characteristic) {
     s.Characteristics = append(s.Characteristics, c)
 }
 
+// model.Service
+func (s *Service) SetId(id int) {
+    s.Id = id
+}
+
+func (s *Service) GetCharacteristics()[]model.Characteristic {
+    return s.Characteristics
+}
+
+// Compareable
 func (s *Service) Equal(other interface{}) bool {
     if service, ok := other.(*Service); ok == true {
         if len(s.Characteristics) != len(service.Characteristics) {

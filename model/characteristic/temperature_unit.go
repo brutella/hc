@@ -12,6 +12,6 @@ func NewTemperatureUnit(unit string) *TemperatureUnit {
     return &c
 }
 
-func (c *TemperatureUnit) Unit() byte {
-    return c.Byte()
+func (t *TemperatureUnit) Unit() byte {
+    return t.Byte()
 }

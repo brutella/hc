@@ -10,10 +10,10 @@ func NewOn(value bool) *On {
     return &On{char}
 }
 
-func (c *On) SetOn(value bool) {
-    c.SetBool(value)
+func (b *On) SetOn(value bool) {
+    b.SetBool(value)
 }
 
-func (c *On) On() bool {
-    return c.BoolValue()
+func (b *On) On() bool {
+    return b.BoolValue()
 }
