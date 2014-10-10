@@ -9,14 +9,21 @@ type Accessory struct {
     Id int              `json:"aid"`
     Services []model.Service `json:"services"`
     
-    info service.AccessoryInfo
+    info *service.AccessoryInfo
     idCount int
 }
 
-func NewAccessory() *Accessory {
-    return &Accessory{
+
+func New(info model.Info) *Accessory {
+    i := service.NewInfo(info)
+    a := &Accessory{
         idCount: 1,
+        info: i,
     }
+    
+    a.AddService(i)
+    
+    return a
 }
 
 func (a *Accessory) SetId(id int) {
@@ -31,19 +38,19 @@ func (a *Accessory) GetServices()[]model.Service {
     return a.Services
 }
 
-func (a *Accessory) GetName() string {
+func (a *Accessory) Name() string {
     return a.info.Name.Name()
 }
 
-func (a *Accessory) GetSerialNumber() string {
+func (a *Accessory) SerialNumber() string {
     return a.info.Serial.SerialNumber()
 }
 
-func (a *Accessory) GetManufacturer() string {
+func (a *Accessory) Manufacturer() string {
     return a.info.Manufacturer.Manufacturer()
 }
 
-func (a *Accessory) GetModel() string {
+func (a *Accessory) Model() string {
     return a.info.Model.Model()
 }
 
@@ -58,10 +65,6 @@ func (a *Accessory) AddService(s model.Service) {
     }
     
     a.Services = append(a.Services, s)
-    
-    if info, ok := s.(service.AccessoryInfo); ok == true {
-        a.info = info
-    }
 }
 
 func (a *Accessory) Equal(other interface{}) bool {

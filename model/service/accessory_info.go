@@ -1,6 +1,7 @@
 package service
 
 import(
+    "github.com/brutella/hap/model"
     "github.com/brutella/hap/model/characteristic"
 )
 
@@ -14,6 +15,10 @@ type AccessoryInfo struct {
     Name *characteristic.Name
 }
 
+func NewInfo(info model.Info) *AccessoryInfo {
+    return NewAccessoryInfo(info.Name, info.Serial, info.Manufacturer, info.Model)
+}
+    
 func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName string) *AccessoryInfo {
     identify        := characteristic.NewIdentify(false)
     serial          := characteristic.NewSerialNumber(serialNumber)

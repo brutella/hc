@@ -4,7 +4,7 @@ This is an implementation of the **H**omeKit **A**ccessory **P**rotocol.
 
 ## TODO
 
-- Create interfaces for models to hide implementation details
+- Create interfaces for models to hide implementation details *WIP*
 - On server close, wait until connections are closed
 - Add test for new methods
 - Check invalid service and characteristics (e.g. temperature must not be smaller than min and bigger than max)

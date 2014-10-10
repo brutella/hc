@@ -4,5 +4,5 @@ type Switch interface {
     Accessory
     
     SetOn(on bool)
-    GetOn() bool
+    IsOn() bool
 }

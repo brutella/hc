@@ -105,7 +105,7 @@ func (c *Characteristic) SetId(id int) {
     c.Id = id
 }
 
-func (c *Characteristic) GetId()int {
+func (c *Characteristic) GetId() int {
     return c.Id
 }
 

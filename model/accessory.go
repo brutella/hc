@@ -8,8 +8,8 @@ type Accessory interface {
     
     GetServices()[]Service
     
-    GetName() string
-    GetSerialNumber() string
-    GetManufacturer() string
-    GetModel() string
+    Name() string
+    SerialNumber() string
+    Manufacturer() string
+    Model() string
 }

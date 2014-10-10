@@ -68,10 +68,10 @@ func (controller *CharacteristicController) HandleUpdateCharacteristics(r io.Rea
 
 func (c *CharacteristicController) GetCharacteristic(accessoryId int, characteristicId int) model.Characteristic {
     for _, a := range c.model.Accessories {
-        if a.GetId() == accessoryId {
+        if a.Id() == accessoryId {
             for _, s := range a.GetServices() {
                 for _, c :=  range s.GetCharacteristics() {
-                    if c.GetId() == characteristicId {
+                    if c.Id() == characteristicId {
                         return c
                     }
                 }

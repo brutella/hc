@@ -1,40 +1,35 @@
 package characteristic
 
-type ThermostatHeatingCoolingMode byte
-
-const (
-    // TODO verify the values
-    ModeOff = ThermostatHeatingCoolingMode(0x00)
-    ModeHeating = ThermostatHeatingCoolingMode(0x01)
-    ModeCooling = ThermostatHeatingCoolingMode(0x02)
+import(
+    "github.com/brutella/hap/model"
 )
 
 type HeatingCoolingMode struct {
     *ByteCharacteristic
 }
 
-func NewHeatingCoolingMode(current ThermostatHeatingCoolingMode, charType CharType, permissions []string) *HeatingCoolingMode {
+func NewHeatingCoolingMode(current model.HeatCoolMode, charType CharType, permissions []string) *HeatingCoolingMode {
     c := HeatingCoolingMode{NewByteCharacteristic(byte(current))}
     c.Type = charType
     c.Permissions = permissions
     return &c
 }
 
-func NewCurrentHeatingCoolingMode(current ThermostatHeatingCoolingMode) *HeatingCoolingMode {
+func NewCurrentHeatingCoolingMode(current model.HeatCoolMode) *HeatingCoolingMode {
     return NewHeatingCoolingMode(current, CharTypeHeatingCoolingModeCurrent, PermsRead())
 }
 
-func NewTargetHeatingCoolingMode(current ThermostatHeatingCoolingMode) *HeatingCoolingMode {
+func NewTargetHeatingCoolingMode(current model.HeatCoolMode) *HeatingCoolingMode {
     return NewHeatingCoolingMode(current, CharTypeHeatingCoolingModeTarget, PermsRead())
 }
 
-func (c *HeatingCoolingMode) SetHeatingCoolingMode(mode ThermostatHeatingCoolingMode) {
+func (c *HeatingCoolingMode) SetHeatingCoolingMode(mode model.HeatCoolMode) {
     c.SetByte(byte(mode))
 }
 
 
-func (c *HeatingCoolingMode) HeatingCoolingMode() ThermostatHeatingCoolingMode {
-    return ThermostatHeatingCoolingMode(c.Byte())
+func (c *HeatingCoolingMode) HeatingCoolingMode() model.HeatCoolMode {
+    return model.HeatCoolMode(c.Byte())
 }
 
 // type CurrentRelativeHumidityCharacteristic struct {
