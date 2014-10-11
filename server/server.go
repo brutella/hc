@@ -2,7 +2,7 @@ package server
 
 import(
     "github.com/brutella/hap/db"
-    "github.com/brutella/hap/model"
+    "github.com/brutella/hap/model/container"
     "github.com/brutella/hap/netio"
     "github.com/brutella/hap/netio/pair"
     "github.com/brutella/hap/netio/endpoint"
@@ -25,7 +25,7 @@ type Server interface {
 
 type ServerExitFunc func()
 type hkServer struct {
-    model *model.Model
+    container *container.Container
     context netio.HAPContext
     database db.Database
     bridge *netio.Bridge
@@ -34,11 +34,11 @@ type hkServer struct {
     exitFunc ServerExitFunc
 }
 
-func NewServer(c netio.HAPContext, d db.Database, m *model.Model, b *netio.Bridge) *hkServer {
+func NewServer(hap_ctx netio.HAPContext, d db.Database, c *container.Container, b *netio.Bridge) *hkServer {
     s := hkServer{
-        context: c, 
+        context: hap_ctx, 
         database: d, 
-        model: m, 
+        container: c, 
         bridge: b,
         mux: http.NewServeMux(),
     }
@@ -110,13 +110,13 @@ func (s *hkServer) addrString() string {
 }
 
 func (s *hkServer) setupEndpoints() {
-    model_controller           := controller.NewModelController(s.model)
-    characteristics_controller := controller.NewCharacteristicController(s.model)
+    container_controller           := controller.NewContainerController(s.container)
+    characteristics_controller := controller.NewCharacteristicController(s.container)
     pairing_controller         := pair.NewPairingController(s.database)
     
     s.mux.Handle("/pair-setup", endpoint.NewPairSetup(s.bridge, s.database, s.context))
     s.mux.Handle("/pair-verify", endpoint.NewPairVerify(s.context, s.database))
-    s.mux.Handle("/accessories", endpoint.NewAccessories(model_controller))
+    s.mux.Handle("/accessories", endpoint.NewAccessories(container_controller))
     s.mux.Handle("/characteristics", endpoint.NewCharacteristics(characteristics_controller))
     s.mux.Handle("/pairings", endpoint.NewPairing(pairing_controller))
 }

@@ -16,10 +16,10 @@ import(
 type Accessories struct {
     http.Handler
     
-    controller *controller.ModelController
+    controller *controller.ContainerController
 }
 
-func NewAccessories(c *controller.ModelController) *Accessories {
+func NewAccessories(c *controller.ContainerController) *Accessories {
     handler := Accessories{
                 controller: c,
             }
