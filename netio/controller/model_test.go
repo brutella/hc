@@ -2,8 +2,9 @@ package controller
 
 import (
     "github.com/brutella/hap/model"
+    "github.com/brutella/hap/model/model"
     "github.com/brutella/hap/model/accessory"
-    "github.com/brutella/hap/model/service"
+    _"github.com/brutella/hap/model/service"
     
 	"testing"    
     "github.com/stretchr/testify/assert"
@@ -14,9 +15,15 @@ import (
 )
 
 func TestGetAccessories(t *testing.T) {
-    info_service := service.NewAccessoryInfo("123-456-789", "Rev1", "Matthias H.", "My Bridge")
-    a := accessory.NewAccessory()
-    a.AddService(info_service.Service)
+    info := model.Info{
+            Name: "My Accessory",
+            Serial: "001",
+            Manufacturer: "Google",
+            Model: "Accessory",
+        }
+    
+    a := accessory.New(info)
+        
     m := model.NewModel()
     m.AddAccessory(a)
     
@@ -31,6 +38,13 @@ func TestGetAccessories(t *testing.T) {
     fmt.Println(string(bytes))
     var returnedModel model.Model
     err = json.Unmarshal(bytes, &returnedModel)
+    
+    jerr := err.(*json.UnmarshalTypeError)
+    fmt.Printf("Unexpected value: %s\n", (*jerr).Value)
+
+    // Expected type: uint
+    fmt.Printf("Unexpected type: %v\n", (*jerr).Type)
+    
     assert.Nil(t, err)
     assert.True(t, returnedModel.Equal(m))
 }

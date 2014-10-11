@@ -1,29 +1,33 @@
 package model
 
 import(
+    "github.com/brutella/hap/model/accessory"
+)
+
+import(
 )
 
 type Model struct {
-    Accessories []Accessory `json:"accessories"`
+    Accessories []*accessory.Accessory `json:"accessories"`
     
     idCount int
 }
 
 func NewModel() *Model {
     return &Model{
-        Accessories: make([]Accessory, 0),
+        Accessories: make([]*accessory.Accessory, 0),
         idCount: 1,
     }
 }
 
-func (m *Model) AddAccessory(a Accessory) {
+func (m *Model) AddAccessory(a *accessory.Accessory) {
     a.SetId(m.idCount)
     m.idCount += 1
     m.Accessories = append(m.Accessories, a)
 }
 
 // TODO write tests
-func (m *Model) RemoveAccessory(a Accessory) {
+func (m *Model) RemoveAccessory(a *accessory.Accessory) {
     for i, accessory := range m.Accessories {
         if accessory == a {
             m.Accessories = append(m.Accessories[:i], m.Accessories[i+1:]...)

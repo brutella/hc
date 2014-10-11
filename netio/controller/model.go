@@ -1,7 +1,7 @@
 package controller
 
 import(
-    "github.com/brutella/hap/model"
+    "github.com/brutella/hap/model/model"
     "encoding/json"
     "bytes"
     "io"

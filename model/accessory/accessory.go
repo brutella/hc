@@ -6,10 +6,10 @@ import(
 )
 
 type Accessory struct {
-    Id int              `json:"aid"`
+    Id int                   `json:"aid"`
     Services []model.Service `json:"services"`
     
-    info *service.AccessoryInfo
+    Info *service.AccessoryInfo `json:"-"`
     idCount int
 }
 
@@ -18,7 +18,7 @@ func New(info model.Info) *Accessory {
     i := service.NewInfo(info)
     a := &Accessory{
         idCount: 1,
-        info: i,
+        Info: i,
     }
     
     a.AddService(i)
@@ -34,28 +34,28 @@ func (a *Accessory) GetId()int {
     return a.Id
 }
 
-func (a *Accessory) GetServices()[]model.Service {
+func (a *Accessory) GetServices()[]*service.Service {
     return a.Services
 }
 
 func (a *Accessory) Name() string {
-    return a.info.Name.Name()
+    return a.Info.Name.Name()
 }
 
 func (a *Accessory) SerialNumber() string {
-    return a.info.Serial.SerialNumber()
+    return a.Info.Serial.SerialNumber()
 }
 
 func (a *Accessory) Manufacturer() string {
-    return a.info.Manufacturer.Manufacturer()
+    return a.Info.Manufacturer.Manufacturer()
 }
 
 func (a *Accessory) Model() string {
-    return a.info.Model.Model()
+    return a.Info.Model.Model()
 }
 
 // Adds a service to the accessory and updates the ids of the service and the corresponding characteristics
-func (a *Accessory) AddService(s model.Service) {
+func (a *Accessory) AddService(s *service.Service) {
     s.SetId(a.idCount)
     a.idCount += 1
     

@@ -6,8 +6,8 @@ import(
 
 type Switch struct {
     *Service
-    On *characteristic.On
-    Name *characteristic.Name
+    On *characteristic.On       `json:"-"`
+    Name *characteristic.Name   `json:"-"`
     
     fn func(bool)
 }

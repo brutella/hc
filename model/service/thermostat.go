@@ -9,12 +9,12 @@ type TempChangeFunc func(float64)
 type Thermostat struct {
     *Service
     
-    Name        *characteristic.Name
-    Unit        *characteristic.TemperatureUnit
-    Temp        *characteristic.TemperatureCharacteristic
-    TargetTemp  *characteristic.TemperatureCharacteristic
-    Mode        *characteristic.HeatingCoolingMode
-    TargetMode  *characteristic.HeatingCoolingMode
+    Name        *characteristic.Name                        `json:"-"`
+    Unit        *characteristic.TemperatureUnit             `json:"-"`
+    Temp        *characteristic.TemperatureCharacteristic   `json:"-"`
+    TargetTemp  *characteristic.TemperatureCharacteristic   `json:"-"`
+    Mode        *characteristic.HeatingCoolingMode          `json:"-"`
+    TargetMode  *characteristic.HeatingCoolingMode          `json:"-"`
     
     targetTempChange TempChangeFunc
 }

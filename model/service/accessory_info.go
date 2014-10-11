@@ -8,11 +8,11 @@ import(
 type AccessoryInfo struct {
     *Service
     
-    Identify *characteristic.Identify
-    Serial *characteristic.SerialNumber
-    Model *characteristic.Model
-    Manufacturer *characteristic.Manufacturer
-    Name *characteristic.Name
+    Identify *characteristic.Identify           `json:"-"`
+    Serial *characteristic.SerialNumber         `json:"-"`
+    Model *characteristic.Model                 `json:"-"`
+    Manufacturer *characteristic.Manufacturer   `json:"-"`
+    Name *characteristic.Name                   `json:"-"`
 }
 
 func NewInfo(info model.Info) *AccessoryInfo {

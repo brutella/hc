@@ -1,7 +1,8 @@
 package controller
 
 import(
-    "github.com/brutella/hap/model"
+    "github.com/brutella/hap/model/model"
+    "github.com/brutella/hap/model/characteristic"
     "github.com/brutella/hap/netio/data"
     
     "fmt"
@@ -66,12 +67,12 @@ func (controller *CharacteristicController) HandleUpdateCharacteristics(r io.Rea
     return err
 }
 
-func (c *CharacteristicController) GetCharacteristic(accessoryId int, characteristicId int) model.Characteristic {
+func (c *CharacteristicController) GetCharacteristic(accessoryId int, characteristicId int) *characteristic.Characteristic {
     for _, a := range c.model.Accessories {
-        if a.Id() == accessoryId {
+        if a.GetId() == accessoryId {
             for _, s := range a.GetServices() {
                 for _, c :=  range s.GetCharacteristics() {
-                    if c.Id() == characteristicId {
+                    if c.GetId() == characteristicId {
                         return c
                     }
                 }
