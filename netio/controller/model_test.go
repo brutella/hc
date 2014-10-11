@@ -2,7 +2,7 @@ package controller
 
 import (
     "github.com/brutella/hap/model"
-    "github.com/brutella/hap/model/model"
+    "github.com/brutella/hap/model/container"
     "github.com/brutella/hap/model/accessory"
     _"github.com/brutella/hap/model/service"
     
@@ -24,10 +24,10 @@ func TestGetAccessories(t *testing.T) {
     
     a := accessory.New(info)
         
-    m := model.NewModel()
+    m := container.NewContainer()
     m.AddAccessory(a)
     
-    controller := NewModelController(m)
+    controller := NewContainerController(m)
     
     var b bytes.Buffer
     r, err := controller.HandleGetAccessories(&b)
@@ -36,15 +36,8 @@ func TestGetAccessories(t *testing.T) {
     
     bytes, _ := ioutil.ReadAll(r)
     fmt.Println(string(bytes))
-    var returnedModel model.Model
-    err = json.Unmarshal(bytes, &returnedModel)
-    
-    jerr := err.(*json.UnmarshalTypeError)
-    fmt.Printf("Unexpected value: %s\n", (*jerr).Value)
-
-    // Expected type: uint
-    fmt.Printf("Unexpected type: %v\n", (*jerr).Type)
-    
+    var returnedContainer container.Container
+    err = json.Unmarshal(bytes, &returnedContainer)    
     assert.Nil(t, err)
-    assert.True(t, returnedModel.Equal(m))
+    assert.True(t, returnedContainer.Equal(m))
 }

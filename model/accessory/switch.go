@@ -14,7 +14,7 @@ func NewSwitch(info model.Info) *switcher {
     accessory := New(info)
     s := service.NewSwitch(info.Name, false) // off
     
-    accessory.AddService(s)
+    accessory.AddService(s.Service)
     
     return &switcher{accessory, s}
 }

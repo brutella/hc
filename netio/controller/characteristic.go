@@ -1,8 +1,8 @@
 package controller
 
 import(
-    "github.com/brutella/hap/model/model"
-    "github.com/brutella/hap/model/characteristic"
+    "github.com/brutella/hap/model"
+    "github.com/brutella/hap/model/container"
     "github.com/brutella/hap/netio/data"
     
     "fmt"
@@ -15,22 +15,22 @@ import(
 )
 
 type CharacteristicController struct {
-    model *model.Model
+    container *container.Container
 }
 
-func NewCharacteristicController(m *model.Model) *CharacteristicController {
-    return &CharacteristicController{model: m}
+func NewCharacteristicController(m *container.Container) *CharacteristicController {
+    return &CharacteristicController{container: m}
 }
 
 func (controller *CharacteristicController) HandleGetCharacteristics(form url.Values) (io.Reader, error) {    
     aid, cid, err := ParseAccessoryAndCharacterId(form.Get("id"))
-    modelChar := controller.GetCharacteristic(aid, cid)
-    if modelChar == nil {
+    containerChar := controller.GetCharacteristic(aid, cid)
+    if containerChar == nil {
         fmt.Printf("[WARNING] No characteristic found with aid %d and iid %d\n", aid, cid)
     }
     
     chars := data.NewCharacteristics()
-    char := data.Characteristic{AccessoryId: aid, Id: cid, Value: modelChar.GetValue()}
+    char := data.Characteristic{AccessoryId: aid, Id: cid, Value: containerChar.GetValue()}
     chars.AddCharacteristic(char)
     
     result, err := json.Marshal(chars)
@@ -56,19 +56,19 @@ func (controller *CharacteristicController) HandleUpdateCharacteristics(r io.Rea
     }
     
     for _, c := range chars.Characteristics {
-        modelChar := controller.GetCharacteristic(c.AccessoryId, c.Id)
-        if modelChar == nil {
+        containerChar := controller.GetCharacteristic(c.AccessoryId, c.Id)
+        if containerChar == nil {
             fmt.Printf("[WARNING] Could not find characteristic with aid %d and iid %d\n", c.AccessoryId, c.Id)
             continue
         }
-        modelChar.SetValueFromRemote(c.Value)
+        containerChar.SetValueFromRemote(c.Value)
     }
     
     return err
 }
 
-func (c *CharacteristicController) GetCharacteristic(accessoryId int, characteristicId int) *characteristic.Characteristic {
-    for _, a := range c.model.Accessories {
+func (c *CharacteristicController) GetCharacteristic(accessoryId int, characteristicId int) model.Characteristic {
+    for _, a := range c.container.Accessories {
         if a.GetId() == accessoryId {
             for _, s := range a.GetServices() {
                 for _, c :=  range s.GetCharacteristics() {

@@ -2,6 +2,7 @@ package controller
 
 import (
     "github.com/brutella/hap/model"
+    "github.com/brutella/hap/model/container"
     "github.com/brutella/hap/model/accessory"
     _"github.com/brutella/hap/model/service"
     "github.com/brutella/hap/netio/data"
@@ -26,7 +27,7 @@ func TestGetCharacteristic(t *testing.T) {
     
     a := accessory.New(info)
     
-    m := model.NewModel()
+    m := container.NewContainer()
     m.AddAccessory(a)
     
     aid := a.GetId()
@@ -58,7 +59,7 @@ func TestPutCharacteristic(t *testing.T) {
     }
     
     a := accessory.New(info)
-    m := model.NewModel()
+    m := container.NewContainer()
     m.AddAccessory(a)
     
     aid := a.GetId()

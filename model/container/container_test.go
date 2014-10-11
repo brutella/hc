@@ -1,4 +1,4 @@
-package model
+package container
 
 // import (
 //     "github.com/brutella/hap/model/accessory"

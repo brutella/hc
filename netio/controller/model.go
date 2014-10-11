@@ -1,22 +1,22 @@
 package controller
 
 import(
-    "github.com/brutella/hap/model/model"
+    "github.com/brutella/hap/model/container"
     "encoding/json"
     "bytes"
     "io"
 )
 
-type ModelController struct {
-    model *model.Model
+type ContainerController struct {
+    container *container.Container
 }
 
-func NewModelController(m *model.Model) *ModelController {
-    return &ModelController{model: m}
+func NewContainerController(m *container.Container) *ContainerController {
+    return &ContainerController{container: m}
 }
 
-func (c *ModelController) HandleGetAccessories(r io.Reader) (io.Reader, error) {
-    result, err := json.Marshal(c.model)
+func (c *ContainerController) HandleGetAccessories(r io.Reader) (io.Reader, error) {
+    result, err := json.Marshal(c.container)
     var b bytes.Buffer
     b.Write(result)
     

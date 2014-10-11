@@ -7,7 +7,7 @@ import(
 
 type Accessory struct {
     Id int                   `json:"aid"`
-    Services []model.Service `json:"services"`
+    Services []*service.Service `json:"services"`
     
     Info *service.AccessoryInfo `json:"-"`
     idCount int
@@ -21,7 +21,7 @@ func New(info model.Info) *Accessory {
         Info: i,
     }
     
-    a.AddService(i)
+    a.AddService(i.Service)
     
     return a
 }
@@ -34,8 +34,12 @@ func (a *Accessory) GetId()int {
     return a.Id
 }
 
-func (a *Accessory) GetServices()[]*service.Service {
-    return a.Services
+func (a *Accessory) GetServices()[]model.Service {
+    result := make([]model.Service, 0)
+    for _, s := range a.Services {
+        result = append(result, s)
+    }
+    return result
 }
 
 func (a *Accessory) Name() string {

@@ -18,8 +18,8 @@ func NewSwitch(name string, on bool) *Switch {
     
     service := NewService()
     service.Type = TypeSwitch
-    service.AddCharacteristic(on_char)
-    service.AddCharacteristic(name_char)
+    service.AddCharacteristic(on_char.Characteristic)
+    service.AddCharacteristic(name_char.Characteristic)
     
     s := Switch{service, on_char, name_char, nil}
     
