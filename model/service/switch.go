@@ -21,19 +21,5 @@ func NewSwitch(name string, on bool) *Switch {
     service.AddCharacteristic(on_char.Characteristic)
     service.AddCharacteristic(name_char.Characteristic)
     
-    s := Switch{service, on_char, name_char, nil}
-    
-    on_char.AddRemoteChangeDelegate(&s)
-    
-    return &s
-}
-
-func (s *Switch) OnStateChanged(fn func(bool)){
-    s.fn = fn
-}
-
-func (s *Switch) CharactericDidChangeValue(c *characteristic.Characteristic, change characteristic.CharacteristicChange) {
-    if s.fn != nil {
-        s.fn(s.On.On())
-    }
+    return &Switch{service, on_char, name_char, nil}
 }

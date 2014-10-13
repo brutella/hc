@@ -5,4 +5,5 @@ type Switch interface {
     
     SetOn(on bool)
     IsOn() bool
+    OnStateChanged(func(bool))
 }

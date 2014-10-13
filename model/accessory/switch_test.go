@@ -22,8 +22,6 @@ func TestSwitch(t *testing.T) {
     assert.Equal(t, s.Manufacturer(), "Google")
     assert.Equal(t, s.Model(), "Switchy")
     assert.False(t, s.IsOn())
-    
     s.SetOn(true)
-    
     assert.True(t, s.IsOn())
 }
