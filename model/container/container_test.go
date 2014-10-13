@@ -11,7 +11,7 @@ import (
 func TestModel(t *testing.T) {
     info := model.Info{
         Name: "Accessory1",
-        Serial: "001",
+        SerialNumber: "001",
         Manufacturer: "Google",
         Model: "Accessory",
     }

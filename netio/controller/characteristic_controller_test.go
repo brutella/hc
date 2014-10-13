@@ -20,7 +20,7 @@ import (
 func TestGetCharacteristic(t *testing.T) {
     info := model.Info{
         Name: "My Bridge",
-        Serial: "001",
+        SerialNumber: "001",
         Manufacturer: "Google",
         Model: "Bridge",
     }
@@ -53,7 +53,7 @@ func TestGetCharacteristic(t *testing.T) {
 func TestPutCharacteristic(t *testing.T) {
     info := model.Info{
         Name: "My Bridge",
-        Serial: "001",
+        SerialNumber: "001",
         Manufacturer: "Google",
         Model: "Bridge",
     }

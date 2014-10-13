@@ -60,7 +60,7 @@ func NewApp(conf Config) (*App, error) {
     
     info := model.Info{
         Name: bridge_config.Name,
-        Serial: bridge_config.SerialNumber,
+        SerialNumber: bridge_config.SerialNumber,
         Manufacturer: bridge_config.Manufacturer,
         Model: "Bridge",
     }

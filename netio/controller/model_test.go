@@ -17,7 +17,7 @@ import (
 func TestGetAccessories(t *testing.T) {
     info := model.Info{
             Name: "My Accessory",
-            Serial: "001",
+            SerialNumber: "001",
             Manufacturer: "Google",
             Model: "Accessory",
         }

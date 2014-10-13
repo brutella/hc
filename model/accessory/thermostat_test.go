@@ -10,7 +10,7 @@ import (
 func TestThermostat(t *testing.T) {
     info := model.Info{
         Name: "My Thermostat",
-        Serial: "001",
+        SerialNumber: "001",
         Manufacturer: "Google",
         Model: "Thermostaty",
     }

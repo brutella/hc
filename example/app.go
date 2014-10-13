@@ -25,7 +25,7 @@ func main() {
     
     info := model.Info{
         Name: "My Switch",
-        Serial: "001",
+        SerialNumber: "001",
         Manufacturer: "Google",
         Model: "Switchy",
     }

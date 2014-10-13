@@ -16,7 +16,7 @@ type AccessoryInfo struct {
 }
 
 func NewInfo(info model.Info) *AccessoryInfo {
-    return NewAccessoryInfo(info.Name, info.Serial, info.Manufacturer, info.Model)
+    return NewAccessoryInfo(info.Name, info.SerialNumber, info.Manufacturer, info.Model)
 }
     
 func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName string) *AccessoryInfo {
