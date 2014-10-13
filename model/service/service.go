@@ -5,9 +5,10 @@ import(
     "github.com/brutella/hap/model/characteristic"
 )
 
+// This class represents accessory services and constis of characteristics
 type Service struct {
-    Id int                            `json:"iid"`
-    Type ServiceType                  `json:"type"`
+    Id int              `json:"iid"`
+    Type ServiceType    `json:"type"`
     Characteristics []*characteristic.Characteristic `json:"characteristics"`
 }
 

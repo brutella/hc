@@ -5,8 +5,13 @@ import(
     "github.com/brutella/hap/model/service"
 )
 
+// This clas holds the main data structure to communicate with HomeKit
+//
+// An accessory in general consists of services, which consists of characteristics.
+// Every accessory has the "accessory info" service by default which consists 
+// of characteristics to identify the accessory: name, model, manufacturer,...
 type Accessory struct {
-    Id int                   `json:"aid"`
+    Id int                      `json:"aid"`
     Services []*service.Service `json:"services"`
     
     Info *service.AccessoryInfo `json:"-"`
@@ -63,7 +68,7 @@ func (a *Accessory) AddService(s *service.Service) {
     s.SetId(a.idCount)
     a.idCount += 1
     
-    for _, c := range s.GetCharacteristics() {
+    for _, c := range s.Characteristics {
         c.SetId(a.idCount)
         a.idCount += 1
     }

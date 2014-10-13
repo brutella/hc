@@ -4,9 +4,6 @@ import(
     "github.com/brutella/hap/model/accessory"
 )
 
-import(
-)
-
 type Container struct {
     Accessories []*accessory.Accessory `json:"accessories"`
     
@@ -19,7 +16,7 @@ func NewContainer() *Container {
         idCount: 1,
     }
 }
-
+    
 func (m *Container) AddAccessory(a *accessory.Accessory) {
     a.SetId(m.idCount)
     m.idCount += 1

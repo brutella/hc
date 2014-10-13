@@ -20,14 +20,6 @@ func NewThermostat(info model.Info, temp, min, max, steps float64) *thermostat{
     return &thermostat{accessory, t}
 }
 
-/*
-    Name        *characteristic.Name
-    Unit        *characteristic.TemperatureUnit
-    Temp        *characteristic.TemperatureCharacteristic
-    TargetTemp  *characteristic.TemperatureCharacteristic
-    Mode        *characteristic.HeatingCoolingMode
-    TargetMode  *characteristic.HeatingCoolingMode
-*/
 func (t *thermostat) Temperature() float64 {
     return t.thermostat.Temp.Temperature()
 }

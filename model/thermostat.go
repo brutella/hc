@@ -9,17 +9,14 @@ const (
     ModeCooling = HeatCoolMode(0x02)
 )
 
+// A thermostat measures temperature and changes the 
+// mode (heating or cooling) to reach certain target temperature
 type Thermostat interface {
     Thermometer
     
+    SetTargetTemperature(float64)
+    TargetTemperature() float64
     Mode() HeatCoolMode
     SetTargetMode(HeatCoolMode)
     TargetMode() HeatCoolMode
-}
-
-type Hygrometer interface {
-    Humidity() float64
-    
-    SetTargetHumidity(float64)
-    TargetHumidity() float64
 }

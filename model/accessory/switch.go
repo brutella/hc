@@ -37,6 +37,7 @@ func (s *switcher) OnStateChanged(fn func(bool)){
     s.onChanged = fn
 }
 
+// CharacteristicDelegate
 func (s *switcher) CharactericDidChangeValue(c *characteristic.Characteristic, change characteristic.CharacteristicChange) {
     if s.onChanged != nil {
         s.onChanged(s.switcher.On.On())
