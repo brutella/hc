@@ -12,10 +12,10 @@ func NewModel(model string) *Model {
     return &Model{str}
 }
 
-func (c *Model) SetModel(model string) {
-    c.SetString(model)
+func (m *Model) SetModel(model string) {
+    m.SetString(model)
 }
 
-func (c *Model) Model() string {
-    return c.StringValue()
+func (m *Model) Model() string {
+    return m.StringValue()
 }

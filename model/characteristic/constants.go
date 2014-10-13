@@ -1,5 +1,9 @@
 package characteristic
 
+import(
+    "github.com/brutella/hap/model"
+)
+
 const (
     
     // Encoded in HomeKit Accessory Simulator.app as bits
@@ -36,25 +40,30 @@ func PermsWriteOnly() []string {
 }
 
 const (
-    UnitCelsius     = "celsius"
-    UnitCelsiusByte = 0x00
-    UnitPercent     = "percent"
-    UnitPercentByte = 0x01 // TODO not sure
-    UnitArcDegrees  = "arcdegrees"
-    UnitArcDegreesByte = 0x02 // TODO not sure
+    TempUnitCelsiusByte = 0x00
+    
+    // UnitPercent     = "percent"
+    // UnitPercentByte = 0x01 // TODO not sure
+    // UnitArcDegrees  = "arcdegrees"
+    // UnitArcDegreesByte = 0x02 // TODO not sure
 )
 
-func ByteFromUnit(unit string) byte {
+func ByteFromUnit(unit model.TempUnit) byte {
     switch unit {
-    case UnitCelsius:
-        return UnitCelsiusByte
-    case UnitPercent:
-        return UnitPercentByte
-    case UnitArcDegrees:
-        return UnitArcDegreesByte
+    case model.TempUnitCelsius:
+        return TempUnitCelsiusByte
     }
     
     return 0x00
+}
+
+func TempUnitFromByte(b byte) model.TempUnit {
+    switch b {
+    case TempUnitCelsiusByte:
+        return model.TempUnitCelsius
+    }
+    
+    return "Unknown"
 }
 
 const (

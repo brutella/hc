@@ -1,30 +1,30 @@
-package model
+package container
 
 import(
     "github.com/brutella/hap/model/accessory"
 )
 
-type Model struct {
+type Container struct {
     Accessories []*accessory.Accessory `json:"accessories"`
     
     idCount int
 }
 
-func NewModel() *Model {
-    return &Model{
+func NewContainer() *Container {
+    return &Container{
         Accessories: make([]*accessory.Accessory, 0),
         idCount: 1,
     }
 }
-
-func (m *Model) AddAccessory(a *accessory.Accessory) {
-    a.Id = m.idCount
+    
+func (m *Container) AddAccessory(a *accessory.Accessory) {
+    a.SetId(m.idCount)
     m.idCount += 1
     m.Accessories = append(m.Accessories, a)
 }
 
 // TODO write tests
-func (m *Model) RemoveAccessory(a *accessory.Accessory) {
+func (m *Container) RemoveAccessory(a *accessory.Accessory) {
     for i, accessory := range m.Accessories {
         if accessory == a {
             m.Accessories = append(m.Accessories[:i], m.Accessories[i+1:]...)
@@ -32,14 +32,14 @@ func (m *Model) RemoveAccessory(a *accessory.Accessory) {
     }
 }
 
-func (m *Model) Equal(other interface{}) bool {
-    if model, ok := other.(*Model); ok == true {
-        if len(m.Accessories) != len(model.Accessories) {
+func (m *Container) Equal(other interface{}) bool {
+    if container, ok := other.(*Container); ok == true {
+        if len(m.Accessories) != len(container.Accessories) {
             return false
         }
         
         for i, a := range m.Accessories {
-            if a.Equal(model.Accessories[i]) == false {
+            if a.Equal(container.Accessories[i]) == false {
                 return false
             }
         }

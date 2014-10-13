@@ -7,8 +7,8 @@ import (
     "github.com/brutella/hap/db"
     "github.com/brutella/hap/common"
     "github.com/brutella/hap/model"
+    "github.com/brutella/hap/model/container"
     "github.com/brutella/hap/model/accessory"
-    "github.com/brutella/hap/model/service"
     "github.com/brutella/hap/server"
     "github.com/brutella/hap/netio"
 )
@@ -35,7 +35,7 @@ type App struct {
     Storage common.Storage
     
     bridge  *netio.Bridge
-    model   *model.Model
+    container   *container.Container
     exitFunc AppExitFunc
 }
 
@@ -58,30 +58,35 @@ func NewApp(conf Config) (*App, error) {
     }
     context     := netio.NewContextForBridge(bridge)
     
-    bridge_info := service.NewAccessoryInfo(bridge_config.Name, bridge_config.SerialNumber, bridge_config.Manufacturer, "Bridge")
-    bridge_accessory := accessory.NewAccessory()
-    bridge_accessory.AddService(bridge_info.Service)
+    info := model.Info{
+        Name: bridge_config.Name,
+        Serial: bridge_config.SerialNumber,
+        Manufacturer: bridge_config.Manufacturer,
+        Model: "Bridge",
+    }
     
-    m := model.NewModel()
-    m.AddAccessory(bridge_accessory)
+    bridge_accessory := accessory.New(info)
+    
+    cont := container.NewContainer()
+    cont.AddAccessory(bridge_accessory)
     
     app := App{
         context: context,
         bridge: bridge,
         Storage: storage,
         Database: database,
-        model: m,
+        container: cont,
     }
     
     return &app, nil
 }
 
 func (app *App) AddAccessory(a *accessory.Accessory) {
-    app.model.AddAccessory(a)
+    app.container.AddAccessory(a)
 }
 
 func (app *App) Run() {
-    s := server.NewServer(app.context, app.Database, app.model, app.bridge)
+    s := server.NewServer(app.context, app.Database, app.container, app.bridge)
     
     s.OnExit(func() {
         if app.exitFunc != nil {

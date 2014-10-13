@@ -2,8 +2,9 @@ package controller
 
 import (
     "github.com/brutella/hap/model"
+    "github.com/brutella/hap/model/container"
     "github.com/brutella/hap/model/accessory"
-    "github.com/brutella/hap/model/service"
+    _"github.com/brutella/hap/model/service"
     "github.com/brutella/hap/netio/data"
     
     "testing"
@@ -17,14 +18,20 @@ import (
 )
 
 func TestGetCharacteristic(t *testing.T) {
-    info_service := service.NewAccessoryInfo( "My Bridge", "123-456-789", "Rev1", "Matthias H.")
-    a := accessory.NewAccessory()
-    a.AddService(info_service.Service)
-    m := model.NewModel()
+    info := model.Info{
+        Name: "My Bridge",
+        Serial: "001",
+        Manufacturer: "Google",
+        Model: "Bridge",
+    }
+    
+    a := accessory.New(info)
+    
+    m := container.NewContainer()
     m.AddAccessory(a)
     
-    aid := a.Id
-    cid := info_service.Name.Id
+    aid := a.GetId()
+    cid := a.Info.Name.GetId()
     values := url.Values{}
     
     values.Set("id", fmt.Sprintf("%d.%d", aid, cid))
@@ -44,14 +51,19 @@ func TestGetCharacteristic(t *testing.T) {
 }
 
 func TestPutCharacteristic(t *testing.T) {
-    info_service := service.NewAccessoryInfo( "My Bridge", "123-456-789", "Rev1", "Matthias H.")
-    a := accessory.NewAccessory()
-    a.AddService(info_service.Service)
-    m := model.NewModel()
+    info := model.Info{
+        Name: "My Bridge",
+        Serial: "001",
+        Manufacturer: "Google",
+        Model: "Bridge",
+    }
+    
+    a := accessory.New(info)
+    m := container.NewContainer()
     m.AddAccessory(a)
     
-    aid := a.Id
-    cid := info_service.Name.Id
+    aid := a.GetId()
+    cid := a.Info.Name.GetId()
     char := data.Characteristic{AccessoryId:aid, Id:cid, Value:"My"}
     slice := make([]data.Characteristic, 0)
     slice = append(slice, char)
@@ -65,5 +77,5 @@ func TestPutCharacteristic(t *testing.T) {
     controller := NewCharacteristicController(m)
     err = controller.HandleUpdateCharacteristics(&buffer)
     assert.Nil(t, err)
-    assert.Equal(t, info_service.Name.Value, "My")
+    assert.Equal(t, a.Info.Name.Value, "My")
 }

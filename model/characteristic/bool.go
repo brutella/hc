@@ -5,7 +5,7 @@ type Bool struct {
 }
 
 func NewBool(value bool) *Bool {
-    number := NewNumber(value, nil, nil, nil, FormatBool, )
+    number := NewNumber(value, nil, nil, nil, FormatBool)
     return &Bool{number}
 }
 

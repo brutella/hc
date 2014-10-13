@@ -100,6 +100,19 @@ func (c *Characteristic) Equal(other interface{}) bool {
     return false
 }
 
+// model.Characteristic
+func (c *Characteristic) SetId(id int) {
+    c.Id = id
+}
+
+func (c *Characteristic) GetId() int {
+    return c.Id
+}
+
+func (c *Characteristic) GetValue() interface{} {
+    return c.Value
+}
+
 // Private
 
 func (c *Characteristic) setValue(value interface{}, remote bool) {    

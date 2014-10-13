@@ -5,42 +5,42 @@ type Number struct {
 }
 
 func NewNumber(value, min, max, step interface{}, format string) *Number {    
-    c := Number{NewCharacteristic(value, format, CharTypeUnknown, nil)}
-    c.MinValue = min
-    c.MaxValue = max
-    c.MinStep = step
+    n := Number{NewCharacteristic(value, format, CharTypeUnknown, nil)}
+    n.MinValue = min
+    n.MaxValue = max
+    n.MinStep = step
     
-    return &c
+    return &n
 }
 
-func (c *Number) SetValue(value interface{}) {
-    c.Value = value
+func (n *Number) SetValue(value interface{}) {
+    n.Value = value
 }
 
-func (c *Number) SetMinValue(value interface{}) {
-    c.MinValue = value
+func (n *Number) SetMinValue(value interface{}) {
+    n.MinValue = value
 }
 
-func (c *Number) SetMaxValue(value interface{}) {
-    c.MaxValue = value
+func (n *Number) SetMaxValue(value interface{}) {
+    n.MaxValue = value
 }
 
-func (c *Number) SetMinStepValue(value interface{}) {
-    c.MinStep = value
+func (n *Number) SetMinStepValue(value interface{}) {
+    n.MinStep = value
 }
 
-func (c *Number) GetValue() interface{} {
-    return c.Value
+func (n *Number) GetValue() interface{} {
+    return n.Value
 }
 
-func (c *Number) GetMinValue() interface{} {
-    return c.MinValue
+func (n *Number) GetMinValue() interface{} {
+    return n.MinValue
 }
 
-func (c *Number) GetMaxValue() interface{} {
-    return c.MaxValue
+func (n *Number) GetMaxValue() interface{} {
+    return n.MaxValue
 }
 
-func (c *Number) GetMinStepValue() interface{} {
-    return c.MinStep
+func (n *Number) GetMinStepValue() interface{} {
+    return n.MinStep
 }

@@ -1,19 +1,24 @@
 package accessory
 
 import (
-    "github.com/brutella/hap/model/service"
+    "github.com/brutella/hap/model"
     
 	"testing"
     "github.com/stretchr/testify/assert"
-    "encoding/json"
 )
 
-func TestAccessory(t *testing.T) {
-    // serialNumber, modelName, manufacturerName, accessoryName string
-    info_service := service.NewAccessoryInfo("123-456-789", "Rev1", "Matthias H.", "My Bridge")
-    accessory := NewAccessory()
-    accessory.AddService(info_service.Service)
+func TestAccessory(t *testing.T) {    
+    info := model.Info{
+        Name: "My Accessory",
+        Serial: "001",
+        Manufacturer: "Google",
+        Model: "Accessory",
+    }
     
-    result, _ := json.Marshal(accessory)
-    assert.NotNil(t, result)
+    var a model.Accessory = New(info)
+    
+    assert.Equal(t, a.Name(), "My Accessory")
+    assert.Equal(t, a.SerialNumber(), "001")
+    assert.Equal(t, a.Manufacturer(), "Google")
+    assert.Equal(t, a.Model(), "Accessory")
 }

@@ -6,11 +6,11 @@ type TemperatureCharacteristic struct {
 }
 
 func NewTemperatureTemperatureCharacteristic(value, min, max, steps float64, unit string, charType CharType, permissions []string) *TemperatureCharacteristic {
-    c := TemperatureCharacteristic{NewFloatMinMaxSteps(value, min, max, steps), value}
-    c.Unit = unit
-    c.Type = charType
-    c.Permissions = permissions
-    return &c
+    t := TemperatureCharacteristic{NewFloatMinMaxSteps(value, min, max, steps), value}
+    t.Unit = unit
+    t.Type = charType
+    t.Permissions = permissions
+    return &t
 }
 
 
@@ -22,22 +22,22 @@ func NewTargetTemperatureCharacteristic(value, min, max, steps float64, unit str
     return NewTemperatureTemperatureCharacteristic(value, min, max, steps, unit, CharTypeTemperatureTarget, PermsAll())
 }
 
-func (c *TemperatureCharacteristic) SetTemperature(value float64) {
-    c.SetFloat(value)
+func (t *TemperatureCharacteristic) SetTemperature(value float64) {
+    t.SetFloat(value)
 }
 
-func (c *TemperatureCharacteristic) Temperature() float64 {
-    return c.FloatValue()
+func (t *TemperatureCharacteristic) Temperature() float64 {
+    return t.FloatValue()
 }
 
-func (c *TemperatureCharacteristic) MinTemperature() float64 {
-    return c.Min()
+func (t *TemperatureCharacteristic) MinTemperature() float64 {
+    return t.Min()
 }
 
-func (c *TemperatureCharacteristic) MaxTemperature() float64 {
-    return c.Max()
+func (t *TemperatureCharacteristic) MaxTemperature() float64 {
+    return t.Max()
 }
 
-func (c *TemperatureCharacteristic) MinStepTemperature() float64 {
-    return c.MinStep()
+func (t *TemperatureCharacteristic) MinStepTemperature() float64 {
+    return t.MinStep()
 }

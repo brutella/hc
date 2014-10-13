@@ -12,10 +12,10 @@ func NewSerialNumber(serial string) *SerialNumber {
     return &SerialNumber{str}
 }
 
-func (c *SerialNumber) SetSerialNumber(serialNumber string) {
-    c.SetString(serialNumber)
+func (s *SerialNumber) SetSerialNumber(serialNumber string) {
+    s.SetString(serialNumber)
 }
 
-func (c *SerialNumber) SerialNumber() string {
-    return c.StringValue()
+func (s SerialNumber) SerialNumber() string {
+    return s.StringValue()
 }
