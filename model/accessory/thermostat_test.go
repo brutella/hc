@@ -26,7 +26,9 @@ func TestThermostat(t *testing.T) {
     assert.Equal(t, thermo.TargetMode(), model.ModeOff)
     assert.Equal(t, thermo.Mode(), model.ModeOff)
     
+    thermo.SetTemperature(11)
     thermo.SetTargetTemperature(12)
     
+    assert.Equal(t, thermo.Temperature(), 11)
     assert.Equal(t, thermo.TargetTemperature(), 12)
 }
