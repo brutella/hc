@@ -2,6 +2,7 @@ package characteristic
 
 import(
     "fmt"
+    "reflect"
 )
 
 type CharacteristicChange struct {
@@ -59,6 +60,7 @@ func (c *Characteristic) SetValue(value interface{}) {
 }
 
 func (c *Characteristic) SetValueFromRemote(value interface{}) {
+    // Make sure that the new value is of same type the old value
     c.setValue(value, true)
 }
 
@@ -124,7 +126,8 @@ func (c *Characteristic) GetValue() interface{} {
 
 // Private
 
-func (c *Characteristic) setValue(value interface{}, remote bool) {    
+func (c *Characteristic) setValue(value interface{}, remote bool) {
+    value = ConvertValue(value, reflect.TypeOf(c.Value))
     old := c.Value
     c.Value = value
 

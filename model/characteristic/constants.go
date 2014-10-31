@@ -42,9 +42,9 @@ func PermsWriteOnly() []string {
 const (
     TempUnitCelsiusByte = 0x00
     
-    // UnitPercent     = "percent"
+    UnitPercentage  = "percentage"
     // UnitPercentByte = 0x01 // TODO not sure
-    // UnitArcDegrees  = "arcdegrees"
+    UnitArcDegrees  = "arcdegrees"
     // UnitArcDegreesByte = 0x02 // TODO not sure
 )
 
