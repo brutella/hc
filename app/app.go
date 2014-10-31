@@ -85,6 +85,10 @@ func (app *App) AddAccessory(a *accessory.Accessory) {
     app.container.AddAccessory(a)
 }
 
+func (app *App) RemoveAccessory(a *accessory.Accessory) {
+    app.container.RemoveAccessory(a)
+}
+
 func (app *App) Run() {
     s := server.NewServer(app.context, app.Database, app.container, app.bridge)
     

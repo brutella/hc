@@ -55,13 +55,20 @@ func (controller *CharacteristicController) HandleUpdateCharacteristics(r io.Rea
         return err
     }
     
+    fmt.Println(string(b))
+    
     for _, c := range chars.Characteristics {
         containerChar := controller.GetCharacteristic(c.AccessoryId, c.Id)
         if containerChar == nil {
             fmt.Printf("[WARNING] Could not find characteristic with aid %d and iid %d\n", c.AccessoryId, c.Id)
             continue
         }
-        containerChar.SetValueFromRemote(c.Value)
+        
+        if c.Value != nil {
+            containerChar.SetValueFromRemote(c.Value)
+        }
+        
+        containerChar.EnableEvents(c.Events)
     }
     
     return err

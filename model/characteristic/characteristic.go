@@ -62,6 +62,11 @@ func (c *Characteristic) SetValueFromRemote(value interface{}) {
     c.setValue(value, true)
 }
 
+// TODO implement notifications
+func (c *Characteristic) EnableEvents(enable bool) {
+    c.Events = enable
+}
+
 func (c *Characteristic) RemoveDelegate(delegate CharacteristicDelegate) {
     for i, d := range c.localDelegates {
         if d == delegate {
