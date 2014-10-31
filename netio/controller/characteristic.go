@@ -30,7 +30,7 @@ func (controller *CharacteristicController) HandleGetCharacteristics(form url.Va
     }
     
     chars := data.NewCharacteristics()
-    char := data.Characteristic{AccessoryId: aid, Id: cid, Value: containerChar.GetValue()}
+    char := data.Characteristic{AccessoryId: aid, Id: cid, Value: containerChar.GetValue(), Events: containerChar.NotificationsEnabled()}
     chars.AddCharacteristic(char)
     
     result, err := json.Marshal(chars)
@@ -68,7 +68,10 @@ func (controller *CharacteristicController) HandleUpdateCharacteristics(r io.Rea
             containerChar.SetValueFromRemote(c.Value)
         }
         
-        containerChar.EnableEvents(c.Events)
+        if events, ok := c.Events.(bool); ok == true {
+            fmt.Println("Events", events)
+            containerChar.EnableEvents(events)
+        }
     }
     
     return err

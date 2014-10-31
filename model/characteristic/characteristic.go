@@ -67,6 +67,10 @@ func (c *Characteristic) EnableEvents(enable bool) {
     c.Events = enable
 }
 
+func (c *Characteristic) NotificationsEnabled() bool {
+    return c.Events
+}
+
 func (c *Characteristic) RemoveDelegate(delegate CharacteristicDelegate) {
     for i, d := range c.localDelegates {
         if d == delegate {
