@@ -4,21 +4,21 @@ package model
 type Accessory interface {
     Compareable
     
-    // Returns the accessories id
+    // Returns the accessory id
     GetId()int
     
     // Returns the services which represent the accessory 
     GetServices()[]Service
     
-    // Returns the name of the accessory
+    // Returns the name
     Name() string
     
-    // Returns the serial number of the accessory
+    // Returns the serial number
     SerialNumber() string
     
-    // Returns the manufacturer name of the accessory
+    // Returns the manufacturer name
     Manufacturer() string
     
-    // Returns the model description of the accessory
+    // Returns the model description
     Model() string
 }

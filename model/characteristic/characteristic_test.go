@@ -16,6 +16,20 @@ func (d *delegate) CharactericDidChangeValue(c *Characteristic, change Character
     d.newValue = change.NewValue
 }
 
+func TestCharacteristicSetValuesOfWrongType(t *testing.T) {
+    var value int = 5
+    c := NewCharacteristic(value, FormatInt, CharTypeOn, nil)
+    
+    c.SetValue(float64(20.5))
+    assert.Equal(t, c.Value, 20)
+    
+    c.SetValue("91")
+    assert.Equal(t, c.Value, 91)
+    
+    c.SetValue(true)
+    assert.Equal(t, c.Value, 1)
+}
+
 func TestCharacteristicLocalDelegate(t *testing.T) {
     c := NewCharacteristic(5, FormatInt, CharTypeOn, nil)
     

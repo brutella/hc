@@ -3,6 +3,7 @@ package characteristic
 import(
     "fmt"
     "reflect"
+    "github.com/gosexy/to"
 )
 
 type CharacteristicChange struct {
@@ -65,11 +66,11 @@ func (c *Characteristic) SetValueFromRemote(value interface{}) {
 }
 
 // TODO implement notifications
-func (c *Characteristic) EnableEvents(enable bool) {
+func (c *Characteristic) SetEventsEnabled(enable bool) {
     c.Events = enable
 }
 
-func (c *Characteristic) NotificationsEnabled() bool {
+func (c *Characteristic) EventsEnabled() bool {
     return c.Events
 }
 
@@ -126,8 +127,15 @@ func (c *Characteristic) GetValue() interface{} {
 
 // Private
 
+// Sets the value of the characteristic
+// The implementation makes sure that the type of the value stays the same
+// E.g. Type of characteristic value int, calling setValue("10.5") sets the value to int(10)
 func (c *Characteristic) setValue(value interface{}, remote bool) {
-    value = ConvertValue(value, reflect.TypeOf(c.Value))
+    converted, err := to.Convert(value, reflect.TypeOf(c.Value).Kind())
+    if err == nil {
+        value = converted
+    }
+    
     old := c.Value
     c.Value = value
 

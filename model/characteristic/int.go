@@ -9,7 +9,7 @@ func NewInt(value, min, max, steps int) *Int {
     return &Int{number}
 }
 
-func (i *Int) SetFloat(value int) {
+func (i *Int) SetInt(value int) {
     i.SetValue(value)
 }
 

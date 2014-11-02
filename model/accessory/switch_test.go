@@ -25,3 +25,23 @@ func TestSwitch(t *testing.T) {
     s.SetOn(true)
     assert.True(t, s.IsOn())
 }
+
+func TestSwitchOnChanged(t *testing.T) {
+    info := model.Info{
+        Name: "My Switch",
+        SerialNumber: "001",
+        Manufacturer: "Google",
+        Model: "Switchy",
+    }
+    
+    s := NewSwitch(info)
+    
+    var newValue = false
+    s.OnStateChanged(func(value bool) {
+        newValue = value
+    })
+    
+    s.switcher.On.SetValueFromRemote(true)
+    assert.True(t, s.IsOn())
+    assert.True(t, newValue)
+}

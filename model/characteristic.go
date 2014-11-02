@@ -6,16 +6,17 @@ type Characteristic interface {
     // Returns the characteristic id
     GetId()int
     
-    // Returns the value of the characteristic
+    // Returns the raw value
     GetValue() interface{}
     
-    NotificationsEnabled() bool
-    
     // Sets the value
-    // Only call this method when a client (e.g. iOS device) invokes
-    // a value change. Otherwise use the accessory setter methods ( e.g. `switch.SetOn(true)`)
+    // Only call this method when a client (e.g. iOS device) changes the value
+    // Otherwise use the provided setter methods ( e.g. `switch.SetOn(true)`)
     SetValueFromRemote(interface{})
     
-    // Enables or disables events for this characteristic
-    EnableEvents(enable bool)
+    // Enables/Disables events for this characteristic
+    SetEventsEnabled(enable bool)
+    
+    // Returns true when events of this characteristic are enabled, otherwise false
+    EventsEnabled() bool
 }

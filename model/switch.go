@@ -3,13 +3,12 @@ package model
 type Switch interface {
     Accessory
     
-    // Changes the switche state to *on* or *off*
+    // Sets the switch state
     SetOn(on bool)
     
-    // Returns `true` when the switch is set to *on*, otherwise `false`
+    // Returns the switch on state
     IsOn() bool
     
-    // Adds a function which is called when a client changed the on state
-    // The function is not invoked when calling `SetOn`.
+    // Sets the on state changed callback
     OnStateChanged(func(bool))
 }
