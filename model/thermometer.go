@@ -6,8 +6,7 @@ const(
 )
 
 // A thermometer is an acessory which measures temperature
-//
-// TODO support different units (e.g Fahrenheit)
+// HomeKit
 type Thermometer interface {
     Accessory
     

@@ -11,6 +11,15 @@ type thermostat struct {
     thermostat *service.Thermostat
 }
 
+func NewThermometer(info model.Info, temp float64) *thermostat{
+    accessory := New(info)
+    t := service.NewThermometer(info.Name, temp)
+    
+    accessory.AddService(t.Service)
+    
+    return &thermostat{accessory, t}
+}
+
 func NewThermostat(info model.Info, temp, min, max, steps float64) *thermostat{
     accessory := New(info)
     t := service.NewThermostat(info.Name, temp, min, max, steps)
@@ -38,6 +47,10 @@ func (t *thermostat) SetTargetTemperature(value float64) {
 
 func (t *thermostat) TargetTemperature() float64 {
     return t.thermostat.TargetTemp.Temperature()
+}
+
+func (t *thermostat) SetMode(value model.HeatCoolMode) {
+    t.thermostat.Mode.SetHeatingCoolingMode(value)
 }
 
 func (t *thermostat) Mode() model.HeatCoolMode {
