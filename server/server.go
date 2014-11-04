@@ -14,23 +14,20 @@ import(
     "os"
     "os/signal"
 )
-
-func RandomPort() int {
-    return 1234
-}
-
 type Server interface {
     ListenAndServe() error
+    Port() string
+    Stop()
 }
 
 type ServerExitFunc func()
 type hkServer struct {
+    port string
     container *container.Container
     context netio.HAPContext
     database db.Database
     bridge *netio.Bridge
     mux *http.ServeMux
-    port string
     exitFunc ServerExitFunc
 }
 
@@ -48,18 +45,18 @@ func NewServer(hap_ctx netio.HAPContext, d db.Database, c *container.Container, 
     return &s
 }
 
-func (s *hkServer) OnExit(fn ServerExitFunc) {
+func (s *hkServer) OnStop(fn ServerExitFunc) {
     s.exitFunc = fn
 }
 
 func (s *hkServer) ListenAndServe() error {
-    s.teardownOnExit()
+    s.teardownOnStop()
     
     
     return s.listenAndServe(s.addrString(), s.mux, s.context)
 }
 
-func (s *hkServer) Exit() {
+func (s *hkServer) Stop() {
     for _, c := range s.context.ActiveConnection() {
         c.Close()
     }
@@ -69,6 +66,10 @@ func (s *hkServer) Exit() {
     }
 }
 
+func (s *hkServer) Port() string {
+    return s.port
+}
+
 func (s *hkServer) dnssdCommand() string {
     hostname, _ := os.Hostname()
     return fmt.Sprintf("dns-sd -P %s _hap local %s %s 192.168.0.14 pv=1.0 id=%s c#=1 s#=1 sf=1 ff=0 md=%s\n", s.bridge.Name(), s.port,  hostname, s.bridge.Id(), s.bridge.Name())
@@ -76,7 +77,7 @@ func (s *hkServer) dnssdCommand() string {
 
 func (s *hkServer) listenAndServe(addr string, handler http.Handler, context netio.HAPContext) error {
     server := http.Server{Addr: addr, Handler:handler}
-    // os gives us a free port when port is "" 
+    // os gives us a free Port when Port is "" 
     ln, err := net.Listen("tcp", "")
     if err != nil {
         return err
@@ -91,7 +92,7 @@ func (s *hkServer) listenAndServe(addr string, handler http.Handler, context net
     return server.Serve(listener)
 }
 
-func (s *hkServer) teardownOnExit() {
+func (s *hkServer) teardownOnStop() {
     c := make(chan os.Signal)
     signal.Notify(c, os.Interrupt)
     signal.Notify(c, os.Kill)
@@ -99,7 +100,7 @@ func (s *hkServer) teardownOnExit() {
     go func() {
         select {
         case <- c:
-            s.Exit()
+            s.Stop()
             os.Exit(1)
         }
 	}()

@@ -3,6 +3,7 @@ package app
 import (
     "log"
     "errors"
+    "time"
     
     "github.com/brutella/hap/db"
     "github.com/brutella/hap/common"
@@ -11,6 +12,7 @@ import (
     "github.com/brutella/hap/model/accessory"
     "github.com/brutella/hap/server"
     "github.com/brutella/hap/netio"
+    "github.com/gosexy/to"
 )
 
 type Config struct {
@@ -23,7 +25,7 @@ type Config struct {
 func NewConfig() Config {
     return Config{
         BridgeName: "GoBridge",
-        BridgePassword: "00102003",
+        BridgePassword: "001-02-003",
         BridgeManufacturer: "brutella",
     }
 }
@@ -37,6 +39,7 @@ type App struct {
     bridge  *netio.Bridge
     container   *container.Container
     exitFunc AppExitFunc
+    mdns *Service
 }
 
 func NewApp(conf Config) (*App, error) {
@@ -91,16 +94,38 @@ func (app *App) RemoveAccessory(a *accessory.Accessory) {
 
 func (app *App) Run() {
     s := server.NewServer(app.context, app.Database, app.container, app.bridge)
-    
-    s.OnExit(func() {
+    s.OnStop(func() {
+        // Stop mDNS
+        if app.mdns != nil {
+            app.mdns.Stop()
+        }
+        
         if app.exitFunc != nil {
             app.exitFunc()
         }
     })
+    
+    go func() {
+        time.Sleep(1 * time.Second)
+        app.PublishServer(s)
+    }()
+    
     err := s.ListenAndServe()
     log.Fatal(err)
 }
 
 func (app *App) OnExit(fn AppExitFunc) {
     app.exitFunc = fn
+}
+
+func (app *App) PublishServer(server server.Server) {
+    mdns := NewService(app.bridge.Name(), app.bridge.Id(), 0)
+    str := server.Port()
+    mdns.port = int(to.Int64(str))
+    err := mdns.Publish()
+    if err != nil {
+        log.Fatalln("Could not publish server", err)
+    }
+    
+    app.mdns = mdns
 }
