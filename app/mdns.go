@@ -31,7 +31,6 @@ func NewService(name, id string, port int) *Service {
 }
 
 func (s *Service) Publish() error {
-    fmt.Println(s.txtRecords())
     service, err := mdns.NewMDNSService(s.name, "_hap._tcp.", "", "", s.port, nil, s.txtRecords())
     server, err := mdns.NewServer(&mdns.Config{Zone: service})
     
@@ -43,7 +42,6 @@ func (s *Service) Publish() error {
 }
 
 func (s *Service) Update() {
-    // TODO publish new txt records
 }
 
 func (s *Service) Stop() {
@@ -57,7 +55,7 @@ func (s *Service) txtRecords() []string {
         fmt.Sprintf("id=%s", s.id),
         fmt.Sprintf("c#=%d", s.configuration),
         fmt.Sprintf("s#=%d", s.state),
-        fmt.Sprintf("sf=%d", s.state),
+        fmt.Sprintf("sf=%d", s.status),
         fmt.Sprintf("ff=%d", to.Int64(s.mfiCompliant)),
         fmt.Sprintf("md=%s", s.name),
     }

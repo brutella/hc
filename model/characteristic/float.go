@@ -15,7 +15,7 @@ func NewFloatMinMaxSteps(value, min, max, min_step float64) *Float {
 }
 
 func (f *Float) SetFloat(value float64) {
-    f.SetValue(value)
+    f.SetNumber(value)
 }
 
 func (f *Float) SetMin(value float64) {

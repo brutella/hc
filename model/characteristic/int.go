@@ -10,7 +10,7 @@ func NewInt(value, min, max, steps int) *Int {
 }
 
 func (i *Int) SetInt(value int) {
-    i.SetValue(value)
+    i.SetNumber(value)
 }
 
 func (i *Int) SetMin(value int) {

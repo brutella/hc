@@ -5,17 +5,6 @@ import (
     "github.com/stretchr/testify/assert"
 )
 
-type delegate struct {
-    CharacteristicDelegate
-    oldValue interface{}
-    newValue interface{}
-}
-
-func (d *delegate) CharactericDidChangeValue(c *Characteristic, change CharacteristicChange) {
-    d.oldValue = change.OldValue
-    d.newValue = change.NewValue
-}
-
 func TestCharacteristicSetValuesOfWrongType(t *testing.T) {
     var value int = 5
     c := NewCharacteristic(value, FormatInt, CharTypeOn, nil)
@@ -33,39 +22,38 @@ func TestCharacteristicSetValuesOfWrongType(t *testing.T) {
 func TestCharacteristicLocalDelegate(t *testing.T) {
     c := NewCharacteristic(5, FormatInt, CharTypeOn, nil)
     
-    d := &delegate{}
-    c.AddLocalChangeDelegate(d)
+    var oldValue interface{}
+    var newValue interface{}
+    
+    c.OnLocalChange(func(c *Characteristic, old interface{}){
+        newValue = c.Value
+        oldValue = old
+    })
+    
     c.SetValue(10)
-    assert.Equal(t, d.oldValue, 5)
-    assert.Equal(t, d.newValue, 10)
+    assert.Equal(t, oldValue, 5)
+    assert.Equal(t, newValue, 10)
     c.SetValueFromRemote(20)
-    assert.Equal(t, d.oldValue, 5)
-    assert.Equal(t, d.newValue, 10)
+    assert.Equal(t, oldValue, 5)
+    assert.Equal(t, newValue, 10)
 }
 
 func TestCharacteristicRemoteDelegate(t *testing.T) {
     c := NewCharacteristic(5, FormatInt, CharTypeOn, nil)
+        
+    var oldValue interface{}
+    var newValue interface{}
+    c.OnRemoteChange(func(c *Characteristic, old interface{}){
+        newValue = c.Value
+        oldValue = old
+    })
     
-    d := &delegate{}
-    c.AddRemoteChangeDelegate(d)
     c.SetValueFromRemote(10)
-    assert.Equal(t, d.oldValue, 5)
-    assert.Equal(t, d.newValue, 10)
+    assert.Equal(t, oldValue, 5)
+    assert.Equal(t, newValue, 10)
     c.SetValue(20)
-    assert.Equal(t, d.oldValue, 5)
-    assert.Equal(t, d.newValue, 10)
-}
-
-func TestRemoveDelegate(t *testing.T) {
-    c := NewCharacteristic(5, FormatInt, CharTypeOn, nil)
-    
-    d := &delegate{}
-    c.AddLocalChangeDelegate(d)
-    c.RemoveDelegate(d)
-    c.SetValueFromRemote(10)
-    c.SetValue(20)
-    assert.Nil(t, d.oldValue)
-    assert.Nil(t, d.newValue)
+    assert.Equal(t, oldValue, 5)
+    assert.Equal(t, newValue, 10)
 }
 
 func TestEqual(t *testing.T) {

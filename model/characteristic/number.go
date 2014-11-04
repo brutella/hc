@@ -13,8 +13,8 @@ func NewNumber(value, min, max, step interface{}, format string) *Number {
     return &n
 }
 
-func (n *Number) SetValue(value interface{}) {
-    n.Value = value
+func (n *Number) SetNumber(value interface{}) {
+    n.SetValue(value)
 }
 
 func (n *Number) SetMinValue(value interface{}) {

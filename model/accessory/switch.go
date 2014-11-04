@@ -20,8 +20,13 @@ func NewSwitch(info model.Info) *switcher {
     accessory.AddService(s.Service)
     
     sw := switcher{accessory, s, nil}
-    s.On.AddRemoteChangeDelegate(&sw)
-        
+    
+    s.On.OnRemoteChange(func(*characteristic.Characteristic, interface{}) {
+        if sw.onChanged != nil {
+            sw.onChanged(s.On.On())
+        }
+    })
+    
     return &sw
 }
 
@@ -35,11 +40,4 @@ func (s *switcher) IsOn() bool {
 
 func (s *switcher) OnStateChanged(fn func(bool)){
     s.onChanged = fn
-}
-
-// CharacteristicDelegate
-func (s *switcher) CharactericDidChangeValue(c *characteristic.Characteristic, change characteristic.CharacteristicChange) {
-    if s.onChanged != nil {
-        s.onChanged(s.switcher.On.On())
-    }
 }

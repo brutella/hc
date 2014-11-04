@@ -9,9 +9,6 @@ import (
     
     "testing"
     "github.com/stretchr/testify/assert"
-    
-    "net/url"
-    "fmt"
     "io/ioutil"
     "encoding/json"
     "bytes"
@@ -32,9 +29,7 @@ func TestGetCharacteristic(t *testing.T) {
     
     aid := a.GetId()
     cid := a.Info.Name.GetId()
-    values := url.Values{}
-    
-    values.Set("id", fmt.Sprintf("%d.%d", aid, cid))
+    values := GetCharacteristicValues(aid, cid)
     controller := NewCharacteristicController(m)
     res, err := controller.HandleGetCharacteristics(values)
     assert.Nil(t, err)

@@ -23,10 +23,30 @@ func NewLightBulb(info model.Info) *lightBulb {
     accessory.AddService(bulb.Service)
     
     lightBulb := lightBulb{accessory, bulb, nil, nil, nil, nil}
-    bulb.On.AddRemoteChangeDelegate(&lightBulb)
-    bulb.Brightness.AddRemoteChangeDelegate(&lightBulb)
-    bulb.Saturation.AddRemoteChangeDelegate(&lightBulb)
-    bulb.Hue.AddRemoteChangeDelegate(&lightBulb)
+        
+    bulb.On.OnRemoteChange(func(*characteristic.Characteristic, interface{}) {
+        if lightBulb.onChanged != nil {
+            lightBulb.onChanged(bulb.On.On())
+        }
+    })
+    
+    bulb.Brightness.OnRemoteChange(func(*characteristic.Characteristic, interface{}) {
+        if lightBulb.brightnessChanged != nil {
+            lightBulb.brightnessChanged(bulb.Brightness.IntValue())
+        }
+    })
+    
+    bulb.Hue.OnRemoteChange(func(*characteristic.Characteristic, interface{}) {
+        if lightBulb.hueChanged != nil {
+            lightBulb.hueChanged(bulb.Hue.FloatValue())
+        }
+    })
+    
+    bulb.Saturation.OnRemoteChange(func(*characteristic.Characteristic, interface{}) {
+        if lightBulb.saturationChanged != nil {
+            lightBulb.saturationChanged(bulb.Saturation.FloatValue())
+        }
+    })
         
     return &lightBulb
 }
@@ -77,27 +97,4 @@ func (l *lightBulb) OnHueChanged(fn func(float64)) {
 
 func (l *lightBulb) OnSaturationChanged(fn func(float64)) {
     l.saturationChanged = fn
-}
-
-
-// CharacteristicDelegate
-func (l *lightBulb) CharactericDidChangeValue(c *characteristic.Characteristic, change characteristic.CharacteristicChange) {
-    switch c {
-    case l.bulb.On.Characteristic:
-        if l.onChanged != nil {
-            l.onChanged(l.bulb.On.On())
-        }
-    case l.bulb.Brightness.Characteristic:
-        if l.brightnessChanged != nil {
-            l.brightnessChanged(l.bulb.Brightness.IntValue())
-        }
-    case l.bulb.Hue.Characteristic:
-        if l.hueChanged != nil {
-            l.hueChanged(l.bulb.Hue.FloatValue())
-        }
-    case l.bulb.Saturation.Characteristic:
-        if l.saturationChanged != nil {
-            l.saturationChanged(l.bulb.Saturation.FloatValue())
-        }
-    }
 }

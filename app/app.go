@@ -10,6 +10,7 @@ import (
     "github.com/brutella/hap/model"
     "github.com/brutella/hap/model/container"
     "github.com/brutella/hap/model/accessory"
+    "github.com/brutella/hap/model/characteristic"
     "github.com/brutella/hap/server"
     "github.com/brutella/hap/netio"
     "github.com/gosexy/to"
@@ -85,6 +86,17 @@ func NewApp(conf Config) (*App, error) {
 }
 
 func (app *App) AddAccessory(a *accessory.Accessory) {
+    for _, s := range a.Services {
+        for _, c := range s.Characteristics {
+            c.OnLocalChange(func(c *characteristic.Characteristic, oldValue interface{}) {
+                log.Println("Local change", oldValue, c.Value)
+                
+                app.mdns.state += 1
+                app.mdns.Update()
+            })
+        }
+    }
+    
     app.container.AddAccessory(a)
 }
 
@@ -119,6 +131,7 @@ func (app *App) OnExit(fn AppExitFunc) {
 }
 
 func (app *App) PublishServer(server server.Server) {
+    // TODO Store state and configuration on disk
     mdns := NewService(app.bridge.Name(), app.bridge.Id(), 0)
     str := server.Port()
     mdns.port = int(to.Int64(str))

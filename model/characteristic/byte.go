@@ -10,7 +10,7 @@ func NewByteCharacteristic(value byte) *ByteCharacteristic {
 }
 
 func (c *ByteCharacteristic) SetByte(value byte) {
-    c.SetValue(value)
+    c.SetNumber(value)
 }
 
 func (c *ByteCharacteristic) Byte() byte {

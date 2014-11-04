@@ -2,6 +2,7 @@ package main
 
 import (
     "log"
+    "time"
     
     "github.com/brutella/hap/app"
     "github.com/brutella/hap/model"
@@ -34,6 +35,16 @@ func main() {
     })
     
     app.AddAccessory(sw.Accessory)
+    
+    go func() {
+        timer := time.NewTimer(2 * time.Second)
+        for {
+            <- timer.C
+            log.Println("Update switch")
+            sw.SetOn(sw.IsOn() == false)
+            timer.Reset(2 * time.Second)
+        }
+    }()
     
     app.Run()
 }

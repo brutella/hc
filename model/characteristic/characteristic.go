@@ -5,17 +5,7 @@ import(
     "reflect"
     "github.com/gosexy/to"
 )
-
-type CharacteristicChange struct {
-    OldValue interface{}
-    NewValue interface{}
-}
-
-type CharacteristicDelegate interface {
-    CharactericDidChangeValue(c *Characteristic, change CharacteristicChange)
-}
-
-type ValueChangedFunc func(CharacteristicChange)
+type ChangeFunc func(c *Characteristic, oldValue interface{})
 type Characteristic struct {
     Id int                  `json:"iid"` // managed by accessory
     Type CharType           `json:"type"`
@@ -35,8 +25,8 @@ type Characteristic struct {
     Events bool     `json:",omitempty"`
     Bonjour bool    `json:",omitempty"`
     
-    remoteDelegates []CharacteristicDelegate
-    localDelegates []CharacteristicDelegate
+    remoteChangeFuncs []ChangeFunc
+    localChangeFuncs []ChangeFunc
 }
 
 // Creates a new characteristic
@@ -50,9 +40,9 @@ func NewCharacteristic(value interface{}, format string, t CharType,  permission
         Value: value,
         Format: format,
         Type: t,
-        Permissions: permissions,
-        remoteDelegates: make([]CharacteristicDelegate, 0),
-        localDelegates: make([]CharacteristicDelegate, 0),
+        Permissions: permissions,        
+        remoteChangeFuncs: make([]ChangeFunc, 0),
+        localChangeFuncs: make([]ChangeFunc, 0),
     }
 }
 
@@ -74,28 +64,12 @@ func (c *Characteristic) EventsEnabled() bool {
     return c.Events
 }
 
-func (c *Characteristic) RemoveDelegate(delegate CharacteristicDelegate) {
-    for i, d := range c.localDelegates {
-        if d == delegate {
-            c.localDelegates = append(c.localDelegates[:i], c.localDelegates[i+1:]...)
-            break
-        }
-    }
-    
-    for i, d := range c.remoteDelegates {
-        if d == delegate {
-            c.remoteDelegates = append(c.remoteDelegates[:i], c.remoteDelegates[i+1:]...)
-            break
-        }
-    }
+func (c *Characteristic) OnLocalChange(fn ChangeFunc) {
+    c.localChangeFuncs = append(c.localChangeFuncs, fn)
 }
 
-func (c *Characteristic) AddLocalChangeDelegate(d CharacteristicDelegate) {
-    c.localDelegates = append(c.localDelegates, d)
-}
-
-func (c *Characteristic) AddRemoteChangeDelegate(d CharacteristicDelegate) {
-    c.remoteDelegates = append(c.remoteDelegates, d)
+func (c *Characteristic) OnRemoteChange(fn ChangeFunc) {
+    c.remoteChangeFuncs = append(c.remoteChangeFuncs, fn)
 }
 
 // Compareable
@@ -138,21 +112,16 @@ func (c *Characteristic) setValue(value interface{}, remote bool) {
     
     old := c.Value
     c.Value = value
-
-    change := CharacteristicChange{
-            OldValue:old,
-            NewValue:c.Value,
-    }
     
     if remote == true {
-        c.callValueChangeOnDelegates(change, c.remoteDelegates)
+        c.onChange(c.remoteChangeFuncs, old)
     } else {
-        c.callValueChangeOnDelegates(change, c.localDelegates)
+        c.onChange(c.localChangeFuncs, old)
     }
 }
 
-func (c *Characteristic) callValueChangeOnDelegates(change CharacteristicChange, delegates []CharacteristicDelegate) {
-    for _, d := range delegates {
-        d.CharactericDidChangeValue(c, change)
+func (c *Characteristic) onChange(funcs []ChangeFunc, oldValue interface{}) {
+    for _, fn := range funcs {
+        fn(c, oldValue)
     }
 }

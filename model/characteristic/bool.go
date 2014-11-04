@@ -10,7 +10,7 @@ func NewBool(value bool) *Bool {
 }
 
 func (c *Bool) SetBool(value bool) {
-    c.SetValue(value)
+    c.SetNumber(value)
 }
 
 func (c *Bool) BoolValue() bool {
