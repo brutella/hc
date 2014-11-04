@@ -6,7 +6,7 @@ import(
     
     "net/http"
     "io/ioutil"
-    "fmt"
+    "log"
 )
 
 // Handles the /accessories endpoint and returns all accessories as JSON
@@ -28,16 +28,16 @@ func NewAccessories(c *controller.ContainerController) *Accessories {
 }
 
 func (handler *Accessories) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-    fmt.Println("GET /accessories")
+    log.Println("GET /accessories")
     response.Header().Set("Content-Type", netio.HTTPContentTypeHAPJson)
     
     res, err := handler.controller.HandleGetAccessories(request.Body)
     if err != nil {
-        fmt.Println(err)
+        log.Println(err)
         response.WriteHeader(http.StatusInternalServerError)
     } else {
         bytes, _ := ioutil.ReadAll(res)
-        fmt.Println("<-  JSON:", string(bytes))
+        log.Println("<-  JSON:", string(bytes))
         response.Write(bytes)
     }
 }

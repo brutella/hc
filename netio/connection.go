@@ -1,7 +1,7 @@
 package netio
 
 import(
-    "fmt"
+    "log"
     "time"
     "net"
     "bytes"
@@ -46,7 +46,7 @@ func (con *tcpHAPConnection) EncryptedWrite(b []byte) (int, error) {
     encrypted, err := con.getEncrypter().Encrypt(&buffer)
     
     if err != nil {
-        fmt.Println("[ERROR] Encryption failed:", err)
+        log.Println("[ERROR] Encryption failed:", err)
         err = con.connection.Close()
         return 0, err
     }
@@ -62,7 +62,7 @@ func (con *tcpHAPConnection) DecryptedRead(b []byte) (int, error) {
         buffered := bufio.NewReader(con.connection)
         decrypted, err := con.getDecrypter().Decrypt(buffered)
         if err != nil {
-            fmt.Println("[ERROR] Decryption failed:", err)
+            log.Println("[ERROR] Decryption failed:", err)
             err = con.connection.Close()
             return 0, err
         }
@@ -96,7 +96,7 @@ func (con *tcpHAPConnection) Read(b []byte) (int, error) {
 }
 
 func (con *tcpHAPConnection) Close() error {
-    fmt.Println("[INFO] Close connection and remove session")
+    log.Println("[INFO] Close connection and remove session")
     
     // Remove session from the context
     con.context.DeleteSessionForConnection(con.connection)

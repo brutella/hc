@@ -7,7 +7,7 @@ import(
     "github.com/brutella/hap/db"
     
     "net/http"
-    "fmt"
+    "log"
     "io/ioutil"
 )
 
@@ -32,14 +32,14 @@ func NewPairVerify(context netio.HAPContext, database db.Database) *PairVerify {
 }
 
 func (handler *PairVerify) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-    fmt.Println("POST /pair-verify")
+    log.Println("POST /pair-verify")
     response.Header().Set("Content-Type", netio.HTTPContentTypePairingTLV8)
     
     key := handler.context.GetConnectionKey(request)
     session := handler.context.Get(key).(netio.Session)
     controller := session.PairVerifyHandler()
     if controller == nil {
-        fmt.Println("Create new pair verify controller")
+        log.Println("Create new pair verify controller")
         controller = pair.NewVerifyServerController(handler.database, handler.context)
         session.SetPairVerifyHandler(controller)
     }
@@ -47,7 +47,7 @@ func (handler *PairVerify) ServeHTTP(response http.ResponseWriter, request *http
     res, err := pair.HandleReaderForHandler(request.Body, controller)
     
     if err != nil {
-        fmt.Println(err)
+        log.Println(err)
         response.WriteHeader(http.StatusInternalServerError)
     } else {
         bytes, _ := ioutil.ReadAll(res)
@@ -59,9 +59,9 @@ func (handler *PairVerify) ServeHTTP(response http.ResponseWriter, request *http
             // Switch to secure session
             secureSession, err := crypto.NewSecureSessionFromSharedKey(controller.SharedKey())
             if err != nil {
-                fmt.Println("Could not setup secure session.", err)
+                log.Println("Could not setup secure session.", err)
             } else {
-                fmt.Println("Setup secure session")
+                log.Println("Setup secure session")
             }
             session.SetCryptographer(secureSession)
         }

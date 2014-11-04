@@ -13,6 +13,7 @@ import (
     "github.com/brutella/hap/model/characteristic"
     "github.com/brutella/hap/server"
     "github.com/brutella/hap/netio"
+    "github.com/brutella/hap/netio/event"
     "github.com/gosexy/to"
 )
 
@@ -86,18 +87,24 @@ func NewApp(conf Config) (*App, error) {
 }
 
 func (app *App) AddAccessory(a *accessory.Accessory) {
+    app.container.AddAccessory(a)
+    
     for _, s := range a.Services {
         for _, c := range s.Characteristics {
             c.OnLocalChange(func(c *characteristic.Characteristic, oldValue interface{}) {
                 log.Println("Local change", oldValue, c.Value)
                 
-                app.mdns.state += 1
-                app.mdns.Update()
+                if app.mdns != nil {
+                    app.mdns.state += 1
+                    app.mdns.Update()
+                }
+                
+                if c.Events == true {
+                    app.NotifyListener(a, c)
+                }
             })
         }
     }
-    
-    app.container.AddAccessory(a)
 }
 
 func (app *App) RemoveAccessory(a *accessory.Accessory) {
@@ -123,7 +130,9 @@ func (app *App) Run() {
     }()
     
     err := s.ListenAndServe()
-    log.Fatal(err)
+    if err != nil {
+        log.Fatal(err)
+    }
 }
 
 func (app *App) OnExit(fn AppExitFunc) {
@@ -141,4 +150,19 @@ func (app *App) PublishServer(server server.Server) {
     }
     
     app.mdns = mdns
+}
+
+func (app *App) NotifyListener(a *accessory.Accessory, c *characteristic.Characteristic) {
+    return
+    // TODO
+    conns := app.context.ActiveConnection()    
+    for _, con := range conns {
+        resp, err := event.NewNotification(a, c)
+        if err != nil {
+            log.Fatal(err)
+        }
+        
+        log.Println("SEND", resp, "TO", con)
+        resp.Write(con)
+    }
 }

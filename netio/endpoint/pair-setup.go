@@ -7,7 +7,7 @@ import(
         
     "io/ioutil"
     "net/http"
-    "fmt"
+    "log"
 )
 
 // Handles the /pair-setup endpoint and returns TLV8 encoded data
@@ -34,18 +34,18 @@ func NewPairSetup(bridge *netio.Bridge, database db.Database, context netio.HAPC
 }
 
 func (handler *PairSetup) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-    fmt.Println("POST /pair-setup")
+    log.Println("POST /pair-setup")
     response.Header().Set("Content-Type", netio.HTTPContentTypePairingTLV8)
     
     key := handler.context.GetConnectionKey(request)
     session := handler.context.Get(key).(netio.Session)
     controller := session.PairSetupHandler()
     if controller == nil {
-        fmt.Println("Create new pair setup controller")
+        log.Println("Create new pair setup controller")
         var err error
         controller, err = pair.NewSetupServerController(handler.bridge, handler.database)
         if err != nil {
-            fmt.Println(err)
+            log.Println(err)
         }
         
         session.SetPairSetupHandler(controller)
@@ -54,7 +54,7 @@ func (handler *PairSetup) ServeHTTP(response http.ResponseWriter, request *http.
     res, err := pair.HandleReaderForHandler(request.Body, controller)
     
     if err != nil {
-        fmt.Println(err)
+        log.Println(err)
         response.WriteHeader(http.StatusInternalServerError)
     } else {
         bytes, _ := ioutil.ReadAll(res)

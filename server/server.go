@@ -87,8 +87,6 @@ func (s *hkServer) listenAndServe(addr string, handler http.Handler, context net
     
     s.port = ExtractPort(ln.Addr())
     
-    fmt.Println(s.dnssdCommand())
-    
     return server.Serve(listener)
 }
 

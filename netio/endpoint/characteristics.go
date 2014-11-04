@@ -5,7 +5,7 @@ import(
     "github.com/brutella/hap/netio/controller"
     
     "net/http"
-    "fmt"
+    "log"
     "io"
     "io/ioutil"
 )
@@ -33,25 +33,25 @@ func (handler *Characteristics) ServeHTTP(response http.ResponseWriter, request 
     var err error
     switch request.Method {
     case netio.MethodGET:
-        fmt.Println("GET /characteristics")
+        log.Println("GET /characteristics")
         request.ParseForm()
         res, err = handler.controller.HandleGetCharacteristics(request.Form)
     case netio.MethodPUT:
-        fmt.Println("PUT /characteristics")
+        log.Println("PUT /characteristics")
         err = handler.controller.HandleUpdateCharacteristics(request.Body)
     default:
-        fmt.Println("Cannot handle HTTP method", request.Method)
+        log.Println("Cannot handle HTTP method", request.Method)
     }
     
     
     if err != nil {
-        fmt.Println(err)
+        log.Println(err)
         response.WriteHeader(http.StatusInternalServerError)
     } else {
         if res != nil {
             bytes, _ := ioutil.ReadAll(res)
             response.Header().Set("Content-Type", netio.HTTPContentTypeHAPJson)
-            fmt.Println("<-  JSON:", string(bytes))
+            log.Println("<-  JSON:", string(bytes))
             response.Write(bytes)
         } else {
             response.WriteHeader(http.StatusNoContent)

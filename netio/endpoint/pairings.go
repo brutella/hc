@@ -2,7 +2,7 @@ package endpoint
 
 import(
     "net/http"
-    "fmt"
+    "log"
     "github.com/brutella/hap/netio/pair"
 )
 
@@ -24,12 +24,12 @@ func NewPairing(controller *pair.PairingController) *Pairing {
 }
 
 func (handler *Pairing) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-    fmt.Println("POST /pairings")
+    log.Println("POST /pairings")
     
     _, err := pair.HandleReaderForHandler(request.Body, handler.controller)
     
     if err != nil {
-        fmt.Println(err)
+        log.Println(err)
         response.WriteHeader(http.StatusInternalServerError)
     } else {
         response.WriteHeader(http.StatusNoContent)
