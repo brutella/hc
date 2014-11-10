@@ -95,17 +95,18 @@ func (c *VerifyServerController) handlePairVerifyStart(cont_in common.Container)
     c.session.GenerateSharedKeyWithOtherPublicKey(otherPublicKey)
     c.session.SetupEncryptionKey([]byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
     
-    LTSK := c.bridge().SecretKey
+    bridge := c.context.GetBridge()
+    LTSK := bridge.SecretKey
     
     material := make([]byte, 0)
     material = append(material, c.session.PublicKey[:]...)
-    material = append(material, c.bridge().Id()...)
+    material = append(material, bridge.Id()...)
     material = append(material, clientPublicKey...)
     signature, _ := crypto.ED25519Signature(LTSK, material)
     
     // Encrypt
     tlv_encrypt := common.NewTLV8Container()
-    tlv_encrypt.SetString(TLVType_Username, c.bridge().Id())
+    tlv_encrypt.SetString(TLVType_Username, bridge.Id())
     tlv_encrypt.SetBytes(TLVType_Ed25519Signature, signature)
     
     encrypted, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(c.session.EncryptionKey[:], []byte("PV-Msg02"), tlv_encrypt.BytesBuffer().Bytes(), nil)
@@ -193,8 +194,4 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 
 func (c *VerifyServerController) Reset() {
     c.curSeq = WaitingForRequest
-}
-
-func (c *VerifyServerController) bridge() *netio.Bridge {
-    return c.context.GetBridge()
 }
