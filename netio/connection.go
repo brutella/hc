@@ -46,7 +46,7 @@ func (con *tcpHAPConnection) EncryptedWrite(b []byte) (int, error) {
     encrypted, err := con.getEncrypter().Encrypt(&buffer)
     
     if err != nil {
-        log.Println("[ERROR] Encryption failed:", err)
+        log.Println("[ERRO] Encryption failed:", err)
         err = con.connection.Close()
         return 0, err
     }
@@ -62,7 +62,7 @@ func (con *tcpHAPConnection) DecryptedRead(b []byte) (int, error) {
         buffered := bufio.NewReader(con.connection)
         decrypted, err := con.getDecrypter().Decrypt(buffered)
         if err != nil {
-            log.Println("[ERROR] Decryption failed:", err)
+            log.Println("[ERRO] Decryption failed:", err)
             err = con.connection.Close()
             return 0, err
         }

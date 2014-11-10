@@ -92,8 +92,8 @@ func (c *SetupServerController) handlePairStart(cont_in common.Container) (commo
     cont_out.SetBytes(TLVType_PublicKey, c.session.PublicKey)
     cont_out.SetBytes(TLVType_Salt, c.session.Salt)
     
-    log.Println("[INFO] <-     B:", hex.EncodeToString(cont_out.GetBytes(TLVType_PublicKey)))
-    log.Println("[INFO] <-     s:", hex.EncodeToString(cont_out.GetBytes(TLVType_Salt)))
+    log.Println("[VERB] <-     B:", hex.EncodeToString(cont_out.GetBytes(TLVType_PublicKey)))
+    log.Println("[VERB] <-     s:", hex.EncodeToString(cont_out.GetBytes(TLVType_Salt)))
     
     return cont_out, nil
 }
@@ -113,7 +113,7 @@ func (c *SetupServerController) handlePairVerify(cont_in common.Container) (comm
     cont_out.SetByte(TLVType_SequenceNumber, c.curSeq)
     
     cpublicKey := cont_in.GetBytes(TLVType_PublicKey)
-    log.Println("[INFO] ->     A:", hex.EncodeToString(cpublicKey))
+    log.Println("[VERB] ->     A:", hex.EncodeToString(cpublicKey))
     
     err := c.session.SetupSecretKeyFromClientPublicKey(cpublicKey)
     if err != nil {
@@ -121,7 +121,7 @@ func (c *SetupServerController) handlePairVerify(cont_in common.Container) (comm
     }
     
     cproof := cont_in.GetBytes(TLVType_Proof)
-    log.Println("[INFO] ->     M1:", hex.EncodeToString(cproof))
+    log.Println("[VERB] ->     M1:", hex.EncodeToString(cproof))
     
     sproof, err := c.session.ProofFromClientProof(cproof)
     if err != nil || len(sproof) == 0 { // proof `M1` is wrong
@@ -139,9 +139,9 @@ func (c *SetupServerController) handlePairVerify(cont_in common.Container) (comm
         cont_out.SetBytes(TLVType_Proof, sproof)
     }
     
-    log.Println("[INFO] <-     M2:", hex.EncodeToString(cont_out.GetBytes(TLVType_Proof)))
-    log.Println("[INFO]         S:", hex.EncodeToString(c.session.SecretKey))
-    log.Println("[INFO]         K:", hex.EncodeToString(c.session.EncryptionKey[:]))
+    log.Println("[VERB] <-     M2:", hex.EncodeToString(cont_out.GetBytes(TLVType_Proof)))
+    log.Println("[VERB]         S:", hex.EncodeToString(c.session.SecretKey))
+    log.Println("[VERB]         K:", hex.EncodeToString(c.session.EncryptionKey[:]))
     
     return cont_out, nil
 }
@@ -167,14 +167,14 @@ func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (com
     message := data[:(len(data) - 16)]
     var mac [16]byte
     copy(mac[:], data[len(message):]) // 16 byte (MAC)
-    log.Println("[INFO] ->     Message:", hex.EncodeToString(message))
-    log.Println("[INFO] ->     MAC:", hex.EncodeToString(mac[:]))
+    log.Println("[VERB] ->     Message:", hex.EncodeToString(message))
+    log.Println("[VERB] ->     MAC:", hex.EncodeToString(mac[:]))
     
     decrypted, err := crypto.Chacha20DecryptAndPoly1305Verify(c.session.EncryptionKey[:], []byte("PS-Msg05"), message, mac, nil)
     
     if err != nil {
         c.reset()
-        log.Println("[ERROR]", err)
+        log.Println("[ERRO]", err)
         cont_out.SetByte(TLVType_ErrorCode, TLVStatus_UnkownError) // return error 1
     } else {
         decrypted_buffer := bytes.NewBuffer(decrypted)
@@ -186,9 +186,9 @@ func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (com
         username  := cont_in.GetString(TLVType_Username)
         ltpk      := cont_in.GetBytes(TLVType_PublicKey)
         signature := cont_in.GetBytes(TLVType_Ed25519Signature)
-        log.Println("[INFO] ->     Username:", username)
-        log.Println("[INFO] ->     LTPK:", hex.EncodeToString(ltpk))
-        log.Println("[INFO] ->     Signature:", hex.EncodeToString(signature))
+        log.Println("[VERB] ->     Username:", username)
+        log.Println("[VERB] ->     LTPK:", hex.EncodeToString(ltpk))
+        log.Println("[VERB] ->     Signature:", hex.EncodeToString(signature))
         
         // Calculate `H`
         H, _ := crypto.HKDF_SHA512(c.session.SecretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
@@ -202,7 +202,7 @@ func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (com
             c.reset()
             cont_out.SetByte(TLVType_ErrorCode, TLVStatus_AuthError) // return error 2
         } else {
-            log.Println("[INFO] ed25519 signature is valid")
+            log.Println("[VERB] ed25519 signature is valid")
             // Store client LTPK and name
             client := db.NewClient(username, ltpk)
             c.database.SaveClient(client)
@@ -228,9 +228,9 @@ func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (com
             tlvPairKeyExchange.SetBytes(TLVType_PublicKey, LTPK)
             tlvPairKeyExchange.SetBytes(TLVType_Ed25519Signature, []byte(signature))
             
-            log.Println("[INFO] <-     Username:", tlvPairKeyExchange.GetString(TLVType_Username))
-            log.Println("[INFO] <-     LTPK:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TLVType_PublicKey)))
-            log.Println("[INFO] <-     Signature:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TLVType_Ed25519Signature)))
+            log.Println("[VERB] <-     Username:", tlvPairKeyExchange.GetString(TLVType_Username))
+            log.Println("[VERB] <-     LTPK:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TLVType_PublicKey)))
+            log.Println("[VERB] <-     Signature:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TLVType_Ed25519Signature)))
             
             encrypted, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(c.session.EncryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)    
             cont_out.SetByte(TLVType_Method, 0)

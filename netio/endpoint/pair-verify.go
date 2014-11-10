@@ -32,14 +32,14 @@ func NewPairVerify(context netio.HAPContext, database db.Database) *PairVerify {
 }
 
 func (handler *PairVerify) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-    log.Println("[INFO] POST /pair-verify")
+    log.Println("[VERB] POST /pair-verify")
     response.Header().Set("Content-Type", netio.HTTPContentTypePairingTLV8)
     
     key := handler.context.GetConnectionKey(request)
     session := handler.context.Get(key).(netio.Session)
     controller := session.PairVerifyHandler()
     if controller == nil {
-        log.Println("[INFO] Create new pair verify controller")
+        log.Println("[VERB] Create new pair verify controller")
         controller = pair.NewVerifyServerController(handler.database, handler.context)
         session.SetPairVerifyHandler(controller)
     }
@@ -59,9 +59,9 @@ func (handler *PairVerify) ServeHTTP(response http.ResponseWriter, request *http
             // Switch to secure session
             secureSession, err := crypto.NewSecureSessionFromSharedKey(controller.SharedKey())
             if err != nil {
-                log.Println("[ERROR] Could not setup secure session.", err)
+                log.Println("[ERRO] Could not setup secure session.", err)
             } else {
-                log.Println("[INFO] Setup secure session")
+                log.Println("[VERB] Setup secure session")
             }
             session.SetCryptographer(secureSession)
         }

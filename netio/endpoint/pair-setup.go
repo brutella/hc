@@ -34,14 +34,14 @@ func NewPairSetup(bridge *netio.Bridge, database db.Database, context netio.HAPC
 }
 
 func (handler *PairSetup) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-    log.Println("[INFO] POST /pair-setup")
+    log.Println("[VERB] POST /pair-setup")
     response.Header().Set("Content-Type", netio.HTTPContentTypePairingTLV8)
     
     key := handler.context.GetConnectionKey(request)
     session := handler.context.Get(key).(netio.Session)
     controller := session.PairSetupHandler()
     if controller == nil {
-        log.Println("[INFO] Create new pair setup controller")
+        log.Println("[VERB] Create new pair setup controller")
         var err error
         controller, err = pair.NewSetupServerController(handler.bridge, handler.database)
         if err != nil {
@@ -54,7 +54,7 @@ func (handler *PairSetup) ServeHTTP(response http.ResponseWriter, request *http.
     res, err := pair.HandleReaderForHandler(request.Body, controller)
     
     if err != nil {
-        log.Println(err)
+        log.Println("[ERRO]", err)
         response.WriteHeader(http.StatusInternalServerError)
     } else {
         bytes, _ := ioutil.ReadAll(res)

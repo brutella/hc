@@ -35,7 +35,7 @@ func (controller *CharacteristicController) HandleGetCharacteristics(form url.Va
     
     result, err := json.Marshal(chars)
     if err != nil {
-        log.Println("[ERROR]", err)
+        log.Println("[ERRO]", err)
     }
     
     var b bytes.Buffer
@@ -55,12 +55,12 @@ func (controller *CharacteristicController) HandleUpdateCharacteristics(r io.Rea
         return err
     }
     
-    log.Println("[INFO]", string(b))
+    log.Println("[VERB]", string(b))
     
     for _, c := range chars.Characteristics {
         containerChar := controller.GetCharacteristic(c.AccessoryId, c.Id)
         if containerChar == nil {
-            log.Printf("[ERROR] Could not find characteristic with aid %d and iid %d\n", c.AccessoryId, c.Id)
+            log.Printf("[ERRO] Could not find characteristic with aid %d and iid %d\n", c.AccessoryId, c.Id)
             continue
         }
         

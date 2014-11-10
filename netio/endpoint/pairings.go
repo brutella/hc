@@ -24,7 +24,7 @@ func NewPairing(controller *pair.PairingController) *Pairing {
 }
 
 func (handler *Pairing) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-    log.Println("[INFO] POST /pairings")
+    log.Println("[VERB] POST /pairings")
     
     _, err := pair.HandleReaderForHandler(request.Body, handler.controller)
     

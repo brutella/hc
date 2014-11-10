@@ -28,16 +28,16 @@ func NewAccessories(c *controller.ContainerController) *Accessories {
 }
 
 func (handler *Accessories) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-    log.Println("[INFO] GET /accessories")
+    log.Println("[VERB] GET /accessories")
     response.Header().Set("Content-Type", netio.HTTPContentTypeHAPJson)
     
     res, err := handler.controller.HandleGetAccessories(request.Body)
     if err != nil {
-        log.Println("[ERROR]", err)
+        log.Println("[ERRO]", err)
         response.WriteHeader(http.StatusInternalServerError)
     } else {
         bytes, _ := ioutil.ReadAll(res)
-        log.Println("[INFO] <-  JSON:", string(bytes))
+        log.Println("[VERB] <-  JSON:", string(bytes))
         response.Write(bytes)
     }
 }

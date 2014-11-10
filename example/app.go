@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-    log.Info = false
+    log.Verbose = false
     
     conf := app.NewConfig()
     conf.DatabaseDir = "./data"

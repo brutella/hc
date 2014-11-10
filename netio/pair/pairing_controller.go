@@ -34,9 +34,9 @@ func (c *PairingController) Handle(tlv8 common.Container) (common.Container, err
     username    := tlv8.GetString(TLVType_Username)
     publicKey   := tlv8.GetBytes(TLVType_PublicKey)
     
-    log.Println("[INFO] ->   Method:", method)
-    log.Println("[INFO] -> Username:", username)
-    log.Println("[INFO] ->     LTPK:", publicKey)
+    log.Println("[VERB] ->   Method:", method)
+    log.Println("[VERB] -> Username:", username)
+    log.Println("[VERB] ->     LTPK:", publicKey)
     
     client := db.NewClient(username, publicKey)
     
@@ -46,7 +46,7 @@ func (c *PairingController) Handle(tlv8 common.Container) (common.Container, err
     case TLVType_Method_PairingAdd:
         err := c.database.SaveClient(client)
         if err != nil {
-            log.Println("[ERROR]", err)
+            log.Println("[ERRO]", err)
             return nil, err
         }
     }

@@ -33,11 +33,11 @@ func (handler *Characteristics) ServeHTTP(response http.ResponseWriter, request 
     var err error
     switch request.Method {
     case netio.MethodGET:
-        log.Println("[INFO] GET /characteristics")
+        log.Println("[VERB] GET /characteristics")
         request.ParseForm()
         res, err = handler.controller.HandleGetCharacteristics(request.Form)
     case netio.MethodPUT:
-        log.Println("[INFO] PUT /characteristics")
+        log.Println("[VERB] PUT /characteristics")
         err = handler.controller.HandleUpdateCharacteristics(request.Body)
     default:
         log.Println("[WARN] Cannot handle HTTP method", request.Method)
@@ -45,13 +45,13 @@ func (handler *Characteristics) ServeHTTP(response http.ResponseWriter, request 
     
     
     if err != nil {
-        log.Println("[ERROR]", err)
+        log.Println("[ERRO]", err)
         response.WriteHeader(http.StatusInternalServerError)
     } else {
         if res != nil {
             bytes, _ := ioutil.ReadAll(res)
             response.Header().Set("Content-Type", netio.HTTPContentTypeHAPJson)
-            log.Println("[INFO] <-  JSON:", string(bytes))
+            log.Println("[VERB] <-  JSON:", string(bytes))
             response.Write(bytes)
         } else {
             response.WriteHeader(http.StatusNoContent)

@@ -14,19 +14,19 @@ func HandleReaderForHandler(r io.Reader, h netio.ContainerHandler) (r_out io.Rea
         return nil, err
     }
     
-    log.Println("[INFO] ->     Seq:", cont_in.GetByte(TLVType_SequenceNumber))
+    log.Println("[VERB] ->     Seq:", cont_in.GetByte(TLVType_SequenceNumber))
     
     cont_out, err := h.Handle(cont_in)
     
     if err != nil {
-        log.Println("[ERROR]", err)
+        log.Println("[ERRO]", err)
     } else {
         if cont_out != nil {
-            log.Println("[INFO] <-     Seq:", cont_out.GetByte(TLVType_SequenceNumber))
+            log.Println("[VERB] <-     Seq:", cont_out.GetByte(TLVType_SequenceNumber))
             r_out = cont_out.BytesBuffer()
         }
     }
-    log.Println("[INFO] --------------------------")
+    log.Println("[VERB] --------------------------")
     
     return r_out, err
 }

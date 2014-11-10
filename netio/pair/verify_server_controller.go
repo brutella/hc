@@ -84,7 +84,7 @@ func (c *VerifyServerController) handlePairVerifyStart(cont_in common.Container)
     c.curSeq = VerifyStartRespond
     
     clientPublicKey := cont_in.GetBytes(TLVType_PublicKey)
-    log.Println("[INFO] ->     A:", hex.EncodeToString(clientPublicKey))
+    log.Println("[VERB] ->     A:", hex.EncodeToString(clientPublicKey))
     if len(clientPublicKey) != 32 {
         return nil, common.NewErrorf("Invalid client public key size %d", len(clientPublicKey))
     }
@@ -115,12 +115,12 @@ func (c *VerifyServerController) handlePairVerifyStart(cont_in common.Container)
     cont_out.SetBytes(TLVType_PublicKey, c.session.PublicKey[:])
     cont_out.SetBytes(TLVType_EncryptedData, append(encrypted, mac[:]...))
     
-    log.Println("[INFO]       K:", hex.EncodeToString(c.session.EncryptionKey[:]))
-    log.Println("[INFO]        B:", hex.EncodeToString(c.session.PublicKey[:]))
-    log.Println("[INFO]        S:", hex.EncodeToString(c.session.SecretKey[:]))
-    log.Println("[INFO]   Shared:", hex.EncodeToString(c.session.SharedKey[:]))
+    log.Println("[VERB]       K:", hex.EncodeToString(c.session.EncryptionKey[:]))
+    log.Println("[VERB]        B:", hex.EncodeToString(c.session.PublicKey[:]))
+    log.Println("[VERB]        S:", hex.EncodeToString(c.session.SecretKey[:]))
+    log.Println("[VERB]   Shared:", hex.EncodeToString(c.session.SharedKey[:]))
     
-    log.Println("[INFO] <-     B:", hex.EncodeToString(cont_out.GetBytes(TLVType_PublicKey)))
+    log.Println("[VERB] <-     B:", hex.EncodeToString(cont_out.GetBytes(TLVType_PublicKey)))
     
     return cont_out, nil
 }
@@ -140,8 +140,8 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
     message := data[:(len(data) - 16)]
     var mac [16]byte
     copy(mac[:], data[len(message):]) // 16 byte (MAC)
-    log.Println("[INFO] ->     Message:", hex.EncodeToString(message))
-    log.Println("[INFO] ->     MAC:", hex.EncodeToString(mac[:]))
+    log.Println("[VERB] ->     Message:", hex.EncodeToString(message))
+    log.Println("[VERB] ->     MAC:", hex.EncodeToString(mac[:]))
     
     decrypted, err := crypto.Chacha20DecryptAndPoly1305Verify(c.session.EncryptionKey[:], []byte("PV-Msg03"), message, mac, nil)
     
@@ -150,7 +150,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
     
     if err != nil {
         c.Reset()
-        log.Println("[ERROR]", err)
+        log.Println("[ERRO]", err)
         cont_out.SetByte(TLVType_ErrorCode, TLVStatus_AuthError) // return error 2
     } else {
         decrypted_buffer := bytes.NewBuffer(decrypted)
@@ -161,8 +161,8 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
         
         username  := cont_in.GetString(TLVType_Username)
         signature := cont_in.GetBytes(TLVType_Ed25519Signature)
-        log.Println("[INFO]     client:", username)
-        log.Println("[INFO]  signature:", hex.EncodeToString(signature))
+        log.Println("[VERB]     client:", username)
+        log.Println("[VERB]  signature:", hex.EncodeToString(signature))
         
         client := c.database.ClientWithName(username)
         if client == nil {
@@ -184,7 +184,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
             c.Reset()
             cont_out.SetByte(TLVType_ErrorCode, TLVStatus_UnkownPeerError) // return error 4
         } else {
-            log.Println("[INFO] signature is valid")
+            log.Println("[VERB] signature is valid")
         }
     }
     
