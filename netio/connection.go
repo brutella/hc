@@ -1,7 +1,7 @@
 package netio
 
 import(
-    "log"
+    "github.com/brutella/log"
     "time"
     "net"
     "bytes"

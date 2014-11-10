@@ -1,15 +1,17 @@
 package main
 
 import (
-    "log"
     "time"
     
+    "github.com/brutella/log"
     "github.com/brutella/hap/app"
     "github.com/brutella/hap/model"
     "github.com/brutella/hap/model/accessory"
 )
 
 func main() {
+    log.Info = false
+    
     conf := app.NewConfig()
     conf.DatabaseDir = "./data"
     
@@ -28,9 +30,9 @@ func main() {
     sw := accessory.NewSwitch(info)
     sw.OnStateChanged(func(on bool) {
         if on == true {
-            log.Println("Switch on")
+            log.Println("[INFO] Switch on")
         } else {
-            log.Println("Switch off")
+            log.Println("[INFO] Switch off")
         }
     })
     
@@ -40,7 +42,7 @@ func main() {
         timer := time.NewTimer(2 * time.Second)
         for {
             <- timer.C
-            log.Println("Update switch")
+            log.Println("[INFO] Update switch")
             sw.SetOn(sw.IsOn() == false)
             timer.Reset(2 * time.Second)
         }

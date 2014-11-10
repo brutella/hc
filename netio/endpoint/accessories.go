@@ -3,10 +3,10 @@ package endpoint
 import(   
     "github.com/brutella/hap/netio"
     "github.com/brutella/hap/netio/controller"
+    "github.com/brutella/log"
     
     "net/http"
     "io/ioutil"
-    "log"
 )
 
 // Handles the /accessories endpoint and returns all accessories as JSON
@@ -28,16 +28,16 @@ func NewAccessories(c *controller.ContainerController) *Accessories {
 }
 
 func (handler *Accessories) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-    log.Println("GET /accessories")
+    log.Println("[INFO] GET /accessories")
     response.Header().Set("Content-Type", netio.HTTPContentTypeHAPJson)
     
     res, err := handler.controller.HandleGetAccessories(request.Body)
     if err != nil {
-        log.Println(err)
+        log.Println("[ERROR]", err)
         response.WriteHeader(http.StatusInternalServerError)
     } else {
         bytes, _ := ioutil.ReadAll(res)
-        log.Println("<-  JSON:", string(bytes))
+        log.Println("[INFO] <-  JSON:", string(bytes))
         response.Write(bytes)
     }
 }

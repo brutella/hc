@@ -3,8 +3,7 @@ package pair
 import(
     "github.com/brutella/hap/common"
     "github.com/brutella/hap/db"
-    
-    "fmt"
+    "github.com/brutella/log"
 )
 
 /*
@@ -35,9 +34,9 @@ func (c *PairingController) Handle(tlv8 common.Container) (common.Container, err
     username    := tlv8.GetString(TLVType_Username)
     publicKey   := tlv8.GetBytes(TLVType_PublicKey)
     
-    fmt.Println("->   Method:", method)
-    fmt.Println("-> Username:", username)
-    fmt.Println("->     LTPK:", publicKey)
+    log.Println("[INFO] ->   Method:", method)
+    log.Println("[INFO] -> Username:", username)
+    log.Println("[INFO] ->     LTPK:", publicKey)
     
     client := db.NewClient(username, publicKey)
     
@@ -47,7 +46,7 @@ func (c *PairingController) Handle(tlv8 common.Container) (common.Container, err
     case TLVType_Method_PairingAdd:
         err := c.database.SaveClient(client)
         if err != nil {
-            fmt.Println(err)
+            log.Println("[ERROR]", err)
             return nil, err
         }
     }

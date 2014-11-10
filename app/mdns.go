@@ -3,8 +3,9 @@ package app
 import (
     "github.com/armon/mdns"
     "github.com/gosexy/to"
+    "github.com/brutella/log"
+    
     "fmt"
-    "log"
     "net"
     "errors"
 )
@@ -40,6 +41,8 @@ func (s *Service) Publish() error {
     if err != nil {
         return err
     }
+    
+    log.Println("[INFO] Bridge IP is", ip)
     
     service, err := mdns.NewMDNSService(s.name, "_hap._tcp.", "", "", s.port, []net.IP{ip}, s.txtRecords())
     if err != nil {

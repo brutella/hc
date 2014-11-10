@@ -2,7 +2,7 @@ package netio
 
 import(
     "net"
-    "time"
+    _"time"
 )
 
 // TCP listener listens for new connection and creates 
@@ -21,9 +21,10 @@ func (l *TCPHAPListener) Accept() (c net.Conn, err error) {
     if err != nil {
         return
     }
-    
-    conn.SetKeepAlive(true)
-    conn.SetKeepAlivePeriod(3 * time.Minute)
+
+    // TODO(brutella) Check if we should use tcp keepalive
+    // conn.SetKeepAlive(true)
+    // conn.SetKeepAlivePeriod(3 * time.Minute)
     hapConn := NewHAPConnection(conn, l.context)
     
     return hapConn, err

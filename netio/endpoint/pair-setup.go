@@ -4,10 +4,10 @@ import(
     "github.com/brutella/hap/db"
     "github.com/brutella/hap/netio/pair"
     "github.com/brutella/hap/netio"
-        
+    "github.com/brutella/log"
+    
     "io/ioutil"
     "net/http"
-    "log"
 )
 
 // Handles the /pair-setup endpoint and returns TLV8 encoded data
@@ -34,14 +34,14 @@ func NewPairSetup(bridge *netio.Bridge, database db.Database, context netio.HAPC
 }
 
 func (handler *PairSetup) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-    log.Println("POST /pair-setup")
+    log.Println("[INFO] POST /pair-setup")
     response.Header().Set("Content-Type", netio.HTTPContentTypePairingTLV8)
     
     key := handler.context.GetConnectionKey(request)
     session := handler.context.Get(key).(netio.Session)
     controller := session.PairSetupHandler()
     if controller == nil {
-        log.Println("Create new pair setup controller")
+        log.Println("[INFO] Create new pair setup controller")
         var err error
         controller, err = pair.NewSetupServerController(handler.bridge, handler.database)
         if err != nil {

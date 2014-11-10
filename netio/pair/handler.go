@@ -3,9 +3,9 @@ package pair
 import(
     "github.com/brutella/hap/common"
     "github.com/brutella/hap/netio"
+    "github.com/brutella/log"
     
     "io"
-    "fmt"
 )
 
 func HandleReaderForHandler(r io.Reader, h netio.ContainerHandler) (r_out io.Reader, err error) {
@@ -14,19 +14,19 @@ func HandleReaderForHandler(r io.Reader, h netio.ContainerHandler) (r_out io.Rea
         return nil, err
     }
     
-    fmt.Println("->     Seq:", cont_in.GetByte(TLVType_SequenceNumber))
+    log.Println("[INFO] ->     Seq:", cont_in.GetByte(TLVType_SequenceNumber))
     
     cont_out, err := h.Handle(cont_in)
     
     if err != nil {
-        fmt.Println("[ERROR]", err)
+        log.Println("[ERROR]", err)
     } else {
         if cont_out != nil {
-            fmt.Println("<-     Seq:", cont_out.GetByte(TLVType_SequenceNumber))
+            log.Println("[INFO] <-     Seq:", cont_out.GetByte(TLVType_SequenceNumber))
             r_out = cont_out.BytesBuffer()
         }
     }
-    fmt.Println("--------------------------")
+    log.Println("[INFO] --------------------------")
     
     return r_out, err
 }

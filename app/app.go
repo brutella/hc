@@ -1,10 +1,10 @@
 package app
 
 import (
-    "log"
     "errors"
     "time"
     
+    "github.com/brutella/log"
     "github.com/brutella/hap/db"
     "github.com/brutella/hap/common"
     "github.com/brutella/hap/model"
@@ -92,8 +92,6 @@ func (app *App) AddAccessory(a *accessory.Accessory) {
     for _, s := range a.Services {
         for _, c := range s.Characteristics {
             c.OnLocalChange(func(c *characteristic.Characteristic, oldValue interface{}) {
-                log.Println("Local change", oldValue, c.Value)
-                
                 if app.mdns != nil {
                     app.mdns.state += 1
                     app.mdns.Update()
@@ -146,7 +144,7 @@ func (app *App) PublishServer(server server.Server) {
     mdns.port = int(to.Int64(str))
     err := mdns.Publish()
     if err != nil {
-        log.Fatalln("Could not publish server", err)
+        log.Fatal("Could not publish server", err)
     }
     
     app.mdns = mdns

@@ -4,8 +4,8 @@ import(
     "github.com/brutella/hap/model"
     "github.com/brutella/hap/model/container"
     "github.com/brutella/hap/netio/data"
+    "github.com/brutella/log"
     
-    "fmt"
     "encoding/json"
     "bytes"
 
@@ -26,7 +26,7 @@ func (controller *CharacteristicController) HandleGetCharacteristics(form url.Va
     aid, cid, err := ParseAccessoryAndCharacterId(form.Get("id"))
     containerChar := controller.GetCharacteristic(aid, cid)
     if containerChar == nil {
-        fmt.Printf("[WARNING] No characteristic found with aid %d and iid %d\n", aid, cid)
+        log.Printf("[WARN] No characteristic found with aid %d and iid %d\n", aid, cid)
     }
     
     chars := data.NewCharacteristics()
@@ -35,7 +35,7 @@ func (controller *CharacteristicController) HandleGetCharacteristics(form url.Va
     
     result, err := json.Marshal(chars)
     if err != nil {
-        fmt.Println(err)
+        log.Println("[ERROR]", err)
     }
     
     var b bytes.Buffer
@@ -55,12 +55,12 @@ func (controller *CharacteristicController) HandleUpdateCharacteristics(r io.Rea
         return err
     }
     
-    fmt.Println(string(b))
+    log.Println("[INFO]", string(b))
     
     for _, c := range chars.Characteristics {
         containerChar := controller.GetCharacteristic(c.AccessoryId, c.Id)
         if containerChar == nil {
-            fmt.Printf("[WARNING] Could not find characteristic with aid %d and iid %d\n", c.AccessoryId, c.Id)
+            log.Printf("[ERROR] Could not find characteristic with aid %d and iid %d\n", c.AccessoryId, c.Id)
             continue
         }
         
@@ -69,7 +69,6 @@ func (controller *CharacteristicController) HandleUpdateCharacteristics(r io.Rea
         }
         
         if events, ok := c.Events.(bool); ok == true {
-            fmt.Println("Events", events)
             containerChar.SetEventsEnabled(events)
         }
     }
