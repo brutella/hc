@@ -21,7 +21,7 @@ func NewLightBulb(name string, on bool) *LightBulb {
     hue := characteristic.NewHue(0.0)
     
     service := NewService()
-    service.Type = TypeSwitch
+    service.Type = TypeLightBulb
     service.AddCharacteristic(on_char.Characteristic)
     service.AddCharacteristic(name_char.Characteristic)
     service.AddCharacteristic(brightness.Characteristic)
