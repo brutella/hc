@@ -42,6 +42,7 @@ func (c *PairingController) Handle(tlv8 common.Container) (common.Container, err
     
     switch method {
     case TLVType_Method_PairingDelete:
+        log.Printf("[INFO] Remove LTPK for client '%s'\n", username)
         c.database.DeleteClient(client)
     case TLVType_Method_PairingAdd:
         err := c.database.SaveClient(client)
