@@ -13,6 +13,7 @@ import(
     "fmt"
     "os"
     "os/signal"
+    "log"
 )
 type Server interface {
     ListenAndServe() error
@@ -51,7 +52,6 @@ func (s *hkServer) OnStop(fn ServerExitFunc) {
 
 func (s *hkServer) ListenAndServe() error {
     s.teardownOnStop()
-    
     
     return s.listenAndServe(s.addrString(), s.mux, s.context)
 }
@@ -98,6 +98,7 @@ func (s *hkServer) teardownOnStop() {
     go func() {
         select {
         case <- c:
+            log.Println("[INFO] Teardown server")
             s.Stop()
             os.Exit(1)
         }

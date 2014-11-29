@@ -38,15 +38,5 @@ func main() {
     
     app.AddAccessory(sw.Accessory)
     
-    go func() {
-        timer := time.NewTimer(2 * time.Second)
-        for {
-            <- timer.C
-            log.Println("[INFO] Update switch")
-            sw.SetOn(sw.IsOn() == false)
-            timer.Reset(2 * time.Second)
-        }
-    }()
-    
     app.Run()
 }

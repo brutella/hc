@@ -93,6 +93,7 @@ func (app *App) AddAccessory(a *accessory.Accessory) {
         for _, c := range s.Characteristics {
             c.OnLocalChange(func(c *characteristic.Characteristic, oldValue interface{}) {
                 if app.mdns != nil {
+                    log.Println("[VERB] Update TXT records")
                     app.mdns.state += 1
                     app.mdns.Update()
                 }
@@ -114,6 +115,7 @@ func (app *App) Run() {
     s.OnStop(func() {
         // Stop mDNS
         if app.mdns != nil {
+            log.Println("[INFO] Stop mdns")
             app.mdns.Stop()
         }
         

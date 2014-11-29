@@ -1,7 +1,7 @@
 package app
 
 import (
-    "github.com/armon/mdns"
+    "github.com/oleksandr/bonjour"
     "github.com/gosexy/to"
     "github.com/brutella/log"
     
@@ -20,7 +20,7 @@ type Service struct {
     mfiCompliant bool       // ff
     status int64            // sf
     
-    server *mdns.Server
+    server *bonjour.Server
 }
 
 func NewService(name, id string, port int) *Service {
@@ -36,20 +36,8 @@ func NewService(name, id string, port int) *Service {
     }
 }
 
-func (s *Service) Publish() error {
-    ip, err := GetFirstLocalIPAddress()
-    if err != nil {
-        return err
-    }
-    
-    log.Println("[INFO] Bridge IP is", ip)
-    
-    service, err := mdns.NewMDNSService(s.name, "_hap._tcp.", "", "", s.port, []net.IP{ip}, s.txtRecords())
-    if err != nil {
-        log.Fatal(err)
-    }
-    
-    server, err := mdns.NewServer(&mdns.Config{Zone: service})
+func (s *Service) Publish() error {    
+    server, err := bonjour.Register(s.name, "_hap._tcp.", "", s.port, s.txtRecords(), nil)
     if err != nil {
         log.Fatal(err)
     }
@@ -59,6 +47,9 @@ func (s *Service) Publish() error {
 }
 
 func (s *Service) Update() {
+    s.state += 1
+    s.server.SetText(s.txtRecords())
+    log.Println("[INFO]", s.txtRecords())
 }
 
 func (s *Service) Stop() {
