@@ -8,6 +8,8 @@ import (
     "fmt"
     "net"
     "errors"
+    "os"
+    "strings"
 )
 
 type Service struct {
@@ -37,7 +39,16 @@ func NewService(name, id string, port int) *Service {
 }
 
 func (s *Service) Publish() error {    
-    server, err := bonjour.Register(s.name, "_hap._tcp.", "", s.port, s.txtRecords(), nil)
+    ip, err := GetFirstLocalIPAddress()
+    if err != nil {
+        return err
+    }
+    log.Println("[INFO] Bridge IP is", ip)
+    
+    // Host should end with '.'
+    hostname, _ := os.Hostname()
+    host := fmt.Sprintf("%s.", strings.Trim(hostname, "."))
+    server, err := bonjour.RegisterProxy(s.name, "_hap._tcp.", "", s.port, host, ip.String(), s.txtRecords(), nil)
     if err != nil {
         log.Fatal(err)
     }

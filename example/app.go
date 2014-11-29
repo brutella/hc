@@ -1,8 +1,6 @@
 package main
 
-import (
-    "time"
-    
+import (    
     "github.com/brutella/log"
     "github.com/brutella/hap/app"
     "github.com/brutella/hap/model"
