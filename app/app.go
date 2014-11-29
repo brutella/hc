@@ -140,10 +140,9 @@ func (app *App) OnExit(fn AppExitFunc) {
 }
 
 func (app *App) PublishServer(server server.Server) {
+    port := to.Int64(server.Port())
     // TODO Store state and configuration on disk
-    mdns := NewService(app.bridge.Name(), app.bridge.Id(), 0)
-    str := server.Port()
-    mdns.port = int(to.Int64(str))
+    mdns := NewService(app.bridge.Name(), app.bridge.Id(), int(port))
     err := mdns.Publish()
     if err != nil {
         log.Fatal("Could not publish server", err)
