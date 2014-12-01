@@ -22,8 +22,7 @@ type Characteristic struct {
     MinStep interface{}     `json:"minStep,omitempty"`
     
     // unused
-    Events bool     `json:",omitempty"`
-    Bonjour bool    `json:",omitempty"`
+    Events bool     `json:"-"`
     
     remoteChangeFuncs []ChangeFunc
     localChangeFuncs []ChangeFunc
@@ -80,7 +79,7 @@ func (c *Characteristic) Equal(other interface{}) bool {
         value := fmt.Sprintf("%+v", c.Value)
         otherValue := fmt.Sprintf("%+v", characteristic.Value)
         
-        return value == otherValue && c.Id == characteristic.Id && c.Type == characteristic.Type && len(c.Permissions) == len(characteristic.Permissions) && c.Description == characteristic.Description && c.Format == characteristic.Format && c.Unit == characteristic.Unit && c.MaxLen == characteristic.MaxLen && c.MaxValue == characteristic.MaxValue && c.MinValue == characteristic.MinValue && c.MinStep == characteristic.MinStep && c.Events == characteristic.Events && c.Bonjour == characteristic.Bonjour
+        return value == otherValue && c.Id == characteristic.Id && c.Type == characteristic.Type && len(c.Permissions) == len(characteristic.Permissions) && c.Description == characteristic.Description && c.Format == characteristic.Format && c.Unit == characteristic.Unit && c.MaxLen == characteristic.MaxLen && c.MaxValue == characteristic.MaxValue && c.MinValue == characteristic.MinValue && c.MinStep == characteristic.MinStep && c.Events == characteristic.Events
     }
     
     return false
