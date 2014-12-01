@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-    // log.Verbose = false
+    log.Verbose = false
     
     conf := app.NewConfig()
     conf.DatabaseDir = "./data"
