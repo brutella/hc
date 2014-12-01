@@ -35,18 +35,29 @@ func main() {
         }
     })
     
-    go func() {
-      for {
-          on := !sw.IsOn()
-          if on == true {
-              log.Println("[INFO] Switch on")
-          } else {
-              log.Println("[INFO] Switch off")
-          }
-          sw.SetOn(on)
-          time.Sleep(5 * time.Second)
-      }  
-    }()
+    // go func() {
+    //   for {
+    //       on := !sw.IsOn()
+    //       if on == true {
+    //           log.Println("[INFO] Switch on")
+    //       } else {
+    //           log.Println("[INFO] Switch off")
+    //       }
+    //       sw.SetOn(on)
+    //       time.Sleep(5 * time.Second)
+    //   }
+    // }()
+    
+    // go func() {
+    //   for {
+    //       time.Sleep(10 * time.Second)
+    //       log.Println("[VERB] Remove accessory")
+    //       app.RemoveAccessory(sw.Accessory)
+    //       time.Sleep(10 * time.Second)
+    //       log.Println("[VERB] Add accessory")
+    //       app.AddAccessory(sw.Accessory)
+    //   }
+    // }()
     
     app.AddAccessory(sw.Accessory)
     

@@ -103,7 +103,7 @@ func (app *App) AddAccessory(a *accessory.Accessory) {
                 // }
                 
                 if c.Events == true {
-                    app.NotifyListener(a, c)
+                    app.notifyListener(a, c)
                 }
             })
         }
@@ -119,15 +119,7 @@ func (app *App) RemoveAccessory(a *accessory.Accessory) {
 func (app *App) Run() {
     s := server.NewServer(app.context, app.Database, app.container, app.bridge)
     s.OnStop(func() {
-        // Stop mDNS
-        if app.mdns != nil {
-            log.Println("[INFO] Stop mdns")
-            app.mdns.Stop()
-        }
-        
-        if app.exitFunc != nil {
-            app.exitFunc()
-        }
+        app.Stop()
     })
     
     go func() {
@@ -147,8 +139,18 @@ func (app *App) OnExit(fn AppExitFunc) {
 
 func (app *App) PublishServer(server server.Server) {
     port := to.Int64(server.Port())
-    // TODO Store state and configuration on disk
     mdns := NewService(app.bridge.Name(), app.bridge.Id(), int(port))
+    
+    // c# and s# TXT records are stored in database
+    // Set to 1 on first launch
+    dns := app.Database.DnsWithName(app.bridge.Name())
+    if dns == nil {
+        dns = db.NewDns(app.bridge.Name(), 1, 1)
+        app.Database.SaveDns(dns)
+    }
+    mdns.configuration = dns.Configuration()
+    mdns.state = dns.State()
+    
     err := mdns.Publish()
     if err != nil {
         log.Fatal("Could not publish server", err)
@@ -157,7 +159,19 @@ func (app *App) PublishServer(server server.Server) {
     app.mdns = mdns
 }
 
-func (app *App) NotifyListener(a *accessory.Accessory, c *characteristic.Characteristic) {
+func (app *App) Stop() {
+    // Stop mDNS
+    if app.mdns != nil {
+        log.Println("[INFO] Stop mdns")
+        app.mdns.Stop()
+    }
+    
+    if app.exitFunc != nil {
+        app.exitFunc()
+    }
+}
+
+func (app *App) notifyListener(a *accessory.Accessory, c *characteristic.Characteristic) {
     conns := app.context.ActiveConnection()    
     for _, con := range conns {
         resp, err := event.NewNotification(a, c)
@@ -179,9 +193,22 @@ func (app *App) NotifyListener(a *accessory.Accessory, c *characteristic.Charact
     }
 }
 
+// updateConfiguration increases the configuration value by 1 
+// re-announced new Text records
 func (app *App) updateConfiguration() {
-    if app.mdns != nil {
-        app.mdns.configuration += 1
+    dns := app.Database.DnsWithName(app.bridge.Name())
+    if dns != nil {
+        dns.SetConfiguration(dns.Configuration() + 1)
+        app.Database.SaveDns(dns)
+        app.updateDns()
+    }
+}
+
+func (app *App) updateDns() {
+    dns := app.Database.DnsWithName(app.bridge.Name())
+    if app.mdns != nil && dns != nil {
+        app.mdns.configuration = dns.Configuration()
+        app.mdns.state = dns.State()
         app.mdns.Update()
     }
 }
