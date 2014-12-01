@@ -27,17 +27,17 @@ type tcpHAPConnection struct {
     readBuffer io.Reader
 }
 
-func NewHAPConnection(connection net.Conn, context HAPContext) *tcpHAPConnection {
-    // Setup new session for the connection
-    session := NewSession(connection)
-    context.SetSessionForConnection(session, connection)
-    
-    c := tcpHAPConnection{
+func NewHAPConnection(connection net.Conn, context HAPContext) *tcpHAPConnection {    
+    conn := &tcpHAPConnection{
         connection: connection,
         context: context,
     }
     
-    return &c
+    // Setup new session for the connection
+    session := NewSession(conn)
+    context.SetSessionForConnection(session, conn)
+    
+    return conn
 }
 
 func (con *tcpHAPConnection) EncryptedWrite(b []byte) (int, error) {
