@@ -22,11 +22,13 @@ func NewCharacteristicController(m *container.Container) *CharacteristicControll
     return &CharacteristicController{container: m}
 }
 
-func (controller *CharacteristicController) HandleGetCharacteristics(form url.Values) (io.Reader, error) {    
+func (controller *CharacteristicController) HandleGetCharacteristics(form url.Values) (io.Reader, error) {
+    var b bytes.Buffer
     aid, cid, err := ParseAccessoryAndCharacterId(form.Get("id"))
     containerChar := controller.GetCharacteristic(aid, cid)
     if containerChar == nil {
         log.Printf("[WARN] No characteristic found with aid %d and iid %d\n", aid, cid)
+        return &b, nil
     }
     
     chars := data.NewCharacteristics()
@@ -38,7 +40,6 @@ func (controller *CharacteristicController) HandleGetCharacteristics(form url.Va
         log.Println("[ERRO]", err)
     }
     
-    var b bytes.Buffer
     b.Write(result)
     return &b, err
 }
