@@ -58,7 +58,7 @@ func (s *Service) Publish() error {
 }
 
 func (s *Service) Update() {
-    s.state += 1
+    // TODO(brutella) Discard if not published yet
     s.server.SetText(s.txtRecords())
     log.Println("[INFO]", s.txtRecords())
 }

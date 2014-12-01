@@ -108,10 +108,12 @@ func (app *App) AddAccessory(a *accessory.Accessory) {
             })
         }
     }
+    app.updateConfiguration()
 }
 
 func (app *App) RemoveAccessory(a *accessory.Accessory) {
     app.container.RemoveAccessory(a)
+    app.updateConfiguration()
 }
 
 func (app *App) Run() {
@@ -174,5 +176,12 @@ func (app *App) NotifyListener(a *accessory.Accessory, c *characteristic.Charact
         // Write bytes to connection instead of using response object
         // resp.Write(con)
         con.Write(bytes)
+    }
+}
+
+func (app *App) updateConfiguration() {
+    if app.mdns != nil {
+        app.mdns.configuration += 1
+        app.mdns.Update()
     }
 }
