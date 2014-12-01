@@ -26,7 +26,7 @@ func TestCharacteristicNotification(t *testing.T) {
     assert.NotNil(t, buffer)
     bytes, err := ioutil.ReadAll(buffer)
     assert.Nil(t, err)
-    assert.Equal(t, string(bytes), `{"characteristics":[{"aid":0,"iid":6,"value":"My Bridge","ev":false}]}`)
+    assert.Equal(t, string(bytes), `{"characteristics":[{"aid":0,"iid":6,"value":"My Bridge"}]}`)
 }
 
 func TestCharacteristicNotificationResponse(t *testing.T) {
@@ -47,6 +47,7 @@ func TestCharacteristicNotificationResponse(t *testing.T) {
     resp.Write(buffer)
     
     bytes, err := ioutil.ReadAll(buffer)
+    bytes = FixProtocolSpecifier(bytes)
     assert.Nil(t, err)
     fmt.Println(string(bytes))
 }

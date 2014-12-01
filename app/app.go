@@ -3,6 +3,8 @@ package app
 import (
     "errors"
     "time"
+    "io/ioutil"
+    "bytes"
     
     "github.com/brutella/log"
     "github.com/brutella/hap/db"
@@ -92,11 +94,13 @@ func (app *App) AddAccessory(a *accessory.Accessory) {
     for _, s := range a.Services {
         for _, c := range s.Characteristics {
             c.OnLocalChange(func(c *characteristic.Characteristic, oldValue interface{}) {
-                if app.mdns != nil {
-                    log.Println("[VERB] Update TXT records")
-                    app.mdns.state += 1
-                    app.mdns.Update()
-                }
+                // (brutella) It's not clear yet when the state (s#) field in the TXT records
+                // is updated. Sometimes it's increment when a client changes a value.
+                // if app.mdns != nil {
+                //     log.Println("[VERB] Update TXT records")
+                //     app.mdns.state += 1
+                //     app.mdns.Update()
+                // }
                 
                 if c.Events == true {
                     app.NotifyListener(a, c)
@@ -152,8 +156,6 @@ func (app *App) PublishServer(server server.Server) {
 }
 
 func (app *App) NotifyListener(a *accessory.Accessory, c *characteristic.Characteristic) {
-    return
-    // TODO
     conns := app.context.ActiveConnection()    
     for _, con := range conns {
         resp, err := event.NewNotification(a, c)
@@ -161,7 +163,16 @@ func (app *App) NotifyListener(a *accessory.Accessory, c *characteristic.Charact
             log.Fatal(err)
         }
         
-        log.Println("SEND", resp, "TO", con)
-        resp.Write(con)
+        // Write response into buffer to replace HTTP protocol 
+        // specifier with Event as required by HAP
+        var buffer = new(bytes.Buffer)
+        resp.Write(buffer)
+        bytes, err := ioutil.ReadAll(buffer)
+        bytes = event.FixProtocolSpecifier(bytes)
+        log.Println("[VERB] <- ", string(bytes))
+        
+        // Write bytes to connection instead of using response object
+        // resp.Write(con)
+        con.Write(bytes)
     }
 }

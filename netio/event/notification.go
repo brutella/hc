@@ -9,6 +9,7 @@ import(
     "net/http"
     "io/ioutil"
     "encoding/json"
+    "strings"
 )
 
 func NewNotification(a *accessory.Accessory, c *characteristic.Characteristic) (*http.Response, error) {
@@ -26,18 +27,20 @@ func NewNotification(a *accessory.Accessory, c *characteristic.Characteristic) (
     resp.ContentLength = int64(body.Len())
     resp.Header = map[string][]string{}
     resp.Header.Set("Content-Type", netio.HTTPContentTypeHAPJson)
+    // (brutella) Not sure if Date header must be set
+    // resp.Header.Set("Date", netio.CurrentRFC1123Date())
     resp.Proto = "EVENT/1.0"
     
     return resp, nil
 }
 
-// func FixProtocolSpecifier(b []byte) []byte {
-//     return []byte(strings.Replace(string(b), "HTTP/1.0", "EVENT/1.0", 1))
-// }
+func FixProtocolSpecifier(b []byte) []byte {
+    return []byte(strings.Replace(string(b), "HTTP/1.0", "EVENT/1.0", 1))
+}
 
 func NotificationBody(a *accessory.Accessory, c *characteristic.Characteristic) (*bytes.Buffer, error) {
     chars := data.NewCharacteristics()
-    char := data.Characteristic{AccessoryId: a.GetId(), Id: c.GetId(), Value: c.GetValue(), Events: c.EventsEnabled()}
+    char := data.Characteristic{AccessoryId: a.GetId(), Id: c.GetId(), Value: c.GetValue()}
     chars.AddCharacteristic(char)
     
     result, err := json.Marshal(chars)
