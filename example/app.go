@@ -5,7 +5,7 @@ import (
     "github.com/brutella/hap/app"
     "github.com/brutella/hap/model"
     "github.com/brutella/hap/model/accessory"
-    "time"
+    _"time"
 )
 
 func main() {

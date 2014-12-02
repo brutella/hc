@@ -8,7 +8,7 @@ const (
     
     // Encoded in HomeKit Accessory Simulator.app as bits
     // 2:  0010 -> write
-    // 13: 1111 -> read, write, events, bonjour
+    // 15: 1111 -> read, write, events, bonjour
     // 13: 1101 -> read, events, bonjour
         
     PermRead = "pr" // can be read

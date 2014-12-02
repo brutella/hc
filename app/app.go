@@ -93,7 +93,7 @@ func (app *App) AddAccessory(a *accessory.Accessory) {
     
     for _, s := range a.Services {
         for _, c := range s.Characteristics {
-            c.OnLocalChange(func(c *characteristic.Characteristic, oldValue interface{}) {
+            onChange := func(c *characteristic.Characteristic, oldValue interface{}) {
                 // (brutella) It's not clear yet when the state (s#) field in the TXT records
                 // is updated. Sometimes it's increment when a client changes a value.
                 // if app.mdns != nil {
@@ -105,7 +105,10 @@ func (app *App) AddAccessory(a *accessory.Accessory) {
                 if c.Events == true {
                     app.notifyListener(a, c)
                 }
-            })
+            }
+            
+            c.OnLocalChange(onChange)
+            c.OnRemoteChange(onChange)
         }
     }
     app.updateConfiguration()
