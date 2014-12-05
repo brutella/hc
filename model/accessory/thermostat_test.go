@@ -17,6 +17,7 @@ func TestThermostat(t *testing.T) {
     
     var thermo model.Thermostat = NewThermostat(info, 10, 0, 100, 1)
     
+    assert.Equal(t, thermo.GetId(), model.InvalidId)    
     assert.Equal(t, thermo.Name(), "My Thermostat")
     assert.Equal(t, thermo.SerialNumber(), "001")
     assert.Equal(t, thermo.Manufacturer(), "Google")

@@ -26,7 +26,7 @@ func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName s
     manufacturer    := characteristic.NewManufacturer(manufacturerName)
     name            := characteristic.NewName(accessoryName)
     
-    service := NewService()
+    service := New()
     service.Type = TypeAccessoryInfo
     service.AddCharacteristic(identify.Characteristic)
     service.AddCharacteristic(serial.Characteristic)

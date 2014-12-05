@@ -11,19 +11,19 @@ import(
 // Every accessory has the "accessory info" service by default which consists 
 // of characteristics to identify the accessory: name, model, manufacturer,...
 type Accessory struct {
-    Id int                      `json:"aid"`
+    Id int64                    `json:"aid"`
     Services []*service.Service `json:"services"`
     
     Info *service.AccessoryInfo `json:"-"`
-    idCount int
+    idCount int64
 }
-
 
 func New(info model.Info) *Accessory {
     i := service.NewInfo(info)
     a := &Accessory{
         idCount: 1,
         Info: i,
+        Id: model.InvalidId,
     }
     
     a.AddService(i.Service)
@@ -31,11 +31,11 @@ func New(info model.Info) *Accessory {
     return a
 }
 
-func (a *Accessory) SetId(id int) {
+func (a *Accessory) SetId(id int64) {
     a.Id = id
 }
 
-func (a *Accessory) GetId()int {
+func (a *Accessory) GetId() int64 {
     return a.Id
 }
 

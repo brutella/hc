@@ -4,10 +4,12 @@ import(
     "fmt"
     "reflect"
     "github.com/gosexy/to"
+    "github.com/brutella/hap/model"
 )
+
 type ChangeFunc func(c *Characteristic, oldValue interface{})
 type Characteristic struct {
-    Id int                  `json:"iid"` // managed by accessory
+    Id int64                `json:"iid"` // managed by accessory
     Type CharType           `json:"type"`
     Permissions []string    `json:"perms"`
     Description string      `json:"description,omitempty"`// manufacturer description (optional) 
@@ -36,6 +38,7 @@ func NewCharacteristic(value interface{}, format string, t CharType,  permission
     }
     
     return &Characteristic{
+        Id: model.InvalidId,
         Value: value,
         Format: format,
         Type: t,
@@ -86,11 +89,11 @@ func (c *Characteristic) Equal(other interface{}) bool {
 }
 
 // model.Characteristic
-func (c *Characteristic) SetId(id int) {
+func (c *Characteristic) SetId(id int64) {
     c.Id = id
 }
 
-func (c *Characteristic) GetId() int {
+func (c *Characteristic) GetId() int64 {
     return c.Id
 }
 

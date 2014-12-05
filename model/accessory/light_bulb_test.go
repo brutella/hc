@@ -17,6 +17,7 @@ func TestLightBulb(t *testing.T) {
     
     var bulb model.LightBulb = NewLightBulb(info)
     
+    assert.Equal(t, bulb.GetId(), model.InvalidId)
     assert.Equal(t, bulb.Name(), "My Light Bulb")
     assert.Equal(t, bulb.SerialNumber(), "001")
     assert.Equal(t, bulb.Manufacturer(), "Google")

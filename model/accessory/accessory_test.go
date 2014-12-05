@@ -17,6 +17,7 @@ func TestAccessory(t *testing.T) {
     
     var a model.Accessory = New(info)
     
+    assert.Equal(t, a.GetId(), model.InvalidId)
     assert.Equal(t, a.Name(), "My Accessory")
     assert.Equal(t, a.SerialNumber(), "001")
     assert.Equal(t, a.Manufacturer(), "Google")

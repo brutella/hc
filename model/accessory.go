@@ -5,7 +5,7 @@ type Accessory interface {
     Compareable
     
     // Returns the accessory id
-    GetId()int
+    GetId() int64
     
     // Returns the services which represent the accessory 
     GetServices()[]Service

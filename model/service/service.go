@@ -7,13 +7,14 @@ import(
 
 // This class represents accessory services and constis of characteristics
 type Service struct {
-    Id int              `json:"iid"`
+    Id int64            `json:"iid"`
     Type ServiceType    `json:"type"`
     Characteristics []*characteristic.Characteristic `json:"characteristics"`
 }
 
-func NewService() *Service {
+func New() *Service {
     s := Service{
+        Id: model.InvalidId,
         Characteristics: []*characteristic.Characteristic{},
     }
     
@@ -25,8 +26,12 @@ func (s *Service) AddCharacteristic(c *characteristic.Characteristic) {
 }
 
 // model.Service
-func (s *Service) SetId(id int) {
+func (s *Service) SetId(id int64) {
     s.Id = id
+}
+
+func (s *Service) GetId() int64 {
+    return s.Id
 }
 
 func (s *Service) GetCharacteristics()[]model.Characteristic {

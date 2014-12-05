@@ -20,7 +20,7 @@ func NewLightBulb(name string, on bool) *LightBulb {
     saturation := characteristic.NewSaturation(0.0)
     hue := characteristic.NewHue(0.0)
     
-    service := NewService()
+    service := New()
     service.Type = TypeLightBulb
     service.AddCharacteristic(on_char.Characteristic)
     service.AddCharacteristic(name_char.Characteristic)

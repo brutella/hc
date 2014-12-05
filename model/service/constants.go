@@ -2,12 +2,12 @@ package service
 
 type ServiceType string
 const (
-    TypeAccessoryInfo                = "3E"
-    TypeGarageDoorOpener             = "41"
-    TypeLightBulb                    = "43"
-    TypeLockManagement               = "44"
-    TypeLockMechanism                = "45"
-    TypeOutlet                       = "47"
-    TypeSwitch                       = "49"
-    TypeThermostat                   = "4A"
+    TypeAccessoryInfo                = ServiceType("3E")
+    TypeGarageDoorOpener             = ServiceType("41")
+    TypeLightBulb                    = ServiceType("43")
+    TypeLockManagement               = ServiceType("44")
+    TypeLockMechanism                = ServiceType("45")
+    TypeOutlet                       = ServiceType("47")
+    TypeSwitch                       = ServiceType("49")
+    TypeThermostat                   = ServiceType("4A")
 )

@@ -17,6 +17,7 @@ func TestSwitch(t *testing.T) {
     
     var s model.Switch = NewSwitch(info)
     
+    assert.Equal(t, s.GetId(), model.InvalidId)
     assert.Equal(t, s.Name(), "My Switch")
     assert.Equal(t, s.SerialNumber(), "001")
     assert.Equal(t, s.Manufacturer(), "Google")

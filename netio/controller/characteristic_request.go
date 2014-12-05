@@ -5,7 +5,7 @@ import(
     "fmt"
 )
 
-func GetCharacteristicValues(accessoryId, characteristicId int) url.Values {
+func GetCharacteristicValues(accessoryId, characteristicId int64) url.Values {
     values := url.Values{}
     values.Set("id", fmt.Sprintf("%d.%d", accessoryId, characteristicId))
     

@@ -4,7 +4,7 @@ type Characteristic interface {
     Compareable
     
     // Returns the characteristic id
-    GetId()int
+    GetId() int64
     
     // Returns the raw value
     GetValue() interface{}

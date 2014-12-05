@@ -77,7 +77,7 @@ func (controller *CharacteristicController) HandleUpdateCharacteristics(r io.Rea
     return err
 }
 
-func (c *CharacteristicController) GetCharacteristic(accessoryId int, characteristicId int) model.Characteristic {
+func (c *CharacteristicController) GetCharacteristic(accessoryId int64, characteristicId int64) model.Characteristic {
     for _, a := range c.container.Accessories {
         if a.GetId() == accessoryId {
             for _, s := range a.GetServices() {
