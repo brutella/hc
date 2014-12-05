@@ -44,6 +44,7 @@ type App struct {
     container   *container.Container
     exitFunc AppExitFunc
     mdns *Service
+    batchUpdate bool
 }
 
 func NewApp(conf Config) (*App, error) {
@@ -111,12 +112,23 @@ func (app *App) AddAccessory(a *accessory.Accessory) {
             c.OnRemoteChange(onChange)
         }
     }
-    app.updateConfiguration()
+    if app.batchUpdate == false {
+        app.updateConfiguration()
+    }
 }
 
 func (app *App) RemoveAccessory(a *accessory.Accessory) {
     app.container.RemoveAccessory(a)
+    if app.batchUpdate == false {
+        app.updateConfiguration()
+    }
+}
+
+func (app *App) PerformBatchUpdates(fn func()) {
+    app.batchUpdate = true
+    fn()
     app.updateConfiguration()
+    app.batchUpdate = false
 }
 
 func (app *App) Run() {

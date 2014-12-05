@@ -6,15 +6,14 @@ import (
 	"testing"
     "github.com/stretchr/testify/assert"
 )
+var info = model.Info{
+    Name: "My Switch",
+    SerialNumber: "001",
+    Manufacturer: "Google",
+    Model: "Switchy",
+}
 
 func TestSwitch(t *testing.T) {
-    info := model.Info{
-        Name: "My Switch",
-        SerialNumber: "001",
-        Manufacturer: "Google",
-        Model: "Switchy",
-    }
-    
     var s model.Switch = NewSwitch(info)
     
     assert.Equal(t, s.GetId(), model.InvalidId)
@@ -28,13 +27,6 @@ func TestSwitch(t *testing.T) {
 }
 
 func TestSwitchOnChanged(t *testing.T) {
-    info := model.Info{
-        Name: "My Switch",
-        SerialNumber: "001",
-        Manufacturer: "Google",
-        Model: "Switchy",
-    }
-    
     s := NewSwitch(info)
     
     var newValue = false
