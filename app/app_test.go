@@ -17,7 +17,7 @@ var info = model.Info{
     Model: "Switchy",
 }
 
-func TestBatchUpdates(t *testing.T) {
+func TestDnsUpdate(t *testing.T) {
     conf := NewConfig()
     conf.DatabaseDir = os.TempDir()
     
@@ -31,15 +31,17 @@ func TestBatchUpdates(t *testing.T) {
     configuration := dns.Configuration()
     
     sw1 := accessory.NewSwitch(info)
+    app.AddAccessory(sw1.Accessory)
+    
+    // Dns must not change because service is not published yet
+    assert.Equal(t, app.Database.DnsWithName(name).Configuration(), configuration)
+    
     sw2 := accessory.NewSwitch(info)
     app.PerformBatchUpdates(func() {
-        app.AddAccessory(sw1.Accessory)
-        assert.Equal(t, app.Database.DnsWithName(name).Configuration(), configuration)
         app.AddAccessory(sw2.Accessory)
         assert.Equal(t, app.Database.DnsWithName(name).Configuration(), configuration)
     })
     
-    // configuration + 1
     assert.Equal(t, app.Database.DnsWithName(name).Configuration(), configuration + 1)
 }
 

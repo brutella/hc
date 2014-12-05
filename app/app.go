@@ -114,7 +114,7 @@ func (app *App) AddAccessory(a *accessory.Accessory) {
             c.OnRemoteChange(onChange)
         }
     }
-    if app.batchUpdate == false {
+    if app.batchUpdate == false && app.IsReachable() {
         app.updateConfiguration()
     }
 }
@@ -143,6 +143,10 @@ func (app *App) SetReachable(reachable bool) {
         app.closeAllConnections()
         app.stopService()
     }
+}
+
+func (app *App) IsReachable() bool {
+    return app.mdns != nil
 }
 
 // Run starts the server and publishes the service via Bonjour
