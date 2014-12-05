@@ -38,7 +38,11 @@ func NewService(name, id string, port int) *Service {
     }
 }
 
-func (s *Service) Publish() error {    
+func (s *Service) IsPublished() bool {
+    return s.server != nil
+}
+
+func (s *Service) Publish() error {
     ip, err := GetFirstLocalIPAddress()
     if err != nil {
         return err

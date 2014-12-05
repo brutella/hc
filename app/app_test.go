@@ -42,3 +42,12 @@ func TestBatchUpdates(t *testing.T) {
     // configuration + 1
     assert.Equal(t, app.Database.DnsWithName(name).Configuration(), configuration + 1)
 }
+
+func TestReachabililty(t *testing.T) {
+    conf := NewConfig()
+    conf.DatabaseDir = os.TempDir()
+    
+    app, err := NewApp(conf)
+    assert.Nil(t, err)
+    assert.NotNil(t, app)
+}

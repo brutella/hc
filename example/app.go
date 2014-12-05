@@ -50,12 +50,12 @@ func main() {
     
     // go func() {
     //   for {
-    //       time.Sleep(10 * time.Second)
-    //       log.Println("[VERB] Remove accessory")
-    //       app.RemoveAccessory(sw.Accessory)
-    //       time.Sleep(10 * time.Second)
-    //       log.Println("[VERB] Add accessory")
-    //       app.AddAccessory(sw.Accessory)
+    //       time.Sleep(20 * time.Second)
+    //       log.Println("[VERB] Set unreachable")
+    //       app.SetReachable(false)
+    //       time.Sleep(20 * time.Second)
+    //       log.Println("[VERB] Set reachable")
+    //       app.SetReachable(true)
     //   }
     // }()
     

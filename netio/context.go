@@ -78,7 +78,10 @@ func (ctx *context) SetSessionForConnection(s Session, c net.Conn) {
 
 func (ctx *context) GetSessionForConnection(c net.Conn) Session {
     key := ctx.GetKey(c)
-    return ctx.Get(key).(Session)
+    if session, ok := ctx.Get(key).(Session); ok == true {
+        return session
+    }
+    return nil
 }
 
 func (ctx *context) GetSessionForRequest(r *http.Request) Session {

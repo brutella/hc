@@ -127,10 +127,18 @@ func (con *tcpHAPConnection) SetWriteDeadline(t time.Time) error {
 // Helper
 func (c *tcpHAPConnection) getEncrypter() Encrypter {
     session  := c.context.GetSessionForConnection(c.connection)
-    return session.Encrypter()
+    if session != nil {
+        return session.Encrypter()
+    }
+    
+    return nil
 }
 
 func (c *tcpHAPConnection) getDecrypter() Decrypter {
-    session  := c.context.GetSessionForConnection(c.connection)
-    return session.Decrypter()
+    session := c.context.GetSessionForConnection(c.connection)
+    if session != nil {
+        return session.Decrypter()
+    }
+    
+    return nil
 }
