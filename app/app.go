@@ -129,7 +129,6 @@ func (app *App) RemoveAccessory(a *accessory.Accessory) {
 func (app *App) PerformBatchUpdates(fn func()) {
     app.batchUpdate = true
     fn()
-    app.updateConfiguration()
     app.batchUpdate = false
 }
 
@@ -219,13 +218,13 @@ func (app *App) stopService() {
 }
 
 func (app *App) closeAllConnections() {
-    for _, c := range app.context.ActiveConnection() {
+    for _, c := range app.context.ActiveConnections() {
         c.Close()
     }
 }
 
 func (app *App) notifyListener(a *accessory.Accessory, c *characteristic.Characteristic) {
-    conns := app.context.ActiveConnection()    
+    conns := app.context.ActiveConnections()    
     for _, con := range conns {
         resp, err := event.NewNotification(a, c)
         if err != nil {

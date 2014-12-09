@@ -8,7 +8,7 @@ import(
     "github.com/brutella/log"
     
     "net/http"
-    "io/ioutil"
+    "io"
 )
 
 // Handles the /pair-verify endpoint and returns TLV8 encoded data
@@ -50,9 +50,7 @@ func (handler *PairVerify) ServeHTTP(response http.ResponseWriter, request *http
         log.Println(err)
         response.WriteHeader(http.StatusInternalServerError)
     } else {
-        bytes, _ := ioutil.ReadAll(res)
-        response.Write(bytes)
-        
+        io.Copy(response, res)        
         // Setup secure session
         if controller.KeyVerified() == true {
             // Verification is done

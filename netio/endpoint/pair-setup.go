@@ -6,7 +6,7 @@ import(
     "github.com/brutella/hap/netio"
     "github.com/brutella/log"
     
-    "io/ioutil"
+    "io"
     "net/http"
 )
 
@@ -57,7 +57,6 @@ func (handler *PairSetup) ServeHTTP(response http.ResponseWriter, request *http.
         log.Println("[ERRO]", err)
         response.WriteHeader(http.StatusInternalServerError)
     } else {
-        bytes, _ := ioutil.ReadAll(res)
-        response.Write(bytes)
+        io.Copy(response, res)
     }
 }

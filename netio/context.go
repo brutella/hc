@@ -30,7 +30,7 @@ type HAPContext interface {
     DeleteSessionForConnection(c net.Conn)
     
     // Returns a list of active connections
-    ActiveConnection() []net.Conn
+    ActiveConnections() []net.Conn
     
     // Setter and getter for bridge
     SetBridge(b *Bridge)
@@ -66,7 +66,7 @@ func (ctx *context) Get(key interface{}) (interface{}) {
     return ctx.storage[key]
 }
 
-func (ctx *context) Delete(key interface{}){
+func (ctx *context) Delete(key interface{}){    
     delete(ctx.storage, key)
 }
 
@@ -95,7 +95,7 @@ func (ctx *context) DeleteSessionForConnection(c net.Conn) {
 }
 
 // Returns a list of active connections
-func (ctx *context) ActiveConnection() []net.Conn {
+func (ctx *context) ActiveConnections() []net.Conn {
     connections := make([]net.Conn, 0)
     
     for _, v := range ctx.storage {

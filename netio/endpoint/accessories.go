@@ -36,8 +36,13 @@ func (handler *Accessories) ServeHTTP(response http.ResponseWriter, request *htt
         log.Println("[ERRO]", err)
         response.WriteHeader(http.StatusInternalServerError)
     } else {
-        bytes, _ := ioutil.ReadAll(res)
-        log.Println("[VERB] <-  JSON:", string(bytes))
-        response.Write(bytes)
+        // Write the data in chunks of 2048 bytes
+        // http.ResponseWriter should do this already, but crashes because of an unkown reason
+        wr := netio.NewChunkedWriter(response, 2048)
+        b, _ := ioutil.ReadAll(res)
+        _, err := wr.Write(b)
+        if err != nil {
+            log.Println("[ERRO]", err)
+        }
     }
 }

@@ -99,7 +99,7 @@ const (
     // switch service
     CharTypeOn                              = "25" // 15
     
-    CharTypeOutletInUse                     = "26" // 13
+    CharTypeInUse                           = "26" // 13
     CharTypeAudioFeedback                   = "5" // 15
     
     // garage door opener

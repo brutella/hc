@@ -31,6 +31,7 @@ func NewCharacteristics(c *controller.CharacteristicController) *Characteristics
 func (handler *Characteristics) ServeHTTP(response http.ResponseWriter, request *http.Request) {
     var res io.Reader
     var err error
+    
     switch request.Method {
     case netio.MethodGET:
         log.Println("[VERB] GET /characteristics")
@@ -49,10 +50,10 @@ func (handler *Characteristics) ServeHTTP(response http.ResponseWriter, request 
         response.WriteHeader(http.StatusInternalServerError)
     } else {
         if res != nil {
-            bytes, _ := ioutil.ReadAll(res)
             response.Header().Set("Content-Type", netio.HTTPContentTypeHAPJson)
-            log.Println("[VERB] <-  JSON:", string(bytes))
-            response.Write(bytes)
+            wr := netio.NewChunkedWriter(response, 2048)
+            b, _ := ioutil.ReadAll(res)
+            wr.Write(b)
         } else {
             response.WriteHeader(http.StatusNoContent)
         }

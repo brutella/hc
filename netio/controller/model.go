@@ -17,8 +17,5 @@ func NewContainerController(m *container.Container) *ContainerController {
 
 func (c *ContainerController) HandleGetAccessories(r io.Reader) (io.Reader, error) {
     result, err := json.Marshal(c.container)
-    var b bytes.Buffer
-    b.Write(result)
-    
-    return &b, err
+    return bytes.NewBuffer(result), err
 }

@@ -57,7 +57,7 @@ func (s *hkServer) ListenAndServe() error {
 }
 
 func (s *hkServer) Stop() {
-    for _, c := range s.context.ActiveConnection() {
+    for _, c := range s.context.ActiveConnections() {
         c.Close()
     }
     
@@ -110,7 +110,7 @@ func (s *hkServer) addrString() string {
 }
 
 func (s *hkServer) setupEndpoints() {
-    container_controller           := controller.NewContainerController(s.container)
+    container_controller       := controller.NewContainerController(s.container)
     characteristics_controller := controller.NewCharacteristicController(s.container)
     pairing_controller         := pair.NewPairingController(s.database)
     
