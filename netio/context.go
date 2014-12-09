@@ -3,6 +3,7 @@ package netio
 import(
     "net"
     "net/http"
+    "sync"
 )
 
 // Provides variables in global has accessible via a connection or request
@@ -40,11 +41,15 @@ type HAPContext interface {
 // HAPContext implementation
 type context struct {
     storage map[interface{}]interface{}
+    
+    // synchronize access because object is used by different goroutines
+    mutex *sync.Mutex
 }
 
 func NewContextForBridge(b *Bridge) *context {
     ctx := context{
         storage: map[interface{}]interface{}{},
+        mutex: &sync.Mutex{},
     }
     ctx.SetBridge(b)
     return &ctx
@@ -59,14 +64,20 @@ func (ctx *context) GetConnectionKey(r *http.Request) interface{} {
 }
 
 func (ctx *context) Set(key, val interface{}) {
+    ctx.mutex.Lock()
+    defer ctx.mutex.Unlock()
     ctx.storage[key] = val
 }
 
 func (ctx *context) Get(key interface{}) (interface{}) {
+    ctx.mutex.Lock()
+    defer ctx.mutex.Unlock()
     return ctx.storage[key]
 }
 
 func (ctx *context) Delete(key interface{}){    
+    ctx.mutex.Lock()
+    defer ctx.mutex.Unlock()
     delete(ctx.storage, key)
 }
 
@@ -97,7 +108,8 @@ func (ctx *context) DeleteSessionForConnection(c net.Conn) {
 // Returns a list of active connections
 func (ctx *context) ActiveConnections() []net.Conn {
     connections := make([]net.Conn, 0)
-    
+    ctx.mutex.Lock()
+    defer ctx.mutex.Unlock()
     for _, v := range ctx.storage {
         if s, ok := v.(Session); ok == true {
             connections = append(connections, s.Connection())
