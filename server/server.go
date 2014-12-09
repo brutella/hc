@@ -14,6 +14,7 @@ import(
     "os"
     "os/signal"
     "log"
+    "sync"
 )
 type Server interface {
     ListenAndServe() error
@@ -29,16 +30,18 @@ type hkServer struct {
     database db.Database
     bridge *netio.Bridge
     mux *http.ServeMux
+    mutex *sync.Mutex
     exitFunc ServerExitFunc
 }
 
-func NewServer(hap_ctx netio.HAPContext, d db.Database, c *container.Container, b *netio.Bridge) *hkServer {
+func NewServer(hap_ctx netio.HAPContext, d db.Database, c *container.Container, b *netio.Bridge, mutex *sync.Mutex) *hkServer {
     s := hkServer{
         context: hap_ctx, 
         database: d, 
         container: c, 
         bridge: b,
         mux: http.NewServeMux(),
+        mutex: mutex,
     }
     
     s.setupEndpoints()
@@ -82,10 +85,8 @@ func (s *hkServer) listenAndServe(addr string, handler http.Handler, context net
     if err != nil {
         return err
     }
-    
-    listener := netio.NewTCPHAPListener(ln.(*net.TCPListener), context)
-    
     s.port = ExtractPort(ln.Addr())
+    listener := netio.NewTCPHAPListener(ln.(*net.TCPListener), context)
     
     return server.Serve(listener)
 }
@@ -116,7 +117,7 @@ func (s *hkServer) setupEndpoints() {
     
     s.mux.Handle("/pair-setup", endpoint.NewPairSetup(s.bridge, s.database, s.context))
     s.mux.Handle("/pair-verify", endpoint.NewPairVerify(s.context, s.database))
-    s.mux.Handle("/accessories", endpoint.NewAccessories(container_controller))
-    s.mux.Handle("/characteristics", endpoint.NewCharacteristics(characteristics_controller))
+    s.mux.Handle("/accessories", endpoint.NewAccessories(container_controller, s.mutex))
+    s.mux.Handle("/characteristics", endpoint.NewCharacteristics(characteristics_controller, s.mutex))
     s.mux.Handle("/pairings", endpoint.NewPairing(pairing_controller))
 }

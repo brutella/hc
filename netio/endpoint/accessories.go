@@ -7,6 +7,7 @@ import(
     
     "net/http"
     "io/ioutil"
+    "sync"
 )
 
 // Handles the /accessories endpoint and returns all accessories as JSON
@@ -17,11 +18,13 @@ type Accessories struct {
     http.Handler
     
     controller *controller.ContainerController
+    mutex *sync.Mutex
 }
 
-func NewAccessories(c *controller.ContainerController) *Accessories {
+func NewAccessories(c *controller.ContainerController, mutex *sync.Mutex) *Accessories {
     handler := Accessories{
                 controller: c,
+                mutex: mutex,
             }
     
     return &handler
@@ -31,7 +34,10 @@ func (handler *Accessories) ServeHTTP(response http.ResponseWriter, request *htt
     log.Println("[VERB] GET /accessories")
     response.Header().Set("Content-Type", netio.HTTPContentTypeHAPJson)
     
+    handler.mutex.Lock()
     res, err := handler.controller.HandleGetAccessories(request.Body)
+    handler.mutex.Unlock()
+    
     if err != nil {
         log.Println("[ERRO]", err)
         response.WriteHeader(http.StatusInternalServerError)

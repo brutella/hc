@@ -8,6 +8,7 @@ import(
     "net/http"
     "io"
     "io/ioutil"
+    "sync"
 )
 
 // Handles the /characteristics endpoint
@@ -18,11 +19,13 @@ type Characteristics struct {
     http.Handler
     
     controller *controller.CharacteristicController
+    mutex *sync.Mutex
 }
 
-func NewCharacteristics(c *controller.CharacteristicController) *Characteristics {
+func NewCharacteristics(c *controller.CharacteristicController, mutex *sync.Mutex) *Characteristics {
     handler := Characteristics{
                 controller: c,
+                mutex: mutex,
             }
     
     return &handler
@@ -32,6 +35,7 @@ func (handler *Characteristics) ServeHTTP(response http.ResponseWriter, request 
     var res io.Reader
     var err error
     
+    handler.mutex.Lock()
     switch request.Method {
     case netio.MethodGET:
         log.Println("[VERB] GET /characteristics")
@@ -43,7 +47,7 @@ func (handler *Characteristics) ServeHTTP(response http.ResponseWriter, request 
     default:
         log.Println("[WARN] Cannot handle HTTP method", request.Method)
     }
-    
+    handler.mutex.Unlock()
     
     if err != nil {
         log.Println("[ERRO]", err)

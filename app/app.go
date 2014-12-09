@@ -5,6 +5,7 @@ import (
     "time"
     "io/ioutil"
     "bytes"
+    "sync"
     
     "github.com/brutella/log"
     "github.com/brutella/hap/db"
@@ -44,6 +45,7 @@ type App struct {
     container *container.Container
     server    server.Server
     mdns      *Service
+    mutex     *sync.Mutex // Syncs access to shared model data
     
     exitFunc AppExitFunc
     batchUpdate bool
@@ -86,6 +88,7 @@ func NewApp(conf Config) (*App, error) {
         Storage: storage,
         Database: database,
         container: cont,
+        mutex: &sync.Mutex{},
     }
     
     return &app, nil
@@ -127,6 +130,8 @@ func (app *App) RemoveAccessory(a *accessory.Accessory) {
 }
 
 func (app *App) PerformBatchUpdates(fn func()) {
+    app.mutex.Lock()
+    defer app.mutex.Unlock()
     app.batchUpdate = true
     fn()
     app.batchUpdate = false
@@ -156,7 +161,7 @@ func (app *App) Run() {
 // RunAndPublish starts the server
 // If publish is true, the Bonjour service is started automatically
 func (app *App) RunAndPublish(publish bool) {
-    s := server.NewServer(app.context, app.Database, app.container, app.bridge)
+    s := server.NewServer(app.context, app.Database, app.container, app.bridge, app.mutex)
     s.OnStop(func() {
         app.Stop()
     })
