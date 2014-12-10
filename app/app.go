@@ -37,18 +37,19 @@ func NewConfig() Config {
 type AppExitFunc func()
 type App struct {    
     context netio.HAPContext
+    
     Database db.Database
-    Storage common.Storage
+    Storage  common.Storage
     
     bridge    *netio.Bridge
-    container *container.Container
     server    server.Server
+    
+    mutex     *sync.Mutex
     mdns      *Service
-    mutex     *sync.Mutex // Syncs access to shared model data
+    container *container.Container
     
     exitFunc AppExitFunc
     batchUpdate bool
-    port  int64
 }
 
 func NewApp(conf Config) (*App, error) {
@@ -61,14 +62,12 @@ func NewApp(conf Config) (*App, error) {
         return nil, err
     }
     
-    database    := db.NewDatabaseWithStorage(storage)
+    database      := db.NewDatabaseWithStorage(storage)
     bridge_config := netio.NewBridgeInfo(conf.BridgeName, conf.BridgePassword, conf.BridgeManufacturer, storage)
-    
     bridge, err   := netio.NewBridge(bridge_config)
     if err != nil {
         return nil, err
     }
-    context     := netio.NewContextForBridge(bridge)
     
     info := model.Info{
         Name: bridge_config.Name,
@@ -76,18 +75,16 @@ func NewApp(conf Config) (*App, error) {
         Manufacturer: bridge_config.Manufacturer,
         Model: "Bridge",
     }
-    
     bridge_accessory := accessory.New(info)
-    
-    cont := container.NewContainer()
-    cont.AddAccessory(bridge_accessory)
+    container := container.NewContainer()
+    container.AddAccessory(bridge_accessory)
     
     app := App{
-        context: context,
+        context: netio.NewContextForBridge(bridge),
         bridge: bridge,
         Storage: storage,
         Database: database,
-        container: cont,
+        container: container,
         mutex: &sync.Mutex{},
     }
     
@@ -141,7 +138,7 @@ func (app *App) PerformBatchUpdates(fn func()) {
 // When a Bonjour service is running and reachable is false, the Bonjour service is stopped
 // When no Bonjour service is running and reachable is true, the service is announed via Bonjour
 func (app *App) SetReachable(reachable bool) {
-    if app.mdns.IsPublished() != reachable {
+    if app.IsReachable() != reachable {
         if reachable == true {
             app.mdns.Publish()
         } else {
@@ -152,7 +149,7 @@ func (app *App) SetReachable(reachable bool) {
 }
 
 func (app *App) IsReachable() bool {
-    return app.mdns.IsPublished()
+    return app.mdns != nil && app.mdns.IsPublished()
 }
 
 // Run starts the server and publishes the service via Bonjour
@@ -195,8 +192,10 @@ func (app *App) OnExit(fn AppExitFunc) {
     app.exitFunc = fn
 }
 
-func (app *App) Stop() {    
-    app.mdns.Stop()
+func (app *App) Stop() {
+    if app.mdns != nil {
+        app.mdns.Stop()
+    }
     if app.exitFunc != nil {
         app.exitFunc()
     }
@@ -217,15 +216,12 @@ func (app *App) notifyListener(a *accessory.Accessory, c *characteristic.Charact
         }
         
         // Write response into buffer to replace HTTP protocol 
-        // specifier with Event as required by HAP
+        // specifier with EVENT as required by HAP
         var buffer = new(bytes.Buffer)
         resp.Write(buffer)
         bytes, err := ioutil.ReadAll(buffer)
         bytes = event.FixProtocolSpecifier(bytes)
         log.Println("[VERB] <- ", string(bytes))
-        
-        // Write bytes to connection instead of using response object
-        // resp.Write(con)
         con.Write(bytes)
     }
 }
@@ -237,6 +233,8 @@ func (app *App) updateConfiguration() {
     if dns != nil {
         dns.SetConfiguration(dns.Configuration() + 1)
         app.Database.SaveDns(dns)
-        app.mdns.Update()
+        if app.mdns != nil {
+            app.mdns.Update()
+        }
     }
 }

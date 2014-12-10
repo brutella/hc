@@ -53,4 +53,5 @@ func TestReachabililty(t *testing.T) {
     app, err := NewApp(conf)
     assert.Nil(t, err)
     assert.NotNil(t, app)
+    assert.False(t, app.IsReachable())
 }
