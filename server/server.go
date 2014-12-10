@@ -23,18 +23,29 @@ type Server interface {
 }
 
 type ServerExitFunc func()
-type hkServer struct {
-    port string
-    container *container.Container
+type hkServer struct {    
     context netio.HAPContext
     database db.Database
     bridge *netio.Bridge
     mux *http.ServeMux
-    mutex *sync.Mutex
+    
     exitFunc ServerExitFunc
+    
+    mutex *sync.Mutex
+    container *container.Container
+    
+    port string
+    listener *net.TCPListener
 }
 
 func NewServer(hap_ctx netio.HAPContext, d db.Database, c *container.Container, b *netio.Bridge, mutex *sync.Mutex) *hkServer {
+    // os gives us a free Port when Port is "" 
+    ln, err := net.Listen("tcp", "")
+    if err != nil {
+        log.Fatal(err)
+    }
+    port := ExtractPort(ln.Addr())
+    
     s := hkServer{
         context: hap_ctx, 
         database: d, 
@@ -42,6 +53,8 @@ func NewServer(hap_ctx netio.HAPContext, d db.Database, c *container.Container, 
         bridge: b,
         mux: http.NewServeMux(),
         mutex: mutex,
+        listener: ln.(*net.TCPListener),
+        port: port,
     }
     
     s.setupEndpoints()
@@ -80,14 +93,7 @@ func (s *hkServer) dnssdCommand() string {
 
 func (s *hkServer) listenAndServe(addr string, handler http.Handler, context netio.HAPContext) error {
     server := http.Server{Addr: addr, Handler:handler}
-    // os gives us a free Port when Port is "" 
-    ln, err := net.Listen("tcp", "")
-    if err != nil {
-        return err
-    }
-    s.port = ExtractPort(ln.Addr())
-    listener := netio.NewTCPHAPListener(ln.(*net.TCPListener), context)
-    
+    listener := netio.NewTCPHAPListener(s.listener, context)
     return server.Serve(listener)
 }
 

@@ -2,7 +2,6 @@ package app
 
 import (
     "errors"
-    "time"
     "io/ioutil"
     "bytes"
     "sync"
@@ -49,6 +48,7 @@ type App struct {
     
     exitFunc AppExitFunc
     batchUpdate bool
+    port  int64
 }
 
 func NewApp(conf Config) (*App, error) {
@@ -141,16 +141,18 @@ func (app *App) PerformBatchUpdates(fn func()) {
 // When a Bonjour service is running and reachable is false, the Bonjour service is stopped
 // When no Bonjour service is running and reachable is true, the service is announed via Bonjour
 func (app *App) SetReachable(reachable bool) {
-    if app.mdns == nil && reachable == true {
-        app.publishService(app.server)
-    } else if app.mdns != nil && reachable == false {
-        app.closeAllConnections()
-        app.stopService()
+    if app.mdns.IsPublished() != reachable {
+        if reachable == true {
+            app.mdns.Publish()
+        } else {
+            app.closeAllConnections()
+            app.mdns.Stop()
+        }
     }
 }
 
 func (app *App) IsReachable() bool {
-    return app.mdns != nil
+    return app.mdns.IsPublished()
 }
 
 // Run starts the server and publishes the service via Bonjour
@@ -162,18 +164,27 @@ func (app *App) Run() {
 // If publish is true, the Bonjour service is started automatically
 func (app *App) RunAndPublish(publish bool) {
     s := server.NewServer(app.context, app.Database, app.container, app.bridge, app.mutex)
+    port := to.Int64(s.Port())
+    
+    app.mutex.Lock()
+    mdns := NewService(app.bridge.Name(), app.bridge.Id(), int(port))
+    app.mdns = mdns
+    app.mutex.Unlock()
+    
+    dns := app.Database.DnsWithName(app.bridge.Name())
+    if dns == nil {
+        dns = db.NewDns(app.bridge.Name(), 1, 1)
+        app.Database.SaveDns(dns)
+    }
+    if publish {
+        app.mutex.Lock()
+        mdns.Update()
+        app.mutex.Unlock()
+    }
+    
     s.OnStop(func() {
         app.Stop()
     })
-    
-    if publish == true {
-        go func() {
-            time.Sleep(1 * time.Second)
-            app.publishService(s)
-        }()
-    }
-    
-    app.server = s
     err := s.ListenAndServe()
     if err != nil {
         log.Fatal(err)
@@ -184,41 +195,10 @@ func (app *App) OnExit(fn AppExitFunc) {
     app.exitFunc = fn
 }
 
-func (app *App) Stop() {
-    // Stop mDNS
-    app.stopService()
+func (app *App) Stop() {    
+    app.mdns.Stop()
     if app.exitFunc != nil {
         app.exitFunc()
-    }
-}
-
-func (app *App) publishService(server server.Server) {
-    port := to.Int64(server.Port())
-    mdns := NewService(app.bridge.Name(), app.bridge.Id(), int(port))
-    
-    // c# and s# TXT records are stored in database
-    // Set to 1 on first launch
-    dns := app.Database.DnsWithName(app.bridge.Name())
-    if dns == nil {
-        dns = db.NewDns(app.bridge.Name(), 1, 1)
-        app.Database.SaveDns(dns)
-    }
-    mdns.configuration = dns.Configuration()
-    mdns.state = dns.State()
-    
-    err := mdns.Publish()
-    if err != nil {
-        log.Fatal("Could not publish server", err)
-    }
-    
-    app.mdns = mdns
-}
-
-func (app *App) stopService() {
-    if app.mdns != nil {
-        log.Println("[INFO] Stopping mdns...")
-        app.mdns.Stop()
-        app.mdns = nil
     }
 }
 
@@ -257,15 +237,6 @@ func (app *App) updateConfiguration() {
     if dns != nil {
         dns.SetConfiguration(dns.Configuration() + 1)
         app.Database.SaveDns(dns)
-        app.updateDns()
-    }
-}
-
-func (app *App) updateDns() {
-    dns := app.Database.DnsWithName(app.bridge.Name())
-    if app.mdns != nil && dns != nil {
-        app.mdns.configuration = dns.Configuration()
-        app.mdns.state = dns.State()
         app.mdns.Update()
     }
 }
