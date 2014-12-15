@@ -20,7 +20,7 @@ func NewCurrentHeatingCoolingMode(current model.HeatCoolMode) *HeatingCoolingMod
 }
 
 func NewTargetHeatingCoolingMode(current model.HeatCoolMode) *HeatingCoolingMode {
-    return NewHeatingCoolingMode(current, CharTypeHeatingCoolingModeTarget, PermsRead())
+    return NewHeatingCoolingMode(current, CharTypeHeatingCoolingModeTarget, PermsAll())
 }
 
 func (c *HeatingCoolingMode) SetHeatingCoolingMode(mode model.HeatCoolMode) {
