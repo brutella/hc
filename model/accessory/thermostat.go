@@ -50,7 +50,9 @@ func (t *thermostat) TargetTemperature() float64 {
 }
 
 func (t *thermostat) SetMode(value model.HeatCoolMode) {
-    t.thermostat.Mode.SetHeatingCoolingMode(value)
+    if value != model.ModeAuto {
+        t.thermostat.Mode.SetHeatingCoolingMode(value)
+    }
 }
 
 func (t *thermostat) Mode() model.HeatCoolMode {

@@ -21,7 +21,8 @@ type Thermostat interface {
     // Returns the target temperature
     TargetTemperature() float64
     
-    // Sets the mode
+    // SetMode sets the current mode
+    // ModeAuto is ignored because the current mode cannot be auto
     SetMode(HeatCoolMode)
     
     // Returns the mode
