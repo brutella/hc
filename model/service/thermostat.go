@@ -22,8 +22,8 @@ type Thermostat struct {
 // HomeKit does not support thermometers
 // We use a thermostat with readonly services
 // TODO File radar
-func NewThermometer(name string, temperature float64) *Thermostat {
-    thermostat := NewThermostat(name, temperature, 0, 100, 1)
+func NewThermometer(name string, temperature, min, max, steps float64) *Thermostat {
+    thermostat := NewThermostat(name, temperature, min, max, steps)
     
     thermostat.TargetTemp.Permissions = characteristic.PermsRead()
     thermostat.TargetMode.Permissions = characteristic.PermsRead()

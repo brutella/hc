@@ -11,9 +11,9 @@ type thermostat struct {
     thermostat *service.Thermostat
 }
 
-func NewThermometer(info model.Info, temp float64) *thermostat{
+func NewThermometer(info model.Info, temp, min, max, steps float64) *thermostat{
     accessory := New(info)
-    t := service.NewThermometer(info.Name, temp)
+    t := service.NewThermometer(info.Name, temp, min, max, steps)
     
     accessory.AddService(t.Service)
     
