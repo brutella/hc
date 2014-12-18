@@ -56,6 +56,23 @@ func TestCharacteristicRemoteDelegate(t *testing.T) {
     assert.Equal(t, newValue, 10)
 }
 
+func TestNoValueChange(t *testing.T) {
+    c := NewCharacteristic(5, FormatInt, CharTypeOn, nil)
+    
+    changed := false
+    c.OnRemoteChange(func(c *Characteristic, old interface{}){
+        changed = true
+    })
+    
+    c.OnLocalChange(func(c *Characteristic, old interface{}){
+        changed = true
+    })
+    
+    c.SetValue(5)
+    c.SetValueFromRemote(5)
+    assert.False(t, changed)
+}
+
 func TestEqual(t *testing.T) {
    c1 := NewCharacteristic(5, FormatInt, CharTypeOn, nil)
    c2 := NewCharacteristic(5, FormatInt, CharTypeOn, nil) 

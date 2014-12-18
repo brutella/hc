@@ -112,6 +112,11 @@ func (c *Characteristic) setValue(value interface{}, remote bool) {
         value = converted
     }
     
+    // Ignore when new value is same
+    if c.Value == value {
+        return
+    }
+    
     old := c.Value
     c.Value = value
     
