@@ -61,10 +61,6 @@ func NewSecureClientSessionFromSharedKey(sharedKey [32]byte) (*secureSession, er
     return s, err
 }
 
-func (s *secureSession) EncryptionEnabled() bool {
-    return true
-}
-
 // Encrypts the data by splitting it into packets
 //  [ length (2 bytes)] [ data ] [ auth (16 bytes)]
 func (s *secureSession) Encrypt(r io.Reader) (io.Reader, error){
