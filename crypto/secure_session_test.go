@@ -21,12 +21,14 @@ func TestCrypto(t *testing.T) {
     var b bytes.Buffer
     b.Write(data)
     
+    // Set count to min 2 bytes to test byte order handling
+    server.encryptCount = 128
     encrypted, err := server.Encrypt(&b)
     assert.Nil(t, err)
-    
+
+    client.decryptCount = 128
     decrypted, err := client.Decrypt(encrypted)
     assert.Nil(t, err)
-    
     orig, err := ioutil.ReadAll(decrypted)
     assert.Nil(t, err)
     assert.Equal(t, orig, data)

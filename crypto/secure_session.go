@@ -8,6 +8,10 @@ import(
     "github.com/brutella/hap/common"
 )
 
+// secureSession provide a secure session by encrypting and decrypting data
+//
+// TODO(brutella) Why is the data encoded in little endian when we are sending
+// it over the wire and it should be network byte order (big endian)?
 type secureSession struct {
     encryptKey [32]byte
     decryptKey [32]byte
@@ -68,7 +72,7 @@ func (s *secureSession) Encrypt(r io.Reader) (io.Reader, error){
     var b bytes.Buffer
     for _, p :=  range packets {
         var nonce_bytes [8]byte
-        binary.PutUvarint(nonce_bytes[:], s.encryptCount)
+        binary.LittleEndian.PutUint64(nonce_bytes[:], s.encryptCount)
         s.encryptCount += 1
         
         length_bytes := make([]byte, 2)
@@ -114,7 +118,7 @@ func (s *secureSession) Decrypt(r io.Reader) (io.Reader, error){
         }
         
         var nonce_bytes [8]byte
-        binary.PutUvarint(nonce_bytes[:], s.decryptCount)
+        binary.LittleEndian.PutUint64(nonce_bytes[:], s.decryptCount)
         s.decryptCount += 1
         
         length_bytes := make([]byte, 2)
