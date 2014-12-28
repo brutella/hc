@@ -23,10 +23,13 @@ func NewPairSetupServerSession(username, password string) (*PairSetupServerSessi
     var err error
     pair_name := []byte("Pair-Setup")
     srp, err := srp.NewSRP(SRPGroup, sha512.New, KeyDerivativeFuncRFC2945(sha512.New, []byte(pair_name)))
+    
     if err == nil {
         srp.SaltLength = 16
+        // TODO(brutella) Needs optimization (takes ~11sec on a Raspberry Pi B+)
         salt, v, err := srp.ComputeVerifier([]byte(password))
         if err == nil {
+            // TODO(brutella) Needs optimization (takes ~8sec on a Raspberry Pi B+)
             session := srp.NewServerSession([]byte(pair_name), salt, v)
             pairing := PairSetupServerSession{
                         srp: srp, 

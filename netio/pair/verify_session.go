@@ -14,6 +14,7 @@ type PairVerifySession struct {
 
 func NewPairVerifySession() (*PairVerifySession) {
     secretKey := crypto.Curve25519_GenerateSecretKey()
+    // TODO(brutella) Needs optimization (takes ~1.5sec on Raspberry Pi B+)
     publicKey := crypto.Curve25519_PublicKey(secretKey)
     
     return &PairVerifySession{
