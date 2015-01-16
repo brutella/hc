@@ -21,7 +21,8 @@ func TestAddPairing(t *testing.T) {
     
     tlv8_out, err := controller.Handle(tlv8)
     assert.Nil(t, err)
-    assert.Nil(t, tlv8_out)
+    assert.NotNil(t, tlv8_out)
+    assert.Equal(t, tlv8_out.GetByte(TLVType_SequenceNumber), byte(0x2))
 }
 
 func TestDeletePairing(t *testing.T) {
@@ -39,7 +40,8 @@ func TestDeletePairing(t *testing.T) {
     
     tlv8_out, err := controller.Handle(tlv8)
     assert.Nil(t, err)
-    assert.Nil(t, tlv8_out)
+    assert.NotNil(t, tlv8_out)
+    assert.Equal(t, tlv8_out.GetByte(TLVType_SequenceNumber), byte(0x2))
     
     saved_client := database.ClientWithName(username)
     assert.Nil(t, saved_client)

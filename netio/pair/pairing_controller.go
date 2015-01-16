@@ -52,5 +52,8 @@ func (c *PairingController) Handle(tlv8 common.Container) (common.Container, err
         }
     }
     
-    return nil, nil
+    out := common.NewTLV8Container()
+    out.SetByte(TLVType_SequenceNumber, 0x2)
+    
+    return out, nil
 }
