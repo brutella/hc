@@ -1,68 +1,68 @@
 package accessory
 
-import(
-    "github.com/brutella/hap/model"
-    "github.com/brutella/hap/model/service"
+import (
+	"github.com/brutella/hap/model"
+	"github.com/brutella/hap/model/service"
 )
 
 type thermostat struct {
-    *Accessory
-    
-    thermostat *service.Thermostat
+	*Accessory
+
+	thermostat *service.Thermostat
 }
 
-func NewThermometer(info model.Info, temp, min, max, steps float64) *thermostat{
-    accessory := New(info)
-    t := service.NewThermometer(info.Name, temp, min, max, steps)
-    
-    accessory.AddService(t.Service)
-    
-    return &thermostat{accessory, t}
+func NewThermometer(info model.Info, temp, min, max, steps float64) *thermostat {
+	accessory := New(info)
+	t := service.NewThermometer(info.Name, temp, min, max, steps)
+
+	accessory.AddService(t.Service)
+
+	return &thermostat{accessory, t}
 }
 
-func NewThermostat(info model.Info, temp, min, max, steps float64) *thermostat{
-    accessory := New(info)
-    t := service.NewThermostat(info.Name, temp, min, max, steps)
-    
-    accessory.AddService(t.Service)
-    
-    return &thermostat{accessory, t}
+func NewThermostat(info model.Info, temp, min, max, steps float64) *thermostat {
+	accessory := New(info)
+	t := service.NewThermostat(info.Name, temp, min, max, steps)
+
+	accessory.AddService(t.Service)
+
+	return &thermostat{accessory, t}
 }
 
 func (t *thermostat) Temperature() float64 {
-    return t.thermostat.Temp.Temperature()
+	return t.thermostat.Temp.Temperature()
 }
 
 func (t *thermostat) SetTemperature(value float64) {
-    t.thermostat.Temp.SetTemperature(value)
+	t.thermostat.Temp.SetTemperature(value)
 }
 
 func (t *thermostat) Unit() model.TempUnit {
-    return t.thermostat.Unit.Unit()
+	return t.thermostat.Unit.Unit()
 }
 
 func (t *thermostat) SetTargetTemperature(value float64) {
-    t.thermostat.TargetTemp.SetTemperature(value)
+	t.thermostat.TargetTemp.SetTemperature(value)
 }
 
 func (t *thermostat) TargetTemperature() float64 {
-    return t.thermostat.TargetTemp.Temperature()
+	return t.thermostat.TargetTemp.Temperature()
 }
 
 func (t *thermostat) SetMode(value model.HeatCoolMode) {
-    if value != model.ModeAuto {
-        t.thermostat.Mode.SetHeatingCoolingMode(value)
-    }
+	if value != model.ModeAuto {
+		t.thermostat.Mode.SetHeatingCoolingMode(value)
+	}
 }
 
 func (t *thermostat) Mode() model.HeatCoolMode {
-    return t.thermostat.Mode.HeatingCoolingMode()
+	return t.thermostat.Mode.HeatingCoolingMode()
 }
 
 func (t *thermostat) SetTargetMode(value model.HeatCoolMode) {
-    t.thermostat.TargetMode.SetHeatingCoolingMode(value)
+	t.thermostat.TargetMode.SetHeatingCoolingMode(value)
 }
 
 func (t *thermostat) TargetMode() model.HeatCoolMode {
-    return t.thermostat.TargetMode.HeatingCoolingMode()
+	return t.thermostat.TargetMode.HeatingCoolingMode()
 }

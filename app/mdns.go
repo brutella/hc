@@ -1,105 +1,105 @@
 package app
 
 import (
-    "github.com/oleksandr/bonjour"
-    "github.com/gosexy/to"
-    "github.com/brutella/log"
-    
-    "fmt"
-    "net"
-    "errors"
-    "os"
-    "strings"
+	"github.com/brutella/log"
+	"github.com/gosexy/to"
+	"github.com/oleksandr/bonjour"
+
+	"errors"
+	"fmt"
+	"net"
+	"os"
+	"strings"
 )
 
 type Service struct {
-    name string
-    port int
-    protocol string         // Protocol version (pv) (Default 1.0)
-    id string
-    configuration int64     // c#
-    state int64             // s#
-    mfiCompliant bool       // ff
-    status int64            // sf
-    
-    server *bonjour.Server
+	name          string
+	port          int
+	protocol      string // Protocol version (pv) (Default 1.0)
+	id            string
+	configuration int64 // c#
+	state         int64 // s#
+	mfiCompliant  bool  // ff
+	status        int64 // sf
+
+	server *bonjour.Server
 }
 
 func NewService(name, id string, port int) *Service {
-    return &Service{
-        name: name,
-        port: port,
-        protocol: "1.0",
-        id: id,
-        configuration: 1,
-        state: 1,
-        mfiCompliant: false,
-        status: 1,
-    }
+	return &Service{
+		name:          name,
+		port:          port,
+		protocol:      "1.0",
+		id:            id,
+		configuration: 1,
+		state:         1,
+		mfiCompliant:  false,
+		status:        1,
+	}
 }
 
 func (s *Service) IsPublished() bool {
-    return s.server != nil
+	return s.server != nil
 }
 
 func (s *Service) Publish() error {
-    ip, err := GetFirstLocalIPAddress()
-    if err != nil {
-        return err
-    }
-    log.Println("[INFO] Bridge IP is", ip)
-    
-    // Host should end with '.'
-    hostname, _ := os.Hostname()
-    host := fmt.Sprintf("%s.", strings.Trim(hostname, "."))
-    server, err := bonjour.RegisterProxy(s.name, "_hap._tcp.", "", s.port, host, ip.String(), s.txtRecords(), nil)
-    if err != nil {
-        log.Fatal(err)
-    }
-    
-    s.server = server
-    return err
+	ip, err := GetFirstLocalIPAddress()
+	if err != nil {
+		return err
+	}
+	log.Println("[INFO] Bridge IP is", ip)
+
+	// Host should end with '.'
+	hostname, _ := os.Hostname()
+	host := fmt.Sprintf("%s.", strings.Trim(hostname, "."))
+	server, err := bonjour.RegisterProxy(s.name, "_hap._tcp.", "", s.port, host, ip.String(), s.txtRecords(), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	s.server = server
+	return err
 }
 
 func (s *Service) Update() {
-    // TODO(brutella) Discard if not published yet
-    s.server.SetText(s.txtRecords())
-    log.Println("[INFO]", s.txtRecords())
+	// TODO(brutella) Discard if not published yet
+	s.server.SetText(s.txtRecords())
+	log.Println("[INFO]", s.txtRecords())
 }
 
 func (s *Service) Stop() {
-    s.server.Shutdown()
-    s.server = nil
+	s.server.Shutdown()
+	s.server = nil
 }
 
 // Returns the first available IP address of the local machine
 // This is a fix for Beaglebone Black where net.LookupIP(hostname)
 // return no IP address
 func GetFirstLocalIPAddress() (net.IP, error) {
-    addrs, err := net.InterfaceAddrs()
+	addrs, err := net.InterfaceAddrs()
 	if err != nil {
-        return nil, err
+		return nil, err
 	}
 
 	for _, a := range addrs {
 		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 			if ipnet.IP.To4() != nil {
-                return ipnet.IP, nil
+				return ipnet.IP, nil
 			}
 		}
 	}
-    
-    return nil, errors.New("Could not determine ip address")
+
+	return nil, errors.New("Could not determine ip address")
 }
 
 func (s *Service) txtRecords() []string {
-    return []string{
-        fmt.Sprintf("pv=%s", s.protocol),
-        fmt.Sprintf("id=%s", s.id),
-        fmt.Sprintf("c#=%d", s.configuration),
-        fmt.Sprintf("s#=%d", s.state),
-        fmt.Sprintf("sf=%d", s.status),
-        fmt.Sprintf("ff=%d", to.Int64(s.mfiCompliant)),
-        fmt.Sprintf("md=%s", s.name),
-    }
+	return []string{
+		fmt.Sprintf("pv=%s", s.protocol),
+		fmt.Sprintf("id=%s", s.id),
+		fmt.Sprintf("c#=%d", s.configuration),
+		fmt.Sprintf("s#=%d", s.state),
+		fmt.Sprintf("sf=%d", s.status),
+		fmt.Sprintf("ff=%d", to.Int64(s.mfiCompliant)),
+		fmt.Sprintf("md=%s", s.name),
+	}
 }

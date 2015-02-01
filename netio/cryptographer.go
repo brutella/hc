@@ -1,18 +1,18 @@
 package netio
 
-import(
-    "io"
+import (
+	"io"
 )
 
 type Encrypter interface {
-    Encrypt(r io.Reader) (io.Reader, error)
+	Encrypt(r io.Reader) (io.Reader, error)
 }
 
 type Decrypter interface {
-    Decrypt(r io.Reader) (io.Reader, error)
+	Decrypt(r io.Reader) (io.Reader, error)
 }
 
 type Cryptographer interface {
-    Encrypter
-    Decrypter
+	Encrypter
+	Decrypter
 }

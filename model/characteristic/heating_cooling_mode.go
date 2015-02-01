@@ -1,35 +1,34 @@
 package characteristic
 
-import(
-    "github.com/brutella/hap/model"
+import (
+	"github.com/brutella/hap/model"
 )
 
 type HeatingCoolingMode struct {
-    *ByteCharacteristic
+	*ByteCharacteristic
 }
 
 func NewHeatingCoolingMode(current model.HeatCoolMode, charType CharType, permissions []string) *HeatingCoolingMode {
-    c := HeatingCoolingMode{NewByteCharacteristic(byte(current))}
-    c.Type = charType
-    c.Permissions = permissions
-    return &c
+	c := HeatingCoolingMode{NewByteCharacteristic(byte(current))}
+	c.Type = charType
+	c.Permissions = permissions
+	return &c
 }
 
 func NewCurrentHeatingCoolingMode(current model.HeatCoolMode) *HeatingCoolingMode {
-    return NewHeatingCoolingMode(current, CharTypeHeatingCoolingModeCurrent, PermsRead())
+	return NewHeatingCoolingMode(current, CharTypeHeatingCoolingModeCurrent, PermsRead())
 }
 
 func NewTargetHeatingCoolingMode(current model.HeatCoolMode) *HeatingCoolingMode {
-    return NewHeatingCoolingMode(current, CharTypeHeatingCoolingModeTarget, PermsAll())
+	return NewHeatingCoolingMode(current, CharTypeHeatingCoolingModeTarget, PermsAll())
 }
 
 func (c *HeatingCoolingMode) SetHeatingCoolingMode(mode model.HeatCoolMode) {
-    c.SetByte(byte(mode))
+	c.SetByte(byte(mode))
 }
 
-
 func (c *HeatingCoolingMode) HeatingCoolingMode() model.HeatCoolMode {
-    return model.HeatCoolMode(c.Byte())
+	return model.HeatCoolMode(c.Byte())
 }
 
 // type CurrentRelativeHumidityCharacteristic struct {

@@ -1,16 +1,15 @@
 package characteristic
 
-import(
-)
+import ()
 
 type TLV8 struct {
-    *Characteristic
+	*Characteristic
 }
 
 // TODO implement
 func NewTLV8(tlv []byte) *TLV8 {
-    b := &Characteristic{}
-    b.Type = CharTypeUnknown
-    
-    return &TLV8{b}
+	b := &Characteristic{}
+	b.Type = CharTypeUnknown
+
+	return &TLV8{b}
 }

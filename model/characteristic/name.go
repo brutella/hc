@@ -1,21 +1,21 @@
 package characteristic
 
 type Name struct {
-    *String
+	*String
 }
 
 func NewName(name string) *Name {
-    str := NewString(name)
-    str.Type = CharTypeName
-    str.Permissions = PermsRead()
-    
-    return &Name{str}
+	str := NewString(name)
+	str.Type = CharTypeName
+	str.Permissions = PermsRead()
+
+	return &Name{str}
 }
 
 func (n *Name) SetName(name string) {
-    n.SetString(name)
+	n.SetString(name)
 }
 
-func (n *Name) Name() string{
-    return n.StringValue()
+func (n *Name) Name() string {
+	return n.StringValue()
 }

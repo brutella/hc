@@ -1,19 +1,19 @@
 package characteristic
 
 type On struct {
-    *Bool
+	*Bool
 }
 
 func NewOn(value bool) *On {
-    char := NewBool(value)
-    char.Type = CharTypeOn
-    return &On{char}
+	char := NewBool(value)
+	char.Type = CharTypeOn
+	return &On{char}
 }
 
 func (b *On) SetOn(value bool) {
-    b.SetBool(value)
+	b.SetBool(value)
 }
 
 func (b *On) On() bool {
-    return b.BoolValue()
+	return b.BoolValue()
 }

@@ -1,18 +1,18 @@
 package characteristic
 
 type Bool struct {
-    *Number
+	*Number
 }
 
 func NewBool(value bool) *Bool {
-    number := NewNumber(value, nil, nil, nil, FormatBool)
-    return &Bool{number}
+	number := NewNumber(value, nil, nil, nil, FormatBool)
+	return &Bool{number}
 }
 
 func (c *Bool) SetBool(value bool) {
-    c.SetNumber(value)
+	c.SetNumber(value)
 }
 
 func (c *Bool) BoolValue() bool {
-    return c.GetValue().(bool)
+	return c.GetValue().(bool)
 }

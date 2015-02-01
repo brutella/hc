@@ -1,20 +1,20 @@
 package app
 
 import (
-    "os"
-    "testing"
-    "github.com/stretchr/testify/assert"
-    
-    // "github.com/brutella/hap/db"
-    "github.com/brutella/hap/model"
-    // "github.com/brutella/hap/model/accessory"
+	"github.com/stretchr/testify/assert"
+	"os"
+	"testing"
+
+	// "github.com/brutella/hap/db"
+	"github.com/brutella/hap/model"
+	// "github.com/brutella/hap/model/accessory"
 )
 
 var info = model.Info{
-    Name: "My Switch",
-    SerialNumber: "001",
-    Manufacturer: "Google",
-    Model: "Switchy",
+	Name:         "My Switch",
+	SerialNumber: "001",
+	Manufacturer: "Google",
+	Model:        "Switchy",
 }
 
 // TODO(brutella) Decide when to update DNS
@@ -47,11 +47,11 @@ var info = model.Info{
 // }
 
 func TestReachabililty(t *testing.T) {
-    conf := NewConfig()
-    conf.DatabaseDir = os.TempDir()
-    
-    app, err := NewApp(conf)
-    assert.Nil(t, err)
-    assert.NotNil(t, app)
-    assert.False(t, app.IsReachable())
+	conf := NewConfig()
+	conf.DatabaseDir = os.TempDir()
+
+	app, err := NewApp(conf)
+	assert.Nil(t, err)
+	assert.NotNil(t, app)
+	assert.False(t, app.IsReachable())
 }

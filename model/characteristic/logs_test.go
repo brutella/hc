@@ -1,11 +1,11 @@
 package characteristic
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
-    "github.com/stretchr/testify/assert"
 )
 
 func TestLogs(t *testing.T) {
-    n := NewLogs("Test")
-    assert.Equal(t, n.Type, CharTypeLogs)
+	n := NewLogs("Test")
+	assert.Equal(t, n.Type, CharTypeLogs)
 }

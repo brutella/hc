@@ -1,17 +1,17 @@
 package characteristic
 
 type String struct {
-    *Characteristic
+	*Characteristic
 }
 
 func NewString(value string) *String {
-    return &String{NewCharacteristic(value, FormatString, CharTypeUnknown, nil)}
+	return &String{NewCharacteristic(value, FormatString, CharTypeUnknown, nil)}
 }
 
 func (s *String) SetString(str string) {
-    s.SetValue(str)
+	s.SetValue(str)
 }
 
 func (s *String) StringValue() string {
-    return s.Value.(string)
+	return s.Value.(string)
 }

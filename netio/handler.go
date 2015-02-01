@@ -1,26 +1,26 @@
 package netio
 
-import(
-    "github.com/brutella/hap/common"
-    "io"
-    "net/url"
+import (
+	"github.com/brutella/hap/common"
+	"io"
+	"net/url"
 )
 
 type ContainerHandler interface {
-    Handle(common.Container) (common.Container, error)
+	Handle(common.Container) (common.Container, error)
 }
 
 type PairVerifyHandler interface {
-    ContainerHandler
-    SharedKey() [32]byte
-    KeyVerified() bool
+	ContainerHandler
+	SharedKey() [32]byte
+	KeyVerified() bool
 }
 
 type AccessoriesHandler interface {
-    HandleGetAccessories() (io.Reader, error)
+	HandleGetAccessories() (io.Reader, error)
 }
 
 type CharacteristicsHandler interface {
-    HandleGetCharacteristics(url.Values) (io.Reader, error)
-    HandleUpdateCharacteristics(io.Reader) error
+	HandleGetCharacteristics(url.Values) (io.Reader, error)
+	HandleUpdateCharacteristics(io.Reader) error
 }

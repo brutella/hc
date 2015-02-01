@@ -1,5 +1,5 @@
 package model
 
 type Compareable interface {
-    Equal(interface{}) bool
+	Equal(interface{}) bool
 }

@@ -1,15 +1,15 @@
 package service
 
 import (
-    "github.com/brutella/hap/model"
-    
+	"github.com/brutella/hap/model"
+
+	"github.com/stretchr/testify/assert"
 	"testing"
-    "github.com/stretchr/testify/assert"
 )
 
-func TestService(t *testing.T) {    
-     s := New()
-    
-    assert.Equal(t, s.GetId(), model.InvalidId)
-    assert.Equal(t, len(s.GetCharacteristics()), 0)
+func TestService(t *testing.T) {
+	s := New()
+
+	assert.Equal(t, s.GetId(), model.InvalidId)
+	assert.Equal(t, len(s.GetCharacteristics()), 0)
 }
