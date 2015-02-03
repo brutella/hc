@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-// Handles the /pairigns endpoint and returns either http status 204
+// Handles the /pairings endpoint
 //
 // This endpoint is not session based and the same for all connections
 type Pairing struct {
