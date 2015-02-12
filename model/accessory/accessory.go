@@ -2,6 +2,7 @@ package accessory
 
 import (
 	"github.com/brutella/hap/model"
+	"github.com/brutella/hap/model/characteristic"
 	"github.com/brutella/hap/model/service"
 )
 
@@ -16,6 +17,8 @@ type Accessory struct {
 
 	Info    *service.AccessoryInfo `json:"-"`
 	idCount int64
+
+	onIdentify func()
 }
 
 func New(info model.Info) *Accessory {
@@ -27,6 +30,13 @@ func New(info model.Info) *Accessory {
 	}
 
 	a.AddService(i.Service)
+
+	i.Identify.OnRemoteChange(func(c *characteristic.Characteristic, v interface{}) {
+		if a.onIdentify != nil && a.Info.Identify.Identify() == true {
+			a.onIdentify()
+		}
+		c.SetValue(false)
+	})
 
 	return a
 }
@@ -61,6 +71,10 @@ func (a *Accessory) Manufacturer() string {
 
 func (a *Accessory) Model() string {
 	return a.Info.Model.Model()
+}
+
+func (a *Accessory) OnIdentify(fn func()) {
+	a.onIdentify = fn
 }
 
 // Adds a service to the accessory and updates the ids of the service and the corresponding characteristics

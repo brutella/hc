@@ -7,19 +7,16 @@ import (
 	"testing"
 )
 
-func TestAccessory(t *testing.T) {
-	info := model.Info{
-		Name:         "My Accessory",
-		SerialNumber: "001",
-		Manufacturer: "Google",
-		Model:        "Accessory",
-	}
+func TestAccessoryIdentifyChanged(t *testing.T) {
+	a := New(info)
 
-	var a model.Accessory = New(info)
+	var identifyCalled = 0
+	a.OnIdentify(func() {
+		identifyCalled += 1
+	})
 
-	assert.Equal(t, a.GetId(), model.InvalidId)
-	assert.Equal(t, a.Name(), "My Accessory")
-	assert.Equal(t, a.SerialNumber(), "001")
-	assert.Equal(t, a.Manufacturer(), "Google")
-	assert.Equal(t, a.Model(), "Accessory")
+	a.Info.Identify.SetValueFromRemote(true)
+	// Identify is set to false immediately
+	assert.False(t, a.Info.Identify.Identify())
+	assert.Equal(t, identifyCalled, 1)
 }

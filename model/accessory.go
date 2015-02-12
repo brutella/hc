@@ -21,4 +21,8 @@ type Accessory interface {
 
 	// Returns the model description
 	Model() string
+
+	// Callback to identify accessory
+	// Make the accessory identify itself (lights would blink)
+	OnIdentify(func())
 }
