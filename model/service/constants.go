@@ -11,4 +11,5 @@ const (
 	TypeOutlet           = ServiceType("47")
 	TypeSwitch           = ServiceType("49")
 	TypeThermostat       = ServiceType("4A")
+	TypeFan              = ServiceType("40")
 )
