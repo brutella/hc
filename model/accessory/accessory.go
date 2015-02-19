@@ -73,6 +73,30 @@ func (a *Accessory) Model() string {
 	return a.Info.Model.Model()
 }
 
+func (a *Accessory) Firmware() string {
+	firmware := a.Info.Firmware
+	if firmware != nil {
+		return firmware.Revision()
+	}
+	return ""
+}
+
+func (a *Accessory) Hardware() string {
+	hardware := a.Info.Hardware
+	if hardware != nil {
+		return hardware.Revision()
+	}
+	return ""
+}
+
+func (a *Accessory) Software() string {
+	software := a.Info.Software
+	if software != nil {
+		return software.Revision()
+	}
+	return ""
+}
+
 func (a *Accessory) OnIdentify(fn func()) {
 	a.onIdentify = fn
 }

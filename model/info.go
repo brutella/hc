@@ -6,4 +6,7 @@ type Info struct {
 	SerialNumber string
 	Manufacturer string
 	Model        string
+	Firmware     string
+	Software     string
+	Hardware     string
 }

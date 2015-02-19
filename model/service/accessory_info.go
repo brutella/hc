@@ -13,13 +13,18 @@ type AccessoryInfo struct {
 	Model        *characteristic.Model
 	Manufacturer *characteristic.Manufacturer
 	Name         *characteristic.Name
+
+	// Optional
+	Firmware *characteristic.Revision
+	Hardware *characteristic.Revision
+	Software *characteristic.Revision
 }
 
 func NewInfo(info model.Info) *AccessoryInfo {
-	return NewAccessoryInfo(info.Name, info.SerialNumber, info.Manufacturer, info.Model)
+	return NewAccessoryInfo(info.Name, info.SerialNumber, info.Manufacturer, info.Model, info.Firmware, info.Hardware, info.Software)
 }
 
-func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName string) *AccessoryInfo {
+func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName, firmwareRevision, hardwareRevision, softwareRevision string) *AccessoryInfo {
 	identify := characteristic.NewIdentify(false)
 	serial := characteristic.NewSerialNumber(serialNumber)
 	model := characteristic.NewModel(modelName)
@@ -34,5 +39,23 @@ func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName s
 	service.AddCharacteristic(manufacturer.Characteristic)
 	service.AddCharacteristic(name.Characteristic)
 
-	return &AccessoryInfo{service, identify, serial, model, manufacturer, name}
+	var firmware *characteristic.Revision
+	if firmwareRevision != "" {
+		firmware = characteristic.NewFirmwareRevision(firmwareRevision)
+		service.AddCharacteristic(firmware.Characteristic)
+	}
+
+	var hardware *characteristic.Revision
+	if hardwareRevision != "" {
+		hardware = characteristic.NewHardwareRevision(hardwareRevision)
+		service.AddCharacteristic(hardware.Characteristic)
+	}
+
+	var software *characteristic.Revision
+	if softwareRevision != "" {
+		software = characteristic.NewSoftwareRevision(softwareRevision)
+		service.AddCharacteristic(software.Characteristic)
+	}
+
+	return &AccessoryInfo{service, identify, serial, model, manufacturer, name, firmware, hardware, software}
 }

@@ -1,0 +1,555 @@
+2015-02-17 01:41:26.885 TestMeta[14449:655453] {
+    "Base UUID" = "-0000-1000-8000-0026BB765291";
+    Characteristics =     {
+        "administrator-only-access" =         {
+            DefaultDescription = "Administrator Only Access";
+            Format = bool;
+            LocalizationKey = "ADMINISTRATOR_ONLY_ACCESS_CHARACTERISTIC";
+            Properties = 7;
+            ShortUUID = 00000001;
+        };
+        "audio-feedback" =         {
+            DefaultDescription = "Audio Feedback";
+            Format = bool;
+            LocalizationKey = "AUDIO_FEEDBACK_CHARACTERISTIC";
+            Properties = 7;
+            ShortUUID = 00000005;
+        };
+        brightness =         {
+            DefaultDescription = Brightness;
+            Format = int;
+            LocalizationKey = "BRIGHTNESS_CHARACTERISTIC";
+            MaxValue = 100;
+            MinValue = 0;
+            Properties = 7;
+            ShortUUID = 00000008;
+            StepValue = 1;
+            Units = percentage;
+        };
+        "door-state.current" =         {
+            DefaultDescription = "Current Door State";
+            Format = uint8;
+            LocalizationKey = "CURRENT_DOOR_STATE_CHARACTERISTIC";
+            MaxValue = 4;
+            MinValue = 0;
+            Properties = 3;
+            ShortUUID = 0000000E;
+            StepValue = 1;
+        };
+        "door-state.target" =         {
+            DefaultDescription = "Target Door State";
+            Format = uint8;
+            LocalizationKey = "TARGET_DOOR_CHARACTERISTIC";
+            MaxValue = 1;
+            MinValue = 0;
+            Properties = 7;
+            ShortUUID = 00000032;
+            StepValue = 1;
+        };
+        "firmware.revision" =         {
+            DefaultDescription = "Firmware Revision";
+            Format = string;
+            LocalizationKey = "FIRMWARE_REVISION_CHARACTERISTIC";
+            Properties = 2;
+            ShortUUID = 00000052;
+        };
+        "hardware.revision" =         {
+            DefaultDescription = "Hardware Revision";
+            Format = string;
+            LocalizationKey = "HARDWARE_REVISION_CHARACTERISTIC";
+            Properties = 2;
+            ShortUUID = 00000053;
+        };
+        "heating-cooling.current" =         {
+            DefaultDescription = "Current Heating Cooling State";
+            Format = uint8;
+            LocalizationKey = "CURRENT_HEATING_COOLING_STATE_CHARACTERISTIC";
+            MaxValue = 2;
+            MinValue = 0;
+            Properties = 3;
+            ShortUUID = 0000000F;
+            StepValue = 1;
+        };
+        "heating-cooling.target" =         {
+            DefaultDescription = "Target Heating Cooling State";
+            Format = uint8;
+            LocalizationKey = "TARGET_HEATING_COOLING_STATE_CHARACTERISTIC";
+            MaxValue = 3;
+            MinValue = 0;
+            Properties = 7;
+            ShortUUID = 00000033;
+            StepValue = 1;
+        };
+        hue =         {
+            DefaultDescription = Hue;
+            Format = float;
+            LocalizationKey = "HUE_CHARACTERISTIC";
+            MaxValue = 360;
+            MinValue = 0;
+            Properties = 7;
+            ShortUUID = 00000013;
+            StepValue = 1;
+            Units = arcdegrees;
+        };
+        identify =         {
+            DefaultDescription = Identify;
+            Format = bool;
+            LocalizationKey = "IDENTIFY_CHARACTERISTIC";
+            Properties = 4;
+            ShortUUID = 00000014;
+        };
+        "lock-management.auto-secure-timeout" =         {
+            DefaultDescription = "Lock Management Auto Security Timeout";
+            Format = uint32;
+            LocalizationKey = "LOCK_MANAGEMENT_AUTO_SECURITY_TIMEOUT_CHARACTERISTIC";
+            MinValue = 0;
+            Properties = 7;
+            ShortUUID = 0000001A;
+            Units = seconds;
+        };
+        "lock-management.control-point" =         {
+            DefaultDescription = "Lock Control Point";
+            Format = tlv8;
+            LocalizationKey = "LOCK_CONTROL_POINT_CHARACTERISTIC";
+            Properties = 4;
+            ShortUUID = 00000019;
+        };
+        "lock-mechanism.additional-authorization" =         {
+            DefaultDescription = "Lock Additional Authorization";
+            Format = date;
+            LocalizationKey = "LOCK_ADDITIONAL_AUTHORIZATION_CHARACTERISTIC";
+            Properties = 6;
+            ShortUUID = 0000001B;
+        };
+        "lock-mechanism.current-state" =         {
+            DefaultDescription = "Lock Current State";
+            Format = uint8;
+            LocalizationKey = "LOCK_CURRENT_STATE_CHARACTERISTIC";
+            MaxValue = 3;
+            MinValue = 0;
+            Properties = 3;
+            ShortUUID = 0000001D;
+            StepValue = 1;
+        };
+        "lock-mechanism.last-known-action" =         {
+            DefaultDescription = "Lock Last Known Action";
+            Format = uint8;
+            LocalizationKey = "LAST_KNOWN_ACTION_CHARACTERISTIC";
+            MaxValue = 10;
+            MinValue = 0;
+            Properties = 3;
+            ShortUUID = 0000001C;
+            StepValue = 1;
+        };
+        "lock-mechanism.target-state" =         {
+            DefaultDescription = "Lock Target State";
+            Format = uint8;
+            LocalizationKey = "LOCK_TARGET_STATE_CHARACTERISTIC";
+            MaxValue = 1;
+            MinValue = 0;
+            Properties = 7;
+            ShortUUID = 0000001E;
+            StepValue = 1;
+        };
+        logs =         {
+            DefaultDescription = Logs;
+            Format = tlv8;
+            LocalizationKey = "LOGS_CHARACTERISTIC";
+            Properties = 3;
+            ShortUUID = 0000001F;
+        };
+        manufacturer =         {
+            DefaultDescription = Manufacturer;
+            Format = string;
+            LocalizationKey = "MANUFACTURER_CHARACTERISTIC";
+            MaxLength = 64;
+            Properties = 2;
+            ShortUUID = 00000020;
+        };
+        model =         {
+            DefaultDescription = Model;
+            Format = string;
+            LocalizationKey = "MODEL_CHARACTERISTIC";
+            MaxLength = 64;
+            Properties = 2;
+            ShortUUID = 00000021;
+        };
+        "motion-detected" =         {
+            DefaultDescription = "Motion Detected";
+            Format = bool;
+            LocalizationKey = "MOTION_DETECTED_CHARACTERISTIC";
+            Properties = 3;
+            ShortUUID = 00000022;
+        };
+        name =         {
+            DefaultDescription = Name;
+            Format = string;
+            LocalizationKey = "NAME_CHARACTERISTIC";
+            MaxLength = 64;
+            Properties = 2;
+            ShortUUID = 00000023;
+        };
+        "obstruction-detected" =         {
+            DefaultDescription = "Obstruction Detected";
+            Format = bool;
+            LocalizationKey = "OBSTRUCTION_DETECTED_CHARACTERISTIC";
+            Properties = 3;
+            ShortUUID = 00000024;
+        };
+        on =         {
+            DefaultDescription = "Power State";
+            Format = bool;
+            LocalizationKey = "POWER_STATE_CHARACTERISTIC";
+            Properties = 7;
+            ShortUUID = 00000025;
+        };
+        "outlet-in-use" =         {
+            DefaultDescription = "Outlet In Use";
+            Format = bool;
+            LocalizationKey = "OUTLET_IN_USE_CHARACTERISTIC";
+            Properties = 3;
+            ShortUUID = 00000026;
+        };
+        "relative-humidity.current" =         {
+            DefaultDescription = "Current Relative Humidity";
+            Format = float;
+            LocalizationKey = "CURRENT_RELATIVE_HUMIDITY_CHARACTERISTIC";
+            MaxValue = 100;
+            MinValue = 0;
+            Properties = 3;
+            ShortUUID = 00000010;
+            StepValue = 1;
+            Units = percentage;
+        };
+        "relative-humidity.target" =         {
+            DefaultDescription = "Target Relative Humidity";
+            Format = float;
+            LocalizationKey = "TARGET_RELATIVE_HUMIDITY_CHARACTERISTIC";
+            MaxValue = 100;
+            MinValue = 0;
+            Properties = 7;
+            ShortUUID = 00000034;
+            StepValue = 1;
+            Units = percentage;
+        };
+        "rotation.direction" =         {
+            DefaultDescription = "Rotation Direction";
+            Format = int;
+            LocalizationKey = "ROTATION_DIRECTION_CHARACTERISTIC";
+            MaxValue = 1;
+            MinValue = 0;
+            Properties = 7;
+            ShortUUID = 00000028;
+            StepValue = 1;
+        };
+        "rotation.speed" =         {
+            DefaultDescription = "Rotation Speed";
+            Format = float;
+            LocalizationKey = "ROTATION_SPEED_CHARACTERISTIC";
+            MaxValue = 100;
+            MinValue = 0;
+            Properties = 7;
+            ShortUUID = 00000029;
+            StepValue = 1;
+        };
+        saturation =         {
+            DefaultDescription = Saturation;
+            Format = float;
+            LocalizationKey = "SATURATION_CHARACTERISTIC";
+            MaxValue = 100;
+            MinValue = 0;
+            Properties = 7;
+            ShortUUID = 0000002F;
+            StepValue = 1;
+            Units = percentage;
+        };
+        "serial-number" =         {
+            DefaultDescription = "Serial Number";
+            Format = string;
+            LocalizationKey = "SERIAL_NUMBER_CHARACTERISTIC";
+            MaxLength = 64;
+            MinLength = 1;
+            Properties = 2;
+            ShortUUID = 00000030;
+        };
+        "software.revision" =         {
+            DefaultDescription = "Software Revision";
+            Format = string;
+            LocalizationKey = "SOFTWARE_REVISION_CHARACTERISTIC";
+            Properties = 2;
+            ShortUUID = 00000054;
+        };
+        "temperature.cooling-threshold" =         {
+            DefaultDescription = "Cooling Threshold Temperature";
+            Format = float;
+            LocalizationKey = "COOLING_THRESHOLD_TEMPERATURE_CHARACTERISTIC";
+            MaxValue = 35;
+            MinValue = 10;
+            Properties = 7;
+            ShortUUID = 0000000D;
+            StepValue = "0.1";
+            Units = celsius;
+        };
+        "temperature.current" =         {
+            DefaultDescription = "Current Temperature";
+            Format = float;
+            LocalizationKey = "CURRENT_TEMPERATURE_CHARACTERISTIC";
+            MaxValue = 100;
+            MinValue = 0;
+            Properties = 3;
+            ShortUUID = 00000011;
+            StepValue = "0.1";
+            Units = celsius;
+        };
+        "temperature.heating-threshold" =         {
+            DefaultDescription = "Heating Threshold Temperature";
+            Format = float;
+            LocalizationKey = "HEATING_THRESHOLD_TEMPERATURE_CHARACTERISTIC";
+            MaxValue = 25;
+            MinValue = 0;
+            Properties = 7;
+            ShortUUID = 00000012;
+            StepValue = "0.1";
+            Units = celsius;
+        };
+        "temperature.target" =         {
+            DefaultDescription = "Target Temperature";
+            Format = float;
+            LocalizationKey = "TARGET_TEMPERATURE_CHARACTERISTIC";
+            MaxValue = 38;
+            MinValue = 10;
+            Properties = 7;
+            ShortUUID = 00000035;
+            StepValue = "0.1";
+            Units = celsius;
+        };
+        "temperature.units" =         {
+            DefaultDescription = "Temperature Display Units";
+            Format = uint8;
+            LocalizationKey = "TEMPERATURE_DISPLAY_UNITS_CHARACTERISTIC";
+            MaxValue = 1;
+            MinValue = 0;
+            Properties = 7;
+            ShortUUID = 00000036;
+            StepValue = 1;
+        };
+        version =         {
+            DefaultDescription = Version;
+            Format = string;
+            LocalizationKey = "VERSION_CHARACTERISTIC";
+            MaxLength = 64;
+            Properties = 3;
+            ShortUUID = 00000037;
+        };
+    };
+    Properties =     {
+        notify =         {
+            DefaultDescription = Notify;
+            LocalizationKey = "NOTIFY_PROPERTY";
+            Position = 0;
+        };
+        read =         {
+            DefaultDescription = Read;
+            LocalizationKey = "READ_PROPERTY";
+            Position = 1;
+        };
+        write =         {
+            DefaultDescription = Write;
+            LocalizationKey = "WRITE_PROPERTY";
+            Position = 2;
+        };
+    };
+    Services =     {
+        "accessory-information" =         {
+            "BTLE_ShortUUID" = FED3;
+            Characteristics =             {
+                Optional =                 (
+                    "firmware.revision",
+                    "hardware.revision",
+                    "software.revision"
+                );
+                Required =                 (
+                    name,
+                    manufacturer,
+                    model,
+                    "serial-number",
+                    identify
+                );
+            };
+            DefaultDescription = "Accessory Information Service";
+            LocalizationKey = "ACCESSORY_INFORMATION_SERVICE";
+            ShortUUID = 0000003E;
+        };
+        fan =         {
+            "BTLE_ShortUUID" = FECB;
+            Characteristics =             {
+                Optional =                 (
+                    name,
+                    "rotation.direction",
+                    "rotation.speed"
+                );
+                Required =                 (
+                    on
+                );
+            };
+            DefaultDescription = Fan;
+            LocalizationKey = "FAN_SERVICE";
+            ShortUUID = 00000040;
+        };
+        "garage-door-opener" =         {
+            "BTLE_ShortUUID" = FECE;
+            Characteristics =             {
+                Optional =                 (
+                    "lock-mechanism.current-state",
+                    "lock-mechanism.target-state",
+                    name
+                );
+                Required =                 (
+                    "door-state.current",
+                    "door-state.target",
+                    "obstruction-detected"
+                );
+            };
+            DefaultDescription = "Garage Door Opener";
+            LocalizationKey = "GARAGE_DOOR_OPENER_SERVICE";
+            ShortUUID = 00000041;
+        };
+        lightbulb =         {
+            "BTLE_ShortUUID" = FED2;
+            Characteristics =             {
+                Optional =                 (
+                    brightness,
+                    hue,
+                    name,
+                    saturation
+                );
+                Required =                 (
+                    on
+                );
+            };
+            DefaultDescription = Lightbulb;
+            LocalizationKey = "LIGHTBULB_SERVICE";
+            ShortUUID = 00000043;
+        };
+        "lock-management" =         {
+            "BTLE_ShortUUID" = FECF;
+            Characteristics =             {
+                Optional =                 (
+                    "administrator-only-access",
+                    "audio-feedback",
+                    "door-state.current",
+                    "lock-management.auto-secure-timeout",
+                    "lock-mechanism.last-known-action",
+                    logs,
+                    "motion-detected"
+                );
+                Required =                 (
+                    "lock-management.control-point",
+                    version
+                );
+            };
+            DefaultDescription = "Lock Management";
+            LocalizationKey = "LOCK_MANAGEMENT_SERVICE";
+            ShortUUID = 00000044;
+        };
+        "lock-mechanism" =         {
+            "BTLE_ShortUUID" = FED0;
+            Characteristics =             {
+                Optional =                 (
+                    name
+                );
+                Required =                 (
+                    "lock-mechanism.current-state",
+                    "lock-mechanism.target-state"
+                );
+            };
+            DefaultDescription = "Lock Mechanism";
+            LocalizationKey = "LOCK_MECHANISM_SERVICE";
+            ShortUUID = 00000045;
+        };
+        outlet =         {
+            AllowAssociatedService = 1;
+            "BTLE_ShortUUID" = FECC;
+            Characteristics =             {
+                Optional =                 (
+                    name
+                );
+                Required =                 (
+                    on,
+                    "outlet-in-use"
+                );
+            };
+            DefaultDescription = Outlet;
+            LocalizationKey = "OUTLET_SERVICE";
+            ShortUUID = 00000047;
+        };
+        switch =         {
+            AllowAssociatedService = 1;
+            "BTLE_ShortUUID" = FECD;
+            Characteristics =             {
+                Optional =                 (
+                    name
+                );
+                Required =                 (
+                    on
+                );
+            };
+            DefaultDescription = Switch;
+            LocalizationKey = "SWITCH_SERVICE";
+            ShortUUID = 00000049;
+        };
+        thermostat =         {
+            "BTLE_ShortUUID" = FED1;
+            Characteristics =             {
+                Optional =                 (
+                    name,
+                    "relative-humidity.current",
+                    "relative-humidity.target",
+                    "temperature.cooling-threshold",
+                    "temperature.heating-threshold"
+                );
+                Required =                 (
+                    "heating-cooling.current",
+                    "heating-cooling.target",
+                    "temperature.current",
+                    "temperature.target",
+                    "temperature.units"
+                );
+            };
+            DefaultDescription = Thermostat;
+            LocalizationKey = "THERMOSTAT_SERVICE";
+            ShortUUID = 0000004A;
+        };
+    };
+    SupportsAuthorizationData =     {
+        "door-state.target" =         (
+            "garage-door-opener"
+        );
+        "lock-mechanism.target-state" =         (
+            "garage-door-opener",
+            "lock-mechanism"
+        );
+    };
+    Units =     {
+        arcdegrees =         {
+            DefaultDescription = ArcDegrees;
+            LocalizationKey = "ARC_DEGREES_UNITS";
+        };
+        celsius =         {
+            DefaultDescription = Celsius;
+            LocalizationKey = "CELSIUS_UNITS";
+        };
+        fahrenheit =         {
+            DefaultDescription = Fahrenheit;
+            LocalizationKey = "FAHRENHEIT_UNITS";
+        };
+        percentage =         {
+            DefaultDescription = Percentage;
+            LocalizationKey = "PERCENTAGE_UNITS";
+        };
+        seconds =         {
+            DefaultDescription = Seconds;
+            LocalizationKey = "SECONDS_UNITS";
+        };
+    };
+}

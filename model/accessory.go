@@ -22,6 +22,15 @@ type Accessory interface {
 	// Returns the model description
 	Model() string
 
+	// Returns the firmware revision or empty string
+	Firmware() string
+
+	// Returns the hardware revision or empty string
+	Hardware() string
+
+	// Returns the sofware revision or empty string
+	Software() string
+
 	// Callback to identify accessory
 	// Make the accessory identify itself (lights would blink)
 	OnIdentify(func())
