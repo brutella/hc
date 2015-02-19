@@ -6,7 +6,7 @@ type On struct {
 
 func NewOn(value bool) *On {
 	char := NewBool(value)
-	char.Type = CharTypeOn
+	char.Type = CharTypePowerState
 	return &On{char}
 }
 

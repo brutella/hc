@@ -91,26 +91,34 @@ const (
 	CharTypeLogs                     = "1F" // 15
 	CharTypeVersion                  = "37" // 2
 	CharTypeAdministratorOnlyAccesss = "1"  // 15
+	CharTypeFirmwareRevision         = "52" // 13?
+	CharTypeHardwareRevision         = "53" // 13?
+	CharTypeSoftwareRevision         = "54" // 13?
 
 	// Light bulb service
 	CharTypeBrightness = "8"  // 15
 	CharTypeHue        = "13" // 15
 	CharTypeSaturation = "2F" // 15
 
-	// switch service
-	CharTypeOn = "25" // 15
+	// switch/outlet service
+	CharTypePowerState = "25" // 15
 
 	CharTypeInUse         = "26" // 13
 	CharTypeAudioFeedback = "5"  // 15
 
 	// garage door opener
-	CharTypeObstructionDetected          = "24" // 13
-	CharTypeDoorStateTarget              = "32" // 15
-	CharTypeDoorStateCurrent             = "E"  // 13
-	CharTypeLockMechanismTargetState     = "1E" // 15
-	CharTypeLockMechanismCurrentState    = "1D" // 13
-	CharTypeLockMechanismLastKnownAction = "1C" // 13
-	CharTypeLockManagementControlPoint   = "19" // 2
+	CharTypeObstructionDetected                  = "24" // 13
+	CharTypeDoorStateTarget                      = "32" // 15
+	CharTypeDoorStateCurrent                     = "E"  // 13
+	CharTypeLockMechanismTargetState             = "1E" // 15
+	CharTypeLockMechanismCurrentState            = "1D" // 13
+	CharTypeLockMechanismLastKnownAction         = "1C" // 13
+	CharTypeLockMechanismAdditionalAuthorization = "1B"
+	CharTypeLockManagementControlPoint           = "19" // 2
+	CharTypeLockManagementAutoSecureTimeout      = "1A"
+
+	CharTypeRotationDirection = "28"
+	CharTypeRotationSpeed     = "29"
 
 	CharTypeTemperatureUnits   = "36" // 15
 	CharTypeTemperatureTarget  = "35" // 15

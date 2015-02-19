@@ -1,12 +1,17 @@
 # GOHAP
 
-This is an implementation of the **H**omeKit **A**ccessory **P**rotocol (HAP), which enabled you to write HomeKit bridges for external accessories.
+This is an implementation of the **H**omeKit **A**ccessory **P**rotocol (HAP) to create HomeKit bridges for external accessories.
 
-Gohap currently supports the following accessory types
+The library supports the following accessory types
 
 - Switch
+- Outlet
 - Light Bulb
 - Thermostat (custom `Thermometer` accessory which has readonly services)
+
+**TODO**
+
+- Rename on characteristic to power state
 
 ## Components
 

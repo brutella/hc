@@ -7,7 +7,7 @@ import (
 
 func TestCharacteristicSetValuesOfWrongType(t *testing.T) {
 	var value int = 5
-	c := NewCharacteristic(value, FormatInt, CharTypeOn, nil)
+	c := NewCharacteristic(value, FormatInt, CharTypePowerState, nil)
 
 	c.SetValue(float64(20.5))
 	assert.Equal(t, c.Value, 20)
@@ -20,7 +20,7 @@ func TestCharacteristicSetValuesOfWrongType(t *testing.T) {
 }
 
 func TestCharacteristicLocalDelegate(t *testing.T) {
-	c := NewCharacteristic(5, FormatInt, CharTypeOn, nil)
+	c := NewCharacteristic(5, FormatInt, CharTypePowerState, nil)
 
 	var oldValue interface{}
 	var newValue interface{}
@@ -39,7 +39,7 @@ func TestCharacteristicLocalDelegate(t *testing.T) {
 }
 
 func TestCharacteristicRemoteDelegate(t *testing.T) {
-	c := NewCharacteristic(5, FormatInt, CharTypeOn, nil)
+	c := NewCharacteristic(5, FormatInt, CharTypePowerState, nil)
 
 	var oldValue interface{}
 	var newValue interface{}
@@ -57,7 +57,7 @@ func TestCharacteristicRemoteDelegate(t *testing.T) {
 }
 
 func TestNoValueChange(t *testing.T) {
-	c := NewCharacteristic(5, FormatInt, CharTypeOn, nil)
+	c := NewCharacteristic(5, FormatInt, CharTypePowerState, nil)
 
 	changed := false
 	c.OnRemoteChange(func(c *Characteristic, old interface{}) {
@@ -74,7 +74,7 @@ func TestNoValueChange(t *testing.T) {
 }
 
 func TestEqual(t *testing.T) {
-	c1 := NewCharacteristic(5, FormatInt, CharTypeOn, nil)
-	c2 := NewCharacteristic(5, FormatInt, CharTypeOn, nil)
+	c1 := NewCharacteristic(5, FormatInt, CharTypePowerState, nil)
+	c2 := NewCharacteristic(5, FormatInt, CharTypePowerState, nil)
 	assert.True(t, c1.Equal(c2))
 }
