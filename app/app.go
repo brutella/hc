@@ -19,22 +19,10 @@ import (
 	"github.com/gosexy/to"
 )
 
-type Config struct {
-	BridgeName         string
-	BridgePassword     string
-	BridgeManufacturer string
-	DatabaseDir        string
-}
-
-func NewConfig() Config {
-	return Config{
-		BridgeName:         "GoBridge",
-		BridgePassword:     "001-02-003",
-		BridgeManufacturer: "brutella",
-	}
-}
-
 type AppExitFunc func()
+
+// App encapsulates all components to create, publish and update accessories and
+// make the available via mDNS.
 type App struct {
 	context netio.HAPContext
 
@@ -52,6 +40,7 @@ type App struct {
 	batchUpdate bool
 }
 
+// NewApp creates a new app based on the configuration.
 func NewApp(conf Config) (*App, error) {
 	if len(conf.DatabaseDir) == 0 {
 		return nil, errors.New("Database directory not specified")
@@ -69,6 +58,7 @@ func NewApp(conf Config) (*App, error) {
 		return nil, err
 	}
 
+	// Bridge appears in HomeKit and must provide the mandatory accessory info servie
 	info := model.Info{
 		Name:         bridge_config.Name,
 		SerialNumber: bridge_config.SerialNumber,
@@ -91,6 +81,8 @@ func NewApp(conf Config) (*App, error) {
 	return &app, nil
 }
 
+// AddAccessory adds an accessory to the bridge and updates the mDNS configuration
+// when no batch updates are currently active.
 func (app *App) AddAccessory(a *accessory.Accessory) {
 	app.container.AddAccessory(a)
 
@@ -105,6 +97,9 @@ func (app *App) AddAccessory(a *accessory.Accessory) {
 				//     app.mdns.Update()
 				// }
 
+				// When a characteristic value changes and events are enabled for this characteristic
+				// all listeners are notified. Since we don't track which client is interested in
+				// which characteristic change event, we send them to all active connections.
 				if c.Events == true {
 					app.notifyListener(a, c)
 				}
@@ -119,6 +114,8 @@ func (app *App) AddAccessory(a *accessory.Accessory) {
 	}
 }
 
+// RemoveAccessory removes the accessory and updates the mDNS configuration
+// when no batch updates are currently active.
 func (app *App) RemoveAccessory(a *accessory.Accessory) {
 	app.container.RemoveAccessory(a)
 	if app.batchUpdate == false {
@@ -126,6 +123,8 @@ func (app *App) RemoveAccessory(a *accessory.Accessory) {
 	}
 }
 
+// PerformBatchUpdates allows multiple accessory (adding, removing) and characteristic (value update)
+// changes at once without triggering mDNS configuration updates after every change.
 func (app *App) PerformBatchUpdates(fn func()) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
@@ -135,8 +134,8 @@ func (app *App) PerformBatchUpdates(fn func()) {
 }
 
 // SetReachable update app's reachability status
-// When a Bonjour service is running and reachable is false, the Bonjour service is stopped
-// When no Bonjour service is running and reachable is true, the service is announed via Bonjour
+// When a Bonjour service is running and reachable is false, the Bonjour service will be stopped.
+// When no Bonjour service is running and reachable is true, the service will be announed via Bonjour
 func (app *App) SetReachable(reachable bool) {
 	if app.IsReachable() != reachable {
 		if reachable == true {
@@ -148,6 +147,7 @@ func (app *App) SetReachable(reachable bool) {
 	}
 }
 
+// IsReachable returns true when the app reachable via mDNS, otherwise false.
 func (app *App) IsReachable() bool {
 	return app.mdns != nil && app.mdns.IsPublished()
 }
@@ -188,10 +188,12 @@ func (app *App) RunAndPublish(publish bool) {
 	}
 }
 
+// OnExit calls the argument function when the app is stopped and right before for termination.
 func (app *App) OnExit(fn AppExitFunc) {
 	app.exitFunc = fn
 }
 
+// Stop stops the app by unpublishing the mDNS entry
 func (app *App) Stop() {
 	if app.mdns != nil {
 		app.mdns.Stop()
@@ -201,12 +203,14 @@ func (app *App) Stop() {
 	}
 }
 
+// closeAllConnections calls Close on all active connections
 func (app *App) closeAllConnections() {
 	for _, c := range app.context.ActiveConnections() {
 		c.Close()
 	}
 }
 
+// notifyListener sends an EVENT HTTP packet containing the characteristic value to all active connections
 func (app *App) notifyListener(a *accessory.Accessory, c *characteristic.Characteristic) {
 	conns := app.context.ActiveConnections()
 	for _, con := range conns {
@@ -226,8 +230,7 @@ func (app *App) notifyListener(a *accessory.Accessory, c *characteristic.Charact
 	}
 }
 
-// updateConfiguration increases the configuration value by 1
-// re-announced new Text records
+// updateConfiguration increases the configuration value by 1 and re-announces the new TXT records
 func (app *App) updateConfiguration() {
 	dns := app.Database.DnsWithName(app.bridge.Name())
 	if dns != nil {

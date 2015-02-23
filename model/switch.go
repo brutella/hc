@@ -1,14 +1,16 @@
 package model
 
+// A Switch is an accessory which has an on state
 type Switch interface {
 	Accessory
 
-	// Sets the switch state
+	// SetOn sets the switch state to the argument boolean
 	SetOn(on bool)
 
-	// Returns the switch on state
+	// IsOn return true when the switch is on, otherwise false
 	IsOn() bool
 
-	// Sets the on state changed callback
+	// OnStateChanged calls the argument function when the switch's
+	// on state changed
 	OnStateChanged(func(bool))
 }

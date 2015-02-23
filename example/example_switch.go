@@ -5,15 +5,20 @@ import (
 	"github.com/brutella/hap/model"
 	"github.com/brutella/hap/model/accessory"
 	"github.com/brutella/log"
-	_ "time"
+	"time"
 )
 
+// This sample demonstrates how to create a HomeKit bridge for a switch accessory
+// which periodically toggles the switch's on state.
 func main() {
+	// Disable verbose logging
 	log.Verbose = false
 
 	conf := app.NewConfig()
+	// Path to database directory to store bridge informations (serial number, crypto keys,...)
 	conf.DatabaseDir = "./data"
 
+	// Create a new app
 	app, err := app.NewApp(conf)
 	if err != nil {
 		log.Fatal(err)
@@ -26,40 +31,34 @@ func main() {
 		Model:        "Switchy",
 	}
 
+	// Create a switch accessory
 	sw := accessory.NewSwitch(info)
+	// Log to console when client (e.g. iOS app) changes the value of the on characteristic
 	sw.OnStateChanged(func(on bool) {
 		if on == true {
-			log.Println("[INFO] Switch on")
+			log.Println("[INFO] Client changed switch to on")
 		} else {
-			log.Println("[INFO] Switch off")
+			log.Println("[INFO] Client changed switch to off")
 		}
 	})
 
-	// go func() {
-	//   for {
-	//       on := !sw.IsOn()
-	//       if on == true {
-	//           log.Println("[INFO] Switch on")
-	//       } else {
-	//           log.Println("[INFO] Switch off")
-	//       }
-	//       sw.SetOn(on)
-	//       time.Sleep(5 * time.Second)
-	//   }
-	// }()
+	// Periodically toggle the switch's on characteristic
+	go func() {
+		for {
+			on := !sw.IsOn()
+			if on == true {
+				log.Println("[INFO] Switch on")
+			} else {
+				log.Println("[INFO] Switch off")
+			}
+			sw.SetOn(on)
+			time.Sleep(5 * time.Second)
+		}
+	}()
 
-	// go func() {
-	//   for {
-	//       time.Sleep(20 * time.Second)
-	//       log.Println("[VERB] Set unreachable")
-	//       app.SetReachable(false)
-	//       time.Sleep(20 * time.Second)
-	//       log.Println("[VERB] Set reachable")
-	//       app.SetReachable(true)
-	//   }
-	// }()
-
+	// Add the switch to the app
 	app.AddAccessory(sw.Accessory)
 
+	// Run the app
 	app.Run()
 }
