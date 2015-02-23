@@ -4,34 +4,34 @@ package model
 type Accessory interface {
 	Compareable
 
-	// Returns the accessory id
+	// GetId returns the accessory's id
 	GetId() int64
 
-	// Returns the services which represent the accessory
+	// GetServices returns the services which represent the accessory
 	GetServices() []Service
 
-	// Returns the name
+	// Name returns accessory's name
 	Name() string
 
-	// Returns the serial number
+	// SerialNumber returns the accessory's serial number
 	SerialNumber() string
 
-	// Returns the manufacturer name
+	// Manufacturer returns the accessory's manufacturer name
 	Manufacturer() string
 
-	// Returns the model description
+	// Model returns the accessory's model description
 	Model() string
 
-	// Returns the firmware revision or empty string
+	// Firmware returns the accessory's firmware revision or empty string
 	Firmware() string
 
-	// Returns the hardware revision or empty string
+	// Hardware returns the accessory's the hardware revision or empty string
 	Hardware() string
 
-	// Returns the sofware revision or empty string
+	// Software returns the accessory's the sofware revision or empty string
 	Software() string
 
-	// Callback to identify accessory
+	// OnIdentify calls the argument function to identify the accessory
 	// Make the accessory identify itself (lights would blink)
 	OnIdentify(func())
 }

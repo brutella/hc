@@ -47,3 +47,12 @@ func TestAccessoryId(t *testing.T) {
 	c.AddAccessory(acc1)
 	assert.Equal(t, acc1.GetId(), id)
 }
+
+func TestRemoveAccessory(t *testing.T) {
+	accessory := accessory.New(info)
+	c := NewContainer()
+	c.AddAccessory(accessory)
+	assert.Equal(t, len(c.Accessories), 1)
+	c.RemoveAccessory(accessory)
+	assert.Equal(t, len(c.Accessories), 0)
+}

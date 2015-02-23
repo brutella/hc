@@ -28,7 +28,6 @@ func (m *Container) AddAccessory(a *accessory.Accessory) {
 	m.Accessories = append(m.Accessories, a)
 }
 
-// TODO write tests
 func (m *Container) RemoveAccessory(a *accessory.Accessory) {
 	for i, accessory := range m.Accessories {
 		if accessory == a {
