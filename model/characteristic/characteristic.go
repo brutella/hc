@@ -57,7 +57,6 @@ func (c *Characteristic) SetValueFromRemote(value interface{}) {
 	c.setValue(value, true)
 }
 
-// TODO implement notifications
 func (c *Characteristic) SetEventsEnabled(enable bool) {
 	c.Events = enable
 }

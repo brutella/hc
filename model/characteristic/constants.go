@@ -15,7 +15,7 @@ const (
 	PermWrite = "pw" // can be written
 
 	// Unused
-	PermEvents  = "ev"      // TODO described as 'events' in docu
+	PermEvents  = "ev"
 	PermBonjour = "bonjour" // TODO never used by accessory simulator
 )
 

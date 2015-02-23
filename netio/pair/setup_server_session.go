@@ -26,10 +26,8 @@ func NewPairSetupServerSession(username, password string) (*PairSetupServerSessi
 
 	if err == nil {
 		srp.SaltLength = 16
-		// TODO(brutella) Needs optimization (takes ~11sec on a Raspberry Pi B+)
 		salt, v, err := srp.ComputeVerifier([]byte(password))
 		if err == nil {
-			// TODO(brutella) Needs optimization (takes ~8sec on a Raspberry Pi B+)
 			session := srp.NewServerSession([]byte(pair_name), salt, v)
 			pairing := PairSetupServerSession{
 				srp:       srp,
@@ -45,7 +43,7 @@ func NewPairSetupServerSession(username, password string) (*PairSetupServerSessi
 	return nil, err
 }
 
-// Validates `M1` from client
+// ProofFromClientProof validates client proof (`M1`) and returns authenticator or error if proof is not valid.
 func (p *PairSetupServerSession) ProofFromClientProof(clientProof []byte) ([]byte, error) {
 	if !p.session.VerifyClientAuthenticator(clientProof) { // Validates M1 based on S and A
 		return nil, errors.New("Client proof is not valid")
@@ -54,7 +52,7 @@ func (p *PairSetupServerSession) ProofFromClientProof(clientProof []byte) ([]byt
 	return p.session.ComputeAuthenticator(clientProof), nil
 }
 
-// Calculates secret key `S` based on client public key `A`
+// SetupSecretKeyFromClientPublicKey calculates and internally sets secret key `S` based on client public key `A`
 func (p *PairSetupServerSession) SetupSecretKeyFromClientPublicKey(key []byte) error {
 	key, err := p.session.ComputeKey(key) // S
 	if err == nil {
@@ -64,7 +62,7 @@ func (p *PairSetupServerSession) SetupSecretKeyFromClientPublicKey(key []byte) e
 	return err
 }
 
-// Calculates encryption key `K` based on salt and info
+// SetupEncryptionKey calculates and internally sets encryption key `K` based on salt and info
 //
 // Only 32 bytes are used from HKDF-SHA512
 func (p *PairSetupServerSession) SetupEncryptionKey(salt []byte, info []byte) error {

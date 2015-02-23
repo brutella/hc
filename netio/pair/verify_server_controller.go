@@ -176,7 +176,6 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 
 		material := make([]byte, 0)
 		material = append(material, c.session.OtherPublicKey[:]...)
-		// TODO Report that material does not include username in docs
 		material = append(material, []byte(username)...)
 		material = append(material, c.session.PublicKey[:]...)
 
