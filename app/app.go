@@ -175,7 +175,7 @@ func (app *App) RunAndPublish(publish bool) {
 	}
 	if publish {
 		app.mutex.Lock()
-		mdns.Update()
+		mdns.Publish()
 		app.mutex.Unlock()
 	}
 
