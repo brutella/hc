@@ -6,8 +6,7 @@ const (
 	TempUnitCelsius = TempUnit("celsius")
 )
 
-// A thermometer is an acessory which measures temperature
-// HomeKit
+// A thermometer measures a temperature and let you set a target temperature
 type Thermometer interface {
 	Accessory
 

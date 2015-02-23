@@ -3,7 +3,6 @@ package model
 type HeatCoolMode byte
 
 const (
-	// TODO verify the values
 	ModeOff     = HeatCoolMode(0x00)
 	ModeHeating = HeatCoolMode(0x01)
 	ModeCooling = HeatCoolMode(0x02)
