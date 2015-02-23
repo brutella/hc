@@ -5,8 +5,8 @@ import (
 	"errors"
 )
 
-// Returns a formatted password used for the bridge pairing setup
-// The string must be 8 characters long
+// NewPassword returns a formatted password used for the bridge pairing setup
+// The argument string must be 8 characters long.
 func NewPassword(str string) (string, error) {
 	var password string
 	if len(str) != 8 {

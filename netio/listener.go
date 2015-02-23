@@ -5,8 +5,7 @@ import (
 	_ "time"
 )
 
-// TCP listener listens for new connection and creates
-// a new TCP HAP connection for new connections
+// TCPHAPListener listens for new connection and creates hapConnections for new connections
 type TCPHAPListener struct {
 	*net.TCPListener
 	context HAPContext
@@ -16,6 +15,7 @@ func NewTCPHAPListener(l *net.TCPListener, context HAPContext) *TCPHAPListener {
 	return &TCPHAPListener{l, context}
 }
 
+// Accept creates and returns a hapConnection
 func (l *TCPHAPListener) Accept() (c net.Conn, err error) {
 	conn, err := l.AcceptTCP()
 	if err != nil {

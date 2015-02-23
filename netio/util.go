@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Returns the current time in RFC1123 format
+// CurrentRFC1123Date returns the current time in RFC1123 format
 // The date string has the suffix GMT instead of UTC
 func CurrentRFC1123Date() string {
 	date := time.Now().UTC().Format(time.RFC1123)

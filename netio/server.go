@@ -5,9 +5,8 @@ import (
 	"net/http"
 )
 
-// Creates a http.Server which to handle TCP connection
-//
-// This server uses a TCPHAPListener to accept incoming connections.
+// ListenAndServe creates a http.Server which to handle TCP connection.
+// The server uses a TCPHAPListener to accept incoming connections.
 //
 // Overview over components
 //      [server]  --------------------------> [mux]

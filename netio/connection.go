@@ -13,13 +13,14 @@ import (
 
 // TCP connection based on HAP protocol
 //
-// The connections creates a new session in the context to support simultaneous encrypted connections.
+// The connections creates a new session in the context to support simultaneous encrypted connections
+// with different encryption keys.
 //
 // The sessions' Encrypter and Decrypter are used to encrypt and decrypt data if possible. If no
 // Encrypter and Decrypter are availabe, the connection is handles as plain.
 //
 // When the connection is closed, the session is removed from the context.
-type tcpHAPConnection struct {
+type hapConnection struct {
 	connection net.Conn
 	context    HAPContext
 
@@ -27,8 +28,11 @@ type tcpHAPConnection struct {
 	readBuffer io.Reader
 }
 
-func NewHAPConnection(connection net.Conn, context HAPContext) *tcpHAPConnection {
-	conn := &tcpHAPConnection{
+// NewHAPConnection returns a new hap connection
+// A new session is created and stored in the context for the new connection.
+// The session holds references to Encrypter and Decrypter.
+func NewHAPConnection(connection net.Conn, context HAPContext) *hapConnection {
+	conn := &hapConnection{
 		connection: connection,
 		context:    context,
 	}
@@ -40,7 +44,9 @@ func NewHAPConnection(connection net.Conn, context HAPContext) *tcpHAPConnection
 	return conn
 }
 
-func (con *tcpHAPConnection) EncryptedWrite(b []byte) (int, error) {
+// EncryptedWrite encrypts and writes bytes to the connection.
+// The method returns the number of written bytes and an error when writing failed.
+func (con *hapConnection) EncryptedWrite(b []byte) (int, error) {
 	var buffer bytes.Buffer
 	buffer.Write(b)
 	encrypted, err := con.getEncrypter().Encrypt(&buffer)
@@ -57,7 +63,9 @@ func (con *tcpHAPConnection) EncryptedWrite(b []byte) (int, error) {
 	return n, err
 }
 
-func (con *tcpHAPConnection) DecryptedRead(b []byte) (int, error) {
+// DecryptedRead reads and decrypts bytes from the connection.
+// The method returns the number of read bytes and an error when reading failed.
+func (con *hapConnection) DecryptedRead(b []byte) (int, error) {
 	if con.readBuffer == nil {
 		buffered := bufio.NewReader(con.connection)
 		decrypted, err := con.getDecrypter().Decrypt(buffered)
@@ -79,7 +87,9 @@ func (con *tcpHAPConnection) DecryptedRead(b []byte) (int, error) {
 	return n, err
 }
 
-func (con *tcpHAPConnection) Write(b []byte) (int, error) {
+// Write writes bytes to the connection.
+// The written bytes are encrypted when possible.
+func (con *hapConnection) Write(b []byte) (int, error) {
 	if con.getEncrypter() != nil {
 		return con.EncryptedWrite(b)
 	}
@@ -87,7 +97,9 @@ func (con *tcpHAPConnection) Write(b []byte) (int, error) {
 	return con.connection.Write(b)
 }
 
-func (con *tcpHAPConnection) Read(b []byte) (int, error) {
+// Read reads bytes from the connection.
+// The read bytes are decrypted when possible.
+func (con *hapConnection) Read(b []byte) (int, error) {
 	if con.getDecrypter() != nil {
 		return con.DecryptedRead(b)
 	}
@@ -95,7 +107,9 @@ func (con *tcpHAPConnection) Read(b []byte) (int, error) {
 	return con.connection.Read(b)
 }
 
-func (con *tcpHAPConnection) Close() error {
+// Close closes the connection and deletes the session from
+// the context.
+func (con *hapConnection) Close() error {
 	log.Println("[INFO] Close connection and remove session")
 
 	// Remove session from the context
@@ -104,28 +118,28 @@ func (con *tcpHAPConnection) Close() error {
 	return con.connection.Close()
 }
 
-func (con *tcpHAPConnection) LocalAddr() net.Addr {
+func (con *hapConnection) LocalAddr() net.Addr {
 	return con.connection.LocalAddr()
 }
 
-func (con *tcpHAPConnection) RemoteAddr() net.Addr {
+func (con *hapConnection) RemoteAddr() net.Addr {
 	return con.connection.RemoteAddr()
 }
 
-func (con *tcpHAPConnection) SetDeadline(t time.Time) error {
+func (con *hapConnection) SetDeadline(t time.Time) error {
 	return con.connection.SetReadDeadline(t)
 }
 
-func (con *tcpHAPConnection) SetReadDeadline(t time.Time) error {
+func (con *hapConnection) SetReadDeadline(t time.Time) error {
 	return con.connection.SetReadDeadline(t)
 }
 
-func (con *tcpHAPConnection) SetWriteDeadline(t time.Time) error {
+func (con *hapConnection) SetWriteDeadline(t time.Time) error {
 	return con.connection.SetWriteDeadline(t)
 }
 
-// Helper
-func (c *tcpHAPConnection) getEncrypter() Encrypter {
+// getEncrypter returns the session's Encrypter, otherwise nil
+func (c *hapConnection) getEncrypter() Encrypter {
 	session := c.context.GetSessionForConnection(c.connection)
 	if session != nil {
 		return session.Encrypter()
@@ -134,7 +148,8 @@ func (c *tcpHAPConnection) getEncrypter() Encrypter {
 	return nil
 }
 
-func (c *tcpHAPConnection) getDecrypter() Decrypter {
+// getDecrypter returns the session's Decrypter, otherwise nil
+func (c *hapConnection) getDecrypter() Decrypter {
 	session := c.context.GetSessionForConnection(c.connection)
 	if session != nil {
 		return session.Decrypter()
