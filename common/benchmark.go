@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// TODO (brutella) Remove if not needed anymore
 type Benchmark struct {
 	name  string
 	start time.Time

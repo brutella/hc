@@ -6,15 +6,15 @@ import (
 	"sync"
 )
 
-// Provides variables in global has accessible via a connection or request
+// Context provides a key-value in-memory storage
 type Context interface {
 	Set(key, val interface{})
 	Get(key interface{}) interface{}
 	Delete(key interface{})
 }
 
-// Sits on top of a normal context and provides convenient
-// methods to access a session for a connection/request
+// HAPContext sits on top of a normal context and provides convenient
+// methods to access a session for a specific connection/request
 type HAPContext interface {
 	Context
 
