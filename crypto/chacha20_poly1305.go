@@ -10,8 +10,9 @@ import (
 	"github.com/brutella/hap/common"
 )
 
-// Decrypts a message with chacha20 and verifies it with poly1305
-// Nonce should be 8 byte
+// Chacha20DecryptAndPoly1305Verify returns the chacha20 decrypted messages.
+// An error is returned when the poly1305 message authenticator (seal) could not be verified.
+// Nonce should be 8 byte.
 func Chacha20DecryptAndPoly1305Verify(key, nonce, message []byte, mac [16]byte, add []byte) ([]byte, error) {
 
 	chacha20, err := chacha20.NewCipher(key, nonce)
@@ -58,7 +59,7 @@ func Chacha20DecryptAndPoly1305Verify(key, nonce, message []byte, mac [16]byte, 
 	return chacha20_out, nil
 }
 
-// Encrypts the message with chacha20 and seals the message with poly1305
+// Chacha20EncryptAndPoly1305Seal returns the chacha20 encrypted message and poly1305 message authentictor (also refered as seals)
 // Nonce should be 8 byte
 func Chacha20EncryptAndPoly1305Seal(key, nonce, message []byte, add []byte) ([]byte /*encrypted*/, [16]byte /*mac*/, error) {
 
@@ -97,14 +98,14 @@ func Chacha20EncryptAndPoly1305Seal(key, nonce, message []byte, add []byte) ([]b
 	return chacha20_out, poly1305_out, nil
 }
 
-// Appends `add` to `b`
+// AddBytes appends *add* to *b*
 // Additional bytes are appended to fill up until mod
 //
 // Example
-// b = []
-// add = [0xFF] -> [255]
-// mod = 8
-// result: [0xFF 0x0 0x0 0x0 0x0 0x0 0x0 0x0]
+//      b = []
+//      add = [0xFF] -> [255]
+//      mod = 8
+//      result: [0xFF 0x0 0x0 0x0 0x0 0x0 0x0 0x0]
 func AddBytes(b, add []byte, mod int) []byte {
 	b = append(b, add...)
 	if len(add)%mod != 0 {

@@ -10,10 +10,8 @@ type fileStorage struct {
 	dir_path string
 }
 
-// Create a file storage for the specified directory
-// Any folders are created if necessary
-//
-// Every key-value pair is stored in seperate file
+// NewFileStorage create a file storage for the specified directory.
+// The folder is created if necessary. Every key-value pair is stored in a seperate file.
 func NewFileStorage(dir string) (*fileStorage, error) {
 	path, err := filepath.Abs(dir)
 	if err != nil {
@@ -26,7 +24,7 @@ func NewFileStorage(dir string) (*fileStorage, error) {
 	return &fileStorage{dir_path: path}, err
 }
 
-// Sets the value for a specific key
+// Set sets the value for a specific key.
 func (f *fileStorage) Set(key string, value []byte) error {
 	file, err := f.fileForWrite(key)
 
@@ -40,7 +38,7 @@ func (f *fileStorage) Set(key string, value []byte) error {
 	return err
 }
 
-// Returns the value for a specific key
+// Get returns the value for a specific key.
 func (f *fileStorage) Get(key string) ([]byte, error) {
 	file, err := f.fileForRead(key)
 
@@ -64,7 +62,7 @@ func (f *fileStorage) Get(key string) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-// Deletes the file for the corresponding key
+// Delete removes the file for the corresponding key.
 func (f *fileStorage) Delete(key string) error {
 	return os.Remove(f.filePathToFile(key))
 }

@@ -31,13 +31,17 @@ The metdata dump in iOS 8.3 (found by [@KhaosT](https://twitter.com/khaost/statu
 
 The library consists several packages
 
-- `model` defines the accessory types
 - `app` to get the bridge up and running
-- `server` contains the server implementation
-- `netio` contains the HTTP endpoint handlers
+- `common` basic structs
 - `crypto` contains helper methods for cryptography
-- `common` some common structs
-- `db` contains classes to read and write data
+- `db` for persistent storage
+- `model` interfaces for HomeKit accessory types
+    - `accessory` implementation of accessories
+    - `service` implementation of services
+    - `characteristic` implementation of characteristics
+- `netio` contains the HTTP endpoint handlers
+    - `controller`
+- `server` contains the server implementation
 - `example` contains example implementation of a HomeKit bridge and client
 
 ## Dependencies
@@ -93,7 +97,7 @@ You should change some default values for your own needs
 
 The following example adds a switch accessory to the bridge
 
-	info := model.Info{
+	info := accessory.Info{
         Name: "My Switch",
         SerialNumber: "001",
         Manufacturer: "Google",

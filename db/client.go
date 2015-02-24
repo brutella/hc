@@ -1,12 +1,18 @@
 package db
 
-// HomeKit client with a name and a long-term public key
+// Client represents a HomeKit client (e.g. iOS device).
 type Client interface {
-	SetName(name string)
+	// Name returns the client name
 	Name() string
 
-	SetPublicKey(publicKey []byte)
+	// SetName sets the client name
+	SetName(name string)
+
+	// PublicKey returns the client (long-term) public key
 	PublicKey() []byte
+
+	// SetPublicKey sets the client (long-term) public key
+	SetPublicKey(publicKey []byte)
 }
 
 type client struct {
@@ -14,7 +20,8 @@ type client struct {
 	publicKey []byte
 }
 
-func NewClient(name string, publicKey []byte) *client {
+// NewClient returns a new client with a name and public key.
+func NewClient(name string, publicKey []byte) Client {
 	return &client{name: name, publicKey: publicKey}
 }
 

@@ -1,5 +1,9 @@
 package model
 
+// A LightBulb is a Switch and additionally has a brightness, saturation and hue value.
+//
+// TODO(brutella): The HAP protocol defines brightness, saturation and hue as optional. This
+// is currently no reflected in the LightBulb interface yet.
 type LightBulb interface {
 	Switch
 

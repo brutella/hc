@@ -1,5 +1,6 @@
 package model
 
+// A Characteristic is identifiable and has a (observeable) value.
 type Characteristic interface {
 	Compareable
 
@@ -14,9 +15,9 @@ type Characteristic interface {
 	// Otherwise use the provided setter methods ( e.g. `switch.SetOn(true)`)
 	SetValueFromRemote(interface{})
 
-	// SetEventsEnabled dis-/enables events for this characteristic
+	// SetEventsEnabled dis-/enables events for the characteristic
 	SetEventsEnabled(enable bool)
 
-	// EventsEnabled returns true when events of this characteristic are enabled, otherwise false
+	// EventsEnabled returns true when events for this characteristic are enabled, otherwise false
 	EventsEnabled() bool
 }

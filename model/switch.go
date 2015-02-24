@@ -1,6 +1,6 @@
 package model
 
-// A Switch is an accessory which has an on state
+// A Switch is an accessory which can be set on or off.
 type Switch interface {
 	Accessory
 

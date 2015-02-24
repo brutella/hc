@@ -16,6 +16,7 @@ type lightBulb struct {
 	hueChanged        func(float64)
 }
 
+// NewLightBulb returns a light bulb which implements model.LightBulb.
 func NewLightBulb(info model.Info) *lightBulb {
 	accessory := New(info)
 	bulb := service.NewLightBulb(info.Name, false) // off

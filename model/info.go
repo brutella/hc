@@ -1,6 +1,6 @@
 package model
 
-// General info about an acessory
+// Info contains basic information about an accessory.
 type Info struct {
 	Name         string
 	SerialNumber string

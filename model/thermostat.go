@@ -9,8 +9,13 @@ const (
 	ModeAuto    = HeatCoolMode(0x03)
 )
 
-// A thermostat measures and lets you change the  mode (heating, cooling, auto)
-// to reach a certain target temperature
+// A Thermostat is a Thermometer but additionally lets you change the target temperature
+// and  mode (heating, cooling, auto).
+//
+// TODO(brutella): The HAP protocol defines additional optional properties (heating- and
+// cooling  threshold, current and target relative humidity), which are not implemented yet.
+// The humidity values are currently defined in the Hygrometer interface, which is not
+// implemented yet.
 type Thermostat interface {
 	Thermometer
 

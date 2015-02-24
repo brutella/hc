@@ -12,6 +12,7 @@ type Config struct {
 	DatabaseDir string
 }
 
+// NewConfig returns a new Config object with the BridgeName = "GoBridge", BridgePassword = "001-02-003" and BridgeManufacturer = "brutella".
 func NewConfig() Config {
 	return Config{
 		BridgeName:         "GoBridge",

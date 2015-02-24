@@ -6,7 +6,12 @@ const (
 	TempUnitCelsius = TempUnit("celsius")
 )
 
-// A thermometer measures the temperature
+// A Thermometer measures the temperature.
+// 
+// Discussion: Because there is no thermometer accessory type in HomeKit, we
+// use a readonly thermostat as a thermometer. This means that the target 
+// temperature and current/target heating-cooling modes characteristics
+// are defined readonly.
 type Thermometer interface {
 	Accessory
 

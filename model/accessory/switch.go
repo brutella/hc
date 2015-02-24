@@ -13,6 +13,7 @@ type switcher struct {
 	onChanged func(bool)
 }
 
+// NewSwitch returns a switch which implements model.Switch.
 func NewSwitch(info model.Info) *switcher {
 	accessory := New(info)
 	s := service.NewSwitch(info.Name, false) // off

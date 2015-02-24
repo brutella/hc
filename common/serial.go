@@ -11,7 +11,7 @@ func SerialFilenameForName(name string) string {
 	return name + ".serial"
 }
 
-// GetSerialNumberForAccessoryName returns the serial for a specific name.
+// GetSerialNumberForAccessoryName returns the serial for a specific name stored in storage.
 // When no serial number is stored for this name yet, a new one is created
 // using GenerateSerialNumber()
 func GetSerialNumberForAccessoryName(name string, storage Storage) string {

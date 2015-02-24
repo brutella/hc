@@ -1,6 +1,6 @@
 package model
 
-// An outlet is a switch which additionally has an inUse state
+// An Outlet is a Switch which additionally has an inUse state.
 type Outlet interface {
 	Switch
 

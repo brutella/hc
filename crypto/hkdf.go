@@ -6,7 +6,7 @@ import (
 	"io"
 )
 
-// Returns a 256-bit key
+// HKDF_SHA512 returns a 256-bit key
 func HKDF_SHA512(master, salt, info []byte) ([32]byte, error) {
 	hash := sha512.New
 	hkdf := hkdf.New(hash, master, salt, info)

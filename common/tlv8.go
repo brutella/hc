@@ -11,12 +11,17 @@ type tlv8Container struct {
 	Items []tlv8
 }
 
+// NewTLV8Container returns a type-length-value container which implements the Container interface.
+// Packets which value exceed a length of 8 bit (255) will be split up in multiple packets.
+//
+// Learn more https://en.wikipedia.org/wiki/Type-length-value
 func NewTLV8Container() Container {
 	return &tlv8Container{
 		Items: make([]tlv8, 0, 1),
 	}
 }
 
+// NewTLV8ContainerFromReader returns a new tlv8 container from a bytes buffer.
 func NewTLV8ContainerFromReader(r io.Reader) (Container, error) {
 	var items = make([]tlv8, 0, 1)
 	for r != nil {

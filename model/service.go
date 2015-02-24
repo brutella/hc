@@ -1,5 +1,6 @@
 package model
 
+// A Service is identifiable and consists of characteristics.
 type Service interface {
 	Compareable
 
@@ -9,6 +10,6 @@ type Service interface {
 	// GetId returns the service's id
 	GetId() int64
 
-	// GetCharacteristics returns a list of characteristic which represent the service
+	// GetCharacteristics returns the containing characteristics
 	GetCharacteristics() []Characteristic
 }

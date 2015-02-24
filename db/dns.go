@@ -1,11 +1,20 @@
 package db
 
+// Dns represents the mDNS TXT records of a HomeKit bridge.
 type Dns interface {
+	// Name returns the bridge name
 	Name() string
+
+	// Configuration returns the bridge configuration (appears as #c in TXT record)
 	Configuration() int64
+
+	// SetConfiguration sets the bridge configuration
 	SetConfiguration(int64)
 
+	// State returns the bridge state (appears as #s in TXT record)
 	State() int64
+
+	// SetState sets the bridge state
 	SetState(int64)
 }
 
@@ -15,6 +24,7 @@ type dns struct {
 	state         int64
 }
 
+// NewDns returns a new dns with name, configuration and state.
 func NewDns(name string, configuration, state int64) *dns {
 	return &dns{name, configuration, state}
 }

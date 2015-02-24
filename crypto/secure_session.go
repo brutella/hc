@@ -22,6 +22,7 @@ type secureSession struct {
 	readEncrypted bool
 }
 
+// NewSecureSessionFromSharedKey returns a new session from a shared secret key
 func NewSecureSessionFromSharedKey(sharedKey [32]byte) (*secureSession, error) {
 	salt := []byte("Control-Salt")
 	info_out := []byte("Control-Read-Encryption-Key")
@@ -41,7 +42,8 @@ func NewSecureSessionFromSharedKey(sharedKey [32]byte) (*secureSession, error) {
 	return s, err
 }
 
-// Only used for tests
+// NewSecureClientSessionFromSharedKey returns a session from a shared secret key to simulate a clien.
+// This is only used int unit tests.
 func NewSecureClientSessionFromSharedKey(sharedKey [32]byte) (*secureSession, error) {
 	salt := []byte("Control-Salt")
 	info_out := []byte("Control-Write-Encryption-Key")
@@ -61,8 +63,8 @@ func NewSecureClientSessionFromSharedKey(sharedKey [32]byte) (*secureSession, er
 	return s, err
 }
 
-// Encrypts the data by splitting it into packets
-//  [ length (2 bytes)] [ data ] [ auth (16 bytes)]
+// Encrypt return the encrypted data by splitting it into packets
+// [ length (2 bytes)] [ data ] [ auth (16 bytes)]
 func (s *secureSession) Encrypt(r io.Reader) (io.Reader, error) {
 	packets := PacketsFromBytes(r)
 	var b bytes.Buffer
@@ -87,7 +89,7 @@ func (s *secureSession) Encrypt(r io.Reader) (io.Reader, error) {
 	return &b, nil
 }
 
-// Decrypts the whole thing again
+// Decrypt returns the decrypted data
 func (s *secureSession) Decrypt(r io.Reader) (io.Reader, error) {
 	var b bytes.Buffer
 	for {
@@ -99,7 +101,7 @@ func (s *secureSession) Decrypt(r io.Reader) (io.Reader, error) {
 			return nil, err
 		}
 
-		if length > 1024 {
+		if length > PacketLengthMax {
 			return nil, common.NewErrorf("Packet size too big %d", length)
 		}
 
@@ -128,6 +130,7 @@ func (s *secureSession) Decrypt(r io.Reader) (io.Reader, error) {
 
 		b.Write(decrypted)
 
+		// Finish when all bytes fit in buffer
 		if length < PacketLengthMax {
 			break
 		}

@@ -6,9 +6,10 @@ import (
 	"github.com/brutella/hap/model/service"
 )
 
-// This clas holds the main data structure to communicate with HomeKit
+// Accessory implements the model.Accessory interface and contains the data 
+// structures to communicate with HomeKit.
 //
-// An accessory in general consists of services, which consists of characteristics.
+// An accessory in consists of services, which consists of characteristics.
 // Every accessory has the "accessory info" service by default which consists
 // of characteristics to identify the accessory: name, model, manufacturer,...
 type Accessory struct {
@@ -21,6 +22,7 @@ type Accessory struct {
 	onIdentify func()
 }
 
+// New returns an accessory which implements model.Accessory.
 func New(info model.Info) *Accessory {
 	i := service.NewInfo(info)
 	a := &Accessory{

@@ -7,6 +7,7 @@ import (
 	"github.com/brutella/hap/common"
 )
 
+// ValidateED25519Signature return true when the ED25519 signature is a valid signature of the data based on the key, otherwise false.
 func ValidateED25519Signature(key, data, signature []byte) bool {
 	if len(key) != ed25519.PublicKeySize || len(signature) != ed25519.SignatureSize {
 		return false
@@ -20,7 +21,7 @@ func ValidateED25519Signature(key, data, signature []byte) bool {
 	return ed25519.Verify(&k, data, &s)
 }
 
-// Signs (ED25519) data based on public and secret key
+// ED25519Signature returns the ED25519 signature of data using the key.
 func ED25519Signature(key, data []byte) ([]byte, error) {
 	if len(key) != ed25519.PrivateKeySize {
 		return nil, common.NewErrorf("Invalid size of key (%d)\n", len(key))
@@ -33,6 +34,7 @@ func ED25519Signature(key, data []byte) ([]byte, error) {
 	return signature[:], nil
 }
 
+// ED25519GenerateKey return a public and private ED25519 key pair from a string.
 func ED25519GenerateKey(str string) ([]byte /* public */, []byte /* secret */, error) {
 	b := bytes.NewBuffer([]byte(str))
 	if len(str) < 32 {

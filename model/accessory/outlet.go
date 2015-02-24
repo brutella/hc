@@ -14,6 +14,7 @@ type outlet struct {
 	inUseChanged func(bool)
 }
 
+// NewOutlet returns an outlet which implements model.Outlet.
 func NewOutlet(info model.Info) *outlet {
 	accessory := New(info)
 	s := service.NewOutlet(info.Name, false, false) // off
