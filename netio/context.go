@@ -6,15 +6,15 @@ import (
 	"sync"
 )
 
-// Context provides a key-value in-memory storage
+// Context provides a key-value in-memory storage.
 type Context interface {
 	Set(key, val interface{})
 	Get(key interface{}) interface{}
 	Delete(key interface{})
 }
 
-// HAPContext sits on top of a normal context and provides convenient
-// methods to access a session for a specific connection/request
+// HAPContext sits on top of a normal context and provides convenient methods to store
+// and access session objects for a specific connection/request.
 type HAPContext interface {
 	Context
 
@@ -46,6 +46,7 @@ type context struct {
 	mutex *sync.Mutex
 }
 
+// NewContextForBridge returns a new HAPContext
 func NewContextForBridge(b *Bridge) *context {
 	ctx := context{
 		storage: map[interface{}]interface{}{},

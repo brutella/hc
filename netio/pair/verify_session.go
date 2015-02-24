@@ -22,8 +22,8 @@ func NewPairVerifySession() *PairVerifySession {
 	}
 }
 
-// Generate Curve25519 shared key for a specified other public key
-// The other public key is also stored for further use in `otherPublicKey` property
+// GenerateSharedKeyWithOtherPublicKey generates a Curve25519 shared key based on a public key.
+// The other public key is also stored for further use in `otherPublicKey` property.
 func (s *PairVerifySession) GenerateSharedKeyWithOtherPublicKey(otherPublicKey [32]byte) {
 	sharedKey := crypto.Curve25519_SharedSecret(s.SecretKey, otherPublicKey)
 
@@ -31,7 +31,7 @@ func (s *PairVerifySession) GenerateSharedKeyWithOtherPublicKey(otherPublicKey [
 	s.SharedKey = sharedKey
 }
 
-// Generates encryption based on shared key, salt and info
+// SetupEncryptionKey generates an encryption key based on the shared key, salt and info.
 func (s *PairVerifySession) SetupEncryptionKey(salt []byte, info []byte) error {
 	key, err := crypto.HKDF_SHA512(s.SharedKey[:], salt, info)
 	if err == nil {

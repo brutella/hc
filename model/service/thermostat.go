@@ -19,9 +19,7 @@ type Thermostat struct {
 	targetTempChange TempChangeFunc
 }
 
-// HomeKit does not support thermometers
-// We use a thermostat with readonly services
-// TODO File radar
+// NewThermometer returns a thermometer service.
 func NewThermometer(name string, temperature, min, max, steps float64) *Thermostat {
 	thermostat := NewThermostat(name, temperature, min, max, steps)
 
@@ -31,6 +29,7 @@ func NewThermometer(name string, temperature, min, max, steps float64) *Thermost
 	return thermostat
 }
 
+// NewThermostat returns a thermostat service.
 func NewThermostat(name string, temperature, min, max, steps float64) *Thermostat {
 	name_char := characteristic.NewName(name)
 	unit := model.TempUnitCelsius

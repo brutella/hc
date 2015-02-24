@@ -1,3 +1,4 @@
+// Package event implements event notifications used to notify clients when characteristic value changed.
 package event
 
 import (
@@ -12,6 +13,7 @@ import (
 	"strings"
 )
 
+// New returns an event response for a characteristic from an accessory.
 func New(a *accessory.Accessory, c *characteristic.Characteristic) (*http.Response, error) {
 	body, err := EventBody(a, c)
 	if err != nil {
@@ -29,15 +31,23 @@ func New(a *accessory.Accessory, c *characteristic.Characteristic) (*http.Respon
 	resp.Header.Set("Content-Type", netio.HTTPContentTypeHAPJson)
 	// (brutella) Not sure if Date header must be set
 	// resp.Header.Set("Date", netio.CurrentRFC1123Date())
+
+	// Will be ignored unfortunately and won't be fixed https://github.com/golang/go/issues/9304
+	// Make sure to call FixProtocolSpecifier() instead
 	resp.Proto = "EVENT/1.0"
 
 	return resp, nil
 }
 
+// FixProtocolSpecifier returns bytes where the http protocol specifier "HTTP/1.0" is replaced by "EVENT/1.0" in the argument bytes.
+// This fix is necessary because http.Response ignores the Proto field value.
+//
+// Related to issue: https://github.com/golang/go/issues/9304
 func FixProtocolSpecifier(b []byte) []byte {
 	return []byte(strings.Replace(string(b), "HTTP/1.0", "EVENT/1.0", 1))
 }
 
+// EventBody returns the json body for an event response as bytes.
 func EventBody(a *accessory.Accessory, c *characteristic.Characteristic) (*bytes.Buffer, error) {
 	chars := data.NewCharacteristics()
 	char := data.Characteristic{AccessoryId: a.GetId(), Id: c.GetId(), Value: c.GetValue()}

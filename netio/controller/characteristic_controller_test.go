@@ -29,7 +29,7 @@ func TestGetCharacteristic(t *testing.T) {
 
 	aid := a.GetId()
 	cid := a.Info.Name.GetId()
-	values := GetCharacteristicValues(aid, cid)
+	values := getCharacteristicValues(aid, cid)
 	controller := NewCharacteristicController(m)
 	res, err := controller.HandleGetCharacteristics(values)
 	assert.Nil(t, err)

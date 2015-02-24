@@ -10,6 +10,7 @@ type Switch struct {
 	Name *characteristic.Name
 }
 
+// NewSwitch returns a switch service.
 func NewSwitch(name string, on bool) *Switch {
 	on_char := characteristic.NewOn(on)
 	name_char := characteristic.NewName(name)

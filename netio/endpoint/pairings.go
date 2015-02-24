@@ -8,9 +8,9 @@ import (
 	"net/http"
 )
 
-// Handles the /pairings endpoint
+// Pairing handles the /pairings endpoint.
 //
-// This endpoint is not session based and the same for all connections
+// This endpoint is not session based and the same for all connections.
 type Pairing struct {
 	http.Handler
 

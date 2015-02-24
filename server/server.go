@@ -17,6 +17,7 @@ import (
 	"sync"
 )
 
+// Server provides a similar interfaces as http.Server to start and stop a TCP server.
 type Server interface {
 	// ListenAndServe start the server
 	ListenAndServe() error
@@ -47,7 +48,7 @@ type hkServer struct {
 	listener *net.TCPListener
 }
 
-// NewServer returns a new server
+// NewServer returns a server
 func NewServer(hap_ctx netio.HAPContext, d db.Database, c *container.Container, b *netio.Bridge, mutex *sync.Mutex) *hkServer {
 	// os gives us a free Port when Port is ""
 	ln, err := net.Listen("tcp", "")
@@ -102,7 +103,7 @@ func (s *hkServer) dnssdCommand() string {
 	return fmt.Sprintf("dns-sd -P %s _hap local %s %s 192.168.0.14 pv=1.0 id=%s c#=1 s#=1 sf=1 ff=0 md=%s\n", s.bridge.Name(), s.port, hostname, s.bridge.Id(), s.bridge.Name())
 }
 
-// listenAndServe creates a new http.Server to listen on a specific address
+// listenAndServe returns a http.Server to listen on a specific address
 func (s *hkServer) listenAndServe(addr string, handler http.Handler, context netio.HAPContext) error {
 	server := http.Server{Addr: addr, Handler: handler}
 	// Use a TCPHAPListener

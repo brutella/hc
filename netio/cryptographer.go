@@ -4,17 +4,17 @@ import (
 	"io"
 )
 
-// Encrypter encrypts bytes
+// Encrypter encrypts bytes.
 type Encrypter interface {
 	Encrypt(r io.Reader) (io.Reader, error)
 }
 
-// Decrypter decrypts bytes
+// Decrypter decrypts bytes.
 type Decrypter interface {
 	Decrypt(r io.Reader) (io.Reader, error)
 }
 
-// A Cryptographer is a De- and Encrypter
+// A Cryptographer is a De- and Encrypter.
 type Cryptographer interface {
 	Encrypter
 	Decrypter

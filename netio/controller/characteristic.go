@@ -14,6 +14,7 @@ import (
 	"net/url"
 )
 
+// CharacteristicController implements the CharacteristicsHandler interface.
 type CharacteristicController struct {
 	container *container.Container
 }

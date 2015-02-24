@@ -12,7 +12,8 @@ const (
 	SRPGroup = "rfc5054.3072" // N (modulo) => 384 byte
 )
 
-// Does x = H(s | H(I | ":" | P)) which is required by the Stanford SRP-6a implementation
+// KeyDerivativeFuncRFC2945 returns the SRP-6a key derivative function which does
+//      x = H(s | H(I | ":" | P))
 func KeyDerivativeFuncRFC2945(h srp.HashFunc, username []byte) srp.KeyDerivationFunc {
 	return func(salt, password []byte) []byte {
 		h := h()

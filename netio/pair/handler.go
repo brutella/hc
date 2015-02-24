@@ -8,6 +8,7 @@ import (
 	"io"
 )
 
+// HandleReaderForHandler wraps h.Handle() call and logs sequence numbers and errors to the console.
 func HandleReaderForHandler(r io.Reader, h netio.ContainerHandler) (r_out io.Reader, err error) {
 	cont_in, err := common.NewTLV8ContainerFromReader(r)
 	if err != nil {

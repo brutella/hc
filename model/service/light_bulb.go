@@ -13,6 +13,7 @@ type LightBulb struct {
 	Hue        *characteristic.Hue
 }
 
+// NewLightBulb returns a light bulb service.
 func NewLightBulb(name string, on bool) *LightBulb {
 	on_char := characteristic.NewOn(on)
 	name_char := characteristic.NewName(name)

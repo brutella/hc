@@ -7,10 +7,12 @@ import (
 	"io"
 )
 
+// ContainerController implements the AccessoriesHandler interface.
 type ContainerController struct {
 	container *container.Container
 }
 
+// NewContainerController returns a controller for the argument container.
 func NewContainerController(m *container.Container) *ContainerController {
 	return &ContainerController{container: m}
 }

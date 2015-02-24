@@ -4,6 +4,7 @@ import (
 	"net"
 )
 
+// A session contains objects used to handle the data communication.
 type Session interface {
 	// Decrypter returns decrypter for incoming data, may be nil
 	Decrypter() Decrypter
@@ -26,7 +27,7 @@ type Session interface {
 	// SetPairVerifyHandler sets the handler for pairing verify
 	SetPairVerifyHandler(c PairVerifyHandler)
 
-	// Returns the associated connection
+	// Connection returns the associated connection
 	Connection() net.Conn
 }
 
@@ -40,7 +41,7 @@ type session struct {
 	nextCryptographer Cryptographer
 }
 
-// NewSession creates a new session for a connection
+// NewSession returns a session for a connection.
 func NewSession(connection net.Conn) *session {
 	s := session{
 		connection: connection,

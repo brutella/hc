@@ -20,7 +20,7 @@ type client struct {
 	publicKey []byte
 }
 
-// NewClient returns a new client with a name and public key.
+// NewClient returns a client with a name and public key.
 func NewClient(name string, publicKey []byte) Client {
 	return &client{name: name, publicKey: publicKey}
 }

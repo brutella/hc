@@ -10,11 +10,11 @@ import (
 	"net/http"
 )
 
-// Handles the /pair-setup endpoint and returns TLV8 encoded data
+// PairSetup handles the /pair-setup endpoint and returns TLV8 encoded data.
 //
 // This endoint is session based and handles requests based on their connections.
-// Which means that for every unique connection, there will be a new controller
-// set up. This is required to support simultaneous pairigin connections.
+// Which means that there is one pair setup controller for every connection.
+// This is required to support simultaneous pairing connections.
 type PairSetup struct {
 	http.Handler
 
@@ -23,6 +23,7 @@ type PairSetup struct {
 	context  netio.HAPContext
 }
 
+// NewPairSetup returns a new pair setup.
 func NewPairSetup(bridge *netio.Bridge, database db.Database, context netio.HAPContext) *PairSetup {
 	handler := PairSetup{
 		bridge:   bridge,

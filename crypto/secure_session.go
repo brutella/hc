@@ -22,7 +22,7 @@ type secureSession struct {
 	readEncrypted bool
 }
 
-// NewSecureSessionFromSharedKey returns a new session from a shared secret key
+// NewSecureSessionFromSharedKey returns a session from a shared secret key
 func NewSecureSessionFromSharedKey(sharedKey [32]byte) (*secureSession, error) {
 	salt := []byte("Control-Salt")
 	info_out := []byte("Control-Read-Encryption-Key")

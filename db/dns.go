@@ -24,7 +24,7 @@ type dns struct {
 	state         int64
 }
 
-// NewDns returns a new dns with name, configuration and state.
+// NewDns returns a dns with name, configuration and state.
 func NewDns(name string, configuration, state int64) *dns {
 	return &dns{name, configuration, state}
 }

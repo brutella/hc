@@ -21,7 +21,8 @@ type BridgeInfo struct {
 	Id string
 }
 
-// NewBridgeInfo creates a new BridgeInfo object from the arguments
+// NewBridgeInfo returns a BridgeInfo object.
+//
 // The BridgeInfo.SerialNumber is loaded from the storage, or created if not found.
 // The BridgeInfo.Id is based on the serial number bytes.
 func NewBridgeInfo(name, password, manufacturer string, storage common.Storage) BridgeInfo {

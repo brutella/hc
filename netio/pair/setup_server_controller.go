@@ -11,6 +11,12 @@ import (
 	"encoding/hex"
 )
 
+// SetupServerController handles pairing with a client using SRP.
+// The client has to known the bridge password to successfully pair.
+// When pairigin was successful, the client's public key (refered as LTPK - long term public key)
+// is stored in the database for later use.
+//
+// Pairing may fail because the password is wrong or the key exchange failed (e.g. packet seals or SRP key authenticator is wrong, ...).
 type SetupServerController struct {
 	bridge   *netio.Bridge
 	session  *PairSetupServerSession
@@ -18,6 +24,7 @@ type SetupServerController struct {
 	database db.Database
 }
 
+// NewSetupServerController returns a new pair setup controller.
 func NewSetupServerController(bridge *netio.Bridge, database db.Database) (*SetupServerController, error) {
 
 	session, err := NewPairSetupServerSession(bridge.Id(), bridge.Password())

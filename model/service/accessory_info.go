@@ -20,10 +20,12 @@ type AccessoryInfo struct {
 	Software *characteristic.Revision
 }
 
+// NewInfo returns a accessory info
 func NewInfo(info model.Info) *AccessoryInfo {
 	return NewAccessoryInfo(info.Name, info.SerialNumber, info.Manufacturer, info.Model, info.Firmware, info.Hardware, info.Software)
 }
 
+// NewAccessoryInfo returns a accessory info
 func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName, firmwareRevision, hardwareRevision, softwareRevision string) *AccessoryInfo {
 	identify := characteristic.NewIdentify(false)
 	serial := characteristic.NewSerialNumber(serialNumber)

@@ -6,20 +6,24 @@ import (
 	"net/url"
 )
 
+// A ContainerHandler abstracts request/response communication
 type ContainerHandler interface {
 	Handle(common.Container) (common.Container, error)
 }
 
+// A PairVerifyHandler is a ContainerHandler which negotations a shared key.
 type PairVerifyHandler interface {
 	ContainerHandler
 	SharedKey() [32]byte
 	KeyVerified() bool
 }
 
+// A AccessoriesHandler returns a list of accessories as json
 type AccessoriesHandler interface {
-	HandleGetAccessories() (io.Reader, error)
+	HandleGetAccessories(r io.Reader) (io.Reader, error)
 }
 
+// A CharacteristicsHandler handles get and update characteristic
 type CharacteristicsHandler interface {
 	HandleGetCharacteristics(url.Values) (io.Reader, error)
 	HandleUpdateCharacteristics(io.Reader) error

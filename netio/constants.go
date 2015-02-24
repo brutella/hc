@@ -8,6 +8,7 @@ const (
 )
 
 const (
+	// HTTP content type used for pairing
 	HTTPContentTypePairingTLV8 = "application/pairing+tlv8"
 	HTTPContentTypeHAPJson     = "application/hap+json"
 )

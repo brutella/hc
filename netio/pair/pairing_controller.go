@@ -6,17 +6,17 @@ import (
 	"github.com/brutella/log"
 )
 
-/*
-{
-  guestName: <string>,
-  guestPublicKey: <string>
-}
-*/
+// Implements pairing json of format
+//     {
+//       "guestName": <string>,
+//       "guestPublicKey": <string>
+//     }
 type Pairing struct {
 	GuestName      string `json:"guestName"`
 	GuestPublicKey string `json:"guestPublicKey"`
 }
 
+// PairingController handles pairing with a client. The client's public key is stored in the database.
 type PairingController struct {
 	database db.Database
 }

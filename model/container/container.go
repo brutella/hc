@@ -5,12 +5,14 @@ import (
 	"github.com/brutella/hap/model/accessory"
 )
 
+// Container manages a list of accessories.
 type Container struct {
 	Accessories []*accessory.Accessory `json:"accessories"`
 
 	idCount int64
 }
 
+// NewContainer returns a container.
 func NewContainer() *Container {
 	return &Container{
 		Accessories: make([]*accessory.Accessory, 0),
@@ -18,6 +20,8 @@ func NewContainer() *Container {
 	}
 }
 
+// AddAccessory adds an accessory to the container.
+// This method ensures that the accessory ids are valid and unique withing the container.
 func (m *Container) AddAccessory(a *accessory.Accessory) {
 	// Set accessory id when invalid
 	if a.GetId() == model.InvalidId {
@@ -28,6 +32,7 @@ func (m *Container) AddAccessory(a *accessory.Accessory) {
 	m.Accessories = append(m.Accessories, a)
 }
 
+// RemoveAccessory removes an accessory from the container.
 func (m *Container) RemoveAccessory(a *accessory.Accessory) {
 	for i, accessory := range m.Accessories {
 		if accessory == a {

@@ -9,6 +9,7 @@ type Outlet struct {
 	InUse *characteristic.InUse
 }
 
+// NewOutlet returns a outlet service.
 func NewOutlet(name string, on, inUse bool) *Outlet {
 	in_use := characteristic.NewInUse(on)
 

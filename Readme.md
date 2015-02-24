@@ -70,7 +70,7 @@ The following code shows a minimal implementation of a Gohap bridge
 	// Path to folder where data is stored
     conf.DatabaseDir = "./data"
         
-    // Creates a new app
+    // returns a app
     app, err := app.NewApp(conf)
     if err != nil {
         log.Fatal(err)

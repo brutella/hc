@@ -15,7 +15,7 @@ var info = model.Info{
 	Model:        "Accessory",
 }
 
-func TestModel(t *testing.T) {
+func TestContainer(t *testing.T) {
 	acc1 := accessory.New(info)
 	assert.Equal(t, acc1.GetId(), model.InvalidId)
 
@@ -30,12 +30,13 @@ func TestModel(t *testing.T) {
 	assert.Equal(t, len(c.Accessories), 2)
 	assert.NotEqual(t, acc1.GetId(), model.InvalidId)
 	assert.NotEqual(t, acc2.GetId(), model.InvalidId)
+	assert.NotEqual(t, acc1.GetId(), acc2.GetId())
 
 	c.RemoveAccessory(acc2)
 	assert.Equal(t, len(c.Accessories), 1)
 }
 
-func TestAccessoryId(t *testing.T) {
+func TestValidAccessoryId(t *testing.T) {
 	acc1 := accessory.New(info)
 	assert.Equal(t, acc1.GetId(), model.InvalidId)
 

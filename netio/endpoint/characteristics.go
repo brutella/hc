@@ -2,7 +2,6 @@ package endpoint
 
 import (
 	"github.com/brutella/hap/netio"
-	"github.com/brutella/hap/netio/controller"
 	"github.com/brutella/log"
 
 	"io"
@@ -18,11 +17,11 @@ import (
 type Characteristics struct {
 	http.Handler
 
-	controller *controller.CharacteristicController
+	controller netio.CharacteristicsHandler
 	mutex      *sync.Mutex
 }
 
-func NewCharacteristics(c *controller.CharacteristicController, mutex *sync.Mutex) *Characteristics {
+func NewCharacteristics(c netio.CharacteristicsHandler, mutex *sync.Mutex) *Characteristics {
 	handler := Characteristics{
 		controller: c,
 		mutex:      mutex,

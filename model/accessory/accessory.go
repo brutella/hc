@@ -6,7 +6,7 @@ import (
 	"github.com/brutella/hap/model/service"
 )
 
-// Accessory implements the model.Accessory interface and contains the data 
+// Accessory implements the model.Accessory interface and contains the data
 // structures to communicate with HomeKit.
 //
 // An accessory in consists of services, which consists of characteristics.

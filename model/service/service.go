@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hap/model/characteristic"
 )
 
-// This class represents accessory services and constis of characteristics
+// Service represents an HomeKit service consisting of characteristics.
 type Service struct {
 	Id              int64                            `json:"iid"`
 	Type            ServiceType                      `json:"type"`

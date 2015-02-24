@@ -21,7 +21,7 @@ func NewTLV8Container() Container {
 	}
 }
 
-// NewTLV8ContainerFromReader returns a new tlv8 container from a bytes buffer.
+// NewTLV8ContainerFromReader returns a tlv8 container from a bytes buffer.
 func NewTLV8ContainerFromReader(r io.Reader) (Container, error) {
 	var items = make([]tlv8, 0, 1)
 	for r != nil {

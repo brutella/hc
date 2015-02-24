@@ -8,6 +8,8 @@ import (
 )
 
 type ChangeFunc func(c *Characteristic, oldValue interface{})
+
+// Characteristic is a HomeKit characteristic.
 type Characteristic struct {
 	Id          int64    `json:"iid"` // managed by accessory
 	Type        CharType `json:"type"`
@@ -30,8 +32,8 @@ type Characteristic struct {
 	localChangeFuncs  []ChangeFunc
 }
 
-// Creates a new characteristic
-// If no permissions are specified, read and write will be added
+// NewCharacteristic returns a characteristic
+// If no permissions are specified, the value of PermsAll() is used.
 func NewCharacteristic(value interface{}, format string, t CharType, permissions []string) *Characteristic {
 	if len(permissions) == 0 {
 		permissions = PermsAll()

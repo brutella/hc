@@ -4,16 +4,16 @@ import (
 	"github.com/brutella/hap/crypto"
 )
 
+// Bridge contains basic information (like name, ...) and cryptho keys to secure
+// the communication.
 type Bridge struct {
-	name     string
-	password string
-	info     BridgeInfo
+	info BridgeInfo
 
 	PublicKey []byte
 	SecretKey []byte
 }
 
-// NewBridge creates a new bridge from the BridgeInfo object
+// NewBridge returns a bridge from a BridgeInfo object
 //
 // The long-term public and secret key are based on the serial
 // number which should be unique for every bridge.
@@ -26,15 +26,17 @@ func NewBridge(info BridgeInfo) (*Bridge, error) {
 	return &b, err
 }
 
+// Name returns the bridge name
 func (b *Bridge) Name() string {
 	return b.info.Name
 }
 
-// Used as username for pairing
+// Id returns the bridge id which is used as username for pairing.
 func (b *Bridge) Id() string {
 	return b.info.Id
 }
 
+// Password returns the bridge password
 func (b *Bridge) Password() string {
 	return b.info.Password
 }

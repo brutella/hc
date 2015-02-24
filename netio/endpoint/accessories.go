@@ -2,7 +2,6 @@ package endpoint
 
 import (
 	"github.com/brutella/hap/netio"
-	"github.com/brutella/hap/netio/controller"
 	"github.com/brutella/log"
 
 	"io/ioutil"
@@ -17,11 +16,11 @@ import (
 type Accessories struct {
 	http.Handler
 
-	controller *controller.ContainerController
+	controller netio.AccessoriesHandler
 	mutex      *sync.Mutex
 }
 
-func NewAccessories(c *controller.ContainerController, mutex *sync.Mutex) *Accessories {
+func NewAccessories(c netio.AccessoriesHandler, mutex *sync.Mutex) *Accessories {
 	handler := Accessories{
 		controller: c,
 		mutex:      mutex,

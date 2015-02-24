@@ -2,6 +2,7 @@ package service
 
 type ServiceType string
 
+// HomeKit defined service types.
 const (
 	TypeAccessoryInfo    = ServiceType("3E")
 	TypeGarageDoorOpener = ServiceType("41")

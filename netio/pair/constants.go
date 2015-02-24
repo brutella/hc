@@ -1,5 +1,6 @@
 package pair
 
+// TLV types
 const (
 	TLVType_Method           = 0x00 // integer, either 0x00 (uncertified) or 0x01 (MFi compliant)
 	TLVType_Username         = 0x01 // string
@@ -15,6 +16,7 @@ const (
 	TLVType_MFiSignature   = 0x0A
 )
 
+// TLV pairing methods
 const (
 	TLVType_Method_PairingDefault = 0x00
 	TLVType_Method_PairingMFi     = 0x01
@@ -22,6 +24,7 @@ const (
 	TLVType_Method_PairingDelete  = 0x04
 )
 
+// TLV errors
 const (
 	TLVStatus_NoError              = 0x00
 	TLVStatus_UnkownError          = 0x01

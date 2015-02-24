@@ -40,7 +40,7 @@ type App struct {
 	batchUpdate bool
 }
 
-// NewApp creates a new app based on the configuration.
+// NewApp returns a app based on the configuration.
 func NewApp(conf Config) (*App, error) {
 	if len(conf.DatabaseDir) == 0 {
 		return nil, errors.New("Database directory not specified")
@@ -133,9 +133,9 @@ func (app *App) PerformBatchUpdates(fn func()) {
 	app.batchUpdate = false
 }
 
-// SetReachable update app's reachability status
-// When a Bonjour service is running and reachable is false, the Bonjour service will be stopped.
-// When no Bonjour service is running and reachable is true, the service will be announed via Bonjour
+// SetReachable update app's reachability status.
+// When reachable is false, the mDNS service will be stopped.
+// When reachable is true, the service will be announed via mDNS,
 func (app *App) SetReachable(reachable bool) {
 	if app.IsReachable() != reachable {
 		if reachable == true {
@@ -147,18 +147,19 @@ func (app *App) SetReachable(reachable bool) {
 	}
 }
 
-// IsReachable returns true when the app reachable via mDNS, otherwise false.
+// IsReachable returns true when the app is reachable via mDNS, otherwise false.
 func (app *App) IsReachable() bool {
 	return app.mdns != nil && app.mdns.IsPublished()
 }
 
-// Run starts the server and publishes the service via Bonjour
+// Run starts the server and publishes the service via mDNS..
 func (app *App) Run() {
 	app.RunAndPublish(true)
 }
 
-// RunAndPublish starts the server
-// If publish is true, the Bonjour service is started automatically
+// RunAndPublish starts the server.
+// If publish is true, the mDNS service is started. Otherwise you have to call
+// SetReachable(true) to make the app visible on the network.
 func (app *App) RunAndPublish(publish bool) {
 	s := server.NewServer(app.context, app.Database, app.container, app.bridge, app.mutex)
 	port := to.Int64(s.Port())
@@ -188,12 +189,12 @@ func (app *App) RunAndPublish(publish bool) {
 	}
 }
 
-// OnExit calls the argument function when the app is stopped and right before for termination.
+// OnExit calls the argument function when the app is stopped and ready for termination.
 func (app *App) OnExit(fn AppExitFunc) {
 	app.exitFunc = fn
 }
 
-// Stop stops the app by unpublishing the mDNS entry
+// Stop stops the app by unpublishing the mDNS entry.
 func (app *App) Stop() {
 	if app.mdns != nil {
 		app.mdns.Stop()
@@ -214,7 +215,7 @@ func (app *App) closeAllConnections() {
 func (app *App) notifyListener(a *accessory.Accessory, c *characteristic.Characteristic) {
 	conns := app.context.ActiveConnections()
 	for _, con := range conns {
-		resp, err := event.NewNotification(a, c)
+		resp, err := event.New(a, c)
 		if err != nil {
 			log.Fatal(err)
 		}

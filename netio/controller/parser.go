@@ -6,7 +6,8 @@ import (
 	"strings"
 )
 
-// string must be in format <accessory id>.<characteristic id>
+// ParseAccessoryAndCharacterId returns the accessory and characteristic id encoded in the argument string.
+// The string must be in format "<accessory id>.<characteristic id>"
 func ParseAccessoryAndCharacterId(str string) (int64, int64, error) {
 	ids := strings.Split(str, ".")
 	if len(ids) != 2 {

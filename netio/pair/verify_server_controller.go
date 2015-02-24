@@ -11,6 +11,11 @@ import (
 	"encoding/hex"
 )
 
+// VerifyServerController verifies the stored client public key and negotiates a shared secret
+// which is used encrypt the upcoming session.
+//
+// Verification fails when the client is not known, the public key for the client was not found,
+// or the packet's seal could not be verified.
 type VerifyServerController struct {
 	database db.Database
 	context  netio.HAPContext

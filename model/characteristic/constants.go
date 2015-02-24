@@ -19,22 +19,27 @@ const (
 	PermBonjour = "bonjour" // TODO never used by accessory simulator
 )
 
+// PermsAll returns read, write and event permissions
 func PermsAll() []string {
 	return []string{PermRead, PermWrite, PermEvents}
 }
 
+// PermsRead returns read and event permissions
 func PermsRead() []string {
 	return []string{PermRead, PermEvents}
 }
 
+// PermsWrite returns write and event permissions
 func PermsWrite() []string {
 	return []string{PermWrite, PermEvents}
 }
 
+// PermsReadOnly returns read permission
 func PermsReadOnly() []string {
 	return []string{PermRead}
 }
 
+// PermsWriteOnly returns write permission
 func PermsWriteOnly() []string {
 	return []string{PermWrite}
 }
@@ -48,6 +53,7 @@ const (
 	// UnitArcDegreesByte = 0x02 // TODO not sure
 )
 
+// ByteFromUnit returns the byte representing the argument TempUnit.
 func ByteFromUnit(unit model.TempUnit) byte {
 	switch unit {
 	case model.TempUnitCelsius:
@@ -57,6 +63,7 @@ func ByteFromUnit(unit model.TempUnit) byte {
 	return 0x00
 }
 
+// TempUnitFromByte returns the TempUnit representing the byte.
 func TempUnitFromByte(b byte) model.TempUnit {
 	switch b {
 	case TempUnitCelsiusByte:
@@ -66,6 +73,7 @@ func TempUnitFromByte(b byte) model.TempUnit {
 	return "Unknown"
 }
 
+// HomeKit defined charactersitic value types
 const (
 	FormatString = "string" // maxLen appears
 	FormatBool   = "bool"   // on|off
@@ -76,6 +84,7 @@ const (
 
 type CharType string
 
+// HomeKit defined charactersitic types
 const (
 	CharTypeUnknown = "0" // not specified in HAP
 

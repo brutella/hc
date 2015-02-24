@@ -4,11 +4,9 @@ import (
 	"github.com/brutella/hap/model"
 	"github.com/brutella/hap/model/accessory"
 	"github.com/brutella/hap/model/container"
-	_ "github.com/brutella/hap/model/service"
 
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"testing"
@@ -35,7 +33,6 @@ func TestGetAccessories(t *testing.T) {
 	assert.NotNil(t, r)
 
 	bytes, _ := ioutil.ReadAll(r)
-	fmt.Println(string(bytes))
 	var returnedContainer container.Container
 	err = json.Unmarshal(bytes, &returnedContainer)
 	assert.Nil(t, err)
