@@ -12,8 +12,8 @@ import (
 	"strings"
 )
 
-func NewNotification(a *accessory.Accessory, c *characteristic.Characteristic) (*http.Response, error) {
-	body, err := NotificationBody(a, c)
+func New(a *accessory.Accessory, c *characteristic.Characteristic) (*http.Response, error) {
+	body, err := EventBody(a, c)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func FixProtocolSpecifier(b []byte) []byte {
 	return []byte(strings.Replace(string(b), "HTTP/1.0", "EVENT/1.0", 1))
 }
 
-func NotificationBody(a *accessory.Accessory, c *characteristic.Characteristic) (*bytes.Buffer, error) {
+func EventBody(a *accessory.Accessory, c *characteristic.Characteristic) (*bytes.Buffer, error) {
 	chars := data.NewCharacteristics()
 	char := data.Characteristic{AccessoryId: a.GetId(), Id: c.GetId(), Value: c.GetValue()}
 	chars.AddCharacteristic(char)
