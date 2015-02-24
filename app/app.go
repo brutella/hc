@@ -133,9 +133,9 @@ func (app *App) PerformBatchUpdates(fn func()) {
 	app.batchUpdate = false
 }
 
-// SetReachable update app's reachability status.
-// When reachable is false, the mDNS service will be stopped.
-// When reachable is true, the service will be announed via mDNS,
+// SetReachable update the app's reachability status.
+// When reachable is true, the app will be announed via mDNS and is then visible to HomeKit clients.
+// When reachable is false, the app will be unannounced via mDNS and all connections get closed.
 func (app *App) SetReachable(reachable bool) {
 	if app.IsReachable() != reachable {
 		if reachable == true {
@@ -152,14 +152,15 @@ func (app *App) IsReachable() bool {
 	return app.mdns != nil && app.mdns.IsPublished()
 }
 
-// Run starts the server and publishes the service via mDNS..
+// Run calls RunAndPublish(true)
 func (app *App) Run() {
 	app.RunAndPublish(true)
 }
 
-// RunAndPublish starts the server.
-// If publish is true, the mDNS service is started. Otherwise you have to call
-// SetReachable(true) to make the app visible on the network.
+// RunAndPublish starts a TCP server which handles sockets on a random port. The method blocks until the server stopped.
+// If publish is true, the mDNS service is started. Otherwise you have to call SetReachable(true) to make the app visible on the network.
+//
+// The app gracefully stops when the server received either an interrupt or kill signal.
 func (app *App) RunAndPublish(publish bool) {
 	s := server.NewServer(app.context, app.Database, app.container, app.bridge, app.mutex)
 	port := to.Int64(s.Port())
@@ -194,7 +195,7 @@ func (app *App) OnExit(fn AppExitFunc) {
 	app.exitFunc = fn
 }
 
-// Stop stops the app by unpublishing the mDNS entry.
+// Stop stops the app by unpublishing the mDNS service.
 func (app *App) Stop() {
 	if app.mdns != nil {
 		app.mdns.Stop()
