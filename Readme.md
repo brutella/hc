@@ -23,19 +23,28 @@ Read the API documentation here: http://godoc.org/github.com/brutella/hap
 
 Here is a minimal implementation of a HomeKit bridge
 
-	conf := app.NewConfig()
-	
-	// Path to folder where data is stored
-    conf.DatabaseDir = "./data"
-        
-    // Create a new app
-    app, err := app.NewApp(conf)
-    if err != nil {
-        log.Fatal(err)
+    package main
+
+    import (
+      "log"
+      "github.com/brutella/hap/app"
+    )
+
+    func main() {
+        conf := app.NewConfig()
+
+        // Path to folder where data is stored
+        conf.DatabaseDir = "./data"
+
+        // Create an app
+        app, err := app.NewApp(conf)
+        if err != nil {
+            log.Fatal(err)
+        }
+
+        // Run it
+        app.Run()
     }
-    
-    // Run it
-    app.Run()
 
 You should change some default values for your own needs
 
