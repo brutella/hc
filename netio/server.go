@@ -25,7 +25,7 @@ import (
 //           |                                   |
 //           V                                   |
 //        context (provides variables) <---------
-//  
+//
 func ListenAndServe(addr string, handler http.Handler, context HAPContext) error {
 	server := http.Server{Addr: addr, Handler: handler}
 	ln, err := net.Listen("tcp", server.Addr)
