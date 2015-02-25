@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/brutella/hap/hap"
-	"github.com/brutella/hap/model"
-	"github.com/brutella/hap/model/accessory"
+	"github.com/brutella/hc/hap"
+	"github.com/brutella/hc/model"
+	"github.com/brutella/hc/model/accessory"
 	"github.com/brutella/log"
 	"time"
 )

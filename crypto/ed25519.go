@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"github.com/agl/ed25519"
 
-	"github.com/brutella/hap/common"
+	"github.com/brutella/hc/common"
 )
 
 // ValidateED25519Signature return true when the ED25519 signature is a valid signature of the data based on the key, otherwise false.

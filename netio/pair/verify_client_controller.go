@@ -1,9 +1,9 @@
 package pair
 
 import (
-	"github.com/brutella/hap/common"
-	"github.com/brutella/hap/crypto"
-	"github.com/brutella/hap/netio"
+	"github.com/brutella/hc/common"
+	"github.com/brutella/hc/crypto"
+	"github.com/brutella/hc/netio"
 
 	"bytes"
 	"encoding/hex"

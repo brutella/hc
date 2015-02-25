@@ -1,9 +1,9 @@
 package accessory
 
 import (
-	"github.com/brutella/hap/model"
-	"github.com/brutella/hap/model/characteristic"
-	"github.com/brutella/hap/model/service"
+	"github.com/brutella/hc/model"
+	"github.com/brutella/hc/model/characteristic"
+	"github.com/brutella/hc/model/service"
 )
 
 // Accessory implements the model.Accessory interface and contains the data

@@ -1,12 +1,12 @@
 package server
 
 import (
-	"github.com/brutella/hap/db"
-	"github.com/brutella/hap/model/container"
-	"github.com/brutella/hap/netio"
-	"github.com/brutella/hap/netio/controller"
-	"github.com/brutella/hap/netio/endpoint"
-	"github.com/brutella/hap/netio/pair"
+	"github.com/brutella/hc/db"
+	"github.com/brutella/hc/model/container"
+	"github.com/brutella/hc/netio"
+	"github.com/brutella/hc/netio/controller"
+	"github.com/brutella/hc/netio/endpoint"
+	"github.com/brutella/hc/netio/pair"
 
 	"fmt"
 	"log"

@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/brutella/hap/model/characteristic"
+	"github.com/brutella/hc/model/characteristic"
 )
 
 type Switch struct {

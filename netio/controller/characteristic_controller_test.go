@@ -1,11 +1,11 @@
 package controller
 
 import (
-	"github.com/brutella/hap/model"
-	"github.com/brutella/hap/model/accessory"
-	"github.com/brutella/hap/model/container"
-	_ "github.com/brutella/hap/model/service"
-	"github.com/brutella/hap/netio/data"
+	"github.com/brutella/hc/model"
+	"github.com/brutella/hc/model/accessory"
+	"github.com/brutella/hc/model/container"
+	_ "github.com/brutella/hc/model/service"
+	"github.com/brutella/hc/netio/data"
 
 	"bytes"
 	"encoding/json"

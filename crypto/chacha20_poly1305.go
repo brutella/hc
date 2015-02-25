@@ -7,7 +7,7 @@ import (
 	"github.com/codahale/chacha20"
 	"github.com/tonnerre/golang-go.crypto/poly1305"
 
-	"github.com/brutella/hap/common"
+	"github.com/brutella/hc/common"
 )
 
 // Chacha20DecryptAndPoly1305Verify returns the chacha20 decrypted messages.

@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	// "github.com/brutella/hap/db"
-	"github.com/brutella/hap/model"
-	// "github.com/brutella/hap/model/accessory"
+	// "github.com/brutella/hc/db"
+	"github.com/brutella/hc/model"
+	// "github.com/brutella/hc/model/accessory"
 )
 
 var info = model.Info{

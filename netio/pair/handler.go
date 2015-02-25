@@ -1,8 +1,8 @@
 package pair
 
 import (
-	"github.com/brutella/hap/common"
-	"github.com/brutella/hap/netio"
+	"github.com/brutella/hc/common"
+	"github.com/brutella/hc/netio"
 	"github.com/brutella/log"
 
 	"io"

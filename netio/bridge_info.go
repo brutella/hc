@@ -3,7 +3,7 @@ package netio
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/brutella/hap/common"
+	"github.com/brutella/hc/common"
 	"strings"
 )
 

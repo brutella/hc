@@ -1,7 +1,7 @@
 package pair
 
 import (
-	"github.com/brutella/hap/crypto"
+	"github.com/brutella/hc/crypto"
 )
 
 type PairVerifySession struct {

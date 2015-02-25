@@ -1,7 +1,7 @@
 package netio
 
 import (
-	"github.com/brutella/hap/common"
+	"github.com/brutella/hc/common"
 	"io"
 	"net/url"
 )

@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 	"io"
 
-	"github.com/brutella/hap/common"
+	"github.com/brutella/hc/common"
 )
 
 // secureSession provide a secure session by encrypting and decrypting data

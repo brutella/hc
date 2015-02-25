@@ -1,7 +1,7 @@
 package netio
 
 import (
-	"github.com/brutella/hap/crypto"
+	"github.com/brutella/hc/crypto"
 )
 
 // Bridge contains basic information (like name, ...) and cryptho keys to secure

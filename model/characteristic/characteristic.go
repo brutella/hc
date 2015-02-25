@@ -2,7 +2,7 @@ package characteristic
 
 import (
 	"fmt"
-	"github.com/brutella/hap/model"
+	"github.com/brutella/hc/model"
 	"github.com/gosexy/to"
 	"reflect"
 )

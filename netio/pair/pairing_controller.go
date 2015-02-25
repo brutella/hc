@@ -1,8 +1,8 @@
 package pair
 
 import (
-	"github.com/brutella/hap/common"
-	"github.com/brutella/hap/db"
+	"github.com/brutella/hc/common"
+	"github.com/brutella/hc/db"
 	"github.com/brutella/log"
 )
 

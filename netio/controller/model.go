@@ -3,7 +3,7 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/brutella/hap/model/container"
+	"github.com/brutella/hc/model/container"
 	"io"
 )
 

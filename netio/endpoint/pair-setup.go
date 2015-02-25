@@ -1,9 +1,9 @@
 package endpoint
 
 import (
-	"github.com/brutella/hap/db"
-	"github.com/brutella/hap/netio"
-	"github.com/brutella/hap/netio/pair"
+	"github.com/brutella/hc/db"
+	"github.com/brutella/hc/netio"
+	"github.com/brutella/hc/netio/pair"
 	"github.com/brutella/log"
 
 	"io"

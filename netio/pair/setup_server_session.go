@@ -1,7 +1,7 @@
 package pair
 
 import (
-	"github.com/brutella/hap/crypto"
+	"github.com/brutella/hc/crypto"
 
 	"crypto/sha512"
 	"github.com/tadglines/go-pkgs/crypto/srp"

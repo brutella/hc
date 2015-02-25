@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/brutella/hap/common"
+	"github.com/brutella/hc/common"
 	"github.com/gosexy/to"
 	"strings"
 )

@@ -1,7 +1,7 @@
 package characteristic
 
 import (
-	"github.com/brutella/hap/model"
+	"github.com/brutella/hc/model"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
