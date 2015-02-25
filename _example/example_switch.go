@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/brutella/hap/app"
+	"github.com/brutella/hap/hap"
 	"github.com/brutella/hap/model"
 	"github.com/brutella/hap/model/accessory"
 	"github.com/brutella/log"
@@ -14,12 +14,12 @@ func main() {
 	// Disable verbose logging
 	log.Verbose = false
 
-	conf := app.NewConfig()
+	conf := hap.NewConfig()
 	// Path to database directory to store bridge informations (serial number, crypto keys,...)
 	conf.DatabaseDir = "./data"
 
 	// Create a new app
-	app, err := app.NewApp(conf)
+	app, err := hap.NewApp(conf)
 	if err != nil {
 		log.Fatal(err)
 	}

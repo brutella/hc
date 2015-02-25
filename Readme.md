@@ -27,17 +27,17 @@ Here is a minimal implementation of a HomeKit bridge
 
     import (
       "log"
-      "github.com/brutella/hap/app"
+      "github.com/brutella/hap/hap"
     )
 
     func main() {
-        conf := app.NewConfig()
+        conf := hap.NewConfig()
 
         // Path to folder where data is stored
         conf.DatabaseDir = "./data"
 
         // Create an app
-        app, err := app.NewApp(conf)
+        app, err := hap.NewApp(conf)
         if err != nil {
             log.Fatal(err)
         }
@@ -64,6 +64,8 @@ You should change some default values for your own needs
 
 Now lets add a switch accessory which can be switched on and off.
 
+    import "github.com/brutella/hap/model/accessory"
+    
 	info := accessory.Info{
         Name: "My Switch",
         SerialNumber: "001",
@@ -108,7 +110,6 @@ When the `on` characteristic is changed by the accessory itself e.g. when the sw
 - On server close, wait until connections are closed
 - Check invalid service and characteristics (e.g. temperature must not be smaller than min and bigger than max)
 - Do not allow value changes of read-only characteristics
-- Rename `on` characteristic to sth like `power state`
 - Add fan, garage door opener, lock management and mechanism accessory types
 - Put vendor packages into vendor dir
 

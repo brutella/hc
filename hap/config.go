@@ -1,4 +1,4 @@
-package app
+package hap
 
 // Config contains essential information to setup and publish a HomeKit bridge
 type Config struct {

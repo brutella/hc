@@ -1,4 +1,4 @@
-package app
+package hap
 
 import (
 	"github.com/stretchr/testify/assert"
