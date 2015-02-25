@@ -4,7 +4,7 @@
 
 ### NOTICE
 
-HomeKit is not ready for prime time yet. The library is still subject to change because I cannot guarantee that everything works with future iOS versions.
+The HomeControl API is still subject to change because HomeKit is not ready for prime time.
 
 ## Overview
 
