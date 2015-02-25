@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/brutella/hap/common"
-	"github.com/brutella/hap/netio"
-	"github.com/brutella/hap/netio/pair"
+	"github.com/brutella/hc/common"
+	"github.com/brutella/hc/netio"
+	"github.com/brutella/hc/netio/pair"
 	"io"
 	"net/http"
 	"os"
