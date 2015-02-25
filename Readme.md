@@ -1,6 +1,6 @@
-# HAP.GO
+# HomeControl
 
-*hap.go* is an implementation of the HomeKit Accessory Protocol (HAP) to create HomeKit bridges. A HomeKit bridge makes non-HomeKit accessories available to HomeKit by acting as a middleman.
+*HomeControl* is an implementation of the HomeKit Accessory Protocol (HAP) to create HomeKit bridges. A HomeKit bridge makes non-HomeKit accessories available to HomeKit by acting as a middleman.
 
 ### NOTICE
 
@@ -8,9 +8,9 @@ HomeKit is not ready for prime time yet. The library is still subject to change 
 
 ## Overview
 
-HomeKit is a set of protocols and libraries to access accessories used for Home Automation. Unfortunately the protocol is not open source and the official documentation is only available to MFi members. *hap.go* is a complete implementation of the HAP in Go and does not depend on any OS.
+HomeKit is a set of protocols and libraries to access accessories used for Home Automation. Unfortunately the protocol is not open source and the official documentation is only available to MFi members. HomeControl is a complete implementation of the HAP in Go and does not depend on any OS.
 
-Read the API documentation here: http://godoc.org/github.com/brutella/hap
+Read the API documentation here: http://godoc.org/github.com/brutella/hc
 
 ## Features
 
@@ -27,7 +27,7 @@ Here is a minimal implementation of a HomeKit bridge
 
     import (
       "log"
-      "github.com/brutella/hap/hap"
+      "github.com/brutella/hc/hap"
     )
 
     func main() {
@@ -64,7 +64,7 @@ You should change some default values for your own needs
 
 Now lets add a switch accessory which can be switched on and off.
 
-    import "github.com/brutella/hap/model/accessory"
+    import "github.com/brutella/hc/model/accessory"
     
 	info := accessory.Info{
         Name: "My Switch",
@@ -92,7 +92,7 @@ When the `on` characteristic is changed by the accessory itself e.g. when the sw
 
 ## Dependencies
 
-*hap* depends on the following libraries
+HomeControl depends on the following libraries
 
 - `github.com/stretchr/testify` to get asserts in unit tests
 - `github.com/tadglines/go-pkgs/crypto/srp` for *SRP* algorithm
