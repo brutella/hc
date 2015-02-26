@@ -53,7 +53,7 @@ You should change some default values for your own needs
 
     // Password the user has to enter when adding the accessory to HomeKit
     // Default "00102003"
-    pwd, _ := server.NewPassword("11122333")
+    pwd, _ := hap.NewPassword("11122333")
     conf.BridgePassword = pwd 
     
     // Bridge manufacturer name
