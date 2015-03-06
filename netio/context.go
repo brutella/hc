@@ -47,7 +47,7 @@ type context struct {
 }
 
 // NewContextForBridge returns a new HAPContext
-func NewContextForBridge(b *Bridge) *context {
+func NewContextForBridge(b *Bridge) HAPContext {
 	ctx := context{
 		storage: map[interface{}]interface{}{},
 		mutex:   &sync.Mutex{},
