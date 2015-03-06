@@ -49,43 +49,48 @@ func main() {
 
 You should change some default values for your own needs
 
-    // Name of the bridge which appears in the accessory browser on iOS; default "GoBridge"
-    conf.BridgeName = "TestBridge"
+```go
+// Name of the bridge which appears in the accessory browser on iOS; default "GoBridge"
+conf.BridgeName = "TestBridge"
 
-    // Password the user has to enter when adding the accessory to HomeKit
-    // Default "00102003"
-    pwd, _ := hap.NewPassword("11122333")
-    conf.BridgePassword = pwd 
-    
-    // Bridge manufacturer name
-    conf.BridgeManufacturer = "Apple Inc."
+// Password the user has to enter when adding the accessory to HomeKit
+// Default "00102003"
+pwd, _ := hap.NewPassword("11122333")
+conf.BridgePassword = pwd 
 
+// Bridge manufacturer name
+conf.BridgeManufacturer = "Apple Inc."
+```
 
 ### Add Accessories
 
 Now lets add a switch accessory which can be switched on and off.
 
-    import "github.com/brutella/hc/model/accessory"
-    
-	info := accessory.Info{
-        Name: "My Switch",
-        SerialNumber: "001",
-        Manufacturer: "Google",
-        Model: "Switchy",
-    }
-    
-    sw := accessory.NewSwitch(info)    
-    app.AddAccessory(sw.Accessory)
+```go
+import "github.com/brutella/hc/model/accessory"
+
+info := accessory.Info{
+    Name: "My Switch",
+    SerialNumber: "001",
+    Manufacturer: "Google",
+    Model: "Switchy",
+}
+
+sw := accessory.NewSwitch(info)    
+app.AddAccessory(sw.Accessory)
+```
 
 You can use the `OnStateChanged` callback to get notified, when a HomeKit client (iOS device) changes the value of the `on` characteristic.
 
-	sw.OnStateChanged(func(on bool) {
-        if on == true {
-            log.Println("Switch on")
-        } else {
-            log.Println("Switch off")
-        }
-    })
+```go
+sw.OnStateChanged(func(on bool) {
+    if on == true {
+        log.Println("Switch on")
+    } else {
+        log.Println("Switch off")
+    }
+})
+```
 
 When the `on` characteristic is changed by the accessory itself e.g. when the switch is turned on "the analog way", you should notify the clients by manually setting the state.
 
