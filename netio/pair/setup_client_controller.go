@@ -30,7 +30,7 @@ func NewSetupClientController(bridge *netio.Bridge, username string) *SetupClien
 func (c *SetupClientController) InitialPairingRequest() io.Reader {
 	tlvPairStart := common.NewTLV8Container()
 	tlvPairStart.SetByte(TagPairingMethod, 0)
-	tlvPairStart.SetByte(TagSequence, SequencePairStartRequest)
+	tlvPairStart.SetByte(TagSequence, SequencePairStartRequest.Byte())
 
 	return tlvPairStart.BytesBuffer()
 }
@@ -49,7 +49,7 @@ func (c *SetupClientController) Handle(cont_in common.Container) (common.Contain
 		return nil, common.NewErrorf("Received error %d", err_code)
 	}
 
-	seq := cont_in.GetByte(TagSequence)
+	seq := PairSequenceType(cont_in.GetByte(TagSequence))
 	fmt.Println("->     Seq:", seq)
 
 	var cont_out common.Container
@@ -108,7 +108,7 @@ func (c *SetupClientController) handleSequencePairStartResponse(cont_in common.C
 
 	cont_out := common.NewTLV8Container()
 	cont_out.SetByte(TagPairingMethod, 0)
-	cont_out.SetByte(TagSequence, SequencePairVerifyRequest)
+	cont_out.SetByte(TagSequence, SequencePairVerifyRequest.Byte())
 	cont_out.SetBytes(TagPublicKey, publicKey)
 	cont_out.SetBytes(TagProof, proof)
 
@@ -162,7 +162,7 @@ func (c *SetupClientController) handleSequencePairVerifyResponse(cont_in common.
 
 	cont_out := common.NewTLV8Container()
 	cont_out.SetByte(TagPairingMethod, 0)
-	cont_out.SetByte(TagSequence, SequencePairKeyExchangeRequest)
+	cont_out.SetByte(TagSequence, SequencePairKeyExchangeRequest.Byte())
 	cont_out.SetBytes(TagEncryptedData, append(encrypted, tag[:]...))
 
 	fmt.Println("<-   Encrypted:", hex.EncodeToString(cont_out.GetBytes(TagEncryptedData)))

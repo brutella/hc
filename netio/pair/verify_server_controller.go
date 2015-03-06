@@ -20,7 +20,7 @@ type VerifyServerController struct {
 	database db.Database
 	context  netio.HAPContext
 	session  *PairVerifySession
-	curSeq   byte
+	curSeq   VerifySequenceType
 }
 
 func NewVerifyServerController(database db.Database, context netio.HAPContext) *VerifyServerController {
@@ -28,7 +28,7 @@ func NewVerifyServerController(database db.Database, context netio.HAPContext) *
 		database: database,
 		context:  context,
 		session:  NewPairVerifySession(),
-		curSeq:   SequenceWaitingForRequest,
+		curSeq:   SequenceVerifyWaiting,
 	}
 
 	return &controller
@@ -53,19 +53,19 @@ func (c *VerifyServerController) Handle(cont_in common.Container) (common.Contai
 		return nil, common.NewErrorf("Cannot handle auth method %b", method)
 	}
 
-	seq := cont_in.GetByte(TagSequence)
+	seq := VerifySequenceType(cont_in.GetByte(TagSequence))
 
 	switch seq {
 	case SequenceVerifyStartRequest:
-		if c.curSeq != SequenceWaitingForRequest {
+		if c.curSeq != SequenceVerifyWaiting {
 			c.Reset()
-			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
+			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq.Byte())
 		}
 		cont_out, err = c.handlePairVerifyStart(cont_in)
 	case SequenceVerifyFinishRequest:
 		if c.curSeq != SequenceVerifyStartResponse {
 			c.Reset()
-			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
+			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq.Byte())
 		}
 
 		cont_out, err = c.handlePairVerifyFinish(cont_in)
@@ -117,7 +117,7 @@ func (c *VerifyServerController) handlePairVerifyStart(cont_in common.Container)
 	encrypted, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(c.session.EncryptionKey[:], []byte("PV-Msg02"), tlv_encrypt.BytesBuffer().Bytes(), nil)
 
 	cont_out := common.NewTLV8Container()
-	cont_out.SetByte(TagSequence, c.curSeq)
+	cont_out.SetByte(TagSequence, c.curSeq.Byte())
 	cont_out.SetBytes(TagPublicKey, c.session.PublicKey[:])
 	cont_out.SetBytes(TagEncryptedData, append(encrypted, mac[:]...))
 
@@ -152,12 +152,12 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 	decrypted, err := crypto.Chacha20DecryptAndPoly1305Verify(c.session.EncryptionKey[:], []byte("PV-Msg03"), message, mac, nil)
 
 	cont_out := common.NewTLV8Container()
-	cont_out.SetByte(TagSequence, c.curSeq)
+	cont_out.SetByte(TagSequence, c.curSeq.Byte())
 
 	if err != nil {
 		c.Reset()
 		log.Println("[ERRO]", err)
-		cont_out.SetByte(TagError, ErrorAuthenticationFailed) // return error 2
+		cont_out.SetByte(TagError, ErrorAuthenticationFailed.Byte()) // return error 2
 	} else {
 		decrypted_buffer := bytes.NewBuffer(decrypted)
 		cont_in, err := common.NewTLV8ContainerFromReader(decrypted_buffer)
@@ -187,7 +187,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 		if crypto.ValidateED25519Signature(client.PublicKey(), material, signature) == false {
 			log.Println("[WARN] signature is invalid")
 			c.Reset()
-			cont_out.SetByte(TagError, ErrorUnknownPeer) // return error 4
+			cont_out.SetByte(TagError, ErrorUnknownPeer.Byte()) // return error 4
 		} else {
 			log.Println("[VERB] signature is valid")
 		}
@@ -197,5 +197,5 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 }
 
 func (c *VerifyServerController) Reset() {
-	c.curSeq = SequenceWaitingForRequest
+	c.curSeq = SequenceVerifyWaiting
 }

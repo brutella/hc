@@ -9,6 +9,18 @@ import (
 	"testing"
 )
 
+func TestUnknownPairingMethod(t *testing.T) {
+	tlv8 := common.NewTLV8Container()
+	tlv8.SetByte(TagPairingMethod, 0x09)
+
+	database, _ := db.NewDatabase(os.TempDir())
+	controller := NewPairingController(database)
+
+	tlv8_out, err := controller.Handle(tlv8)
+	assert.NotNil(t, err)
+	assert.Nil(t, tlv8_out)
+}
+
 func TestAddPairing(t *testing.T) {
 	tlv8 := common.NewTLV8Container()
 	tlv8.SetByte(TagPairingMethod, PairingMethodAdd)

@@ -34,7 +34,7 @@ func (c *PairingController) Handle(tlv8 common.Container) (common.Container, err
 	username := tlv8.GetString(TagUsername)
 	publicKey := tlv8.GetBytes(TagPublicKey)
 
-	log.Println("[VERB] ->   Method:", method)
+	log.Printf("[VERB] ->   Method: %v\n", method)
 	log.Println("[VERB] -> Username:", username)
 	log.Println("[VERB] ->     LTPK:", publicKey)
 
@@ -50,6 +50,8 @@ func (c *PairingController) Handle(tlv8 common.Container) (common.Container, err
 			log.Println("[ERRO]", err)
 			return nil, err
 		}
+	default:
+		return nil, common.NewErrorf("Invalid pairing method type %v", method)
 	}
 
 	out := common.NewTLV8Container()

@@ -45,7 +45,7 @@ func (c *VerifyClientController) Handle(cont_in common.Container) (common.Contai
 		return nil, common.NewErrorf("Cannot handle auth method %b", method)
 	}
 
-	seq := cont_in.GetByte(TagSequence)
+	seq := VerifySequenceType(cont_in.GetByte(TagSequence))
 	switch seq {
 	case SequenceVerifyStartResponse:
 		cont_out, err = c.handleSequencePairVerifyResponse(cont_in)
@@ -63,7 +63,7 @@ func (c *VerifyClientController) Handle(cont_in common.Container) (common.Contai
 func (c *VerifyClientController) InitialKeyVerifyRequest() io.Reader {
 	cont_out := common.NewTLV8Container()
 	cont_out.SetByte(TagPairingMethod, 0)
-	cont_out.SetByte(TagSequence, SequenceVerifyStartRequest)
+	cont_out.SetByte(TagSequence, SequenceVerifyStartRequest.Byte())
 	cont_out.SetBytes(TagPublicKey, c.session.PublicKey[:])
 
 	fmt.Println("<-     A:", hex.EncodeToString(cont_out.GetBytes(TagPublicKey)))
@@ -134,8 +134,8 @@ func (c *VerifyClientController) handleSequencePairVerifyResponse(cont_in common
 	}
 
 	cont_out := common.NewTLV8Container()
-	cont_out.SetByte(TagPairingMethod, 0)
-	cont_out.SetByte(TagSequence, SequenceVerifyFinishRequest)
+	cont_out.SetByte(TagPairingMethod, PairingMethodDefault)
+	cont_out.SetByte(TagSequence, SequenceVerifyFinishRequest.Byte())
 
 	tlv_encrypt := common.NewTLV8Container()
 	tlv_encrypt.SetString(TagUsername, c.username)
@@ -162,9 +162,9 @@ func (c *VerifyClientController) handleSequencePairVerifyResponse(cont_in common
 // Server -> Client
 // - only error ocde (optional)
 func (c *VerifyClientController) handlePairSequenceVerifyFinishResponse(cont_in common.Container) (common.Container, error) {
-	err_code := cont_in.GetByte(ErrorNone)
-	if err_code != 0x00 {
-		fmt.Println("Unexpected error %d", err_code)
+	err := ErrorType(cont_in.GetByte(TagError))
+	if err != ErrorNone {
+		fmt.Printf("Unexpected error %v\n", err)
 	}
 
 	return nil, nil
