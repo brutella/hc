@@ -29,10 +29,10 @@ func NewPairingController(database db.Database) *PairingController {
 	return &c
 }
 
-func (c *PairingController) Handle(tlv8 common.Container) (common.Container, error) {
-	method := tlv8.GetByte(TLVType_Method)
-	username := tlv8.GetString(TLVType_Username)
-	publicKey := tlv8.GetBytes(TLVType_PublicKey)
+func (c *PairingController) Handle(cont common.Container) (common.Container, error) {
+	method := PairMethodType(cont.GetByte(TagPairingMethod))
+	username := cont.GetString(TagUsername)
+	publicKey := cont.GetBytes(TagPublicKey)
 
 	log.Println("[VERB] ->   Method:", method)
 	log.Println("[VERB] -> Username:", username)
@@ -41,19 +41,21 @@ func (c *PairingController) Handle(tlv8 common.Container) (common.Container, err
 	client := db.NewClient(username, publicKey)
 
 	switch method {
-	case TLVType_Method_PairingDelete:
+	case PairingMethodDelete:
 		log.Printf("[INFO] Remove LTPK for client '%s'\n", username)
 		c.database.DeleteClient(client)
-	case TLVType_Method_PairingAdd:
+	case PairingMethodAdd:
 		err := c.database.SaveClient(client)
 		if err != nil {
 			log.Println("[ERRO]", err)
 			return nil, err
 		}
+	default:
+		return nil, common.NewErrorf("Invalid pairing method type %v", method)
 	}
 
 	out := common.NewTLV8Container()
-	out.SetByte(TLVType_SequenceNumber, 0x2)
+	out.SetByte(TagSequence, 0x2)
 
 	return out, nil
 }

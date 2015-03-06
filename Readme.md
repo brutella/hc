@@ -137,3 +137,16 @@ The metdata dump in iOS 8.3 (found by [@KhaosT](https://twitter.com/khaost/statu
     <tr><td>Lock Management</td><td>version, lock-management.control-point</td><td>administrator-only-access, audio-feedback, door-state.current, lock-management.auto-secure-timeout, lock-mechanism.last-known-action, logs, motion-detected</td><tr>
     <tr><td>Lock Mechanism</td><td>lock-mechanism.current-state, lock-mechanism.target-state</td><td>name</td><tr>
 </table>
+
+# Contact
+
+Matthias Hochgatterer
+
+Github: [https://github.com/brutella/](https://github.com/brutella/)
+
+Twitter: [https://twitter.com/brutella](https://twitter.com/brutella)
+
+
+# License
+
+HomeControl is available under a non-commercial license. See the LICENSE file for more info.

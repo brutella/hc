@@ -29,41 +29,41 @@ func NewSetupClientController(bridge *netio.Bridge, username string) *SetupClien
 
 func (c *SetupClientController) InitialPairingRequest() io.Reader {
 	tlvPairStart := common.NewTLV8Container()
-	tlvPairStart.SetByte(TLVType_Method, 0)
-	tlvPairStart.SetByte(TLVType_SequenceNumber, PairStartRequest)
+	tlvPairStart.SetByte(TagPairingMethod, 0)
+	tlvPairStart.SetByte(TagSequence, PairStepStartRequest.Byte())
 
 	return tlvPairStart.BytesBuffer()
 }
 
 func (c *SetupClientController) Handle(cont_in common.Container) (common.Container, error) {
-	method := cont_in.GetByte(TLVType_Method)
+	method := PairMethodType(cont_in.GetByte(TagPairingMethod))
 
 	// It is valid that method is not sent
 	// If method is sent then it must be 0x00
-	if method != 0x00 {
-		return nil, common.NewErrorf("Cannot handle auth method %b", method)
+	if method != PairingMethodDefault {
+		return nil, ErrInvalidPairMethod(method)
 	}
 
-	err_code := cont_in.GetByte(TLVType_ErrorCode)
-	if err_code != 0x00 {
-		return nil, common.NewErrorf("Received error %d", err_code)
+	code := ErrCode(cont_in.GetByte(TagErrCode))
+	if code != ErrCodeNo {
+		return nil, code.Error()
 	}
 
-	seq := cont_in.GetByte(TLVType_SequenceNumber)
+	seq := PairStepType(cont_in.GetByte(TagSequence))
 	fmt.Println("->     Seq:", seq)
 
 	var cont_out common.Container
 	var err error
 
 	switch seq {
-	case PairStartRespond:
-		cont_out, err = c.handlePairStartRespond(cont_in)
-	case PairVerifyRespond:
-		cont_out, err = c.handlePairVerifyRespond(cont_in)
-	case PairKeyExchangeRespond:
+	case PairStepStartResponse:
+		cont_out, err = c.handlePairStepStartResponse(cont_in)
+	case PairStepVerifyResponse:
+		cont_out, err = c.handlePairStepVerifyResponse(cont_in)
+	case PairStepKeyExchangeResponse:
 		cont_out, err = c.handleKeyExchange(cont_in)
 	default:
-		return nil, common.NewErrorf("Cannot handle sequence number %d", seq)
+		return nil, ErrInvalidPairStep(seq)
 	}
 
 	return cont_out, err
@@ -76,9 +76,9 @@ func (c *SetupClientController) Handle(cont_in common.Container) (common.Contain
 // Client -> Server
 // - A: client public key
 // - M1: proof
-func (c *SetupClientController) handlePairStartRespond(cont_in common.Container) (common.Container, error) {
-	salt := cont_in.GetBytes(TLVType_Salt)
-	serverPublicKey := cont_in.GetBytes(TLVType_PublicKey)
+func (c *SetupClientController) handlePairStepStartResponse(cont_in common.Container) (common.Container, error) {
+	salt := cont_in.GetBytes(TagSalt)
+	serverPublicKey := cont_in.GetBytes(TagPublicKey)
 
 	if len(salt) != 16 {
 		return nil, common.NewErrorf("Salt is invalid (%d bytes)", len(salt))
@@ -107,10 +107,10 @@ func (c *SetupClientController) handlePairStartRespond(cont_in common.Container)
 	fmt.Println("<-     M1:", hex.EncodeToString(proof))
 
 	cont_out := common.NewTLV8Container()
-	cont_out.SetByte(TLVType_Method, 0)
-	cont_out.SetByte(TLVType_SequenceNumber, PairVerifyRequest)
-	cont_out.SetBytes(TLVType_PublicKey, publicKey)
-	cont_out.SetBytes(TLVType_Proof, proof)
+	cont_out.SetByte(TagPairingMethod, 0)
+	cont_out.SetByte(TagSequence, PairStepVerifyRequest.Byte())
+	cont_out.SetBytes(TagPublicKey, publicKey)
+	cont_out.SetBytes(TagProof, proof)
 
 	return cont_out, nil
 }
@@ -123,8 +123,8 @@ func (c *SetupClientController) handlePairStartRespond(cont_in common.Container)
 // - M2: proof
 // or
 // - auth error
-func (c *SetupClientController) handlePairVerifyRespond(cont_in common.Container) (common.Container, error) {
-	serverProof := cont_in.GetBytes(TLVType_Proof)
+func (c *SetupClientController) handlePairStepVerifyResponse(cont_in common.Container) (common.Container, error) {
+	serverProof := cont_in.GetBytes(TagProof)
 	fmt.Println("->     M2:", hex.EncodeToString(serverProof))
 
 	if c.session.IsServerProofValid(serverProof) == false {
@@ -151,9 +151,9 @@ func (c *SetupClientController) handlePairVerifyRespond(cont_in common.Container
 	}
 
 	tlvPairKeyExchange := common.NewTLV8Container()
-	tlvPairKeyExchange.SetString(TLVType_Username, c.username)
-	tlvPairKeyExchange.SetBytes(TLVType_PublicKey, []byte(c.session.LTPK))
-	tlvPairKeyExchange.SetBytes(TLVType_Ed25519Signature, []byte(signature))
+	tlvPairKeyExchange.SetString(TagUsername, c.username)
+	tlvPairKeyExchange.SetBytes(TagPublicKey, []byte(c.session.LTPK))
+	tlvPairKeyExchange.SetBytes(TagSignature, []byte(signature))
 
 	encrypted, tag, err := crypto.Chacha20EncryptAndPoly1305Seal(c.session.EncryptionKey[:], []byte("PS-Msg05"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)
 	if err != nil {
@@ -161,11 +161,11 @@ func (c *SetupClientController) handlePairVerifyRespond(cont_in common.Container
 	}
 
 	cont_out := common.NewTLV8Container()
-	cont_out.SetByte(TLVType_Method, 0)
-	cont_out.SetByte(TLVType_SequenceNumber, PairKeyExchangeRequest)
-	cont_out.SetBytes(TLVType_EncryptedData, append(encrypted, tag[:]...))
+	cont_out.SetByte(TagPairingMethod, 0)
+	cont_out.SetByte(TagSequence, PairStepKeyExchangeRequest.Byte())
+	cont_out.SetBytes(TagEncryptedData, append(encrypted, tag[:]...))
 
-	fmt.Println("<-   Encrypted:", hex.EncodeToString(cont_out.GetBytes(TLVType_EncryptedData)))
+	fmt.Println("<-   Encrypted:", hex.EncodeToString(cont_out.GetBytes(TagEncryptedData)))
 
 	return cont_out, nil
 }
@@ -181,7 +181,7 @@ func (c *SetupClientController) handlePairVerifyRespond(cont_in common.Container
 // Server -> Client
 // - encrpyted tlv8: bridge LTPK, bridge name, signature (of H2, bridge name, LTPK)
 func (c *SetupClientController) handleKeyExchange(cont_in common.Container) (common.Container, error) {
-	data := cont_in.GetBytes(TLVType_EncryptedData)
+	data := cont_in.GetBytes(TagEncryptedData)
 	message := data[:(len(data) - 16)]
 	var mac [16]byte
 	copy(mac[:], data[len(message):]) // 16 byte (MAC)
@@ -199,9 +199,9 @@ func (c *SetupClientController) handleKeyExchange(cont_in common.Container) (com
 			fmt.Println(err)
 		}
 
-		username := cont_in.GetString(TLVType_Username)
-		ltpk := cont_in.GetBytes(TLVType_PublicKey)
-		signature := cont_in.GetBytes(TLVType_Ed25519Signature)
+		username := cont_in.GetString(TagUsername)
+		ltpk := cont_in.GetBytes(TagPublicKey)
+		signature := cont_in.GetBytes(TagSignature)
 		fmt.Println("->     Username:", username)
 		fmt.Println("->     LTPK:", hex.EncodeToString(ltpk))
 		fmt.Println("->     Signature:", hex.EncodeToString(signature))
