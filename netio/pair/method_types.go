@@ -2,7 +2,7 @@ package pair
 
 import "fmt"
 
-type PairingMethodType byte
+type PairMethodType byte
 
 const (
 	PairingMethodDefault = 0x00
@@ -11,7 +11,7 @@ const (
 	PairingMethodDelete  = 0x04
 )
 
-func (m PairingMethodType) String() string {
+func (m PairMethodType) String() string {
 	switch m {
 	case PairingMethodDefault:
 		return "Default"

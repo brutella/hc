@@ -30,40 +30,40 @@ func NewSetupClientController(bridge *netio.Bridge, username string) *SetupClien
 func (c *SetupClientController) InitialPairingRequest() io.Reader {
 	tlvPairStart := common.NewTLV8Container()
 	tlvPairStart.SetByte(TagPairingMethod, 0)
-	tlvPairStart.SetByte(TagSequence, SequencePairStartRequest.Byte())
+	tlvPairStart.SetByte(TagSequence, PairStepStartRequest.Byte())
 
 	return tlvPairStart.BytesBuffer()
 }
 
 func (c *SetupClientController) Handle(cont_in common.Container) (common.Container, error) {
-	method := cont_in.GetByte(TagPairingMethod)
+	method := PairMethodType(cont_in.GetByte(TagPairingMethod))
 
 	// It is valid that method is not sent
 	// If method is sent then it must be 0x00
-	if method != 0x00 {
-		return nil, common.NewErrorf("Cannot handle auth method %b", method)
+	if method != PairingMethodDefault {
+		return nil, ErrInvalidPairMethod(method)
 	}
 
-	err_code := cont_in.GetByte(TagError)
-	if err_code != 0x00 {
-		return nil, common.NewErrorf("Received error %d", err_code)
+	code := ErrCode(cont_in.GetByte(TagErrCode))
+	if code != ErrCodeNo {
+		return nil, code.Error()
 	}
 
-	seq := PairSequenceType(cont_in.GetByte(TagSequence))
+	seq := PairStepType(cont_in.GetByte(TagSequence))
 	fmt.Println("->     Seq:", seq)
 
 	var cont_out common.Container
 	var err error
 
 	switch seq {
-	case SequencePairStartResponse:
-		cont_out, err = c.handleSequencePairStartResponse(cont_in)
-	case SequencePairVerifyResponse:
-		cont_out, err = c.handleSequencePairVerifyResponse(cont_in)
-	case SequencePairKeyExchangeResponse:
+	case PairStepStartResponse:
+		cont_out, err = c.handlePairStepStartResponse(cont_in)
+	case PairStepVerifyResponse:
+		cont_out, err = c.handlePairStepVerifyResponse(cont_in)
+	case PairStepKeyExchangeResponse:
 		cont_out, err = c.handleKeyExchange(cont_in)
 	default:
-		return nil, common.NewErrorf("Cannot handle sequence number %d", seq)
+		return nil, ErrInvalidPairStep(seq)
 	}
 
 	return cont_out, err
@@ -76,7 +76,7 @@ func (c *SetupClientController) Handle(cont_in common.Container) (common.Contain
 // Client -> Server
 // - A: client public key
 // - M1: proof
-func (c *SetupClientController) handleSequencePairStartResponse(cont_in common.Container) (common.Container, error) {
+func (c *SetupClientController) handlePairStepStartResponse(cont_in common.Container) (common.Container, error) {
 	salt := cont_in.GetBytes(TagSalt)
 	serverPublicKey := cont_in.GetBytes(TagPublicKey)
 
@@ -108,7 +108,7 @@ func (c *SetupClientController) handleSequencePairStartResponse(cont_in common.C
 
 	cont_out := common.NewTLV8Container()
 	cont_out.SetByte(TagPairingMethod, 0)
-	cont_out.SetByte(TagSequence, SequencePairVerifyRequest.Byte())
+	cont_out.SetByte(TagSequence, PairStepVerifyRequest.Byte())
 	cont_out.SetBytes(TagPublicKey, publicKey)
 	cont_out.SetBytes(TagProof, proof)
 
@@ -123,7 +123,7 @@ func (c *SetupClientController) handleSequencePairStartResponse(cont_in common.C
 // - M2: proof
 // or
 // - auth error
-func (c *SetupClientController) handleSequencePairVerifyResponse(cont_in common.Container) (common.Container, error) {
+func (c *SetupClientController) handlePairStepVerifyResponse(cont_in common.Container) (common.Container, error) {
 	serverProof := cont_in.GetBytes(TagProof)
 	fmt.Println("->     M2:", hex.EncodeToString(serverProof))
 
@@ -162,7 +162,7 @@ func (c *SetupClientController) handleSequencePairVerifyResponse(cont_in common.
 
 	cont_out := common.NewTLV8Container()
 	cont_out.SetByte(TagPairingMethod, 0)
-	cont_out.SetByte(TagSequence, SequencePairKeyExchangeRequest.Byte())
+	cont_out.SetByte(TagSequence, PairStepKeyExchangeRequest.Byte())
 	cont_out.SetBytes(TagEncryptedData, append(encrypted, tag[:]...))
 
 	fmt.Println("<-   Encrypted:", hex.EncodeToString(cont_out.GetBytes(TagEncryptedData)))

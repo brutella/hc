@@ -37,22 +37,22 @@ func (c *VerifyClientController) Handle(cont_in common.Container) (common.Contai
 	var cont_out common.Container
 	var err error
 
-	method := cont_in.GetByte(TagPairingMethod)
+	method := PairMethodType(cont_in.GetByte(TagPairingMethod))
 
 	// It is valid that method is not sent
 	// If method is sent then it must be 0x00
-	if method != 0x00 {
-		return nil, common.NewErrorf("Cannot handle auth method %b", method)
+	if method != PairingMethodDefault {
+		return nil, ErrInvalidPairMethod(method)
 	}
 
 	seq := VerifyStepType(cont_in.GetByte(TagSequence))
 	switch seq {
-	case StepVerifyStartResponse:
-		cont_out, err = c.handleSequencePairVerifyResponse(cont_in)
-	case StepVerifyFinishResponse:
-		cont_out, err = c.handlePairStepVerifyFinishResponse(cont_in)
+	case VerifyStepStartResponse:
+		cont_out, err = c.handlePairStepVerifyResponse(cont_in)
+	case VerifyStepFinishResponse:
+		cont_out, err = c.handlePairVerifyStepFinishResponse(cont_in)
 	default:
-		return nil, common.NewErrorf("Cannot handle sequence number %d", seq)
+		return nil, ErrInvalidVerifyStep(seq)
 	}
 
 	return cont_out, err
@@ -63,7 +63,7 @@ func (c *VerifyClientController) Handle(cont_in common.Container) (common.Contai
 func (c *VerifyClientController) InitialKeyVerifyRequest() io.Reader {
 	cont_out := common.NewTLV8Container()
 	cont_out.SetByte(TagPairingMethod, 0)
-	cont_out.SetByte(TagSequence, StepVerifyStartRequest.Byte())
+	cont_out.SetByte(TagSequence, VerifyStepStartRequest.Byte())
 	cont_out.SetBytes(TagPublicKey, c.session.PublicKey[:])
 
 	fmt.Println("<-     A:", hex.EncodeToString(cont_out.GetBytes(TagPublicKey)))
@@ -81,7 +81,7 @@ func (c *VerifyClientController) InitialKeyVerifyRequest() io.Reader {
 // - encrypted message
 //      - username
 //      - signature: from client session public key, server name, server session public key,
-func (c *VerifyClientController) handleSequencePairVerifyResponse(cont_in common.Container) (common.Container, error) {
+func (c *VerifyClientController) handlePairStepVerifyResponse(cont_in common.Container) (common.Container, error) {
 	serverPublicKey := cont_in.GetBytes(TagPublicKey)
 	if len(serverPublicKey) != 32 {
 		return nil, common.NewErrorf("Invalid server public key size %d", len(serverPublicKey))
@@ -135,7 +135,7 @@ func (c *VerifyClientController) handleSequencePairVerifyResponse(cont_in common
 
 	cont_out := common.NewTLV8Container()
 	cont_out.SetByte(TagPairingMethod, PairingMethodDefault)
-	cont_out.SetByte(TagSequence, StepVerifyFinishRequest.Byte())
+	cont_out.SetByte(TagSequence, VerifyStepFinishRequest.Byte())
 
 	tlv_encrypt := common.NewTLV8Container()
 	tlv_encrypt.SetString(TagUsername, c.username)
@@ -161,8 +161,8 @@ func (c *VerifyClientController) handleSequencePairVerifyResponse(cont_in common
 
 // Server -> Client
 // - only error ocde (optional)
-func (c *VerifyClientController) handlePairStepVerifyFinishResponse(cont_in common.Container) (common.Container, error) {
-	code := ErrCode(cont_in.GetByte(TagError))
+func (c *VerifyClientController) handlePairVerifyStepFinishResponse(cont_in common.Container) (common.Container, error) {
+	code := ErrCode(cont_in.GetByte(TagErrCode))
 	if code != ErrCodeNo {
 		fmt.Printf("Unexpected error %v\n", code)
 	}

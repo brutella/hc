@@ -28,7 +28,7 @@ func NewVerifyServerController(database db.Database, context netio.HAPContext) *
 		database: database,
 		context:  context,
 		session:  NewVerifySession(),
-		step:     StepVerifyWaiting,
+		step:     VerifyStepWaiting,
 	}
 
 	return &controller
@@ -38,39 +38,39 @@ func (c *VerifyServerController) SharedKey() [32]byte {
 }
 
 func (c *VerifyServerController) KeyVerified() bool {
-	return c.step == StepVerifyFinishResponse
+	return c.step == VerifyStepFinishResponse
 }
 
 func (c *VerifyServerController) Handle(cont_in common.Container) (common.Container, error) {
 	var cont_out common.Container
 	var err error
 
-	method := cont_in.GetByte(TagPairingMethod)
+	method := PairMethodType(cont_in.GetByte(TagPairingMethod))
 
 	// It is valid that method is not sent
 	// If method is sent then it must be 0x00
-	if method != 0x00 {
-		return nil, common.NewErrorf("Cannot handle auth method %b", method)
+	if method != PairingMethodDefault {
+		return nil, ErrInvalidPairMethod(method)
 	}
 
 	seq := VerifyStepType(cont_in.GetByte(TagSequence))
 
 	switch seq {
-	case StepVerifyStartRequest:
-		if c.step != StepVerifyWaiting {
+	case VerifyStepStartRequest:
+		if c.step != VerifyStepWaiting {
 			c.Reset()
-			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.step.Byte())
+			return nil, ErrInvalidInternalVerifyStep(c.step)
 		}
 		cont_out, err = c.handlePairVerifyStart(cont_in)
-	case StepVerifyFinishRequest:
-		if c.step != StepVerifyStartResponse {
+	case VerifyStepFinishRequest:
+		if c.step != VerifyStepStartResponse {
 			c.Reset()
-			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.step.Byte())
+			return nil, ErrInvalidInternalVerifyStep(c.step)
 		}
 
 		cont_out, err = c.handlePairVerifyFinish(cont_in)
 	default:
-		return nil, common.NewErrorf("Cannot handle sequence number %d", seq)
+		return nil, ErrInvalidVerifyStep(seq)
 	}
 
 	return cont_out, err
@@ -86,12 +86,12 @@ func (c *VerifyServerController) Handle(cont_in common.Container) (common.Contai
 // - B: server public key
 // - signature: from server session public key, server name, client session public key
 func (c *VerifyServerController) handlePairVerifyStart(cont_in common.Container) (common.Container, error) {
-	c.step = StepVerifyStartResponse
+	c.step = VerifyStepStartResponse
 
 	clientPublicKey := cont_in.GetBytes(TagPublicKey)
 	log.Println("[VERB] ->     A:", hex.EncodeToString(clientPublicKey))
 	if len(clientPublicKey) != 32 {
-		return nil, common.NewErrorf("Invalid client public key size %d", len(clientPublicKey))
+		return nil, ErrInvalidClientKeyLength
 	}
 
 	var otherPublicKey [32]byte
@@ -140,7 +140,7 @@ func (c *VerifyServerController) handlePairVerifyStart(cont_in common.Container)
 // - only sequence number
 // - error code (optional)
 func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container) (common.Container, error) {
-	c.step = StepVerifyFinishResponse
+	c.step = VerifyStepFinishResponse
 
 	data := cont_in.GetBytes(TagEncryptedData)
 	message := data[:(len(data) - 16)]
@@ -157,7 +157,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 	if err != nil {
 		c.Reset()
 		log.Println("[ERRO]", err)
-		cont_out.SetByte(TagError, ErrCodeAuthenticationFailed.Byte()) // return error 2
+		cont_out.SetByte(TagErrCode, ErrCodeAuthenticationFailed.Byte()) // return error 2
 	} else {
 		decrypted_buffer := bytes.NewBuffer(decrypted)
 		cont_in, err := common.NewTLV8ContainerFromReader(decrypted_buffer)
@@ -187,7 +187,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 		if crypto.ValidateED25519Signature(client.PublicKey(), material, signature) == false {
 			log.Println("[WARN] signature is invalid")
 			c.Reset()
-			cont_out.SetByte(TagError, ErrCodeUnknownPeer.Byte()) // return error 4
+			cont_out.SetByte(TagErrCode, ErrCodeUnknownPeer.Byte()) // return error 4
 		} else {
 			log.Println("[VERB] signature is valid")
 		}
@@ -197,5 +197,5 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 }
 
 func (c *VerifyServerController) Reset() {
-	c.step = StepVerifyWaiting
+	c.step = VerifyStepWaiting
 }

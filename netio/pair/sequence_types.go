@@ -2,37 +2,37 @@ package pair
 
 import "fmt"
 
-type PairSequenceType byte
+type PairStepType byte
 
 const (
-	SequencePairWaiting             PairSequenceType = 0x00
-	SequencePairStartRequest        PairSequenceType = 0x01
-	SequencePairStartResponse       PairSequenceType = 0x02
-	SequencePairVerifyRequest       PairSequenceType = 0x03
-	SequencePairVerifyResponse      PairSequenceType = 0x04
-	SequencePairKeyExchangeRequest  PairSequenceType = 0x05
-	SequencePairKeyExchangeResponse PairSequenceType = 0x06
+	PairStepWaiting             PairStepType = 0x00
+	PairStepStartRequest        PairStepType = 0x01
+	PairStepStartResponse       PairStepType = 0x02
+	PairStepVerifyRequest       PairStepType = 0x03
+	PairStepVerifyResponse      PairStepType = 0x04
+	PairStepKeyExchangeRequest  PairStepType = 0x05
+	PairStepKeyExchangeResponse PairStepType = 0x06
 )
 
-func (t PairSequenceType) Byte() byte {
+func (t PairStepType) Byte() byte {
 	return byte(t)
 }
 
-func (t PairSequenceType) String() string {
+func (t PairStepType) String() string {
 	switch t {
-	case SequencePairWaiting:
+	case PairStepWaiting:
 		return "Waiting"
-	case SequencePairStartRequest:
+	case PairStepStartRequest:
 		return "Pairing Start Request"
-	case SequencePairStartResponse:
+	case PairStepStartResponse:
 		return "Pairing Start Response"
-	case SequencePairVerifyRequest:
+	case PairStepVerifyRequest:
 		return "Pairing Verify Request"
-	case SequencePairVerifyResponse:
+	case PairStepVerifyResponse:
 		return "Pair Verify Response"
-	case SequencePairKeyExchangeRequest:
+	case PairStepKeyExchangeRequest:
 		return "Pair Key Exchange Request"
-	case SequencePairKeyExchangeResponse:
+	case PairStepKeyExchangeResponse:
 		return "Pair Key Exchange Response"
 	}
 	return fmt.Sprintf("%v Unknown", byte(t))
@@ -41,11 +41,11 @@ func (t PairSequenceType) String() string {
 type VerifyStepType byte
 
 const (
-	StepVerifyWaiting        VerifyStepType = 0x00
-	StepVerifyStartRequest   VerifyStepType = 0x01
-	StepVerifyStartResponse  VerifyStepType = 0x02
-	StepVerifyFinishRequest  VerifyStepType = 0x03
-	StepVerifyFinishResponse VerifyStepType = 0x04
+	VerifyStepWaiting        VerifyStepType = 0x00
+	VerifyStepStartRequest   VerifyStepType = 0x01
+	VerifyStepStartResponse  VerifyStepType = 0x02
+	VerifyStepFinishRequest  VerifyStepType = 0x03
+	VerifyStepFinishResponse VerifyStepType = 0x04
 )
 
 func (t VerifyStepType) Byte() byte {
@@ -54,15 +54,15 @@ func (t VerifyStepType) Byte() byte {
 
 func (t VerifyStepType) String() string {
 	switch t {
-	case StepVerifyWaiting:
+	case VerifyStepWaiting:
 		return "Waiting"
-	case StepVerifyStartRequest:
+	case VerifyStepStartRequest:
 		return "Verify Start Request"
-	case StepVerifyStartResponse:
+	case VerifyStepStartResponse:
 		return "Verify Start Response"
-	case StepVerifyFinishRequest:
+	case VerifyStepFinishRequest:
 		return "Verify Finish Request"
-	case StepVerifyFinishResponse:
+	case VerifyStepFinishResponse:
 		return "Verify Finish Response"
 	}
 	return fmt.Sprintf("%v Unknown", byte(t))

@@ -29,10 +29,10 @@ func NewPairingController(database db.Database) *PairingController {
 	return &c
 }
 
-func (c *PairingController) Handle(tlv8 common.Container) (common.Container, error) {
-	method := PairingMethodType(tlv8.GetByte(TagPairingMethod))
-	username := tlv8.GetString(TagUsername)
-	publicKey := tlv8.GetBytes(TagPublicKey)
+func (c *PairingController) Handle(cont common.Container) (common.Container, error) {
+	method := PairMethodType(cont.GetByte(TagPairingMethod))
+	username := cont.GetString(TagUsername)
+	publicKey := cont.GetBytes(TagPublicKey)
 
 	log.Println("[VERB] ->   Method:", method)
 	log.Println("[VERB] -> Username:", username)

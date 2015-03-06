@@ -1,6 +1,9 @@
 package pair
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type ErrCode byte
 
@@ -16,6 +19,10 @@ const (
 
 func (t ErrCode) Byte() byte {
 	return byte(t)
+}
+
+func (t ErrCode) Error() error {
+	return errors.New(t.String())
 }
 
 func (t ErrCode) String() string {
