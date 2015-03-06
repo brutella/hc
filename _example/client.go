@@ -24,25 +24,25 @@ func main() {
 	client := pair.NewSetupClientController(bridge, "HomeKit Client")
 	pairStartRequest := client.InitialPairingRequest()
 
-	pairStartRespond, err := sendTLV8(pairStartRequest)
+	pairStartResponse, err := sendTLV8(pairStartRequest)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	// 2) S -> C
-	pairVerifyRequest, err := pair.HandleReaderForHandler(pairStartRespond, client)
+	pairVerifyRequest, err := pair.HandleReaderForHandler(pairStartResponse, client)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	// 3) C -> S
-	pairVerifyRespond, err := sendTLV8(pairVerifyRequest)
+	pairVerifyResponse, err := sendTLV8(pairVerifyRequest)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	// 4) S -> C
-	pairKeyRequest, err := pair.HandleReaderForHandler(pairVerifyRespond, client)
+	pairKeyRequest, err := pair.HandleReaderForHandler(pairVerifyResponse, client)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -70,25 +70,25 @@ func main() {
 
 	verifyStartRequest := verify.InitialKeyVerifyRequest()
 	// 1) C -> S
-	verifyStartRespond, err := sendTLV8(verifyStartRequest)
+	verifyStartResponse, err := sendTLV8(verifyStartRequest)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	// 2) S -> C
-	verifyFinishRequest, err := pair.HandleReaderForHandler(verifyStartRespond, verify)
+	verifyFinishRequest, err := pair.HandleReaderForHandler(verifyStartResponse, verify)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	// 3) C -> S
-	verifyFinishRespond, err := sendTLV8(verifyFinishRequest)
+	verifyFinishResponse, err := sendTLV8(verifyFinishRequest)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	// 4) S -> C
-	last_request, err := pair.HandleReaderForHandler(verifyFinishRespond, verify)
+	last_request, err := pair.HandleReaderForHandler(verifyFinishResponse, verify)
 	if err != nil {
 		fmt.Println(err)
 	}

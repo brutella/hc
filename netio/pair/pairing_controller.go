@@ -30,9 +30,9 @@ func NewPairingController(database db.Database) *PairingController {
 }
 
 func (c *PairingController) Handle(tlv8 common.Container) (common.Container, error) {
-	method := tlv8.GetByte(TLVMethod)
-	username := tlv8.GetString(TLVUsername)
-	publicKey := tlv8.GetBytes(TLVPublicKey)
+	method := PairingMethodType(tlv8.GetByte(TagPairingMethod))
+	username := tlv8.GetString(TagUsername)
+	publicKey := tlv8.GetBytes(TagPublicKey)
 
 	log.Println("[VERB] ->   Method:", method)
 	log.Println("[VERB] -> Username:", username)
@@ -41,10 +41,10 @@ func (c *PairingController) Handle(tlv8 common.Container) (common.Container, err
 	client := db.NewClient(username, publicKey)
 
 	switch method {
-	case MethodDelete:
+	case PairingMethodDelete:
 		log.Printf("[INFO] Remove LTPK for client '%s'\n", username)
 		c.database.DeleteClient(client)
-	case MethodAdd:
+	case PairingMethodAdd:
 		err := c.database.SaveClient(client)
 		if err != nil {
 			log.Println("[ERRO]", err)
@@ -53,7 +53,7 @@ func (c *PairingController) Handle(tlv8 common.Container) (common.Container, err
 	}
 
 	out := common.NewTLV8Container()
-	out.SetByte(TLVSequenceNumber, 0x2)
+	out.SetByte(TagSequence, 0x2)
 
 	return out, nil
 }

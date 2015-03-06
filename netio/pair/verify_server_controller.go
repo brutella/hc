@@ -28,7 +28,7 @@ func NewVerifyServerController(database db.Database, context netio.HAPContext) *
 		database: database,
 		context:  context,
 		session:  NewPairVerifySession(),
-		curSeq:   WaitingForRequest,
+		curSeq:   SequenceWaitingForRequest,
 	}
 
 	return &controller
@@ -38,14 +38,14 @@ func (c *VerifyServerController) SharedKey() [32]byte {
 }
 
 func (c *VerifyServerController) KeyVerified() bool {
-	return c.curSeq == VerifyFinishRespond
+	return c.curSeq == SequenceVerifyFinishResponse
 }
 
 func (c *VerifyServerController) Handle(cont_in common.Container) (common.Container, error) {
 	var cont_out common.Container
 	var err error
 
-	method := cont_in.GetByte(TLVMethod)
+	method := cont_in.GetByte(TagPairingMethod)
 
 	// It is valid that method is not sent
 	// If method is sent then it must be 0x00
@@ -53,17 +53,17 @@ func (c *VerifyServerController) Handle(cont_in common.Container) (common.Contai
 		return nil, common.NewErrorf("Cannot handle auth method %b", method)
 	}
 
-	seq := cont_in.GetByte(TLVSequenceNumber)
+	seq := cont_in.GetByte(TagSequence)
 
 	switch seq {
-	case VerifyStartRequest:
-		if c.curSeq != WaitingForRequest {
+	case SequenceVerifyStartRequest:
+		if c.curSeq != SequenceWaitingForRequest {
 			c.Reset()
 			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
 		}
 		cont_out, err = c.handlePairVerifyStart(cont_in)
-	case VerifyFinishRequest:
-		if c.curSeq != VerifyStartRespond {
+	case SequenceVerifyFinishRequest:
+		if c.curSeq != SequenceVerifyStartResponse {
 			c.Reset()
 			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq)
 		}
@@ -86,9 +86,9 @@ func (c *VerifyServerController) Handle(cont_in common.Container) (common.Contai
 // - B: server public key
 // - signature: from server session public key, server name, client session public key
 func (c *VerifyServerController) handlePairVerifyStart(cont_in common.Container) (common.Container, error) {
-	c.curSeq = VerifyStartRespond
+	c.curSeq = SequenceVerifyStartResponse
 
-	clientPublicKey := cont_in.GetBytes(TLVPublicKey)
+	clientPublicKey := cont_in.GetBytes(TagPublicKey)
 	log.Println("[VERB] ->     A:", hex.EncodeToString(clientPublicKey))
 	if len(clientPublicKey) != 32 {
 		return nil, common.NewErrorf("Invalid client public key size %d", len(clientPublicKey))
@@ -111,22 +111,22 @@ func (c *VerifyServerController) handlePairVerifyStart(cont_in common.Container)
 
 	// Encrypt
 	tlv_encrypt := common.NewTLV8Container()
-	tlv_encrypt.SetString(TLVUsername, bridge.Id())
-	tlv_encrypt.SetBytes(TLVEd25519Signature, signature)
+	tlv_encrypt.SetString(TagUsername, bridge.Id())
+	tlv_encrypt.SetBytes(TagEd25519Signature, signature)
 
 	encrypted, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(c.session.EncryptionKey[:], []byte("PV-Msg02"), tlv_encrypt.BytesBuffer().Bytes(), nil)
 
 	cont_out := common.NewTLV8Container()
-	cont_out.SetByte(TLVSequenceNumber, c.curSeq)
-	cont_out.SetBytes(TLVPublicKey, c.session.PublicKey[:])
-	cont_out.SetBytes(TLVEncryptedData, append(encrypted, mac[:]...))
+	cont_out.SetByte(TagSequence, c.curSeq)
+	cont_out.SetBytes(TagPublicKey, c.session.PublicKey[:])
+	cont_out.SetBytes(TagEncryptedData, append(encrypted, mac[:]...))
 
 	log.Println("[VERB]       K:", hex.EncodeToString(c.session.EncryptionKey[:]))
 	log.Println("[VERB]        B:", hex.EncodeToString(c.session.PublicKey[:]))
 	log.Println("[VERB]        S:", hex.EncodeToString(c.session.SecretKey[:]))
 	log.Println("[VERB]   Shared:", hex.EncodeToString(c.session.SharedKey[:]))
 
-	log.Println("[VERB] <-     B:", hex.EncodeToString(cont_out.GetBytes(TLVPublicKey)))
+	log.Println("[VERB] <-     B:", hex.EncodeToString(cont_out.GetBytes(TagPublicKey)))
 
 	return cont_out, nil
 }
@@ -140,9 +140,9 @@ func (c *VerifyServerController) handlePairVerifyStart(cont_in common.Container)
 // - only sequence number
 // - error code (optional)
 func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container) (common.Container, error) {
-	c.curSeq = VerifyFinishRespond
+	c.curSeq = SequenceVerifyFinishResponse
 
-	data := cont_in.GetBytes(TLVEncryptedData)
+	data := cont_in.GetBytes(TagEncryptedData)
 	message := data[:(len(data) - 16)]
 	var mac [16]byte
 	copy(mac[:], data[len(message):]) // 16 byte (MAC)
@@ -152,12 +152,12 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 	decrypted, err := crypto.Chacha20DecryptAndPoly1305Verify(c.session.EncryptionKey[:], []byte("PV-Msg03"), message, mac, nil)
 
 	cont_out := common.NewTLV8Container()
-	cont_out.SetByte(TLVSequenceNumber, c.curSeq)
+	cont_out.SetByte(TagSequence, c.curSeq)
 
 	if err != nil {
 		c.Reset()
 		log.Println("[ERRO]", err)
-		cont_out.SetByte(TLVErrorCode, TLVStatus_AuthError) // return error 2
+		cont_out.SetByte(TagError, ErrorAuthenticationFailed) // return error 2
 	} else {
 		decrypted_buffer := bytes.NewBuffer(decrypted)
 		cont_in, err := common.NewTLV8ContainerFromReader(decrypted_buffer)
@@ -165,8 +165,8 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 			return nil, err
 		}
 
-		username := cont_in.GetString(TLVUsername)
-		signature := cont_in.GetBytes(TLVEd25519Signature)
+		username := cont_in.GetString(TagUsername)
+		signature := cont_in.GetBytes(TagEd25519Signature)
 		log.Println("[VERB]     client:", username)
 		log.Println("[VERB]  signature:", hex.EncodeToString(signature))
 
@@ -187,7 +187,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 		if crypto.ValidateED25519Signature(client.PublicKey(), material, signature) == false {
 			log.Println("[WARN] signature is invalid")
 			c.Reset()
-			cont_out.SetByte(TLVErrorCode, TLVStatus_UnkownPeerError) // return error 4
+			cont_out.SetByte(TagError, ErrorUnknownPeer) // return error 4
 		} else {
 			log.Println("[VERB] signature is valid")
 		}
@@ -197,5 +197,5 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 }
 
 func (c *VerifyServerController) Reset() {
-	c.curSeq = WaitingForRequest
+	c.curSeq = SequenceWaitingForRequest
 }

@@ -37,7 +37,7 @@ func (c *VerifyClientController) Handle(cont_in common.Container) (common.Contai
 	var cont_out common.Container
 	var err error
 
-	method := cont_in.GetByte(TLVMethod)
+	method := cont_in.GetByte(TagPairingMethod)
 
 	// It is valid that method is not sent
 	// If method is sent then it must be 0x00
@@ -45,12 +45,12 @@ func (c *VerifyClientController) Handle(cont_in common.Container) (common.Contai
 		return nil, common.NewErrorf("Cannot handle auth method %b", method)
 	}
 
-	seq := cont_in.GetByte(TLVSequenceNumber)
+	seq := cont_in.GetByte(TagSequence)
 	switch seq {
-	case VerifyStartRespond:
-		cont_out, err = c.handlePairVerifyRespond(cont_in)
-	case VerifyFinishRespond:
-		cont_out, err = c.handlePairVerifyFinishRespond(cont_in)
+	case SequenceVerifyStartResponse:
+		cont_out, err = c.handleSequencePairVerifyResponse(cont_in)
+	case SequenceVerifyFinishResponse:
+		cont_out, err = c.handlePairSequenceVerifyFinishResponse(cont_in)
 	default:
 		return nil, common.NewErrorf("Cannot handle sequence number %d", seq)
 	}
@@ -62,11 +62,11 @@ func (c *VerifyClientController) Handle(cont_in common.Container) (common.Contai
 // - Public key `A`
 func (c *VerifyClientController) InitialKeyVerifyRequest() io.Reader {
 	cont_out := common.NewTLV8Container()
-	cont_out.SetByte(TLVMethod, 0)
-	cont_out.SetByte(TLVSequenceNumber, VerifyStartRequest)
-	cont_out.SetBytes(TLVPublicKey, c.session.PublicKey[:])
+	cont_out.SetByte(TagPairingMethod, 0)
+	cont_out.SetByte(TagSequence, SequenceVerifyStartRequest)
+	cont_out.SetBytes(TagPublicKey, c.session.PublicKey[:])
 
-	fmt.Println("<-     A:", hex.EncodeToString(cont_out.GetBytes(TLVPublicKey)))
+	fmt.Println("<-     A:", hex.EncodeToString(cont_out.GetBytes(TagPublicKey)))
 
 	return cont_out.BytesBuffer()
 }
@@ -81,8 +81,8 @@ func (c *VerifyClientController) InitialKeyVerifyRequest() io.Reader {
 // - encrypted message
 //      - username
 //      - signature: from client session public key, server name, server session public key,
-func (c *VerifyClientController) handlePairVerifyRespond(cont_in common.Container) (common.Container, error) {
-	serverPublicKey := cont_in.GetBytes(TLVPublicKey)
+func (c *VerifyClientController) handleSequencePairVerifyResponse(cont_in common.Container) (common.Container, error) {
+	serverPublicKey := cont_in.GetBytes(TagPublicKey)
 	if len(serverPublicKey) != 32 {
 		return nil, common.NewErrorf("Invalid server public key size %d", len(serverPublicKey))
 	}
@@ -99,7 +99,7 @@ func (c *VerifyClientController) handlePairVerifyRespond(cont_in common.Containe
 	fmt.Println("     K:", hex.EncodeToString(c.session.EncryptionKey[:]))
 
 	// Decrypt
-	data := cont_in.GetBytes(TLVEncryptedData)
+	data := cont_in.GetBytes(TagEncryptedData)
 	message := data[:(len(data) - 16)]
 	var mac [16]byte
 	copy(mac[:], data[len(message):]) // 16 byte (MAC)
@@ -115,8 +115,8 @@ func (c *VerifyClientController) handlePairVerifyRespond(cont_in common.Containe
 		return nil, err
 	}
 
-	username := tlv_decrypted.GetString(TLVUsername)
-	signature := tlv_decrypted.GetBytes(TLVEd25519Signature)
+	username := tlv_decrypted.GetString(TagUsername)
+	signature := tlv_decrypted.GetBytes(TagEd25519Signature)
 
 	fmt.Println("    Username:", username)
 	fmt.Println("   Signature:", hex.EncodeToString(signature))
@@ -134,11 +134,11 @@ func (c *VerifyClientController) handlePairVerifyRespond(cont_in common.Containe
 	}
 
 	cont_out := common.NewTLV8Container()
-	cont_out.SetByte(TLVMethod, 0)
-	cont_out.SetByte(TLVSequenceNumber, VerifyFinishRequest)
+	cont_out.SetByte(TagPairingMethod, 0)
+	cont_out.SetByte(TagSequence, SequenceVerifyFinishRequest)
 
 	tlv_encrypt := common.NewTLV8Container()
-	tlv_encrypt.SetString(TLVUsername, c.username)
+	tlv_encrypt.SetString(TagUsername, c.username)
 
 	material = make([]byte, 0)
 	material = append(material, c.session.PublicKey[:]...)
@@ -150,19 +150,19 @@ func (c *VerifyClientController) handlePairVerifyRespond(cont_in common.Containe
 		return nil, err
 	}
 
-	tlv_encrypt.SetBytes(TLVEd25519Signature, signature)
+	tlv_encrypt.SetBytes(TagEd25519Signature, signature)
 
 	encrypted, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(c.session.EncryptionKey[:], []byte("PV-Msg03"), tlv_encrypt.BytesBuffer().Bytes(), nil)
 
-	cont_out.SetBytes(TLVEncryptedData, append(encrypted, mac[:]...))
+	cont_out.SetBytes(TagEncryptedData, append(encrypted, mac[:]...))
 
 	return cont_out, nil
 }
 
 // Server -> Client
 // - only error ocde (optional)
-func (c *VerifyClientController) handlePairVerifyFinishRespond(cont_in common.Container) (common.Container, error) {
-	err_code := cont_in.GetByte(TLVStatus_NoError)
+func (c *VerifyClientController) handlePairSequenceVerifyFinishResponse(cont_in common.Container) (common.Container, error) {
+	err_code := cont_in.GetByte(ErrorNone)
 	if err_code != 0x00 {
 		fmt.Println("Unexpected error %d", err_code)
 	}

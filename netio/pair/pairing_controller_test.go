@@ -11,10 +11,10 @@ import (
 
 func TestAddPairing(t *testing.T) {
 	tlv8 := common.NewTLV8Container()
-	tlv8.SetByte(TLVMethod, MethodAdd)
-	tlv8.SetByte(TLVSequenceNumber, 0x01)
-	tlv8.SetString(TLVUsername, "Unit Test")
-	tlv8.SetBytes(TLVPublicKey, []byte{0x01, 0x02})
+	tlv8.SetByte(TagPairingMethod, PairingMethodAdd)
+	tlv8.SetByte(TagSequence, 0x01)
+	tlv8.SetString(TagUsername, "Unit Test")
+	tlv8.SetBytes(TagPublicKey, []byte{0x01, 0x02})
 
 	database, _ := db.NewDatabase(os.TempDir())
 	controller := NewPairingController(database)
@@ -22,7 +22,7 @@ func TestAddPairing(t *testing.T) {
 	tlv8_out, err := controller.Handle(tlv8)
 	assert.Nil(t, err)
 	assert.NotNil(t, tlv8_out)
-	assert.Equal(t, tlv8_out.GetByte(TLVSequenceNumber), byte(0x2))
+	assert.Equal(t, tlv8_out.GetByte(TagSequence), byte(0x2))
 }
 
 func TestDeletePairing(t *testing.T) {
@@ -32,16 +32,16 @@ func TestDeletePairing(t *testing.T) {
 	database.SaveClient(client)
 
 	tlv8 := common.NewTLV8Container()
-	tlv8.SetByte(TLVMethod, MethodDelete)
-	tlv8.SetByte(TLVSequenceNumber, 0x01)
-	tlv8.SetString(TLVUsername, username)
+	tlv8.SetByte(TagPairingMethod, PairingMethodDelete)
+	tlv8.SetByte(TagSequence, 0x01)
+	tlv8.SetString(TagUsername, username)
 
 	controller := NewPairingController(database)
 
 	tlv8_out, err := controller.Handle(tlv8)
 	assert.Nil(t, err)
 	assert.NotNil(t, tlv8_out)
-	assert.Equal(t, tlv8_out.GetByte(TLVSequenceNumber), byte(0x2))
+	assert.Equal(t, tlv8_out.GetByte(TagSequence), byte(0x2))
 
 	saved_client := database.ClientWithName(username)
 	assert.Nil(t, saved_client)
