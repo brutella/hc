@@ -16,21 +16,24 @@ type LightBulb interface {
 	// OnSaturationChanged sets the saturation changed callback
 	OnSaturationChanged(func(float64))
 
-	// GetBrightness returns the light bulb's brightness
+	// GetBrightness returns the light bulb's brightness between 0 and 100
 	GetBrightness() int
 
 	// SetBrightness sets the light bulb's brightness
+	// The argument should be between 0 and 100
 	SetBrightness(int)
 
-	// GetHue returns the light bulb's hue
+	// GetHue returns the light bulb's hue between 0.0 and 360.0
 	GetHue() float64
 
 	// SetHue sets the light bulb's hue
+	// The argument should be between 0.0 and 360.0
 	SetHue(float64)
 
-	// GetSaturation returns the light bulb's saturation
+	// GetSaturation returns the light bulb's saturation between 0.0 and 100.0
 	GetSaturation() float64
 
 	// SetSaturation sets the light bulb's saturation
+	// The argument should be between 0 and 100
 	SetSaturation(float64)
 }
