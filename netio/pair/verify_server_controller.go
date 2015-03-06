@@ -157,7 +157,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 	if err != nil {
 		c.Reset()
 		log.Println("[ERRO]", err)
-		cont_out.SetByte(TagError, ErrorAuthenticationFailed.Byte()) // return error 2
+		cont_out.SetByte(TagError, ErrCodeAuthenticationFailed.Byte()) // return error 2
 	} else {
 		decrypted_buffer := bytes.NewBuffer(decrypted)
 		cont_in, err := common.NewTLV8ContainerFromReader(decrypted_buffer)
@@ -187,7 +187,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 		if crypto.ValidateED25519Signature(client.PublicKey(), material, signature) == false {
 			log.Println("[WARN] signature is invalid")
 			c.Reset()
-			cont_out.SetByte(TagError, ErrorUnknownPeer.Byte()) // return error 4
+			cont_out.SetByte(TagError, ErrCodeUnknownPeer.Byte()) // return error 4
 		} else {
 			log.Println("[VERB] signature is valid")
 		}

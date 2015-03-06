@@ -10,7 +10,7 @@ const (
 	TagProof          = 0x04 // SRP proof (64 bytes)
 	TagEncryptedData  = 0x05 // data with auth tag (mac)
 	TagSequence       = 0x06 // PairSequenceType
-	TagError          = 0x07 // ErrorType
+	TagError          = 0x07 // ErrCode
 	TagSignature      = 0x0A // Ed25519 signature (64 bytes)
 	TagMFiCertificate = 0x09
 	TagMFiSignature   = 0x0A

@@ -2,37 +2,37 @@ package pair
 
 import "fmt"
 
-type ErrorType byte
+type ErrCode byte
 
 const (
-	ErrorNone                      ErrorType = 0x00
-	ErrorUnknown                   ErrorType = 0x01
-	ErrorAuthenticationFailed      ErrorType = 0x02 // e.g. client proof `M1` is wrong
-	ErrorTooManyAttempts           ErrorType = 0x03
-	ErrorUnknownPeer               ErrorType = 0x04
-	ErrorMaxPeer                   ErrorType = 0x05
-	ErrorMaxAuthenticationAttempts ErrorType = 0x06
+	ErrCodeNone                      ErrCode = 0x00
+	ErrCodeUnknown                   ErrCode = 0x01
+	ErrCodeAuthenticationFailed      ErrCode = 0x02 // e.g. client proof `M1` is wrong
+	ErrCodeTooManyAttempts           ErrCode = 0x03
+	ErrCodeUnknownPeer               ErrCode = 0x04
+	ErrCodeMaxPeer                   ErrCode = 0x05
+	ErrCodeMaxAuthenticationAttempts ErrCode = 0x06
 )
 
-func (t ErrorType) Byte() byte {
+func (t ErrCode) Byte() byte {
 	return byte(t)
 }
 
-func (t ErrorType) String() string {
+func (t ErrCode) String() string {
 	switch t {
-	case ErrorNone:
+	case ErrCodeNone:
 		return "None"
-	case ErrorUnknown:
+	case ErrCodeUnknown:
 		return "Unknown"
-	case ErrorAuthenticationFailed:
+	case ErrCodeAuthenticationFailed:
 		return "Authentication Failed"
-	case ErrorTooManyAttempts:
+	case ErrCodeTooManyAttempts:
 		return "Too Many Attemps"
-	case ErrorUnknownPeer:
+	case ErrCodeUnknownPeer:
 		return "Unknown Peer"
-	case ErrorMaxPeer:
+	case ErrCodeMaxPeer:
 		return "Max Peer"
-	case ErrorMaxAuthenticationAttempts:
+	case ErrCodeMaxAuthenticationAttempts:
 		return "Max Authentication Attempts"
 	}
 	return fmt.Sprintf("%v Unknown", byte(t))

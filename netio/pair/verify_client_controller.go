@@ -162,9 +162,9 @@ func (c *VerifyClientController) handleSequencePairVerifyResponse(cont_in common
 // Server -> Client
 // - only error ocde (optional)
 func (c *VerifyClientController) handlePairStepVerifyFinishResponse(cont_in common.Container) (common.Container, error) {
-	err := ErrorType(cont_in.GetByte(TagError))
-	if err != ErrorNone {
-		fmt.Printf("Unexpected error %v\n", err)
+	code := ErrCode(cont_in.GetByte(TagError))
+	if code != ErrCodeNone {
+		fmt.Printf("Unexpected error %v\n", code)
 	}
 
 	return nil, nil

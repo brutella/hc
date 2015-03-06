@@ -134,7 +134,7 @@ func (c *SetupServerController) handlePairVerify(cont_in common.Container) (comm
 	if err != nil || len(sproof) == 0 { // proof `M1` is wrong
 		log.Println("[WARN] Proof M1 is wrong")
 		c.reset()
-		cont_out.SetByte(TagError, ErrorAuthenticationFailed.Byte()) // return error 2
+		cont_out.SetByte(TagError, ErrCodeAuthenticationFailed.Byte()) // return error 2
 	} else {
 		log.Println("[INFO] Proof M1 is valid")
 		err := c.session.SetupEncryptionKey([]byte("Pair-Setup-Encrypt-Salt"), []byte("Pair-Setup-Encrypt-Info"))
@@ -182,7 +182,7 @@ func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (com
 	if err != nil {
 		c.reset()
 		log.Println("[ERRO]", err)
-		cont_out.SetByte(TagError, ErrorUnknown.Byte()) // return error 1
+		cont_out.SetByte(TagError, ErrCodeUnknown.Byte()) // return error 1
 	} else {
 		decrypted_buffer := bytes.NewBuffer(decrypted)
 		cont_in, err := common.NewTLV8ContainerFromReader(decrypted_buffer)
@@ -207,7 +207,7 @@ func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (com
 		if crypto.ValidateED25519Signature(ltpk, material, signature) == false {
 			log.Println("[WARN] ed25519 signature is invalid")
 			c.reset()
-			cont_out.SetByte(TagError, ErrorAuthenticationFailed.Byte()) // return error 2
+			cont_out.SetByte(TagError, ErrCodeAuthenticationFailed.Byte()) // return error 2
 		} else {
 			log.Println("[VERB] ed25519 signature is valid")
 			// Store client LTPK and name
