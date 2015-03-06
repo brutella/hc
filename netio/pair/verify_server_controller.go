@@ -20,7 +20,7 @@ type VerifyServerController struct {
 	database db.Database
 	context  netio.HAPContext
 	session  *PairVerifySession
-	curSeq   VerifySequenceType
+	step     VerifyStepType
 }
 
 func NewVerifyServerController(database db.Database, context netio.HAPContext) *VerifyServerController {
@@ -28,7 +28,7 @@ func NewVerifyServerController(database db.Database, context netio.HAPContext) *
 		database: database,
 		context:  context,
 		session:  NewPairVerifySession(),
-		curSeq:   SequenceVerifyWaiting,
+		step:     StepVerifyWaiting,
 	}
 
 	return &controller
@@ -38,7 +38,7 @@ func (c *VerifyServerController) SharedKey() [32]byte {
 }
 
 func (c *VerifyServerController) KeyVerified() bool {
-	return c.curSeq == SequenceVerifyFinishResponse
+	return c.step == StepVerifyFinishResponse
 }
 
 func (c *VerifyServerController) Handle(cont_in common.Container) (common.Container, error) {
@@ -53,19 +53,19 @@ func (c *VerifyServerController) Handle(cont_in common.Container) (common.Contai
 		return nil, common.NewErrorf("Cannot handle auth method %b", method)
 	}
 
-	seq := VerifySequenceType(cont_in.GetByte(TagSequence))
+	seq := VerifyStepType(cont_in.GetByte(TagSequence))
 
 	switch seq {
-	case SequenceVerifyStartRequest:
-		if c.curSeq != SequenceVerifyWaiting {
+	case StepVerifyStartRequest:
+		if c.step != StepVerifyWaiting {
 			c.Reset()
-			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq.Byte())
+			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.step.Byte())
 		}
 		cont_out, err = c.handlePairVerifyStart(cont_in)
-	case SequenceVerifyFinishRequest:
-		if c.curSeq != SequenceVerifyStartResponse {
+	case StepVerifyFinishRequest:
+		if c.step != StepVerifyStartResponse {
 			c.Reset()
-			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq.Byte())
+			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.step.Byte())
 		}
 
 		cont_out, err = c.handlePairVerifyFinish(cont_in)
@@ -86,7 +86,7 @@ func (c *VerifyServerController) Handle(cont_in common.Container) (common.Contai
 // - B: server public key
 // - signature: from server session public key, server name, client session public key
 func (c *VerifyServerController) handlePairVerifyStart(cont_in common.Container) (common.Container, error) {
-	c.curSeq = SequenceVerifyStartResponse
+	c.step = StepVerifyStartResponse
 
 	clientPublicKey := cont_in.GetBytes(TagPublicKey)
 	log.Println("[VERB] ->     A:", hex.EncodeToString(clientPublicKey))
@@ -112,12 +112,12 @@ func (c *VerifyServerController) handlePairVerifyStart(cont_in common.Container)
 	// Encrypt
 	tlv_encrypt := common.NewTLV8Container()
 	tlv_encrypt.SetString(TagUsername, bridge.Id())
-	tlv_encrypt.SetBytes(TagEd25519Signature, signature)
+	tlv_encrypt.SetBytes(TagSignature, signature)
 
 	encrypted, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(c.session.EncryptionKey[:], []byte("PV-Msg02"), tlv_encrypt.BytesBuffer().Bytes(), nil)
 
 	cont_out := common.NewTLV8Container()
-	cont_out.SetByte(TagSequence, c.curSeq.Byte())
+	cont_out.SetByte(TagSequence, c.step.Byte())
 	cont_out.SetBytes(TagPublicKey, c.session.PublicKey[:])
 	cont_out.SetBytes(TagEncryptedData, append(encrypted, mac[:]...))
 
@@ -140,7 +140,7 @@ func (c *VerifyServerController) handlePairVerifyStart(cont_in common.Container)
 // - only sequence number
 // - error code (optional)
 func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container) (common.Container, error) {
-	c.curSeq = SequenceVerifyFinishResponse
+	c.step = StepVerifyFinishResponse
 
 	data := cont_in.GetBytes(TagEncryptedData)
 	message := data[:(len(data) - 16)]
@@ -152,7 +152,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 	decrypted, err := crypto.Chacha20DecryptAndPoly1305Verify(c.session.EncryptionKey[:], []byte("PV-Msg03"), message, mac, nil)
 
 	cont_out := common.NewTLV8Container()
-	cont_out.SetByte(TagSequence, c.curSeq.Byte())
+	cont_out.SetByte(TagSequence, c.step.Byte())
 
 	if err != nil {
 		c.Reset()
@@ -166,7 +166,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 		}
 
 		username := cont_in.GetString(TagUsername)
-		signature := cont_in.GetBytes(TagEd25519Signature)
+		signature := cont_in.GetBytes(TagSignature)
 		log.Println("[VERB]     client:", username)
 		log.Println("[VERB]  signature:", hex.EncodeToString(signature))
 
@@ -197,5 +197,5 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 }
 
 func (c *VerifyServerController) Reset() {
-	c.curSeq = SequenceVerifyWaiting
+	c.step = StepVerifyWaiting
 }

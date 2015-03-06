@@ -26,13 +26,13 @@ func TestPairVerifyIntegration(t *testing.T) {
 	client_controller := NewVerifyClientController(bridge, name)
 	database.SaveClient(db.NewClient(name, client_controller.LTPK)) // make LTPK available to server
 
-	tlvSequenceVerifyStartRequest := client_controller.InitialKeyVerifyRequest()
+	tlvStepVerifyStartRequest := client_controller.InitialKeyVerifyRequest()
 	// 1) C -> S
-	tlvSequenceVerifyStartResponse, err := HandleReaderForHandler(tlvSequenceVerifyStartRequest, controller)
+	tlvStepVerifyStartResponse, err := HandleReaderForHandler(tlvStepVerifyStartRequest, controller)
 	assert.Nil(t, err)
 
 	// 2) S -> C
-	tlvFinishRequest, err := HandleReaderForHandler(tlvSequenceVerifyStartResponse, client_controller)
+	tlvFinishRequest, err := HandleReaderForHandler(tlvStepVerifyStartResponse, client_controller)
 	assert.Nil(t, err)
 
 	// 3) C -> S

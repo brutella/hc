@@ -34,7 +34,7 @@ func (c *PairingController) Handle(tlv8 common.Container) (common.Container, err
 	username := tlv8.GetString(TagUsername)
 	publicKey := tlv8.GetBytes(TagPublicKey)
 
-	log.Printf("[VERB] ->   Method: %v\n", method)
+	log.Println("[VERB] ->   Method:", method)
 	log.Println("[VERB] -> Username:", username)
 	log.Println("[VERB] ->     LTPK:", publicKey)
 

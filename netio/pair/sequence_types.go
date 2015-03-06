@@ -38,31 +38,31 @@ func (t PairSequenceType) String() string {
 	return fmt.Sprintf("%v Unknown", byte(t))
 }
 
-type VerifySequenceType byte
+type VerifyStepType byte
 
 const (
-	SequenceVerifyWaiting        VerifySequenceType = 0x00
-	SequenceVerifyStartRequest   VerifySequenceType = 0x01
-	SequenceVerifyStartResponse  VerifySequenceType = 0x02
-	SequenceVerifyFinishRequest  VerifySequenceType = 0x03
-	SequenceVerifyFinishResponse VerifySequenceType = 0x04
+	StepVerifyWaiting        VerifyStepType = 0x00
+	StepVerifyStartRequest   VerifyStepType = 0x01
+	StepVerifyStartResponse  VerifyStepType = 0x02
+	StepVerifyFinishRequest  VerifyStepType = 0x03
+	StepVerifyFinishResponse VerifyStepType = 0x04
 )
 
-func (t VerifySequenceType) Byte() byte {
+func (t VerifyStepType) Byte() byte {
 	return byte(t)
 }
 
-func (t VerifySequenceType) String() string {
+func (t VerifyStepType) String() string {
 	switch t {
-	case SequenceVerifyWaiting:
+	case StepVerifyWaiting:
 		return "Waiting"
-	case SequenceVerifyStartRequest:
+	case StepVerifyStartRequest:
 		return "Verify Start Request"
-	case SequenceVerifyStartResponse:
+	case StepVerifyStartResponse:
 		return "Verify Start Response"
-	case SequenceVerifyFinishRequest:
+	case StepVerifyFinishRequest:
 		return "Verify Finish Request"
-	case SequenceVerifyFinishResponse:
+	case StepVerifyFinishResponse:
 		return "Verify Finish Response"
 	}
 	return fmt.Sprintf("%v Unknown", byte(t))

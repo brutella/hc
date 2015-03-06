@@ -20,7 +20,7 @@ import (
 type SetupServerController struct {
 	bridge   *netio.Bridge
 	session  *PairSetupServerSession
-	curSeq   PairSequenceType
+	step     PairSequenceType
 	database db.Database
 }
 
@@ -36,7 +36,7 @@ func NewSetupServerController(bridge *netio.Bridge, database db.Database) (*Setu
 		bridge:   bridge,
 		session:  session,
 		database: database,
-		curSeq:   SequencePairWaiting,
+		step:     SequencePairWaiting,
 	}
 
 	return &controller, nil
@@ -58,23 +58,23 @@ func (c *SetupServerController) Handle(cont_in common.Container) (common.Contain
 
 	switch seq {
 	case SequencePairStartRequest:
-		if c.curSeq != SequencePairWaiting {
+		if c.step != SequencePairWaiting {
 			c.reset()
-			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq.Byte())
+			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.step.Byte())
 		}
 
 		cont_out, err = c.handlePairStart(cont_in)
 	case SequencePairVerifyRequest:
-		if c.curSeq != SequencePairStartResponse {
+		if c.step != SequencePairStartResponse {
 			c.reset()
-			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq.Byte())
+			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.step.Byte())
 		}
 
 		cont_out, err = c.handlePairVerify(cont_in)
 	case SequencePairKeyExchangeRequest:
-		if c.curSeq != SequencePairVerifyResponse {
+		if c.step != SequencePairVerifyResponse {
 			c.reset()
-			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.curSeq.Byte())
+			return nil, common.NewErrorf("Controller is in wrong state (%d)", c.step.Byte())
 		}
 
 		cont_out, err = c.handleKeyExchange(cont_in)
@@ -93,9 +93,9 @@ func (c *SetupServerController) Handle(cont_in common.Container) (common.Contain
 // - s: salt
 func (c *SetupServerController) handlePairStart(cont_in common.Container) (common.Container, error) {
 	cont_out := common.NewTLV8Container()
-	c.curSeq = SequencePairStartResponse
+	c.step = SequencePairStartResponse
 
-	cont_out.SetByte(TagSequence, c.curSeq.Byte())
+	cont_out.SetByte(TagSequence, c.step.Byte())
 	cont_out.SetBytes(TagPublicKey, c.session.PublicKey)
 	cont_out.SetBytes(TagSalt, c.session.Salt)
 
@@ -115,9 +115,9 @@ func (c *SetupServerController) handlePairStart(cont_in common.Container) (commo
 // - auth error
 func (c *SetupServerController) handlePairVerify(cont_in common.Container) (common.Container, error) {
 	cont_out := common.NewTLV8Container()
-	c.curSeq = SequencePairVerifyResponse
+	c.step = SequencePairVerifyResponse
 
-	cont_out.SetByte(TagSequence, c.curSeq.Byte())
+	cont_out.SetByte(TagSequence, c.step.Byte())
 
 	cpublicKey := cont_in.GetBytes(TagPublicKey)
 	log.Println("[VERB] ->     A:", hex.EncodeToString(cpublicKey))
@@ -166,9 +166,9 @@ func (c *SetupServerController) handlePairVerify(cont_in common.Container) (comm
 func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (common.Container, error) {
 	cont_out := common.NewTLV8Container()
 
-	c.curSeq = SequencePairKeyExchangeResponse
+	c.step = SequencePairKeyExchangeResponse
 
-	cont_out.SetByte(TagSequence, c.curSeq.Byte())
+	cont_out.SetByte(TagSequence, c.step.Byte())
 
 	data := cont_in.GetBytes(TagEncryptedData)
 	message := data[:(len(data) - 16)]
@@ -192,7 +192,7 @@ func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (com
 
 		username := cont_in.GetString(TagUsername)
 		ltpk := cont_in.GetBytes(TagPublicKey)
-		signature := cont_in.GetBytes(TagEd25519Signature)
+		signature := cont_in.GetBytes(TagSignature)
 		log.Println("[VERB] ->     Username:", username)
 		log.Println("[VERB] ->     LTPK:", hex.EncodeToString(ltpk))
 		log.Println("[VERB] ->     Signature:", hex.EncodeToString(signature))
@@ -233,11 +233,11 @@ func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (com
 			tlvPairKeyExchange := common.NewTLV8Container()
 			tlvPairKeyExchange.SetBytes(TagUsername, c.session.Username)
 			tlvPairKeyExchange.SetBytes(TagPublicKey, LTPK)
-			tlvPairKeyExchange.SetBytes(TagEd25519Signature, []byte(signature))
+			tlvPairKeyExchange.SetBytes(TagSignature, []byte(signature))
 
 			log.Println("[VERB] <-     Username:", tlvPairKeyExchange.GetString(TagUsername))
 			log.Println("[VERB] <-     LTPK:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TagPublicKey)))
-			log.Println("[VERB] <-     Signature:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TagEd25519Signature)))
+			log.Println("[VERB] <-     Signature:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TagSignature)))
 
 			encrypted, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(c.session.EncryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)
 			cont_out.SetByte(TagPairingMethod, 0)
@@ -252,6 +252,6 @@ func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (com
 }
 
 func (c *SetupServerController) reset() {
-	c.curSeq = SequencePairWaiting
+	c.step = SequencePairWaiting
 	// TODO: reset session
 }
