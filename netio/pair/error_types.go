@@ -5,7 +5,7 @@ import "fmt"
 type ErrCode byte
 
 const (
-	ErrCodeNone                      ErrCode = 0x00
+	ErrCodeNo                        ErrCode = 0x00
 	ErrCodeUnknown                   ErrCode = 0x01
 	ErrCodeAuthenticationFailed      ErrCode = 0x02 // e.g. client proof `M1` is wrong
 	ErrCodeTooManyAttempts           ErrCode = 0x03
@@ -20,7 +20,7 @@ func (t ErrCode) Byte() byte {
 
 func (t ErrCode) String() string {
 	switch t {
-	case ErrCodeNone:
+	case ErrCodeNo:
 		return "None"
 	case ErrCodeUnknown:
 		return "Unknown"

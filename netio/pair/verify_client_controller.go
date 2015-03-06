@@ -163,7 +163,7 @@ func (c *VerifyClientController) handleSequencePairVerifyResponse(cont_in common
 // - only error ocde (optional)
 func (c *VerifyClientController) handlePairStepVerifyFinishResponse(cont_in common.Container) (common.Container, error) {
 	code := ErrCode(cont_in.GetByte(TagError))
-	if code != ErrCodeNone {
+	if code != ErrCodeNo {
 		fmt.Printf("Unexpected error %v\n", code)
 	}
 
