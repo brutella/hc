@@ -1,12 +1,12 @@
 package model
 
-type HeatCoolMode byte
+type HeatCoolModeType byte
 
 const (
-	ModeOff     = HeatCoolMode(0x00)
-	ModeHeating = HeatCoolMode(0x01)
-	ModeCooling = HeatCoolMode(0x02)
-	ModeAuto    = HeatCoolMode(0x03)
+	HeatCoolModeOff  HeatCoolModeType = 0x00
+	HeatCoolModeHeat HeatCoolModeType = 0x01
+	HeatCoolModeCool HeatCoolModeType = 0x02
+	HeatCoolModeAuto HeatCoolModeType = 0x03
 )
 
 // A Thermostat is a Thermometer but additionally lets you change the target temperature
@@ -26,15 +26,15 @@ type Thermostat interface {
 	TargetTemperature() float64
 
 	// SetMode sets the current mode
-	// ModeAuto is ignored because the current mode cannot be auto
-	SetMode(HeatCoolMode)
+	// HeatCoolModeAuto is ignored because the current mode cannot be auto
+	SetMode(HeatCoolModeType)
 
 	// Mode returns the current mode
-	Mode() HeatCoolMode
+	Mode() HeatCoolModeType
 
 	// SetTargetMode sets the target mode
-	SetTargetMode(HeatCoolMode)
+	SetTargetMode(HeatCoolModeType)
 
 	// TargetMode returns the target mode
-	TargetMode() HeatCoolMode
+	TargetMode() HeatCoolModeType
 }

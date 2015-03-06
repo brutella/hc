@@ -8,27 +8,27 @@ type HeatingCoolingMode struct {
 	*ByteCharacteristic
 }
 
-func NewHeatingCoolingMode(current model.HeatCoolMode, charType CharType, permissions []string) *HeatingCoolingMode {
+func NewHeatingCoolingMode(current model.HeatCoolModeType, charType CharType, permissions []string) *HeatingCoolingMode {
 	c := HeatingCoolingMode{NewByteCharacteristic(byte(current))}
 	c.Type = charType
 	c.Permissions = permissions
 	return &c
 }
 
-func NewCurrentHeatingCoolingMode(current model.HeatCoolMode) *HeatingCoolingMode {
+func NewCurrentHeatingCoolingMode(current model.HeatCoolModeType) *HeatingCoolingMode {
 	return NewHeatingCoolingMode(current, CharTypeHeatingCoolingModeCurrent, PermsRead())
 }
 
-func NewTargetHeatingCoolingMode(current model.HeatCoolMode) *HeatingCoolingMode {
+func NewTargetHeatingCoolingMode(current model.HeatCoolModeType) *HeatingCoolingMode {
 	return NewHeatingCoolingMode(current, CharTypeHeatingCoolingModeTarget, PermsAll())
 }
 
-func (c *HeatingCoolingMode) SetHeatingCoolingMode(mode model.HeatCoolMode) {
+func (c *HeatingCoolingMode) SetHeatingCoolingMode(mode model.HeatCoolModeType) {
 	c.SetByte(byte(mode))
 }
 
-func (c *HeatingCoolingMode) HeatingCoolingMode() model.HeatCoolMode {
-	return model.HeatCoolMode(c.Byte())
+func (c *HeatingCoolingMode) HeatingCoolingMode() model.HeatCoolModeType {
+	return model.HeatCoolModeType(c.Byte())
 }
 
 // type CurrentRelativeHumidityCharacteristic struct {

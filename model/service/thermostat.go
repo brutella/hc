@@ -36,8 +36,8 @@ func NewThermostat(name string, temperature, min, max, steps float64) *Thermosta
 	unit_char := characteristic.NewTemperatureUnit(unit)
 	temp := characteristic.NewCurrentTemperatureCharacteristic(temperature, min, max, steps, string(unit))
 	targetTemp := characteristic.NewTargetTemperatureCharacteristic(temperature, min, max, steps, string(unit))
-	mode := characteristic.NewCurrentHeatingCoolingMode(model.ModeOff)
-	targetMode := characteristic.NewTargetHeatingCoolingMode(model.ModeOff)
+	mode := characteristic.NewCurrentHeatingCoolingMode(model.HeatCoolModeOff)
+	targetMode := characteristic.NewTargetHeatingCoolingMode(model.HeatCoolModeOff)
 
 	service := New()
 	service.Type = TypeThermostat

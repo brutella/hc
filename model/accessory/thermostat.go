@@ -51,20 +51,20 @@ func (t *thermostat) TargetTemperature() float64 {
 	return t.thermostat.TargetTemp.Temperature()
 }
 
-func (t *thermostat) SetMode(value model.HeatCoolMode) {
-	if value != model.ModeAuto {
+func (t *thermostat) SetMode(value model.HeatCoolModeType) {
+	if value != model.HeatCoolModeAuto {
 		t.thermostat.Mode.SetHeatingCoolingMode(value)
 	}
 }
 
-func (t *thermostat) Mode() model.HeatCoolMode {
+func (t *thermostat) Mode() model.HeatCoolModeType {
 	return t.thermostat.Mode.HeatingCoolingMode()
 }
 
-func (t *thermostat) SetTargetMode(value model.HeatCoolMode) {
+func (t *thermostat) SetTargetMode(value model.HeatCoolModeType) {
 	t.thermostat.TargetMode.SetHeatingCoolingMode(value)
 }
 
-func (t *thermostat) TargetMode() model.HeatCoolMode {
+func (t *thermostat) TargetMode() model.HeatCoolModeType {
 	return t.thermostat.TargetMode.HeatingCoolingMode()
 }
