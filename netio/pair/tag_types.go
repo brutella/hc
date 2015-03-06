@@ -1,7 +1,5 @@
 package pair
 
-type TagType byte
-
 const (
 	TagPairingMethod  = 0x00 // PairMethodType
 	TagUsername       = 0x01 // string
