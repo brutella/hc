@@ -153,7 +153,7 @@ func (c *SetupClientController) handleSequencePairVerifyResponse(cont_in common.
 	tlvPairKeyExchange := common.NewTLV8Container()
 	tlvPairKeyExchange.SetString(TagUsername, c.username)
 	tlvPairKeyExchange.SetBytes(TagPublicKey, []byte(c.session.LTPK))
-	tlvPairKeyExchange.SetBytes(TagEd25519Signature, []byte(signature))
+	tlvPairKeyExchange.SetBytes(TagSignature, []byte(signature))
 
 	encrypted, tag, err := crypto.Chacha20EncryptAndPoly1305Seal(c.session.EncryptionKey[:], []byte("PS-Msg05"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)
 	if err != nil {
@@ -201,7 +201,7 @@ func (c *SetupClientController) handleKeyExchange(cont_in common.Container) (com
 
 		username := cont_in.GetString(TagUsername)
 		ltpk := cont_in.GetBytes(TagPublicKey)
-		signature := cont_in.GetBytes(TagEd25519Signature)
+		signature := cont_in.GetBytes(TagSignature)
 		fmt.Println("->     Username:", username)
 		fmt.Println("->     LTPK:", hex.EncodeToString(ltpk))
 		fmt.Println("->     Signature:", hex.EncodeToString(signature))
