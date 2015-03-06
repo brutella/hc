@@ -15,36 +15,37 @@ Read the API documentation here: http://godoc.org/github.com/brutella/hc
 ## Features
 
 - Complete implementation of HAP (only some accessory types are missing)
-- Very easy to get started
 - Optional logging with https://github.com/brutella/log
 - Runs on multiple platforms (already in use on Linux and OS X)
 
 ## Example
 
-Here is a minimal implementation of a HomeKit bridge
+Minimal implementation of a HomeKit bridge
 
-    package main
+```go
+package main
 
-    import (
-      "log"
-      "github.com/brutella/hc/hap"
-    )
+import (
+    "log"
+    "github.com/brutella/hc/hap"
+)
 
-    func main() {
-        conf := hap.NewConfig()
+func main() {
+    conf := hap.NewConfig()
 
-        // Path to folder where data is stored
-        conf.DatabaseDir = "./data"
+    // Path to folder where data is stored
+    conf.DatabaseDir = "./data"
 
-        // Create an app
-        app, err := hap.NewApp(conf)
-        if err != nil {
-            log.Fatal(err)
-        }
-
-        // Run it
-        app.Run()
+    // Create an app
+    app, err := hap.NewApp(conf)
+    if err != nil {
+        log.Fatal(err)
     }
+
+    // Run it
+    app.Run()
+}
+```
 
 You should change some default values for your own needs
 
