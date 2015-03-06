@@ -4,7 +4,7 @@ import (
 	"github.com/brutella/hc/crypto"
 )
 
-type PairVerifySession struct {
+type VerifySession struct {
 	OtherPublicKey [32]byte
 	PublicKey      [32]byte
 	SecretKey      [32]byte
@@ -12,11 +12,11 @@ type PairVerifySession struct {
 	EncryptionKey  [32]byte
 }
 
-func NewPairVerifySession() *PairVerifySession {
+func NewVerifySession() *VerifySession {
 	secretKey := crypto.Curve25519_GenerateSecretKey()
 	publicKey := crypto.Curve25519_PublicKey(secretKey)
 
-	return &PairVerifySession{
+	return &VerifySession{
 		PublicKey: publicKey,
 		SecretKey: secretKey,
 	}
@@ -24,7 +24,7 @@ func NewPairVerifySession() *PairVerifySession {
 
 // GenerateSharedKeyWithOtherPublicKey generates a Curve25519 shared key based on a public key.
 // The other public key is also stored for further use in `otherPublicKey` property.
-func (s *PairVerifySession) GenerateSharedKeyWithOtherPublicKey(otherPublicKey [32]byte) {
+func (s *VerifySession) GenerateSharedKeyWithOtherPublicKey(otherPublicKey [32]byte) {
 	sharedKey := crypto.Curve25519_SharedSecret(s.SecretKey, otherPublicKey)
 
 	s.OtherPublicKey = otherPublicKey
@@ -32,7 +32,7 @@ func (s *PairVerifySession) GenerateSharedKeyWithOtherPublicKey(otherPublicKey [
 }
 
 // SetupEncryptionKey generates an encryption key based on the shared key, salt and info.
-func (s *PairVerifySession) SetupEncryptionKey(salt []byte, info []byte) error {
+func (s *VerifySession) SetupEncryptionKey(salt []byte, info []byte) error {
 	key, err := crypto.HKDF_SHA512(s.SharedKey[:], salt, info)
 	if err == nil {
 		s.EncryptionKey = key

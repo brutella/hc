@@ -13,7 +13,7 @@ import (
 
 type VerifyClientController struct {
 	bridge   *netio.Bridge
-	session  *PairVerifySession
+	session  *VerifySession
 	username string
 	LTPK     []byte
 	LTSK     []byte
@@ -25,7 +25,7 @@ func NewVerifyClientController(bridge *netio.Bridge, username string) *VerifyCli
 	controller := VerifyClientController{
 		username: username,
 		bridge:   bridge,
-		session:  NewPairVerifySession(),
+		session:  NewVerifySession(),
 		LTPK:     LTPK,
 		LTSK:     LTSK,
 	}

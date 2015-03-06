@@ -19,7 +19,7 @@ import (
 type VerifyServerController struct {
 	database db.Database
 	context  netio.HAPContext
-	session  *PairVerifySession
+	session  *VerifySession
 	step     VerifyStepType
 }
 
@@ -27,7 +27,7 @@ func NewVerifyServerController(database db.Database, context netio.HAPContext) *
 	controller := VerifyServerController{
 		database: database,
 		context:  context,
-		session:  NewPairVerifySession(),
+		session:  NewVerifySession(),
 		step:     StepVerifyWaiting,
 	}
 
