@@ -4,13 +4,13 @@ type Float struct {
 	*Number
 }
 
-func NewFloat(value float64) *Float {
-	number := NewNumber(value, nil, nil, nil, FormatFloat)
+func NewFloat(value float64, permissions []string) *Float {
+	number := NewNumber(value, nil, nil, nil, FormatFloat, permissions)
 	return &Float{number}
 }
 
-func NewFloatMinMaxSteps(value, min, max, min_step float64) *Float {
-	number := NewNumber(value, min, max, min_step, FormatFloat)
+func NewFloatMinMaxSteps(value, min, max, min_step float64, permissions []string) *Float {
+	number := NewNumber(value, min, max, min_step, FormatFloat, permissions)
 	return &Float{number}
 }
 

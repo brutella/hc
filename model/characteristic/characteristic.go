@@ -7,7 +7,7 @@ import (
 	"reflect"
 )
 
-type ChangeFunc func(c *Characteristic, oldValue interface{})
+type ChangeFunc func(c *Characteristic, newValue, oldValue interface{})
 
 // Characteristic is a HomeKit characteristic.
 type Characteristic struct {
@@ -16,7 +16,7 @@ type Characteristic struct {
 	Permissions []string `json:"perms"`
 	Description string   `json:"description,omitempty"` // manufacturer description (optional)
 
-	Value  interface{} `json:"value"` // any
+	Value  interface{} `json:"value,omitempty"` // nil for write-only characteristics
 	Format string      `json:"format"`
 	Unit   string      `json:"unit,omitempty"`
 
@@ -32,11 +32,26 @@ type Characteristic struct {
 	localChangeFuncs  []ChangeFunc
 }
 
+func WriteOnlyPermissions(permissions []string) bool {
+	if len(permissions) == 1 {
+		return permissions[0] == PermWrite
+	}
+	return false
+}
+
 // NewCharacteristic returns a characteristic
 // If no permissions are specified, the value of PermsAll() is used.
+//
+// If permissions are write-only the setter methods (SetValue and SetValueFromRemote)
+// don't set the Value field. The OnLocalChange and OnRemoteChange have the new
+// value set as expect, but characteristics current and old value are nil.
 func NewCharacteristic(value interface{}, format string, t CharType, permissions []string) *Characteristic {
 	if len(permissions) == 0 {
 		permissions = PermsAll()
+	}
+
+	if WriteOnlyPermissions(permissions) == true {
+		value = nil
 	}
 
 	return &Characteristic{
@@ -104,13 +119,21 @@ func (c *Characteristic) GetValue() interface{} {
 
 // Private
 
+func (c *Characteristic) isWriteOnly() bool {
+	return WriteOnlyPermissions(c.Permissions)
+}
+
 // Sets the value of the characteristic
 // The implementation makes sure that the type of the value stays the same
 // E.g. Type of characteristic value int, calling setValue("10.5") sets the value to int(10)
+//
+// When permissions are write only, this methods does not set the Value field.
 func (c *Characteristic) setValue(value interface{}, remote bool) {
-	converted, err := to.Convert(value, reflect.TypeOf(c.Value).Kind())
-	if err == nil {
-		value = converted
+	if c.Value != nil {
+		converted, err := to.Convert(value, reflect.TypeOf(c.Value).Kind())
+		if err == nil {
+			value = converted
+		}
 	}
 
 	// Ignore when new value is same
@@ -119,17 +142,21 @@ func (c *Characteristic) setValue(value interface{}, remote bool) {
 	}
 
 	old := c.Value
-	c.Value = value
+	if c.isWriteOnly() == false {
+		c.Value = value
+	} else {
+		c.Value = nil
+	}
 
 	if remote == true {
-		c.onChange(c.remoteChangeFuncs, old)
+		c.onChange(c.remoteChangeFuncs, value, old)
 	} else {
-		c.onChange(c.localChangeFuncs, old)
+		c.onChange(c.localChangeFuncs, value, old)
 	}
 }
 
-func (c *Characteristic) onChange(funcs []ChangeFunc, oldValue interface{}) {
+func (c *Characteristic) onChange(funcs []ChangeFunc, newValue, oldValue interface{}) {
 	for _, fn := range funcs {
-		fn(c, oldValue)
+		fn(c, newValue, oldValue)
 	}
 }

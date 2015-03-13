@@ -23,13 +23,13 @@ func NewOutlet(info model.Info) *outlet {
 
 	sw := outlet{accessory, s, nil, nil}
 
-	s.On.OnRemoteChange(func(*characteristic.Characteristic, interface{}) {
+	s.On.OnRemoteChange(func(c *characteristic.Characteristic, new, old interface{}) {
 		if sw.onChanged != nil {
 			sw.onChanged(s.On.On())
 		}
 	})
 
-	s.InUse.OnRemoteChange(func(*characteristic.Characteristic, interface{}) {
+	s.InUse.OnRemoteChange(func(c *characteristic.Characteristic, new, old interface{}) {
 		if sw.inUseChanged != nil {
 			sw.inUseChanged(s.InUse.InUse())
 		}

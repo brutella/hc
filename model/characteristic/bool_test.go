@@ -6,7 +6,7 @@ import (
 )
 
 func TestBool(t *testing.T) {
-	b := NewBool(true)
+	b := NewBool(true, PermsAll())
 	assert.True(t, b.BoolValue())
 	b.SetBool(false)
 	assert.False(t, b.BoolValue())

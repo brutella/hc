@@ -88,7 +88,7 @@ func (app *App) AddAccessory(a *accessory.Accessory) {
 
 	for _, s := range a.Services {
 		for _, c := range s.Characteristics {
-			onChange := func(c *characteristic.Characteristic, oldValue interface{}) {
+			onChange := func(c *characteristic.Characteristic, new, old interface{}) {
 				// (brutella) It's not clear yet when the state (s#) field in the TXT records
 				// is updated. Sometimes it's increment when a client changes a value.
 				// if app.mdns != nil {
@@ -137,6 +137,7 @@ func (app *App) PerformBatchUpdates(fn func()) {
 // When reachable is true, the app will be announed via mDNS and is then visible to HomeKit clients.
 // When reachable is false, the app will be unannounced via mDNS and all connections get closed.
 func (app *App) SetReachable(reachable bool) {
+	log.Println("Set bridge reachable", reachable)
 	if app.IsReachable() != reachable {
 		if reachable == true {
 			app.mdns.Publish()
@@ -238,7 +239,7 @@ func (app *App) updateConfiguration() {
 	if dns != nil {
 		dns.SetConfiguration(dns.Configuration() + 1)
 		app.Database.SaveDns(dns)
-		if app.mdns != nil {
+		if app.IsReachable() {
 			app.mdns.Update()
 		}
 	}

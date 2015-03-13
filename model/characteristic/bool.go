@@ -4,8 +4,8 @@ type Bool struct {
 	*Number
 }
 
-func NewBool(value bool) *Bool {
-	number := NewNumber(value, nil, nil, nil, FormatBool)
+func NewBool(value bool, permissions []string) *Bool {
+	number := NewNumber(value, nil, nil, nil, FormatBool, permissions)
 	return &Bool{number}
 }
 

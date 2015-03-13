@@ -4,8 +4,8 @@ type Number struct {
 	*Characteristic
 }
 
-func NewNumber(value, min, max, step interface{}, format string) *Number {
-	n := Number{NewCharacteristic(value, format, CharTypeUnknown, nil)}
+func NewNumber(value, min, max, step interface{}, format string, permissions []string) *Number {
+	n := Number{NewCharacteristic(value, format, CharTypeUnknown, permissions)}
 	n.MinValue = min
 	n.MaxValue = max
 	n.MinStep = step

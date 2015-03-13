@@ -25,8 +25,8 @@ func TestCharacteristicLocalDelegate(t *testing.T) {
 	var oldValue interface{}
 	var newValue interface{}
 
-	c.OnLocalChange(func(c *Characteristic, old interface{}) {
-		newValue = c.Value
+	c.OnLocalChange(func(c *Characteristic, new, old interface{}) {
+		newValue = new
 		oldValue = old
 	})
 
@@ -43,8 +43,8 @@ func TestCharacteristicRemoteDelegate(t *testing.T) {
 
 	var oldValue interface{}
 	var newValue interface{}
-	c.OnRemoteChange(func(c *Characteristic, old interface{}) {
-		newValue = c.Value
+	c.OnRemoteChange(func(c *Characteristic, new, old interface{}) {
+		newValue = new
 		oldValue = old
 	})
 
@@ -60,11 +60,11 @@ func TestNoValueChange(t *testing.T) {
 	c := NewCharacteristic(5, FormatInt, CharTypePowerState, nil)
 
 	changed := false
-	c.OnRemoteChange(func(c *Characteristic, old interface{}) {
+	c.OnRemoteChange(func(c *Characteristic, new, old interface{}) {
 		changed = true
 	})
 
-	c.OnLocalChange(func(c *Characteristic, old interface{}) {
+	c.OnLocalChange(func(c *Characteristic, new, old interface{}) {
 		changed = true
 	})
 

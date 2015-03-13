@@ -9,9 +9,9 @@ type HeatingCoolingMode struct {
 }
 
 func NewHeatingCoolingMode(current model.HeatCoolModeType, charType CharType, permissions []string) *HeatingCoolingMode {
-	c := HeatingCoolingMode{NewByteCharacteristic(byte(current))}
+	c := HeatingCoolingMode{NewByteCharacteristic(byte(current), permissions)}
 	c.Type = charType
-	c.Permissions = permissions
+
 	return &c
 }
 

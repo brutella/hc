@@ -22,7 +22,7 @@ func NewSwitch(info model.Info) *switcher {
 
 	sw := switcher{accessory, s, nil}
 
-	s.On.OnRemoteChange(func(*characteristic.Characteristic, interface{}) {
+	s.On.OnRemoteChange(func(c *characteristic.Characteristic, new, old interface{}) {
 		if sw.onChanged != nil {
 			sw.onChanged(s.On.On())
 		}

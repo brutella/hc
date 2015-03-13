@@ -6,7 +6,7 @@ import (
 )
 
 func TestNumber(t *testing.T) {
-	number := NewNumber(20.2, 0, 100, 0.1, FormatFloat)
+	number := NewNumber(20.2, 0, 100, 0.1, FormatFloat, PermsAll())
 	assert.Equal(t, number.Format, FormatFloat)
 	assert.Equal(t, number.GetValue(), 20.2)
 	assert.Equal(t, number.GetMinValue(), 0)

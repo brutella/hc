@@ -4,18 +4,9 @@ type Identify struct {
 	*Bool
 }
 
-func NewIdentify(identify bool) *Identify {
-	b := NewBool(identify)
+func NewIdentify() *Identify {
+	b := NewBool(false, PermsWriteOnly())
 	b.Type = CharTypeIdentify
-	b.Permissions = PermsWriteOnly()
 
 	return &Identify{b}
-}
-
-func (c *Identify) SetIdentify(identify bool) {
-	c.SetBool(identify)
-}
-
-func (c *Identify) Identify() bool {
-	return c.BoolValue()
 }

@@ -4,8 +4,8 @@ type Int struct {
 	*Number
 }
 
-func NewInt(value, min, max, steps int) *Int {
-	number := NewNumber(value, min, max, steps, FormatInt)
+func NewInt(value, min, max, steps int, permissions []string) *Int {
+	number := NewNumber(value, min, max, steps, FormatInt, permissions)
 	return &Int{number}
 }
 

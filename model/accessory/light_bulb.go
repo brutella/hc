@@ -25,25 +25,25 @@ func NewLightBulb(info model.Info) *lightBulb {
 
 	lightBulb := lightBulb{accessory, bulb, nil, nil, nil, nil}
 
-	bulb.On.OnRemoteChange(func(*characteristic.Characteristic, interface{}) {
+	bulb.On.OnRemoteChange(func(c *characteristic.Characteristic, new, old interface{}) {
 		if lightBulb.onChanged != nil {
 			lightBulb.onChanged(bulb.On.On())
 		}
 	})
 
-	bulb.Brightness.OnRemoteChange(func(*characteristic.Characteristic, interface{}) {
+	bulb.Brightness.OnRemoteChange(func(c *characteristic.Characteristic, new, old interface{}) {
 		if lightBulb.brightnessChanged != nil {
 			lightBulb.brightnessChanged(bulb.Brightness.IntValue())
 		}
 	})
 
-	bulb.Hue.OnRemoteChange(func(*characteristic.Characteristic, interface{}) {
+	bulb.Hue.OnRemoteChange(func(c *characteristic.Characteristic, new, old interface{}) {
 		if lightBulb.hueChanged != nil {
 			lightBulb.hueChanged(bulb.Hue.FloatValue())
 		}
 	})
 
-	bulb.Saturation.OnRemoteChange(func(*characteristic.Characteristic, interface{}) {
+	bulb.Saturation.OnRemoteChange(func(c *characteristic.Characteristic, new, old interface{}) {
 		if lightBulb.saturationChanged != nil {
 			lightBulb.saturationChanged(bulb.Saturation.FloatValue())
 		}

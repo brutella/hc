@@ -17,7 +17,7 @@ func TestAccessoryIdentifyChanged(t *testing.T) {
 
 	a.Info.Identify.SetValueFromRemote(true)
 	// Identify is set to false immediately
-	assert.False(t, a.Info.Identify.Identify())
+	assert.Nil(t, a.Info.Identify.GetValue())
 	assert.Equal(t, identifyCalled, 1)
 }
 

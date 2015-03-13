@@ -4,8 +4,8 @@ type ByteCharacteristic struct {
 	*Number
 }
 
-func NewByteCharacteristic(value byte) *ByteCharacteristic {
-	number := NewNumber(value, nil, nil, nil, FormatByte)
+func NewByteCharacteristic(value byte, permissions []string) *ByteCharacteristic {
+	number := NewNumber(value, nil, nil, nil, FormatByte, permissions)
 	return &ByteCharacteristic{number}
 }
 

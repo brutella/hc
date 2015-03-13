@@ -52,7 +52,8 @@ func (s *Service) Publish() error {
 	// Host should end with '.'
 	hostname, _ := os.Hostname()
 	host := fmt.Sprintf("%s.", strings.Trim(hostname, "."))
-	server, err := bonjour.RegisterProxy(s.name, "_hap._tcp.", "", s.port, host, ip.String(), s.txtRecords(), nil)
+	text := s.txtRecords()
+	server, err := bonjour.RegisterProxy(s.name, "_hap._tcp.", "", s.port, host, ip.String(), text, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -62,9 +63,10 @@ func (s *Service) Publish() error {
 }
 
 func (s *Service) Update() {
-	// TODO(brutella) Discard if not published yet
-	s.server.SetText(s.txtRecords())
-	log.Println("[INFO]", s.txtRecords())
+	if s.server != nil {
+		s.server.SetText(s.txtRecords())
+		log.Println("[INFO]", s.txtRecords())
+	}
 }
 
 func (s *Service) Stop() {

@@ -33,11 +33,10 @@ func New(info model.Info) *Accessory {
 
 	a.AddService(i.Service)
 
-	i.Identify.OnRemoteChange(func(c *characteristic.Characteristic, v interface{}) {
-		if a.onIdentify != nil && a.Info.Identify.Identify() == true {
+	i.Identify.OnRemoteChange(func(c *characteristic.Characteristic, new, old interface{}) {
+		if a.onIdentify != nil {
 			a.onIdentify()
 		}
-		c.SetValue(false)
 	})
 
 	return a
