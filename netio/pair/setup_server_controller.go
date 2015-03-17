@@ -224,6 +224,7 @@ func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (com
 
 			signature, err := crypto.ED25519Signature(LTSK, material)
 			if err != nil {
+				log.Fatal(err)
 				return nil, err
 			}
 

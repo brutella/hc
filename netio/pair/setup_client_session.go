@@ -10,12 +10,9 @@ import (
 type PairSetupClientSession struct {
 	srp           *srp.SRP
 	session       *srp.ClientSession
-	PublicKey     []byte // A
-	SecretKey     []byte // S
-	Proof         []byte // M1
-	Name          []byte
-	LTPK          []byte
-	LTSK          []byte
+	PublicKey     []byte   // A
+	SecretKey     []byte   // S
+	Proof         []byte   // M1
 	EncryptionKey [32]byte // K
 }
 
@@ -23,12 +20,7 @@ func NewPairSetupClientSession(username string, password string) *PairSetupClien
 	rp, _ := srp.NewSRP(SRPGroup, sha512.New, KeyDerivativeFuncRFC2945(sha512.New, []byte(username)))
 
 	client := rp.NewClientSession([]byte(username), []byte(password))
-	LTPK, LTSK, _ := crypto.ED25519GenerateKey(username)
-
 	hap := PairSetupClientSession{
-		Name:    []byte(username),
-		LTPK:    LTPK,
-		LTSK:    LTSK,
 		srp:     rp,
 		session: client,
 	}

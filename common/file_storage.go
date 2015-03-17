@@ -3,11 +3,17 @@ package common
 import (
 	"bytes"
 	"os"
+	"path"
 	"path/filepath"
 )
 
 type fileStorage struct {
 	dir_path string
+}
+
+func NewTempFileStorage() (*fileStorage, error) {
+	dir := RandomHexString()
+	return NewFileStorage(path.Join(os.TempDir(), dir))
 }
 
 // NewFileStorage create a file storage for the specified directory.

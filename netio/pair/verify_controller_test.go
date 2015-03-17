@@ -6,13 +6,12 @@ import (
 	"github.com/brutella/hc/netio"
 
 	"github.com/stretchr/testify/assert"
-	"os"
 	"testing"
 )
 
 // Tests the pairing key verification
 func TestInvalidPublicKey(t *testing.T) {
-	storage, err := common.NewFileStorage(os.TempDir())
+	storage, err := common.NewTempFileStorage()
 	assert.Nil(t, err)
 	database := db.NewDatabaseWithStorage(storage)
 	info := netio.NewBridgeInfo("Macbook Bridge", "001-02-003", "Matthias H.", storage)
@@ -22,9 +21,8 @@ func TestInvalidPublicKey(t *testing.T) {
 
 	controller := NewVerifyServerController(database, context)
 
-	name := "UnitTest"
-	client_controller := NewVerifyClientController(bridge, name)
-	database.SaveEntity(db.NewEntity(name, client_controller.LTPK, nil)) // make LTPK available to server
+	client, _ := netio.NewClient("HomeKit Client", database)
+	client_controller := NewVerifyClientController(client, database)
 
 	req := client_controller.InitialKeyVerifyRequest()
 	req_tlv, err := common.NewTLV8ContainerFromReader(req)
@@ -37,19 +35,26 @@ func TestInvalidPublicKey(t *testing.T) {
 
 // Tests the pairing key verification
 func TestPairVerifyIntegration(t *testing.T) {
-	storage, err := common.NewFileStorage(os.TempDir())
+	storage, err := common.NewTempFileStorage()
 	assert.Nil(t, err)
 	database := db.NewDatabaseWithStorage(storage)
 	info := netio.NewBridgeInfo("Macbook Bridge", "001-02-003", "Matthias H.", storage)
 	bridge, err := netio.NewBridge(info, database)
 	assert.Nil(t, err)
 	context := netio.NewContextForBridge(bridge)
-
 	controller := NewVerifyServerController(database, context)
 
-	name := "UnitTest"
-	client_controller := NewVerifyClientController(bridge, name)
-	database.SaveEntity(db.NewEntity(name, client_controller.LTPK, nil)) // make LTPK available to server
+	client_database, _ := db.NewTempDatabase()
+	bridge_entity := db.NewEntity(bridge.Id(), bridge.PublicKey(), nil)
+	err = client_database.SaveEntity(bridge_entity)
+	assert.Nil(t, err)
+
+	client, _ := netio.NewClient("HomeKit Client", client_database)
+    client_entity := db.NewEntity(client.Name(), client.PublicKey(), nil)
+	err = database.SaveEntity(client_entity)
+	assert.Nil(t, err)
+    
+	client_controller := NewVerifyClientController(client, client_database)
 
 	tlvVerifyStepStartRequest := client_controller.InitialKeyVerifyRequest()
 	// 1) C -> S

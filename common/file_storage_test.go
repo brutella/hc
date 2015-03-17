@@ -8,7 +8,7 @@ import (
 )
 
 func TestFileStorage(t *testing.T) {
-	storage, err := NewFileStorage(os.TempDir())
+	storage, err := NewTempFileStorage()
 	assert.Nil(t, err)
 	assert.NotNil(t, storage)
 
@@ -44,13 +44,13 @@ func TestStoreInSubdirectory(t *testing.T) {
 }
 
 func TestDeleteUndefined(t *testing.T) {
-	storage, err := NewFileStorage(os.TempDir())
+	storage, err := NewTempFileStorage()
 	assert.Nil(t, err)
 	assert.NotNil(t, storage.Delete("test"))
 }
 
 func TestGetUndefined(t *testing.T) {
-	storage, err := NewFileStorage(os.TempDir())
+	storage, err := NewTempFileStorage()
 	assert.Nil(t, err)
 
 	_, err = storage.Get("test")

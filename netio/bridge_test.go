@@ -4,12 +4,11 @@ import (
 	"github.com/brutella/hc/common"
 	"github.com/brutella/hc/db"
 	"github.com/stretchr/testify/assert"
-	"os"
 	"testing"
 )
 
 func TestNewBridge(t *testing.T) {
-	storage, _ := common.NewFileStorage(os.TempDir())
+	storage, _ := common.NewTempFileStorage()
 	info := NewBridgeInfo("Test Bridge", "719-47-107", "Matthias H.", storage)
 	db := db.NewDatabaseWithStorage(storage)
 	bridge, err := NewBridge(info, db)

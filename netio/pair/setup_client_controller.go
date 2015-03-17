@@ -3,6 +3,7 @@ package pair
 import (
 	"github.com/brutella/hc/common"
 	"github.com/brutella/hc/crypto"
+	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/netio"
 
 	"bytes"
@@ -12,17 +13,19 @@ import (
 )
 
 type SetupClientController struct {
-	username string
+	client   *netio.Client
 	session  *PairSetupClientSession
+	database db.Database
 }
 
-func NewSetupClientController(bridge *netio.Bridge, username string) *SetupClientController {
+func NewSetupClientController(password string, client *netio.Client, database db.Database) *SetupClientController {
 
-	session := NewPairSetupClientSession("Pair-Setup", bridge.Password())
+	session := NewPairSetupClientSession("Pair-Setup", password)
 
 	controller := SetupClientController{
-		username: username,
+		client:   client,
 		session:  session,
+		database: database,
 	}
 	return &controller
 }
@@ -142,17 +145,17 @@ func (c *SetupClientController) handlePairStepVerifyResponse(cont_in common.Cont
 	H, err := crypto.HKDF_SHA512(c.session.SecretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
 	material := make([]byte, 0)
 	material = append(material, H[:]...)
-	material = append(material, c.username...)
-	material = append(material, c.session.LTPK...)
+	material = append(material, c.client.Name()...)
+	material = append(material, c.client.PublicKey()...)
 
-	signature, err := crypto.ED25519Signature(c.session.LTSK, material)
+	signature, err := crypto.ED25519Signature(c.client.PrivateKey(), material)
 	if err != nil {
 		return nil, err
 	}
 
 	tlvPairKeyExchange := common.NewTLV8Container()
-	tlvPairKeyExchange.SetString(TagUsername, c.username)
-	tlvPairKeyExchange.SetBytes(TagPublicKey, []byte(c.session.LTPK))
+	tlvPairKeyExchange.SetString(TagUsername, c.client.Name())
+	tlvPairKeyExchange.SetBytes(TagPublicKey, []byte(c.client.PublicKey()))
 	tlvPairKeyExchange.SetBytes(TagSignature, []byte(signature))
 
 	encrypted, tag, err := crypto.Chacha20EncryptAndPoly1305Seal(c.session.EncryptionKey[:], []byte("PS-Msg05"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)
@@ -205,6 +208,12 @@ func (c *SetupClientController) handleKeyExchange(cont_in common.Container) (com
 		fmt.Println("->     Username:", username)
 		fmt.Println("->     LTPK:", hex.EncodeToString(ltpk))
 		fmt.Println("->     Signature:", hex.EncodeToString(signature))
+
+		entity := db.NewEntity(username, ltpk, nil)
+		err = c.database.SaveEntity(entity)
+		if err != nil {
+			fmt.Println("[ERRO]", err)
+		}
 	}
 
 	return nil, err

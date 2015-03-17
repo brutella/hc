@@ -2,12 +2,11 @@ package common
 
 import (
 	"github.com/stretchr/testify/assert"
-	"os"
 	"testing"
 )
 
 func TestSerialForName(t *testing.T) {
-	storage, err := NewFileStorage(os.TempDir())
+	storage, err := NewTempFileStorage()
 	assert.Nil(t, err)
 	name := "My Accessory"
 	serial := GetSerialNumberForAccessoryName(name, storage)

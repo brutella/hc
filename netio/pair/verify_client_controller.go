@@ -3,31 +3,27 @@ package pair
 import (
 	"github.com/brutella/hc/common"
 	"github.com/brutella/hc/crypto"
+	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/netio"
 
 	"bytes"
 	"encoding/hex"
 	"fmt"
 	"io"
+	"log"
 )
 
 type VerifyClientController struct {
-	bridge   *netio.Bridge
+	client   *netio.Client
+	database db.Database
 	session  *VerifySession
-	username string
-	LTPK     []byte
-	LTSK     []byte
 }
 
-func NewVerifyClientController(bridge *netio.Bridge, username string) *VerifyClientController {
-	LTPK, LTSK, _ := crypto.ED25519GenerateKey(username)
-
+func NewVerifyClientController(client *netio.Client, database db.Database) *VerifyClientController {
 	controller := VerifyClientController{
-		username: username,
-		bridge:   bridge,
+		client:   client,
+		database: database,
 		session:  NewVerifySession(),
-		LTPK:     LTPK,
-		LTSK:     LTSK,
 	}
 
 	return &controller
@@ -127,9 +123,16 @@ func (c *VerifyClientController) handlePairStepVerifyResponse(cont_in common.Con
 	material = append(material, username...)
 	material = append(material, c.session.PublicKey[:]...)
 
-	LTPK := c.bridge.PublicKey()
+	entity := c.database.EntityWithName(username)
+	if entity == nil {
+		return nil, common.NewErrorf("Server %s is unknown", username)
+	}
 
-	if crypto.ValidateED25519Signature(LTPK, material, signature) == false {
+	if len(entity.PublicKey()) == 0 {
+		return nil, common.NewErrorf("No LTPK available for client %s", username)
+	}
+
+	if crypto.ValidateED25519Signature(entity.PublicKey(), material, signature) == false {
 		return nil, common.NewErrorf("Could not validate signature")
 	}
 
@@ -138,15 +141,16 @@ func (c *VerifyClientController) handlePairStepVerifyResponse(cont_in common.Con
 	cont_out.SetByte(TagSequence, VerifyStepFinishRequest.Byte())
 
 	tlv_encrypt := common.NewTLV8Container()
-	tlv_encrypt.SetString(TagUsername, c.username)
+	tlv_encrypt.SetString(TagUsername, c.client.Name())
 
 	material = make([]byte, 0)
 	material = append(material, c.session.PublicKey[:]...)
-	material = append(material, c.username...)
+	material = append(material, c.client.Name()...)
 	material = append(material, c.session.OtherPublicKey[:]...)
 
-	signature, err = crypto.ED25519Signature(c.LTSK, material)
+	signature, err = crypto.ED25519Signature(c.client.PrivateKey(), material)
 	if err != nil {
+		log.Fatal(err)
 		return nil, err
 	}
 

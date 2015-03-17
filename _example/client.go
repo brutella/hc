@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/brutella/hc/common"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/netio"
 	"github.com/brutella/hc/netio/pair"
@@ -17,13 +16,9 @@ func sendTLV8(b io.Reader) (io.Reader, error) {
 }
 
 func main() {
-	storage, err := common.NewFileStorage(os.TempDir())
-	info := netio.NewBridgeInfo("Test Bridge", "719-47-107", "Matthias H.", storage)
-	info.Id = "42:cd:02:57:0d:40"
-	db := db.NewDatabaseWithStorage(storage)
-	bridge, err := netio.NewBridge(info, db)
-
-	client := pair.NewSetupClientController(bridge, "HomeKit Client")
+	database, _ := db.NewDatabase(os.TempDir())
+    c, _ := netio.NewClient("HomeKit Client", database)
+	client := pair.NewSetupClientController("719-47-107", c, database)
 	pairStartRequest := client.InitialPairingRequest()
 
 	pairStartResponse, err := sendTLV8(pairStartRequest)
@@ -66,9 +61,8 @@ func main() {
 	}
 
 	fmt.Println("*** Pairing done ***")
-
-	name := "UnitTest"
-	verify := pair.NewVerifyClientController(bridge, name)
+    
+	verify := pair.NewVerifyClientController(c, database)
 
 	verifyStartRequest := verify.InitialKeyVerifyRequest()
 	// 1) C -> S

@@ -6,24 +6,23 @@ import (
 	"github.com/brutella/hc/netio"
 
 	"github.com/stretchr/testify/assert"
-	"os"
 	"testing"
 )
 
 // Tests the pairing setup
 func TestPairingIntegration(t *testing.T) {
-	storage, err := common.NewFileStorage(os.TempDir())
+	storage, err := common.NewTempFileStorage()
 	assert.Nil(t, err)
 	database := db.NewDatabaseWithStorage(storage)
-
 	info := netio.NewBridgeInfo("Macbook Bridge", "001-02-003", "Matthias H.", storage)
 	bridge, err := netio.NewBridge(info, database)
 	assert.Nil(t, err)
 
 	controller, err := NewSetupServerController(bridge, database)
 	assert.Nil(t, err)
-
-	client_controller := NewSetupClientController(bridge, "HomeKit Client")
+	client_database, _ := db.NewTempDatabase()
+	client, _ := netio.NewClient("Client", client_database)
+	client_controller := NewSetupClientController("001-02-003", client, client_database)
 	pairStartRequest := client_controller.InitialPairingRequest()
 
 	// 1) C -> S

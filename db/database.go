@@ -30,6 +30,12 @@ type database struct {
 	storage common.Storage
 }
 
+// NewTempDatabase returns a temp database
+func NewTempDatabase() (Database, error) {
+	storage, err := common.NewTempFileStorage()
+	return NewDatabaseWithStorage(storage), err
+}
+
 // NewDatabase returns a database which stores data into the folder specified by the argument string.
 func NewDatabase(path string) (Database, error) {
 	storage, err := common.NewFileStorage(path)

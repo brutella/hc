@@ -107,7 +107,11 @@ func (c *VerifyServerController) handlePairVerifyStart(cont_in common.Container)
 	material = append(material, c.session.PublicKey[:]...)
 	material = append(material, bridge.Id()...)
 	material = append(material, clientPublicKey...)
-	signature, _ := crypto.ED25519Signature(LTSK, material)
+	signature, err := crypto.ED25519Signature(LTSK, material)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
 
 	// Encrypt
 	tlv_encrypt := common.NewTLV8Container()
@@ -170,12 +174,12 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 		log.Println("[VERB]     client:", username)
 		log.Println("[VERB]  signature:", hex.EncodeToString(signature))
 
-		client := c.database.EntityWithName(username)
-		if client == nil {
+		entity := c.database.EntityWithName(username)
+		if entity == nil {
 			return nil, common.NewErrorf("Client %s is unknown", username)
 		}
 
-		if len(client.PublicKey()) == 0 {
+		if len(entity.PublicKey()) == 0 {
 			return nil, common.NewErrorf("No LTPK available for client %s", username)
 		}
 
@@ -184,7 +188,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 		material = append(material, []byte(username)...)
 		material = append(material, c.session.PublicKey[:]...)
 
-		if crypto.ValidateED25519Signature(client.PublicKey(), material, signature) == false {
+		if crypto.ValidateED25519Signature(entity.PublicKey(), material, signature) == false {
 			log.Println("[WARN] signature is invalid")
 			c.Reset()
 			cont_out.SetByte(TagErrCode, ErrCodeUnknownPeer.Byte()) // return error 4
