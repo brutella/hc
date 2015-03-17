@@ -5,6 +5,7 @@ import (
 	"github.com/brutella/hc/crypto"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/netio"
+	"github.com/brutella/log"
 
 	"bytes"
 	"encoding/hex"
@@ -49,11 +50,11 @@ func (c *SetupClientController) Handle(cont_in common.Container) (common.Contain
 
 	code := ErrCode(cont_in.GetByte(TagErrCode))
 	if code != ErrCodeNo {
+		log.Println("[ERRO]", code)
 		return nil, code.Error()
 	}
 
 	seq := PairStepType(cont_in.GetByte(TagSequence))
-	fmt.Println("->     Seq:", seq)
 
 	var cont_out common.Container
 	var err error
@@ -145,7 +146,7 @@ func (c *SetupClientController) handlePairStepVerifyResponse(cont_in common.Cont
 	H, err := crypto.HKDF_SHA512(c.session.SecretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
 	material := make([]byte, 0)
 	material = append(material, H[:]...)
-	material = append(material, c.client.Name()...)
+	material = append(material, c.client.Id()...)
 	material = append(material, c.client.PublicKey()...)
 
 	signature, err := crypto.ED25519Signature(c.client.PrivateKey(), material)
@@ -154,7 +155,7 @@ func (c *SetupClientController) handlePairStepVerifyResponse(cont_in common.Cont
 	}
 
 	tlvPairKeyExchange := common.NewTLV8Container()
-	tlvPairKeyExchange.SetString(TagUsername, c.client.Name())
+	tlvPairKeyExchange.SetString(TagUsername, c.client.Id())
 	tlvPairKeyExchange.SetBytes(TagPublicKey, []byte(c.client.PublicKey()))
 	tlvPairKeyExchange.SetBytes(TagSignature, []byte(signature))
 

@@ -1,97 +1,109 @@
 package main
 
 import (
-	"fmt"
+	"log"
+    "fmt"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/netio"
+    "github.com/brutella/hc/common"
 	"github.com/brutella/hc/netio/pair"
 	"io"
 	"net/http"
-	"os"
 )
 
-func sendTLV8(b io.Reader) (io.Reader, error) {
-	resp, err := http.Post("http://127.0.0.1:55036/pair-setup", netio.HTTPContentTypePairingTLV8, b)
+func pairSetup(b io.Reader) (io.Reader, error) {
+    return sendTLV8(b, "pair-setup")
+}
+
+func pairVerify(b io.Reader) (io.Reader, error) {
+    return sendTLV8(b, "pair-verify")
+}
+
+func sendTLV8(b io.Reader, endpoint string) (io.Reader, error) {
+    url := fmt.Sprintf("http://127.0.0.1:62743/%s", endpoint)
+	resp, err := http.Post(url, netio.HTTPContentTypePairingTLV8, b)
 	return resp.Body, err
 }
 
 func main() {
-	database, _ := db.NewDatabase(os.TempDir())
-    c, _ := netio.NewClient("HomeKit Client", database)
-	client := pair.NewSetupClientController("719-47-107", c, database)
+	database, _ := db.NewTempDatabase()
+    // Use random client name to avoid pairing setup with already paired client 
+    name := common.RandomHexString()
+    c, _ := netio.NewClient(name, database)
+	client := pair.NewSetupClientController("673-10-149", c, database)
 	pairStartRequest := client.InitialPairingRequest()
 
-	pairStartResponse, err := sendTLV8(pairStartRequest)
+	pairStartResponse, err := pairSetup(pairStartRequest)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	// 2) S -> C
 	pairVerifyRequest, err := pair.HandleReaderForHandler(pairStartResponse, client)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	// 3) C -> S
-	pairVerifyResponse, err := sendTLV8(pairVerifyRequest)
+	pairVerifyResponse, err := pairSetup(pairVerifyRequest)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	// 4) S -> C
 	pairKeyRequest, err := pair.HandleReaderForHandler(pairVerifyResponse, client)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	// 5) C -> S
-	pairKeyRespond, err := sendTLV8(pairKeyRequest)
+	pairKeyRespond, err := pairSetup(pairKeyRequest)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	// 6) S -> C
 	request, err := pair.HandleReaderForHandler(pairKeyRespond, client)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	if request != nil {
-		fmt.Println(request)
+		log.Println(request)
 	}
 
-	fmt.Println("*** Pairing done ***")
+	log.Println("*** Pairing done ***")
     
 	verify := pair.NewVerifyClientController(c, database)
 
 	verifyStartRequest := verify.InitialKeyVerifyRequest()
 	// 1) C -> S
-	verifyStartResponse, err := sendTLV8(verifyStartRequest)
+	verifyStartResponse, err := pairVerify(verifyStartRequest)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	// 2) S -> C
 	verifyFinishRequest, err := pair.HandleReaderForHandler(verifyStartResponse, verify)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	// 3) C -> S
-	verifyFinishResponse, err := sendTLV8(verifyFinishRequest)
+	verifyFinishResponse, err := pairVerify(verifyFinishRequest)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	// 4) S -> C
 	last_request, err := pair.HandleReaderForHandler(verifyFinishResponse, verify)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	if last_request != nil {
-		fmt.Println(last_request)
+		log.Println(last_request)
 	}
 
-	fmt.Println("*** Key Verification done ***")
+	log.Println("*** Key Verification done ***")
 }

@@ -10,7 +10,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"log"
 )
 
 type VerifyClientController struct {
@@ -141,16 +140,15 @@ func (c *VerifyClientController) handlePairStepVerifyResponse(cont_in common.Con
 	cont_out.SetByte(TagSequence, VerifyStepFinishRequest.Byte())
 
 	tlv_encrypt := common.NewTLV8Container()
-	tlv_encrypt.SetString(TagUsername, c.client.Name())
+	tlv_encrypt.SetString(TagUsername, c.client.Id())
 
 	material = make([]byte, 0)
 	material = append(material, c.session.PublicKey[:]...)
-	material = append(material, c.client.Name()...)
+	material = append(material, c.client.Id()...)
 	material = append(material, c.session.OtherPublicKey[:]...)
 
 	signature, err = crypto.ED25519Signature(c.client.PrivateKey(), material)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 

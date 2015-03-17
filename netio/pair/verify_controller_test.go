@@ -50,10 +50,10 @@ func TestPairVerifyIntegration(t *testing.T) {
 	assert.Nil(t, err)
 
 	client, _ := netio.NewClient("HomeKit Client", client_database)
-    client_entity := db.NewEntity(client.Name(), client.PublicKey(), nil)
+	client_entity := db.NewEntity(client.Id(), client.PublicKey(), nil)
 	err = database.SaveEntity(client_entity)
 	assert.Nil(t, err)
-    
+
 	client_controller := NewVerifyClientController(client, client_database)
 
 	tlvVerifyStepStartRequest := client_controller.InitialKeyVerifyRequest()

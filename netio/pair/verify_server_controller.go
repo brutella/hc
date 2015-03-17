@@ -125,7 +125,7 @@ func (c *VerifyServerController) handlePairVerifyStart(cont_in common.Container)
 	cont_out.SetBytes(TagPublicKey, c.session.PublicKey[:])
 	cont_out.SetBytes(TagEncryptedData, append(encrypted, mac[:]...))
 
-	log.Println("[VERB]       K:", hex.EncodeToString(c.session.EncryptionKey[:]))
+	log.Println("[VERB]        K:", hex.EncodeToString(c.session.EncryptionKey[:]))
 	log.Println("[VERB]        B:", hex.EncodeToString(c.session.PublicKey[:]))
 	log.Println("[VERB]        S:", hex.EncodeToString(c.session.SecretKey[:]))
 	log.Println("[VERB]   Shared:", hex.EncodeToString(c.session.SharedKey[:]))
