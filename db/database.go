@@ -5,16 +5,16 @@ import (
 	"github.com/gosexy/to"
 )
 
-// Database stores clients and dns persistently.
+// Database stores entities and dns persistently.
 type Database interface {
-	// ClientWithName returns the client referenced by name
-	ClientWithName(name string) Client
+	// EntityWithName returns the entity referenced by name
+	EntityWithName(name string) Entity
 
-	// SaveClient saves a client in the database
-	SaveClient(client Client) error
+	// SaveEntity saves a entity in the database
+	SaveEntity(entity Entity) error
 
-	// DeleteClient deletes a client from the database
-	DeleteClient(client Client)
+	// DeleteEntity deletes a entity from the database
+	DeleteEntity(entity Entity)
 
 	// DnsWithName returns the dns references by name
 	DnsWithName(name string) Dns
@@ -47,34 +47,33 @@ func NewDatabaseWithStorage(storage common.Storage) Database {
 	return &c
 }
 
-// ClientWithName returns a client for a specific name
+// EntityWithName returns a entity for a specific name
 // The method tries to load the ltpk from disk and returns initialized client object.
 // The method returns nil when no file for this client could be found.
-func (m *database) ClientWithName(name string) Client {
-	data, err := m.storage.Get(keyForClientName(name))
+func (m *database) EntityWithName(name string) Entity {
+	data, err := m.storage.Get(keyForEntityName(name))
 
 	if len(data) > 0 && err == nil {
-		client := NewClient(name, data)
-		return client
+		return NewEntity(name, data)
 	}
 
 	return nil
 }
 
-// SaveClient stores the long-term public key of the client as {client-name}.ltpk to disk.
-func (m *database) SaveClient(client Client) error {
-	if len(client.PublicKey()) == 0 {
-		return common.NewErrorf("No public key to save for client%s\n", client.Name())
+// SaveEntity stores the long-term public key of the entity as {entity-name}.ltpk to disk.
+func (m *database) SaveEntity(entity Entity) error {
+	if len(entity.PublicKey()) == 0 {
+		return common.NewErrorf("No public key to save for entity%s\n", entity.Name())
 	}
 
-	return m.storage.Set(keyForClientName(client.Name()), client.PublicKey())
+	return m.storage.Set(keyForEntityName(entity.Name()), entity.PublicKey())
 }
 
-func (db *database) DeleteClient(client Client) {
-	db.storage.Delete(keyForClientName(client.Name()))
+func (db *database) DeleteEntity(entity Entity) {
+	db.storage.Delete(keyForEntityName(entity.Name()))
 }
 
-func keyForClientName(name string) string {
+func keyForEntityName(name string) string {
 	return name + ".ltpk"
 }
 

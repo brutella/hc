@@ -38,14 +38,14 @@ func (c *PairingController) Handle(cont common.Container) (common.Container, err
 	log.Println("[VERB] -> Username:", username)
 	log.Println("[VERB] ->     LTPK:", publicKey)
 
-	client := db.NewClient(username, publicKey)
+	entity := db.NewEntity(username, publicKey)
 
 	switch method {
 	case PairingMethodDelete:
 		log.Printf("[INFO] Remove LTPK for client '%s'\n", username)
-		c.database.DeleteClient(client)
+		c.database.DeleteEntity(entity)
 	case PairingMethodAdd:
-		err := c.database.SaveClient(client)
+		err := c.database.SaveEntity(entity)
 		if err != nil {
 			log.Println("[ERRO]", err)
 			return nil, err

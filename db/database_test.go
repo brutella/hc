@@ -6,37 +6,37 @@ import (
 	"testing"
 )
 
-func TestLoadUndefinedClient(t *testing.T) {
+func TestLoadUndefinedEntity(t *testing.T) {
 	db, _ := NewDatabase(os.TempDir())
-	client := db.ClientWithName("My Name")
-	assert.Nil(t, client)
+	entity := db.EntityWithName("My Name")
+	assert.Nil(t, entity)
 }
 
-func TestLoadClient(t *testing.T) {
+func TestLoadEntity(t *testing.T) {
 	db, _ := NewDatabase(os.TempDir())
-	db.SaveClient(NewClient("My Name", []byte{0x01}))
-	client := db.ClientWithName("My Name")
-	assert.NotNil(t, client)
-	assert.Equal(t, client.PublicKey(), []byte{0x01})
+	db.SaveEntity(NewEntity("My Name", []byte{0x01}))
+	entity := db.EntityWithName("My Name")
+	assert.NotNil(t, entity)
+	assert.Equal(t, entity.PublicKey(), []byte{0x01})
 }
 
-func TestDeleteClient(t *testing.T) {
+func TestDeleteEntity(t *testing.T) {
 	db, _ := NewDatabase(os.TempDir())
-	c := NewClient("My Name", []byte{0x01})
-	db.SaveClient(c)
-	db.DeleteClient(c)
-	client := db.ClientWithName("My Name")
-	assert.Nil(t, client)
+	c := NewEntity("My Name", []byte{0x01})
+	db.SaveEntity(c)
+	db.DeleteEntity(c)
+	entity := db.EntityWithName("My Name")
+	assert.Nil(t, entity)
 }
 
 func TestLoadDns(t *testing.T) {
 	db, _ := NewDatabase(os.TempDir())
 	dns := NewDns("My Name", 10, 20)
 	db.SaveDns(dns)
-	client := db.DnsWithName("My Name")
-	assert.NotNil(t, client)
-	assert.Equal(t, client.Configuration(), 10)
-	assert.Equal(t, client.State(), 20)
+	entity := db.DnsWithName("My Name")
+	assert.NotNil(t, entity)
+	assert.Equal(t, entity.Configuration(), 10)
+	assert.Equal(t, entity.State(), 20)
 }
 
 func TestDeleteDns(t *testing.T) {

@@ -11,9 +11,9 @@ import (
 	"encoding/hex"
 )
 
-// SetupServerController handles pairing with a client using SRP.
-// The client has to known the bridge password to successfully pair.
-// When pairigin was successful, the client's public key (refered as LTPK - long term public key)
+// SetupServerController handles pairing with a entity using SRP.
+// The entity has to known the bridge password to successfully pair.
+// When pairigin was successful, the entity's public key (refered as LTPK - long term public key)
 // is stored in the database for later use.
 //
 // Pairing may fail because the password is wrong or the key exchange failed (e.g. packet seals or SRP key authenticator is wrong, ...).
@@ -103,10 +103,10 @@ func (c *SetupServerController) handlePairStart(cont_in common.Container) (commo
 }
 
 // Client -> Server
-// - A: client public key
+// - A: entity public key
 // - M1: proof
 //
-// Server -> client
+// Server -> entity
 // - M2: proof
 // or
 // - auth error
@@ -151,12 +151,12 @@ func (c *SetupServerController) handlePairVerify(cont_in common.Container) (comm
 }
 
 // Client -> Server
-// - encrypted tlv8: client LTPK, client name and signature (of H, client name, LTPK)
+// - encrypted tlv8: entity LTPK, entity name and signature (of H, entity name, LTPK)
 // - auth tag (mac)
 //
 // Server
 // - Validate signature of encrpyted tlv8
-// - Read and store client LTPK and name
+// - Read and store entity LTPK and name
 //
 // Server -> Client
 // - encrpyted tlv8: bridge LTPK, bridge name, signature (of H2, bridge name, LTPK)
@@ -207,10 +207,10 @@ func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (com
 			cont_out.SetByte(TagErrCode, ErrCodeAuthenticationFailed.Byte()) // return error 2
 		} else {
 			log.Println("[VERB] ed25519 signature is valid")
-			// Store client LTPK and name
-			client := db.NewClient(username, ltpk)
-			c.database.SaveClient(client)
-			log.Printf("[INFO] Stored LTPK '%s' for client '%s'\n", hex.EncodeToString(ltpk), username)
+			// Store entity LTPK and name
+			entity := db.NewEntity(username, ltpk)
+			c.database.SaveEntity(entity)
+			log.Printf("[INFO] Stored LTPK '%s' for entity '%s'\n", hex.EncodeToString(ltpk), username)
 
 			LTPK := c.bridge.PublicKey
 			LTSK := c.bridge.SecretKey

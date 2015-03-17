@@ -170,7 +170,7 @@ func (c *VerifyServerController) handlePairVerifyFinish(cont_in common.Container
 		log.Println("[VERB]     client:", username)
 		log.Println("[VERB]  signature:", hex.EncodeToString(signature))
 
-		client := c.database.ClientWithName(username)
+		client := c.database.EntityWithName(username)
 		if client == nil {
 			return nil, common.NewErrorf("Client %s is unknown", username)
 		}

@@ -39,9 +39,9 @@ func TestAddPairing(t *testing.T) {
 
 func TestDeletePairing(t *testing.T) {
 	username := "Unit Test"
-	client := db.NewClient(username, []byte{0x01, 0x02})
+	entity := db.NewEntity(username, []byte{0x01, 0x02})
 	database, _ := db.NewDatabase(os.TempDir())
-	database.SaveClient(client)
+	database.SaveEntity(entity)
 
 	tlv8 := common.NewTLV8Container()
 	tlv8.SetByte(TagPairingMethod, PairingMethodDelete)
@@ -55,6 +55,6 @@ func TestDeletePairing(t *testing.T) {
 	assert.NotNil(t, tlv8_out)
 	assert.Equal(t, tlv8_out.GetByte(TagSequence), byte(0x2))
 
-	saved_client := database.ClientWithName(username)
-	assert.Nil(t, saved_client)
+	saved_entity := database.EntityWithName(username)
+	assert.Nil(t, saved_entity)
 }

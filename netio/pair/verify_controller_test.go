@@ -24,7 +24,7 @@ func TestInvalidPublicKey(t *testing.T) {
 
 	name := "UnitTest"
 	client_controller := NewVerifyClientController(bridge, name)
-	database.SaveClient(db.NewClient(name, client_controller.LTPK)) // make LTPK available to server
+	database.SaveEntity(db.NewEntity(name, client_controller.LTPK)) // make LTPK available to server
 
 	req := client_controller.InitialKeyVerifyRequest()
 	req_tlv, err := common.NewTLV8ContainerFromReader(req)
@@ -49,7 +49,7 @@ func TestPairVerifyIntegration(t *testing.T) {
 
 	name := "UnitTest"
 	client_controller := NewVerifyClientController(bridge, name)
-	database.SaveClient(db.NewClient(name, client_controller.LTPK)) // make LTPK available to server
+	database.SaveEntity(db.NewEntity(name, client_controller.LTPK)) // make LTPK available to server
 
 	tlvVerifyStepStartRequest := client_controller.InitialKeyVerifyRequest()
 	// 1) C -> S
