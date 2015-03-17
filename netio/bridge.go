@@ -1,29 +1,28 @@
 package netio
 
 import (
-	"github.com/brutella/hc/crypto"
+	"github.com/brutella/hc/db"
 )
 
 // Bridge contains basic information (like name, ...) and cryptho keys to secure
 // the communication.
 type Bridge struct {
-	info BridgeInfo
-
-	PublicKey []byte
-	SecretKey []byte
+	info   BridgeInfo
+	entity db.Entity
 }
 
 // NewBridge returns a bridge from a BridgeInfo object
 //
 // The long-term public and secret key are based on the serial
 // number which should be unique for every bridge.
-func NewBridge(info BridgeInfo) (*Bridge, error) {
-	b := Bridge{info: info}
-	public, secret, err := crypto.ED25519GenerateKey(b.info.SerialNumber)
-	b.PublicKey = public
-	b.SecretKey = secret
+func NewBridge(info BridgeInfo, database db.Database) (*Bridge, error) {
+	var err error
+	entity := database.EntityWithName(info.Id)
+	if entity == nil {
+		entity, err = db.NewRandomEntityWithName(info.Id)
+	}
 
-	return &b, err
+	return &Bridge{info, entity}, err
 }
 
 // Name returns the bridge name
@@ -39,4 +38,14 @@ func (b *Bridge) Id() string {
 // Password returns the bridge password
 func (b *Bridge) Password() string {
 	return b.info.Password
+}
+
+// PrivateKey returns the bridge private key
+func (b *Bridge) PrivateKey() []byte {
+	return b.entity.PrivateKey()
+}
+
+// PublicKey returns the bridge public key
+func (b *Bridge) PublicKey() []byte {
+	return b.entity.PublicKey()
 }

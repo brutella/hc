@@ -51,10 +51,15 @@ func NewDatabaseWithStorage(storage common.Storage) Database {
 // The method tries to load the ltpk from disk and returns initialized client object.
 // The method returns nil when no file for this client could be found.
 func (m *database) EntityWithName(name string) Entity {
-	data, err := m.storage.Get(keyForEntityName(name))
+	publicKeyFile := publicKeyFileForEntityName(name)
+	privateKeyFile := privateKeyFileForEntityName(name)
 
-	if len(data) > 0 && err == nil {
-		return NewEntity(name, data)
+	public, err_public := m.storage.Get(publicKeyFile)
+	// Ignore error for private key which is optional
+	private, _ := m.storage.Get(privateKeyFile)
+
+	if len(public) > 0 && err_public == nil {
+		return NewEntity(name, public, private)
 	}
 
 	return nil
@@ -62,19 +67,32 @@ func (m *database) EntityWithName(name string) Entity {
 
 // SaveEntity stores the long-term public key of the entity as {entity-name}.ltpk to disk.
 func (m *database) SaveEntity(entity Entity) error {
+	name := entity.Name()
 	if len(entity.PublicKey()) == 0 {
-		return common.NewErrorf("No public key to save for entity%s\n", entity.Name())
+		return common.NewErrorf("No public key to save for entity%s\n", name)
 	}
 
-	return m.storage.Set(keyForEntityName(entity.Name()), entity.PublicKey())
+	publicKeyFile := publicKeyFileForEntityName(name)
+	err := m.storage.Set(publicKeyFile, entity.PublicKey())
+	if err != nil {
+		return err
+	}
+
+	privateKeyFile := privateKeyFileForEntityName(name)
+	return m.storage.Set(privateKeyFile, entity.PrivateKey())
 }
 
 func (db *database) DeleteEntity(entity Entity) {
-	db.storage.Delete(keyForEntityName(entity.Name()))
+	db.storage.Delete(privateKeyFileForEntityName(entity.Name()))
+	db.storage.Delete(publicKeyFileForEntityName(entity.Name()))
 }
 
-func keyForEntityName(name string) string {
-	return name + ".ltpk"
+func privateKeyFileForEntityName(name string) string {
+	return name + ".private_key"
+}
+
+func publicKeyFileForEntityName(name string) string {
+	return name + ".public_key"
 }
 
 func (db *database) DnsWithName(name string) Dns {

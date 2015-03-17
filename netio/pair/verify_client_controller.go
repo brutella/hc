@@ -127,7 +127,7 @@ func (c *VerifyClientController) handlePairStepVerifyResponse(cont_in common.Con
 	material = append(material, username...)
 	material = append(material, c.session.PublicKey[:]...)
 
-	LTPK := c.bridge.PublicKey
+	LTPK := c.bridge.PublicKey()
 
 	if crypto.ValidateED25519Signature(LTPK, material, signature) == false {
 		return nil, common.NewErrorf("Could not validate signature")

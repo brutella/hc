@@ -16,7 +16,7 @@ func TestInvalidPublicKey(t *testing.T) {
 	assert.Nil(t, err)
 	database := db.NewDatabaseWithStorage(storage)
 	info := netio.NewBridgeInfo("Macbook Bridge", "001-02-003", "Matthias H.", storage)
-	bridge, err := netio.NewBridge(info)
+	bridge, err := netio.NewBridge(info, database)
 	assert.Nil(t, err)
 	context := netio.NewContextForBridge(bridge)
 
@@ -24,7 +24,7 @@ func TestInvalidPublicKey(t *testing.T) {
 
 	name := "UnitTest"
 	client_controller := NewVerifyClientController(bridge, name)
-	database.SaveEntity(db.NewEntity(name, client_controller.LTPK)) // make LTPK available to server
+	database.SaveEntity(db.NewEntity(name, client_controller.LTPK, nil)) // make LTPK available to server
 
 	req := client_controller.InitialKeyVerifyRequest()
 	req_tlv, err := common.NewTLV8ContainerFromReader(req)
@@ -41,7 +41,7 @@ func TestPairVerifyIntegration(t *testing.T) {
 	assert.Nil(t, err)
 	database := db.NewDatabaseWithStorage(storage)
 	info := netio.NewBridgeInfo("Macbook Bridge", "001-02-003", "Matthias H.", storage)
-	bridge, err := netio.NewBridge(info)
+	bridge, err := netio.NewBridge(info, database)
 	assert.Nil(t, err)
 	context := netio.NewContextForBridge(bridge)
 
@@ -49,7 +49,7 @@ func TestPairVerifyIntegration(t *testing.T) {
 
 	name := "UnitTest"
 	client_controller := NewVerifyClientController(bridge, name)
-	database.SaveEntity(db.NewEntity(name, client_controller.LTPK)) // make LTPK available to server
+	database.SaveEntity(db.NewEntity(name, client_controller.LTPK, nil)) // make LTPK available to server
 
 	tlvVerifyStepStartRequest := client_controller.InitialKeyVerifyRequest()
 	// 1) C -> S

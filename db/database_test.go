@@ -14,15 +14,25 @@ func TestLoadUndefinedEntity(t *testing.T) {
 
 func TestLoadEntity(t *testing.T) {
 	db, _ := NewDatabase(os.TempDir())
-	db.SaveEntity(NewEntity("My Name", []byte{0x01}))
+	db.SaveEntity(NewEntity("My Name", []byte{0x01}, []byte{0x02}))
 	entity := db.EntityWithName("My Name")
 	assert.NotNil(t, entity)
 	assert.Equal(t, entity.PublicKey(), []byte{0x01})
+	assert.Equal(t, entity.PrivateKey(), []byte{0x02})
+}
+
+func TestLoadEntityWithPublicKeyOnly(t *testing.T) {
+	db, _ := NewDatabase(os.TempDir())
+	db.SaveEntity(NewEntity("Entity", []byte{0x03}, nil))
+	entity := db.EntityWithName("Entity")
+	assert.NotNil(t, entity)
+	assert.Equal(t, entity.PublicKey(), []byte{0x03}, nil)
+	assert.Nil(t, entity.PrivateKey())
 }
 
 func TestDeleteEntity(t *testing.T) {
 	db, _ := NewDatabase(os.TempDir())
-	c := NewEntity("My Name", []byte{0x01})
+	c := NewEntity("My Name", []byte{0x01}, nil)
 	db.SaveEntity(c)
 	db.DeleteEntity(c)
 	entity := db.EntityWithName("My Name")

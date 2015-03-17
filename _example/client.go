@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/brutella/hc/common"
+	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/netio"
 	"github.com/brutella/hc/netio/pair"
 	"io"
@@ -19,7 +20,8 @@ func main() {
 	storage, err := common.NewFileStorage(os.TempDir())
 	info := netio.NewBridgeInfo("Test Bridge", "719-47-107", "Matthias H.", storage)
 	info.Id = "42:cd:02:57:0d:40"
-	bridge, err := netio.NewBridge(info)
+	db := db.NewDatabaseWithStorage(storage)
+	bridge, err := netio.NewBridge(info, db)
 
 	client := pair.NewSetupClientController(bridge, "HomeKit Client")
 	pairStartRequest := client.InitialPairingRequest()

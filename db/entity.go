@@ -1,5 +1,10 @@
 package db
 
+import (
+	"github.com/brutella/hc/common"
+	"github.com/brutella/hc/crypto"
+)
+
 // Entity represents a HomeKit entity (e.g. iOS device or HomeKit bridge).
 type Entity interface {
 	// Name returns the entity name
@@ -13,16 +18,32 @@ type Entity interface {
 
 	// SetPublicKey sets the entity (long-term) public key
 	SetPublicKey(publicKey []byte)
+
+	// PrivateKey returns the entity (long-term) private key
+	PrivateKey() []byte
+
+	// SetPrivateKey sets the entity (long-term) private key
+	SetPrivateKey(privateKey []byte)
 }
 
 type entity struct {
-	name      string
-	publicKey []byte
+	name       string
+	publicKey  []byte
+	privateKey []byte
+}
+
+func NewRandomEntityWithName(name string) (Entity, error) {
+	public_bytes, private_bytes, err := generateKeyPairs()
+	if err == nil && len(public_bytes) > 0 && len(private_bytes) > 0 {
+		return NewEntity(name, public_bytes, private_bytes), nil
+	}
+
+	return nil, err
 }
 
 // NewEntity returns a entity with a name and public key.
-func NewEntity(name string, publicKey []byte) Entity {
-	return &entity{name: name, publicKey: publicKey}
+func NewEntity(name string, publicKey, privateKey []byte) Entity {
+	return &entity{name: name, publicKey: publicKey, privateKey: privateKey}
 }
 
 func (c *entity) SetName(name string) {
@@ -39,4 +60,19 @@ func (c *entity) SetPublicKey(publicKey []byte) {
 
 func (c *entity) PublicKey() []byte {
 	return c.publicKey
+}
+
+func (c *entity) SetPrivateKey(privateKey []byte) {
+	c.privateKey = privateKey
+}
+
+func (c *entity) PrivateKey() []byte {
+	return c.privateKey
+}
+
+// generateKeyPairs generates random public and private key pairs
+func generateKeyPairs() ([]byte, []byte, error) {
+	str := common.RandomHexString()
+	public, secret, err := crypto.ED25519GenerateKey(str)
+	return public, secret, err
 }

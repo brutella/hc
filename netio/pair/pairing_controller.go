@@ -38,7 +38,7 @@ func (c *PairingController) Handle(cont common.Container) (common.Container, err
 	log.Println("[VERB] -> Username:", username)
 	log.Println("[VERB] ->     LTPK:", publicKey)
 
-	entity := db.NewEntity(username, publicKey)
+	entity := db.NewEntity(username, publicKey, nil)
 
 	switch method {
 	case PairingMethodDelete:

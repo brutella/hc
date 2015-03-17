@@ -53,7 +53,7 @@ func NewApp(conf Config) (*App, error) {
 
 	database := db.NewDatabaseWithStorage(storage)
 	bridge_config := netio.NewBridgeInfo(conf.BridgeName, conf.BridgePassword, conf.BridgeManufacturer, storage)
-	bridge, err := netio.NewBridge(bridge_config)
+	bridge, err := netio.NewBridge(bridge_config, database)
 	if err != nil {
 		return nil, err
 	}

@@ -39,7 +39,7 @@ func TestAddPairing(t *testing.T) {
 
 func TestDeletePairing(t *testing.T) {
 	username := "Unit Test"
-	entity := db.NewEntity(username, []byte{0x01, 0x02})
+	entity := db.NewEntity(username, []byte{0x01, 0x02}, nil)
 	database, _ := db.NewDatabase(os.TempDir())
 	database.SaveEntity(entity)
 

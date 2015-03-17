@@ -101,7 +101,7 @@ func (c *VerifyServerController) handlePairVerifyStart(cont_in common.Container)
 	c.session.SetupEncryptionKey([]byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
 
 	bridge := c.context.GetBridge()
-	LTSK := bridge.SecretKey
+	LTSK := bridge.PrivateKey()
 
 	material := make([]byte, 0)
 	material = append(material, c.session.PublicKey[:]...)

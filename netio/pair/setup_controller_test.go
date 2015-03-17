@@ -17,7 +17,7 @@ func TestPairingIntegration(t *testing.T) {
 	database := db.NewDatabaseWithStorage(storage)
 
 	info := netio.NewBridgeInfo("Macbook Bridge", "001-02-003", "Matthias H.", storage)
-	bridge, err := netio.NewBridge(info)
+	bridge, err := netio.NewBridge(info, database)
 	assert.Nil(t, err)
 
 	controller, err := NewSetupServerController(bridge, database)

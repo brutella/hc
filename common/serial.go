@@ -1,38 +1,21 @@
 package common
 
-import (
-	"crypto/md5"
-	"encoding/hex"
-	"time"
-)
-
 // SerialFilenameForName returns the serial file name for a name
-func SerialFilenameForName(name string) string {
+func serialFilenameForName(name string) string {
 	return name + ".serial"
 }
 
 // GetSerialNumberForAccessoryName returns the serial for a specific name stored in storage.
 // When no serial number is stored for this name yet, a new one is created
-// using GenerateSerialNumber()
+// using RandomHexString()
 func GetSerialNumberForAccessoryName(name string, storage Storage) string {
-	serial_file := SerialFilenameForName(name)
+	serial_file := serialFilenameForName(name)
 	serial_bytes, _ := storage.Get(serial_file)
 	serial := string(serial_bytes)
 	if len(serial) == 0 {
-		serial = GenerateSerialNumber()
+		serial = RandomHexString()
 		storage.Set(serial_file, []byte(serial))
 	}
 
 	return serial
-}
-
-// GenerateSerialNumber generates a new serial number using the current time stamp
-func GenerateSerialNumber() string {
-	t := time.Now().Format(time.RFC3339Nano)
-
-	h := md5.New()
-	h.Write([]byte(t))
-	result := h.Sum(nil)
-
-	return hex.EncodeToString(result)
 }

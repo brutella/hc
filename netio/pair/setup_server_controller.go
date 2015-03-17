@@ -208,12 +208,12 @@ func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (com
 		} else {
 			log.Println("[VERB] ed25519 signature is valid")
 			// Store entity LTPK and name
-			entity := db.NewEntity(username, ltpk)
+			entity := db.NewEntity(username, ltpk, nil)
 			c.database.SaveEntity(entity)
 			log.Printf("[INFO] Stored LTPK '%s' for entity '%s'\n", hex.EncodeToString(ltpk), username)
 
-			LTPK := c.bridge.PublicKey
-			LTSK := c.bridge.SecretKey
+			LTPK := c.bridge.PublicKey()
+			LTSK := c.bridge.PrivateKey()
 
 			// Send username, LTPK, signature as encrypted message
 			H2, err := crypto.HKDF_SHA512(c.session.SecretKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
