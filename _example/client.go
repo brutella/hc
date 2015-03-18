@@ -20,7 +20,7 @@ func pairVerify(b io.Reader) (io.Reader, error) {
 }
 
 func sendTLV8(b io.Reader, endpoint string) (io.Reader, error) {
-    url := fmt.Sprintf("http://127.0.0.1:62743/%s", endpoint)
+    url := fmt.Sprintf("http://127.0.0.1:63211/%s", endpoint)
 	resp, err := http.Post(url, netio.HTTPContentTypePairingTLV8, b)
 	return resp.Body, err
 }
@@ -30,7 +30,7 @@ func main() {
     // Use random client name to avoid pairing setup with already paired client 
     name := common.RandomHexString()
     c, _ := netio.NewClient(name, database)
-	client := pair.NewSetupClientController("673-10-149", c, database)
+	client := pair.NewSetupClientController("740-51-881", c, database)
 	pairStartRequest := client.InitialPairingRequest()
 
 	pairStartResponse, err := pairSetup(pairStartRequest)

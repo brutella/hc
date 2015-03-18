@@ -9,25 +9,29 @@ import (
 
 	"bytes"
 	"encoding/hex"
+	"errors"
 )
 
 // SetupServerController handles pairing with a entity using SRP.
 // The entity has to known the bridge password to successfully pair.
-// When pairigin was successful, the entity's public key (refered as LTPK - long term public key)
-// is stored in the database for later use.
+// When pairing was successful, the entity's public key (refered as LTPK - long term public key)
+// is stored in the database.
 //
 // Pairing may fail because the password is wrong or the key exchange failed (e.g. packet seals or SRP key authenticator is wrong, ...).
 type SetupServerController struct {
 	bridge   *netio.Bridge
-	session  *PairSetupServerSession
+	session  *SetupServerSession
 	step     PairStepType
 	database db.Database
 }
 
 // NewSetupServerController returns a new pair setup controller.
 func NewSetupServerController(bridge *netio.Bridge, database db.Database) (*SetupServerController, error) {
+	if len(bridge.PrivateKey()) == 0 {
+		return nil, errors.New("no private key for pairing available")
+	}
 
-	session, err := NewPairSetupServerSession(bridge.Id(), bridge.Password())
+	session, err := NewSetupServerSession(bridge.Id(), bridge.Password())
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +123,7 @@ func (c *SetupServerController) handlePairVerify(cont_in common.Container) (comm
 	cpublicKey := cont_in.GetBytes(TagPublicKey)
 	log.Println("[VERB] ->     A:", hex.EncodeToString(cpublicKey))
 
-	err := c.session.SetupSecretKeyFromClientPublicKey(cpublicKey)
+	err := c.session.SetupPrivateKeyFromClientPublicKey(cpublicKey)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +148,7 @@ func (c *SetupServerController) handlePairVerify(cont_in common.Container) (comm
 	}
 
 	log.Println("[VERB] <-     M2:", hex.EncodeToString(cont_out.GetBytes(TagProof)))
-	log.Println("[VERB]         S:", hex.EncodeToString(c.session.SecretKey))
+	log.Println("[VERB]         S:", hex.EncodeToString(c.session.PrivateKey))
 	log.Println("[VERB]         K:", hex.EncodeToString(c.session.EncryptionKey[:]))
 
 	return cont_out, nil
@@ -195,7 +199,7 @@ func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (com
 		log.Println("[VERB] ->     Signature:", hex.EncodeToString(signature))
 
 		// Calculate `H`
-		H, _ := crypto.HKDF_SHA512(c.session.SecretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
+		H, _ := crypto.HKDF_SHA512(c.session.PrivateKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
 		material := make([]byte, 0)
 		material = append(material, H[:]...)
 		material = append(material, []byte(username)...)
@@ -216,7 +220,7 @@ func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (com
 			LTSK := c.bridge.PrivateKey()
 
 			// Send username, LTPK, signature as encrypted message
-			H2, err := crypto.HKDF_SHA512(c.session.SecretKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
+			H2, err := crypto.HKDF_SHA512(c.session.PrivateKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
 			material = make([]byte, 0)
 			material = append(material, H2[:]...)
 			material = append(material, []byte(c.session.Username)...)

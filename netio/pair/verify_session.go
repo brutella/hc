@@ -7,25 +7,26 @@ import (
 type VerifySession struct {
 	OtherPublicKey [32]byte
 	PublicKey      [32]byte
-	SecretKey      [32]byte
+	PrivateKey     [32]byte
 	SharedKey      [32]byte
 	EncryptionKey  [32]byte
 }
 
+// NewVerifySession creates a new session with random public and private key
 func NewVerifySession() *VerifySession {
-	secretKey := crypto.Curve25519_GenerateSecretKey()
-	publicKey := crypto.Curve25519_PublicKey(secretKey)
+	privateKey := crypto.Curve25519_GeneratePrivateKey()
+	publicKey := crypto.Curve25519_PublicKey(privateKey)
 
 	return &VerifySession{
-		PublicKey: publicKey,
-		SecretKey: secretKey,
+		PublicKey:  publicKey,
+		PrivateKey: privateKey,
 	}
 }
 
 // GenerateSharedKeyWithOtherPublicKey generates a Curve25519 shared key based on a public key.
 // The other public key is also stored for further use in `otherPublicKey` property.
 func (s *VerifySession) GenerateSharedKeyWithOtherPublicKey(otherPublicKey [32]byte) {
-	sharedKey := crypto.Curve25519_SharedSecret(s.SecretKey, otherPublicKey)
+	sharedKey := crypto.Curve25519_SharedSecret(s.PrivateKey, otherPublicKey)
 
 	s.OtherPublicKey = otherPublicKey
 	s.SharedKey = sharedKey

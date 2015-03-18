@@ -89,7 +89,7 @@ func (c *VerifyClientController) handlePairStepVerifyResponse(cont_in common.Con
 
 	fmt.Println("Client")
 	fmt.Println("->   B:", hex.EncodeToString(serverPublicKey))
-	fmt.Println("     S:", hex.EncodeToString(c.session.SecretKey[:]))
+	fmt.Println("     S:", hex.EncodeToString(c.session.PrivateKey[:]))
 	fmt.Println("Shared:", hex.EncodeToString(c.session.SharedKey[:]))
 	fmt.Println("     K:", hex.EncodeToString(c.session.EncryptionKey[:]))
 

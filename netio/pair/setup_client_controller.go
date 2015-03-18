@@ -15,13 +15,13 @@ import (
 
 type SetupClientController struct {
 	client   *netio.Client
-	session  *PairSetupClientSession
+	session  *SetupClientSession
 	database db.Database
 }
 
 func NewSetupClientController(password string, client *netio.Client, database db.Database) *SetupClientController {
 
-	session := NewPairSetupClientSession("Pair-Setup", password)
+	session := NewSetupClientSession("Pair-Setup", password)
 
 	controller := SetupClientController{
 		client:   client,
@@ -101,7 +101,7 @@ func (c *SetupClientController) handlePairStepStartResponse(cont_in common.Conta
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("        S:", hex.EncodeToString(c.session.SecretKey))
+	fmt.Println("        S:", hex.EncodeToString(c.session.PrivateKey))
 
 	// 2) Send public key `A` and proof `M1`
 	publicKey := c.session.PublicKey // SRP public key
@@ -143,7 +143,7 @@ func (c *SetupClientController) handlePairStepVerifyResponse(cont_in common.Cont
 	fmt.Println("        K:", hex.EncodeToString(c.session.EncryptionKey[:]))
 
 	// 2) Send username, LTPK, signature as encrypted message
-	H, err := crypto.HKDF_SHA512(c.session.SecretKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
+	H, err := crypto.HKDF_SHA512(c.session.PrivateKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
 	material := make([]byte, 0)
 	material = append(material, H[:]...)
 	material = append(material, c.client.Id()...)
