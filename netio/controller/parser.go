@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/brutella/hc/common"
+	"fmt"
 	"github.com/gosexy/to"
 	"strings"
 )
@@ -11,7 +11,7 @@ import (
 func ParseAccessoryAndCharacterId(str string) (int64, int64, error) {
 	ids := strings.Split(str, ".")
 	if len(ids) != 2 {
-		return 0, 0, common.NewErrorf("Could not parse uid %s", str)
+		return 0, 0, fmt.Errorf("Could not parse uid %s", str)
 	}
 
 	aid := to.Int64(ids[0])

@@ -1,14 +1,14 @@
 package pair
 
 import (
+	"bytes"
+	"encoding/hex"
+	"fmt"
 	"github.com/brutella/hc/common"
 	"github.com/brutella/hc/crypto"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/netio"
 	"github.com/brutella/log"
-
-	"bytes"
-	"encoding/hex"
 )
 
 // VerifyServerController verifies the stored client public key and negotiates a shared secret
@@ -173,11 +173,11 @@ func (verify *VerifyServerController) handlePairVerifyFinish(in common.Container
 
 		entity := verify.database.EntityWithName(username)
 		if entity == nil {
-			return nil, common.NewErrorf("Client %s is unknown", username)
+			return nil, fmt.Errorf("Client %s is unknown", username)
 		}
 
 		if len(entity.PublicKey()) == 0 {
-			return nil, common.NewErrorf("No LTPK available for client %s", username)
+			return nil, fmt.Errorf("No LTPK available for client %s", username)
 		}
 
 		material := make([]byte, 0)

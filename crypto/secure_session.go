@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 	"io"
 
-	"github.com/brutella/hc/common"
+	"fmt"
 )
 
 // secureSession provide a secure session by encrypting and decrypting data
@@ -102,7 +102,7 @@ func (s *secureSession) Decrypt(r io.Reader) (io.Reader, error) {
 		}
 
 		if length > PacketLengthMax {
-			return nil, common.NewErrorf("Packet size too big %d", length)
+			return nil, fmt.Errorf("Packet size too big %d", length)
 		}
 
 		var buffer = make([]byte, length)
@@ -125,7 +125,7 @@ func (s *secureSession) Decrypt(r io.Reader) (io.Reader, error) {
 		decrypted, err := Chacha20DecryptAndPoly1305Verify(s.decryptKey[:], nonce_bytes[:], buffer, mac, length_bytes)
 
 		if err != nil {
-			return nil, common.NewErrorf("Data encryption failed %s", err)
+			return nil, fmt.Errorf("Data encryption failed %s", err)
 		}
 
 		b.Write(decrypted)

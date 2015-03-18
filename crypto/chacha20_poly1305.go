@@ -4,10 +4,9 @@ import (
 	_ "crypto/cipher"
 	"encoding/binary"
 	"encoding/hex"
+	"errors"
 	"github.com/codahale/chacha20"
 	"github.com/tonnerre/golang-go.crypto/poly1305"
-
-	"github.com/brutella/hc/common"
 )
 
 // Chacha20DecryptAndPoly1305Verify returns the chacha20 decrypted messages.
@@ -52,7 +51,7 @@ func Chacha20DecryptAndPoly1305Verify(key, nonce, message []byte, mac [16]byte, 
 	poly1305.Sum(&poly1305_out, poly1305_in, &poly1305_key)
 
 	if poly1305.Verify(&mac, poly1305_in, &poly1305_key) == false {
-		return nil, common.NewError("MAC not equal: " + hex.EncodeToString(poly1305_out[:]) + " != " + hex.EncodeToString(mac[:]))
+		return nil, errors.New("MAC not equal: " + hex.EncodeToString(poly1305_out[:]) + " != " + hex.EncodeToString(mac[:]))
 	}
 
 	chacha20.XORKeyStream(chacha20_out, message)

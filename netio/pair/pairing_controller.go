@@ -1,6 +1,7 @@
 package pair
 
 import (
+	"fmt"
 	"github.com/brutella/hc/common"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/log"
@@ -51,7 +52,7 @@ func (c *PairingController) Handle(cont common.Container) (common.Container, err
 			return nil, err
 		}
 	default:
-		return nil, common.NewErrorf("Invalid pairing method type %v", method)
+		return nil, fmt.Errorf("Invalid pairing method type %v", method)
 	}
 
 	out := common.NewTLV8Container()

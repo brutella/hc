@@ -79,7 +79,7 @@ func (verify *VerifyClientController) InitialKeyVerifyRequest() io.Reader {
 func (verify *VerifyClientController) handlePairStepVerifyResponse(in common.Container) (common.Container, error) {
 	serverPublicKey := in.GetBytes(TagPublicKey)
 	if len(serverPublicKey) != 32 {
-		return nil, common.NewErrorf("Invalid server public key size %d", len(serverPublicKey))
+		return nil, fmt.Errorf("Invalid server public key size %d", len(serverPublicKey))
 	}
 
 	var otherPublicKey [32]byte
@@ -123,15 +123,15 @@ func (verify *VerifyClientController) handlePairStepVerifyResponse(in common.Con
 
 	entity := verify.database.EntityWithName(username)
 	if entity == nil {
-		return nil, common.NewErrorf("Server %s is unknown", username)
+		return nil, fmt.Errorf("Server %s is unknown", username)
 	}
 
 	if len(entity.PublicKey()) == 0 {
-		return nil, common.NewErrorf("No LTPK available for client %s", username)
+		return nil, fmt.Errorf("No LTPK available for client %s", username)
 	}
 
 	if crypto.ValidateED25519Signature(entity.PublicKey(), material, signature) == false {
-		return nil, common.NewErrorf("Could not validate signature")
+		return nil, fmt.Errorf("Could not validate signature")
 	}
 
 	out := common.NewTLV8Container()

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"github.com/agl/ed25519"
 
-	"github.com/brutella/hc/common"
+	"fmt"
 )
 
 // ValidateED25519Signature return true when the ED25519 signature is a valid signature of the data based on the key, otherwise false.
@@ -24,7 +24,7 @@ func ValidateED25519Signature(key, data, signature []byte) bool {
 // ED25519Signature returns the ED25519 signature of data using the key.
 func ED25519Signature(key, data []byte) ([]byte, error) {
 	if len(key) != ed25519.PrivateKeySize {
-		return nil, common.NewErrorf("Invalid size of key (%d)\n", len(key))
+		return nil, fmt.Errorf("Invalid size of key (%v)", len(key))
 	}
 
 	var k [ed25519.PrivateKeySize]byte

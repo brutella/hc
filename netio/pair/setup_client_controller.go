@@ -83,11 +83,11 @@ func (setup *SetupClientController) handlePairStepStartResponse(in common.Contai
 	serverPublicKey := in.GetBytes(TagPublicKey)
 
 	if len(salt) != 16 {
-		return nil, common.NewErrorf("Salt is invalid (%d bytes)", len(salt))
+		return nil, fmt.Errorf("Salt is invalid (%d bytes)", len(salt))
 	}
 
 	if len(serverPublicKey) != 384 {
-		return nil, common.NewErrorf("B is invalid (%d bytes)", len(serverPublicKey))
+		return nil, fmt.Errorf("B is invalid (%d bytes)", len(serverPublicKey))
 	}
 
 	fmt.Println("->     B:", hex.EncodeToString(serverPublicKey))
@@ -130,7 +130,7 @@ func (setup *SetupClientController) handlePairStepVerifyResponse(in common.Conta
 	fmt.Println("->     M2:", hex.EncodeToString(serverProof))
 
 	if setup.session.IsServerProofValid(serverProof) == false {
-		return nil, common.NewErrorf("M2 %s is invalid", hex.EncodeToString(serverProof))
+		return nil, fmt.Errorf("M2 %s is invalid", hex.EncodeToString(serverProof))
 	}
 
 	err := setup.session.SetupEncryptionKey([]byte("Pair-Setup-Encrypt-Salt"), []byte("Pair-Setup-Encrypt-Info"))

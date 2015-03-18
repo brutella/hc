@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	"github.com/brutella/hc/common"
 	"github.com/gosexy/to"
 )
@@ -75,7 +76,7 @@ func (m *database) EntityWithName(name string) Entity {
 func (m *database) SaveEntity(entity Entity) error {
 	name := entity.Name()
 	if len(entity.PublicKey()) == 0 {
-		return common.NewErrorf("No public key to save for entity%s\n", name)
+		return fmt.Errorf("No public key to save for entity%s\n", name)
 	}
 
 	publicKeyFile := publicKeyFileForEntityName(name)
@@ -94,11 +95,11 @@ func (db *database) DeleteEntity(entity Entity) {
 }
 
 func privateKeyFileForEntityName(name string) string {
-	return name + ".private_key"
+	return name + ".privateKey"
 }
 
 func publicKeyFileForEntityName(name string) string {
-	return name + ".public_key"
+	return name + ".publicKey"
 }
 
 func (db *database) DnsWithName(name string) Dns {
