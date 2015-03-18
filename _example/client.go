@@ -1,35 +1,35 @@
 package main
 
 import (
-	"log"
-    "fmt"
+	"fmt"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/netio"
-    "github.com/brutella/hc/common"
 	"github.com/brutella/hc/netio/pair"
 	"io"
+	"log"
 	"net/http"
 )
 
 func pairSetup(b io.Reader) (io.Reader, error) {
-    return sendTLV8(b, "pair-setup")
+	return sendTLV8(b, "pair-setup")
 }
 
 func pairVerify(b io.Reader) (io.Reader, error) {
-    return sendTLV8(b, "pair-verify")
+	return sendTLV8(b, "pair-verify")
 }
 
 func sendTLV8(b io.Reader, endpoint string) (io.Reader, error) {
-    url := fmt.Sprintf("http://127.0.0.1:63211/%s", endpoint)
+	url := fmt.Sprintf("http://127.0.0.1:49624/%s", endpoint)
 	resp, err := http.Post(url, netio.HTTPContentTypePairingTLV8, b)
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Invalid status code %v", resp.StatusCode)
+	}
 	return resp.Body, err
 }
 
 func main() {
-	database, _ := db.NewTempDatabase()
-    // Use random client name to avoid pairing setup with already paired client 
-    name := common.RandomHexString()
-    c, _ := netio.NewClient(name, database)
+	database, _ := db.NewDatabase("./data")
+	c, _ := netio.NewClient("Golang Client", database)
 	client := pair.NewSetupClientController("740-51-881", c, database)
 	pairStartRequest := client.InitialPairingRequest()
 
@@ -73,7 +73,7 @@ func main() {
 	}
 
 	log.Println("*** Pairing done ***")
-    
+
 	verify := pair.NewVerifyClientController(c, database)
 
 	verifyStartRequest := verify.InitialKeyVerifyRequest()

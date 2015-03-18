@@ -113,6 +113,7 @@ HomeControl depends on the following libraries
 ## TODOs
 
 - Create interfaces for models to hide implementation details *WIP*
+- Return 500 when bridge is already paired (similar how HomeKit Accessory Simulator does it since Xcode 6.3 beta3)
 - On server close, wait until connections are closed
 - Check invalid service and characteristics (e.g. temperature must not be smaller than min and bigger than max)
 - Do not allow value changes of read-only characteristics
