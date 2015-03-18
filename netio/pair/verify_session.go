@@ -34,9 +34,9 @@ func (s *VerifySession) GenerateSharedKeyWithOtherPublicKey(otherPublicKey [32]b
 
 // SetupEncryptionKey generates an encryption key based on the shared key, salt and info.
 func (s *VerifySession) SetupEncryptionKey(salt []byte, info []byte) error {
-	key, err := crypto.HKDF_SHA512(s.SharedKey[:], salt, info)
+	hash, err := crypto.HKDF_SHA512(s.SharedKey[:], salt, info)
 	if err == nil {
-		s.EncryptionKey = key
+		s.EncryptionKey = hash
 	}
 
 	return err

@@ -46,9 +46,9 @@ func (s *SetupClientSession) IsServerProofValid(proof []byte) bool {
 //
 // Only 32 bytes are used from HKDF-SHA512
 func (p *SetupClientSession) SetupEncryptionKey(salt []byte, info []byte) error {
-	key, err := crypto.HKDF_SHA512(p.PrivateKey, salt, info)
+	hash, err := crypto.HKDF_SHA512(p.PrivateKey, salt, info)
 	if err == nil {
-		p.EncryptionKey = key
+		p.EncryptionKey = hash
 	}
 
 	return err

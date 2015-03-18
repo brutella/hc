@@ -28,11 +28,11 @@ func NewVerifyClientController(client *netio.Client, database db.Database) *Veri
 	return &controller
 }
 
-func (c *VerifyClientController) Handle(cont_in common.Container) (common.Container, error) {
-	var cont_out common.Container
+func (verify *VerifyClientController) Handle(in common.Container) (common.Container, error) {
+	var out common.Container
 	var err error
 
-	method := PairMethodType(cont_in.GetByte(TagPairingMethod))
+	method := PairMethodType(in.GetByte(TagPairingMethod))
 
 	// It is valid that method is not sent
 	// If method is sent then it must be 0x00
@@ -40,30 +40,30 @@ func (c *VerifyClientController) Handle(cont_in common.Container) (common.Contai
 		return nil, ErrInvalidPairMethod(method)
 	}
 
-	seq := VerifyStepType(cont_in.GetByte(TagSequence))
+	seq := VerifyStepType(in.GetByte(TagSequence))
 	switch seq {
 	case VerifyStepStartResponse:
-		cont_out, err = c.handlePairStepVerifyResponse(cont_in)
+		out, err = verify.handlePairStepVerifyResponse(in)
 	case VerifyStepFinishResponse:
-		cont_out, err = c.handlePairVerifyStepFinishResponse(cont_in)
+		out, err = verify.handlePairVerifyStepFinishResponse(in)
 	default:
 		return nil, ErrInvalidVerifyStep(seq)
 	}
 
-	return cont_out, err
+	return out, err
 }
 
 // Client -> Server
 // - Public key `A`
-func (c *VerifyClientController) InitialKeyVerifyRequest() io.Reader {
-	cont_out := common.NewTLV8Container()
-	cont_out.SetByte(TagPairingMethod, 0)
-	cont_out.SetByte(TagSequence, VerifyStepStartRequest.Byte())
-	cont_out.SetBytes(TagPublicKey, c.session.PublicKey[:])
+func (verify *VerifyClientController) InitialKeyVerifyRequest() io.Reader {
+	out := common.NewTLV8Container()
+	out.SetByte(TagPairingMethod, 0)
+	out.SetByte(TagSequence, VerifyStepStartRequest.Byte())
+	out.SetBytes(TagPublicKey, verify.session.PublicKey[:])
 
-	fmt.Println("<-     A:", hex.EncodeToString(cont_out.GetBytes(TagPublicKey)))
+	fmt.Println("<-     A:", hex.EncodeToString(out.GetBytes(TagPublicKey)))
 
-	return cont_out.BytesBuffer()
+	return out.BytesBuffer()
 }
 
 // Server -> Client
@@ -76,53 +76,52 @@ func (c *VerifyClientController) InitialKeyVerifyRequest() io.Reader {
 // - encrypted message
 //      - username
 //      - signature: from client session public key, server name, server session public key,
-func (c *VerifyClientController) handlePairStepVerifyResponse(cont_in common.Container) (common.Container, error) {
-	serverPublicKey := cont_in.GetBytes(TagPublicKey)
+func (verify *VerifyClientController) handlePairStepVerifyResponse(in common.Container) (common.Container, error) {
+	serverPublicKey := in.GetBytes(TagPublicKey)
 	if len(serverPublicKey) != 32 {
 		return nil, common.NewErrorf("Invalid server public key size %d", len(serverPublicKey))
 	}
 
 	var otherPublicKey [32]byte
 	copy(otherPublicKey[:], serverPublicKey)
-	c.session.GenerateSharedKeyWithOtherPublicKey(otherPublicKey)
-	c.session.SetupEncryptionKey([]byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
+	verify.session.GenerateSharedKeyWithOtherPublicKey(otherPublicKey)
+	verify.session.SetupEncryptionKey([]byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
 
 	fmt.Println("Client")
 	fmt.Println("->   B:", hex.EncodeToString(serverPublicKey))
-	fmt.Println("     S:", hex.EncodeToString(c.session.PrivateKey[:]))
-	fmt.Println("Shared:", hex.EncodeToString(c.session.SharedKey[:]))
-	fmt.Println("     K:", hex.EncodeToString(c.session.EncryptionKey[:]))
+	fmt.Println("     S:", hex.EncodeToString(verify.session.PrivateKey[:]))
+	fmt.Println("Shared:", hex.EncodeToString(verify.session.SharedKey[:]))
+	fmt.Println("     K:", hex.EncodeToString(verify.session.EncryptionKey[:]))
 
 	// Decrypt
-	data := cont_in.GetBytes(TagEncryptedData)
+	data := in.GetBytes(TagEncryptedData)
 	message := data[:(len(data) - 16)]
 	var mac [16]byte
 	copy(mac[:], data[len(message):]) // 16 byte (MAC)
 
-	decrypted, err := crypto.Chacha20DecryptAndPoly1305Verify(c.session.EncryptionKey[:], []byte("PV-Msg02"), message, mac, nil)
+	decryptedBytes, err := crypto.Chacha20DecryptAndPoly1305Verify(verify.session.EncryptionKey[:], []byte("PV-Msg02"), message, mac, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	decrypted_buffer := bytes.NewBuffer(decrypted)
-	tlv_decrypted, err := common.NewTLV8ContainerFromReader(decrypted_buffer)
+	decryptedIn, err := common.NewTLV8ContainerFromReader(bytes.NewBuffer(decryptedBytes))
 	if err != nil {
 		return nil, err
 	}
 
-	username := tlv_decrypted.GetString(TagUsername)
-	signature := tlv_decrypted.GetBytes(TagSignature)
+	username := decryptedIn.GetString(TagUsername)
+	signature := decryptedIn.GetBytes(TagSignature)
 
 	fmt.Println("    Username:", username)
 	fmt.Println("   Signature:", hex.EncodeToString(signature))
 
 	// Validate signature
 	material := make([]byte, 0)
-	material = append(material, c.session.OtherPublicKey[:]...)
+	material = append(material, verify.session.OtherPublicKey[:]...)
 	material = append(material, username...)
-	material = append(material, c.session.PublicKey[:]...)
+	material = append(material, verify.session.PublicKey[:]...)
 
-	entity := c.database.EntityWithName(username)
+	entity := verify.database.EntityWithName(username)
 	if entity == nil {
 		return nil, common.NewErrorf("Server %s is unknown", username)
 	}
@@ -135,36 +134,36 @@ func (c *VerifyClientController) handlePairStepVerifyResponse(cont_in common.Con
 		return nil, common.NewErrorf("Could not validate signature")
 	}
 
-	cont_out := common.NewTLV8Container()
-	cont_out.SetByte(TagPairingMethod, PairingMethodDefault)
-	cont_out.SetByte(TagSequence, VerifyStepFinishRequest.Byte())
+	out := common.NewTLV8Container()
+	out.SetByte(TagPairingMethod, PairingMethodDefault)
+	out.SetByte(TagSequence, VerifyStepFinishRequest.Byte())
 
-	tlv_encrypt := common.NewTLV8Container()
-	tlv_encrypt.SetString(TagUsername, c.client.Id())
+	encryptedOut := common.NewTLV8Container()
+	encryptedOut.SetString(TagUsername, verify.client.Id())
 
 	material = make([]byte, 0)
-	material = append(material, c.session.PublicKey[:]...)
-	material = append(material, c.client.Id()...)
-	material = append(material, c.session.OtherPublicKey[:]...)
+	material = append(material, verify.session.PublicKey[:]...)
+	material = append(material, verify.client.Id()...)
+	material = append(material, verify.session.OtherPublicKey[:]...)
 
-	signature, err = crypto.ED25519Signature(c.client.PrivateKey(), material)
+	signature, err = crypto.ED25519Signature(verify.client.PrivateKey(), material)
 	if err != nil {
 		return nil, err
 	}
 
-	tlv_encrypt.SetBytes(TagSignature, signature)
+	encryptedOut.SetBytes(TagSignature, signature)
 
-	encrypted, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(c.session.EncryptionKey[:], []byte("PV-Msg03"), tlv_encrypt.BytesBuffer().Bytes(), nil)
+	encryptedBytes, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(verify.session.EncryptionKey[:], []byte("PV-Msg03"), encryptedOut.BytesBuffer().Bytes(), nil)
 
-	cont_out.SetBytes(TagEncryptedData, append(encrypted, mac[:]...))
+	out.SetBytes(TagEncryptedData, append(encryptedBytes, mac[:]...))
 
-	return cont_out, nil
+	return out, nil
 }
 
 // Server -> Client
 // - only error ocde (optional)
-func (c *VerifyClientController) handlePairVerifyStepFinishResponse(cont_in common.Container) (common.Container, error) {
-	code := ErrCode(cont_in.GetByte(TagErrCode))
+func (verify *VerifyClientController) handlePairVerifyStepFinishResponse(in common.Container) (common.Container, error) {
+	code := ErrCode(in.GetByte(TagErrCode))
 	if code != ErrCodeNo {
 		fmt.Printf("Unexpected error %v\n", code)
 	}

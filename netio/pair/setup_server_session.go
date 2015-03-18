@@ -64,9 +64,9 @@ func (p *SetupServerSession) SetupPrivateKeyFromClientPublicKey(key []byte) erro
 //
 // Only 32 bytes are used from HKDF-SHA512
 func (p *SetupServerSession) SetupEncryptionKey(salt []byte, info []byte) error {
-	key, err := crypto.HKDF_SHA512(p.PrivateKey, salt, info)
+	hash, err := crypto.HKDF_SHA512(p.PrivateKey, salt, info)
 	if err == nil {
-		p.EncryptionKey = key
+		p.EncryptionKey = hash
 	}
 
 	return err

@@ -14,7 +14,7 @@ import (
 
 // SetupServerController handles pairing with a entity using SRP.
 // The entity has to known the bridge password to successfully pair.
-// When pairing was successful, the entity's public key (refered as LTPK - long term public key)
+// When pairing was successful, the entity's public key (refered as ltpk - long term public key)
 // is stored in the database.
 //
 // Pairing may fail because the password is wrong or the key exchange failed (e.g. packet seals or SRP key authenticator is wrong, ...).
@@ -46,44 +46,44 @@ func NewSetupServerController(bridge *netio.Bridge, database db.Database) (*Setu
 	return &controller, nil
 }
 
-func (c *SetupServerController) Handle(cont_in common.Container) (cont_out common.Container, err error) {
-	method := PairMethodType(cont_in.GetByte(TagPairingMethod))
+func (setup *SetupServerController) Handle(in common.Container) (out common.Container, err error) {
+	method := PairMethodType(in.GetByte(TagPairingMethod))
 
-	// It is valid that method is not sent
-	// If method is sent then it must be 0x00
+	// It is valid that pair method is not sent
+	// If method set then it must be 0x00
 	if method != PairingMethodDefault {
 		return nil, ErrInvalidPairMethod(method)
 	}
 
-	seq := PairStepType(cont_in.GetByte(TagSequence))
+	seq := PairStepType(in.GetByte(TagSequence))
 
 	switch seq {
 	case PairStepStartRequest:
-		if c.step != PairStepWaiting {
-			c.reset()
-			return nil, ErrInvalidInternalPairStep(c.step)
+		if setup.step != PairStepWaiting {
+			setup.reset()
+			return nil, ErrInvalidInternalPairStep(setup.step)
 		}
 
-		cont_out, err = c.handlePairStart(cont_in)
+		out, err = setup.handlePairStart(in)
 	case PairStepVerifyRequest:
-		if c.step != PairStepStartResponse {
-			c.reset()
-			return nil, ErrInvalidInternalPairStep(c.step)
+		if setup.step != PairStepStartResponse {
+			setup.reset()
+			return nil, ErrInvalidInternalPairStep(setup.step)
 		}
 
-		cont_out, err = c.handlePairVerify(cont_in)
+		out, err = setup.handlePairVerify(in)
 	case PairStepKeyExchangeRequest:
-		if c.step != PairStepVerifyResponse {
-			c.reset()
-			return nil, ErrInvalidInternalPairStep(c.step)
+		if setup.step != PairStepVerifyResponse {
+			setup.reset()
+			return nil, ErrInvalidInternalPairStep(setup.step)
 		}
 
-		cont_out, err = c.handleKeyExchange(cont_in)
+		out, err = setup.handleKeyExchange(in)
 	default:
 		return nil, ErrInvalidPairStep(seq)
 	}
 
-	return cont_out, err
+	return out, err
 }
 
 // Client -> Server
@@ -92,18 +92,18 @@ func (c *SetupServerController) Handle(cont_in common.Container) (cont_out commo
 // Server -> Client
 // - B: server public key
 // - s: salt
-func (c *SetupServerController) handlePairStart(cont_in common.Container) (common.Container, error) {
-	cont_out := common.NewTLV8Container()
-	c.step = PairStepStartResponse
+func (setup *SetupServerController) handlePairStart(in common.Container) (common.Container, error) {
+	out := common.NewTLV8Container()
+	setup.step = PairStepStartResponse
 
-	cont_out.SetByte(TagSequence, c.step.Byte())
-	cont_out.SetBytes(TagPublicKey, c.session.PublicKey)
-	cont_out.SetBytes(TagSalt, c.session.Salt)
+	out.SetByte(TagSequence, setup.step.Byte())
+	out.SetBytes(TagPublicKey, setup.session.PublicKey)
+	out.SetBytes(TagSalt, setup.session.Salt)
 
-	log.Println("[VERB] <-     B:", hex.EncodeToString(cont_out.GetBytes(TagPublicKey)))
-	log.Println("[VERB] <-     s:", hex.EncodeToString(cont_out.GetBytes(TagSalt)))
+	log.Println("[VERB] <-     B:", hex.EncodeToString(out.GetBytes(TagPublicKey)))
+	log.Println("[VERB] <-     s:", hex.EncodeToString(out.GetBytes(TagSalt)))
 
-	return cont_out, nil
+	return out, nil
 }
 
 // Client -> Server
@@ -114,146 +114,145 @@ func (c *SetupServerController) handlePairStart(cont_in common.Container) (commo
 // - M2: proof
 // or
 // - auth error
-func (c *SetupServerController) handlePairVerify(cont_in common.Container) (common.Container, error) {
-	cont_out := common.NewTLV8Container()
-	c.step = PairStepVerifyResponse
+func (setup *SetupServerController) handlePairVerify(in common.Container) (common.Container, error) {
+	setup.step = PairStepVerifyResponse
+	out := common.NewTLV8Container()
+	out.SetByte(TagSequence, setup.step.Byte())
 
-	cont_out.SetByte(TagSequence, c.step.Byte())
+	clientPublicKey := in.GetBytes(TagPublicKey)
+	log.Println("[VERB] ->     A:", hex.EncodeToString(clientPublicKey))
 
-	cpublicKey := cont_in.GetBytes(TagPublicKey)
-	log.Println("[VERB] ->     A:", hex.EncodeToString(cpublicKey))
-
-	err := c.session.SetupPrivateKeyFromClientPublicKey(cpublicKey)
+	err := setup.session.SetupPrivateKeyFromClientPublicKey(clientPublicKey)
 	if err != nil {
 		return nil, err
 	}
 
-	cproof := cont_in.GetBytes(TagProof)
-	log.Println("[VERB] ->     M1:", hex.EncodeToString(cproof))
+	clientProof := in.GetBytes(TagProof)
+	log.Println("[VERB] ->     M1:", hex.EncodeToString(clientProof))
 
-	sproof, err := c.session.ProofFromClientProof(cproof)
-	if err != nil || len(sproof) == 0 { // proof `M1` is wrong
+	proof, err := setup.session.ProofFromClientProof(clientProof)
+	if err != nil || len(proof) == 0 { // proof `M1` is wrong
 		log.Println("[WARN] Proof M1 is wrong")
-		c.reset()
-		cont_out.SetByte(TagErrCode, ErrCodeAuthenticationFailed.Byte()) // return error 2
+		setup.reset()
+		out.SetByte(TagErrCode, ErrCodeAuthenticationFailed.Byte()) // return error 2
 	} else {
 		log.Println("[INFO] Proof M1 is valid")
-		err := c.session.SetupEncryptionKey([]byte("Pair-Setup-Encrypt-Salt"), []byte("Pair-Setup-Encrypt-Info"))
+		err := setup.session.SetupEncryptionKey([]byte("Pair-Setup-Encrypt-Salt"), []byte("Pair-Setup-Encrypt-Info"))
 		if err != nil {
 			return nil, err
 		}
 
-		// Return proof `M1`
-		cont_out.SetBytes(TagProof, sproof)
+		// Return proof `M2`
+		out.SetBytes(TagProof, proof)
 	}
 
-	log.Println("[VERB] <-     M2:", hex.EncodeToString(cont_out.GetBytes(TagProof)))
-	log.Println("[VERB]         S:", hex.EncodeToString(c.session.PrivateKey))
-	log.Println("[VERB]         K:", hex.EncodeToString(c.session.EncryptionKey[:]))
+	log.Println("[VERB] <-     M2:", hex.EncodeToString(out.GetBytes(TagProof)))
+	log.Println("[VERB]         S:", hex.EncodeToString(setup.session.PrivateKey))
+	log.Println("[VERB]         K:", hex.EncodeToString(setup.session.EncryptionKey[:]))
 
-	return cont_out, nil
+	return out, nil
 }
 
 // Client -> Server
-// - encrypted tlv8: entity LTPK, entity name and signature (of H, entity name, LTPK)
+// - encrypted tlv8: entity ltpk, entity name and signature (of H, entity name, ltpk)
 // - auth tag (mac)
 //
 // Server
 // - Validate signature of encrpyted tlv8
-// - Read and store entity LTPK and name
+// - Read and store entity ltpk and name
 //
 // Server -> Client
-// - encrpyted tlv8: bridge LTPK, bridge name, signature (of H2, bridge name, LTPK)
-func (c *SetupServerController) handleKeyExchange(cont_in common.Container) (common.Container, error) {
-	cont_out := common.NewTLV8Container()
+// - encrpyted tlv8: bridge ltpk, bridge name, signature (of hash, bridge name, ltpk)
+func (setup *SetupServerController) handleKeyExchange(in common.Container) (common.Container, error) {
+	out := common.NewTLV8Container()
 
-	c.step = PairStepKeyExchangeResponse
+	setup.step = PairStepKeyExchangeResponse
 
-	cont_out.SetByte(TagSequence, c.step.Byte())
+	out.SetByte(TagSequence, setup.step.Byte())
 
-	data := cont_in.GetBytes(TagEncryptedData)
+	data := in.GetBytes(TagEncryptedData)
 	message := data[:(len(data) - 16)]
 	var mac [16]byte
 	copy(mac[:], data[len(message):]) // 16 byte (MAC)
 	log.Println("[VERB] ->     Message:", hex.EncodeToString(message))
 	log.Println("[VERB] ->     MAC:", hex.EncodeToString(mac[:]))
 
-	decrypted, err := crypto.Chacha20DecryptAndPoly1305Verify(c.session.EncryptionKey[:], []byte("PS-Msg05"), message, mac, nil)
+	decrypted, err := crypto.Chacha20DecryptAndPoly1305Verify(setup.session.EncryptionKey[:], []byte("PS-Msg05"), message, mac, nil)
 
 	if err != nil {
-		c.reset()
+		setup.reset()
 		log.Println("[ERRO]", err)
-		cont_out.SetByte(TagErrCode, ErrCodeUnknown.Byte()) // return error 1
+		out.SetByte(TagErrCode, ErrCodeUnknown.Byte()) // return error 1
 	} else {
 		decrypted_buffer := bytes.NewBuffer(decrypted)
-		cont_in, err := common.NewTLV8ContainerFromReader(decrypted_buffer)
+		in, err := common.NewTLV8ContainerFromReader(decrypted_buffer)
 		if err != nil {
 			return nil, err
 		}
 
-		username := cont_in.GetString(TagUsername)
-		ltpk := cont_in.GetBytes(TagPublicKey)
-		signature := cont_in.GetBytes(TagSignature)
+		username := in.GetString(TagUsername)
+		clientltpk := in.GetBytes(TagPublicKey)
+		signature := in.GetBytes(TagSignature)
 		log.Println("[VERB] ->     Username:", username)
-		log.Println("[VERB] ->     LTPK:", hex.EncodeToString(ltpk))
+		log.Println("[VERB] ->     ltpk:", hex.EncodeToString(clientltpk))
 		log.Println("[VERB] ->     Signature:", hex.EncodeToString(signature))
 
-		// Calculate `H`
-		H, _ := crypto.HKDF_SHA512(c.session.PrivateKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
+		// Calculate hash `H`
+		hash, _ := crypto.HKDF_SHA512(setup.session.PrivateKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
 		material := make([]byte, 0)
-		material = append(material, H[:]...)
+		material = append(material, hash[:]...)
 		material = append(material, []byte(username)...)
-		material = append(material, ltpk...)
+		material = append(material, clientltpk...)
 
-		if crypto.ValidateED25519Signature(ltpk, material, signature) == false {
+		if crypto.ValidateED25519Signature(clientltpk, material, signature) == false {
 			log.Println("[WARN] ed25519 signature is invalid")
-			c.reset()
-			cont_out.SetByte(TagErrCode, ErrCodeAuthenticationFailed.Byte()) // return error 2
+			setup.reset()
+			out.SetByte(TagErrCode, ErrCodeAuthenticationFailed.Byte()) // return error 2
 		} else {
 			log.Println("[VERB] ed25519 signature is valid")
-			// Store entity LTPK and name
-			entity := db.NewEntity(username, ltpk, nil)
-			c.database.SaveEntity(entity)
-			log.Printf("[INFO] Stored LTPK '%s' for entity '%s'\n", hex.EncodeToString(ltpk), username)
+			// Store entity ltpk and name
+			entity := db.NewEntity(username, clientltpk, nil)
+			setup.database.SaveEntity(entity)
+			log.Printf("[INFO] Stored ltpk '%s' for entity '%s'\n", hex.EncodeToString(clientltpk), username)
 
-			LTPK := c.bridge.PublicKey()
-			LTSK := c.bridge.PrivateKey()
+			ltpk := setup.bridge.PublicKey()
+			ltsk := setup.bridge.PrivateKey()
 
-			// Send username, LTPK, signature as encrypted message
-			H2, err := crypto.HKDF_SHA512(c.session.PrivateKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
+			// Send username, ltpk, signature as encrypted message
+			hash, err := crypto.HKDF_SHA512(setup.session.PrivateKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
 			material = make([]byte, 0)
-			material = append(material, H2[:]...)
-			material = append(material, []byte(c.session.Username)...)
-			material = append(material, LTPK...)
+			material = append(material, hash[:]...)
+			material = append(material, []byte(setup.session.Username)...)
+			material = append(material, ltpk...)
 
-			signature, err := crypto.ED25519Signature(LTSK, material)
+			signature, err := crypto.ED25519Signature(ltsk, material)
 			if err != nil {
 				log.Fatal(err)
 				return nil, err
 			}
 
 			tlvPairKeyExchange := common.NewTLV8Container()
-			tlvPairKeyExchange.SetBytes(TagUsername, c.session.Username)
-			tlvPairKeyExchange.SetBytes(TagPublicKey, LTPK)
+			tlvPairKeyExchange.SetBytes(TagUsername, setup.session.Username)
+			tlvPairKeyExchange.SetBytes(TagPublicKey, ltpk)
 			tlvPairKeyExchange.SetBytes(TagSignature, []byte(signature))
 
 			log.Println("[VERB] <-     Username:", tlvPairKeyExchange.GetString(TagUsername))
-			log.Println("[VERB] <-     LTPK:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TagPublicKey)))
+			log.Println("[VERB] <-     ltpk:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TagPublicKey)))
 			log.Println("[VERB] <-     Signature:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TagSignature)))
 
-			encrypted, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(c.session.EncryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)
-			cont_out.SetByte(TagPairingMethod, 0)
-			cont_out.SetByte(TagSequence, PairStepKeyExchangeRequest.Byte())
-			cont_out.SetBytes(TagEncryptedData, append(encrypted, mac[:]...))
+			encrypted, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(setup.session.EncryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)
+			out.SetByte(TagPairingMethod, 0)
+			out.SetByte(TagSequence, PairStepKeyExchangeRequest.Byte())
+			out.SetBytes(TagEncryptedData, append(encrypted, mac[:]...))
 
-			c.reset()
+			setup.reset()
 		}
 	}
 
-	return cont_out, nil
+	return out, nil
 }
 
-func (c *SetupServerController) reset() {
-	c.step = PairStepWaiting
+func (setup *SetupServerController) reset() {
+	setup.step = PairStepWaiting
 	// TODO: reset session
 }
