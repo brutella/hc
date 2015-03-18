@@ -139,14 +139,14 @@ func (verify *VerifyClientController) handlePairStepVerifyResponse(in common.Con
 	out.SetByte(TagSequence, VerifyStepFinishRequest.Byte())
 
 	encryptedOut := common.NewTLV8Container()
-	encryptedOut.SetString(TagUsername, verify.client.Id())
+	encryptedOut.SetString(TagUsername, verify.client.PairUsername())
 
 	material = make([]byte, 0)
 	material = append(material, verify.session.PublicKey[:]...)
-	material = append(material, verify.client.Id()...)
+	material = append(material, verify.client.PairUsername()...)
 	material = append(material, verify.session.OtherPublicKey[:]...)
 
-	signature, err = crypto.ED25519Signature(verify.client.PrivateKey(), material)
+	signature, err = crypto.ED25519Signature(verify.client.PairPrivateKey(), material)
 	if err != nil {
 		return nil, err
 	}

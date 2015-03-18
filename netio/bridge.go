@@ -40,12 +40,16 @@ func (b *Bridge) Password() string {
 	return b.info.Password
 }
 
+func (b *Bridge) PairUsername() string {
+	return b.Id()
+}
+
 // PrivateKey returns the bridge private key
-func (b *Bridge) PrivateKey() []byte {
+func (b *Bridge) PairPrivateKey() []byte {
 	return b.entity.PrivateKey()
 }
 
 // PublicKey returns the bridge public key
-func (b *Bridge) PublicKey() []byte {
+func (b *Bridge) PairPublicKey() []byte {
 	return b.entity.PublicKey()
 }

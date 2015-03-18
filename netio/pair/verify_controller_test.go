@@ -45,12 +45,12 @@ func TestPairVerifyIntegration(t *testing.T) {
 	controller := NewVerifyServerController(database, context)
 
 	client_database, _ := db.NewTempDatabase()
-	bridge_entity := db.NewEntity(bridge.Id(), bridge.PublicKey(), nil)
+	bridge_entity := db.NewEntity(bridge.PairUsername(), bridge.PairPublicKey(), nil)
 	err = client_database.SaveEntity(bridge_entity)
 	assert.Nil(t, err)
 
 	client, _ := netio.NewClient("HomeKit Client", client_database)
-	client_entity := db.NewEntity(client.Id(), client.PublicKey(), nil)
+	client_entity := db.NewEntity(client.PairUsername(), client.PairPublicKey(), nil)
 	err = database.SaveEntity(client_entity)
 	assert.Nil(t, err)
 

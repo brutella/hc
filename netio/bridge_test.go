@@ -13,6 +13,6 @@ func TestNewBridge(t *testing.T) {
 	db := db.NewDatabaseWithStorage(storage)
 	bridge, err := NewBridge(info, db)
 	assert.Nil(t, err)
-	assert.True(t, len(bridge.PublicKey()) > 0)
-	assert.True(t, len(bridge.PrivateKey()) > 0)
+	assert.True(t, len(bridge.PairPublicKey()) > 0)
+	assert.True(t, len(bridge.PairPrivateKey()) > 0)
 }

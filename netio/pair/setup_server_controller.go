@@ -27,11 +27,11 @@ type SetupServerController struct {
 
 // NewSetupServerController returns a new pair setup controller.
 func NewSetupServerController(bridge *netio.Bridge, database db.Database) (*SetupServerController, error) {
-	if len(bridge.PrivateKey()) == 0 {
+	if len(bridge.PairPrivateKey()) == 0 {
 		return nil, errors.New("no private key for pairing available")
 	}
 
-	session, err := NewSetupServerSession(bridge.Id(), bridge.Password())
+	session, err := NewSetupServerSession(bridge.PairUsername(), bridge.Password())
 	if err != nil {
 		return nil, err
 	}
@@ -215,8 +215,8 @@ func (setup *SetupServerController) handleKeyExchange(in common.Container) (comm
 			setup.database.SaveEntity(entity)
 			log.Printf("[INFO] Stored ltpk '%s' for entity '%s'\n", hex.EncodeToString(clientltpk), username)
 
-			ltpk := setup.bridge.PublicKey()
-			ltsk := setup.bridge.PrivateKey()
+			ltpk := setup.bridge.PairPublicKey()
+			ltsk := setup.bridge.PairPrivateKey()
 
 			// Send username, ltpk, signature as encrypted message
 			hash, err := crypto.HKDF_SHA512(setup.session.PrivateKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
