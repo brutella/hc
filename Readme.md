@@ -119,6 +119,7 @@ HomeControl depends on the following libraries
 - Do not allow value changes of read-only characteristics
 - Add fan, garage door opener, lock management and mechanism accessory types
 - Put vendor packages into vendor dir
+- Rethink serial number generation
 
 ## HomeKit Accessories
 
