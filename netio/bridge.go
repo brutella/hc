@@ -20,6 +20,9 @@ func NewBridge(info BridgeInfo, database db.Database) (*Bridge, error) {
 	entity := database.EntityWithName(info.Id)
 	if entity == nil {
 		entity, err = db.NewRandomEntityWithName(info.Id)
+		if err == nil {
+			err = database.SaveEntity(entity)
+		}
 	}
 
 	return &Bridge{info, entity}, err
