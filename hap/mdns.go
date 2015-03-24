@@ -12,7 +12,8 @@ import (
 	"strings"
 )
 
-type Service struct {
+// MDNSService represents a mDNS service.
+type MDNSService struct {
 	name          string
 	port          int
 	protocol      string // Protocol version (pv) (Default 1.0)
@@ -25,8 +26,9 @@ type Service struct {
 	server *bonjour.Server
 }
 
-func NewService(name, id string, port int) *Service {
-	return &Service{
+// NewMDNSService returns a new service based for the bridge name, id and port.
+func NewMDNSService(name, id string, port int) *MDNSService {
+	return &MDNSService{
 		name:          name,
 		port:          port,
 		protocol:      "1.0",
@@ -38,11 +40,13 @@ func NewService(name, id string, port int) *Service {
 	}
 }
 
-func (s *Service) IsPublished() bool {
+// IsPublished returns true when the HAP service is published.
+func (s *MDNSService) IsPublished() bool {
 	return s.server != nil
 }
 
-func (s *Service) Publish() error {
+// Publish announces the HAP service for the machine's ip address on a random port used mDNS.
+func (s *MDNSService) Publish() error {
 	ip, err := GetFirstLocalIPAddress()
 	if err != nil {
 		return err
@@ -62,21 +66,22 @@ func (s *Service) Publish() error {
 	return err
 }
 
-func (s *Service) Update() {
+// Update updates the mDNS txt records.
+func (s *MDNSService) Update() {
 	if s.server != nil {
 		s.server.SetText(s.txtRecords())
 		log.Println("[INFO]", s.txtRecords())
 	}
 }
 
-func (s *Service) Stop() {
+// Stop stops the running mDNS service.
+func (s *MDNSService) Stop() {
 	s.server.Shutdown()
 	s.server = nil
 }
 
-// Returns the first available IP address of the local machine
-// This is a fix for Beaglebone Black where net.LookupIP(hostname)
-// return no IP address
+// GetFirstLocalIPAddress returns the first available IP address of the local machine
+// This is a fix for Beaglebone Black where net.LookupIP(hostname) return no IP address.
 func GetFirstLocalIPAddress() (net.IP, error) {
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
@@ -94,7 +99,7 @@ func GetFirstLocalIPAddress() (net.IP, error) {
 	return nil, errors.New("Could not determine ip address")
 }
 
-func (s *Service) txtRecords() []string {
+func (s *MDNSService) txtRecords() []string {
 	return []string{
 		fmt.Sprintf("pv=%s", s.protocol),
 		fmt.Sprintf("id=%s", s.id),

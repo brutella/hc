@@ -5,27 +5,40 @@ import (
 	"fmt"
 )
 
-type ErrCode byte
+type errCode byte
 
 const (
-	ErrCodeNo                        ErrCode = 0x00
-	ErrCodeUnknown                   ErrCode = 0x01
-	ErrCodeAuthenticationFailed      ErrCode = 0x02 // e.g. client proof `M1` is wrong
-	ErrCodeTooManyAttempts           ErrCode = 0x03
-	ErrCodeUnknownPeer               ErrCode = 0x04
-	ErrCodeMaxPeer                   ErrCode = 0x05
-	ErrCodeMaxAuthenticationAttempts ErrCode = 0x06
+	// ErrCodeNo is code for no error
+	ErrCodeNo errCode = 0x00
+
+	// ErrCodeUnknown is code for unknown error
+	ErrCodeUnknown errCode = 0x01
+
+	// ErrCodeAuthenticationFailed is code for authentication error e.g. client proof is wrong
+	ErrCodeAuthenticationFailed errCode = 0x02
+
+	// ErrCodeTooManyAttempts is code for too many attempts error (not used)
+	ErrCodeTooManyAttempts errCode = 0x03
+
+	// ErrCodeUnknownPeer is code for unknown accessory or client error
+	ErrCodeUnknownPeer errCode = 0x04
+
+	// ErrCodeMaxPeer is code for reaching maximum number of peers error (not used)
+	ErrCodeMaxPeer errCode = 0x05
+
+	// ErrCodeMaxAuthenticationAttempts is code for reaching maximum number of authentication attemps error (not used)
+	ErrCodeMaxAuthenticationAttempts errCode = 0x06
 )
 
-func (t ErrCode) Byte() byte {
+func (t errCode) Byte() byte {
 	return byte(t)
 }
 
-func (t ErrCode) Error() error {
+func (t errCode) Error() error {
 	return errors.New(t.String())
 }
 
-func (t ErrCode) String() string {
+func (t errCode) String() string {
 	switch t {
 	case ErrCodeNo:
 		return "None"

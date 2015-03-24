@@ -4,8 +4,8 @@ package model
 type Characteristic interface {
 	Compareable
 
-	// GetId returns the characteristic's id
-	GetId() int64
+	// GetID returns the characteristic's id
+	GetID() int64
 
 	// GetValue returns the raw value
 	GetValue() interface{}

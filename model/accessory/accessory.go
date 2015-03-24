@@ -13,7 +13,7 @@ import (
 // Every accessory has the "accessory info" service by default which consists
 // of characteristics to identify the accessory: name, model, manufacturer,...
 type Accessory struct {
-	Id       int64              `json:"aid"`
+	ID       int64              `json:"aid"`
 	Services []*service.Service `json:"services"`
 
 	Info    *service.AccessoryInfo `json:"-"`
@@ -28,7 +28,7 @@ func New(info model.Info) *Accessory {
 	a := &Accessory{
 		idCount: 1,
 		Info:    i,
-		Id:      model.InvalidId,
+		ID:      model.InvalidID,
 	}
 
 	a.AddService(i.Service)
@@ -42,12 +42,12 @@ func New(info model.Info) *Accessory {
 	return a
 }
 
-func (a *Accessory) SetId(id int64) {
-	a.Id = id
+func (a *Accessory) SetID(id int64) {
+	a.ID = id
 }
 
-func (a *Accessory) GetId() int64 {
-	return a.Id
+func (a *Accessory) GetID() int64 {
+	return a.ID
 }
 
 func (a *Accessory) GetServices() []model.Service {
@@ -104,17 +104,18 @@ func (a *Accessory) OnIdentify(fn func()) {
 
 // Adds a service to the accessory and updates the ids of the service and the corresponding characteristics
 func (a *Accessory) AddService(s *service.Service) {
-	s.SetId(a.idCount)
-	a.idCount += 1
+	s.SetID(a.idCount)
+	a.idCount++
 
 	for _, c := range s.Characteristics {
-		c.SetId(a.idCount)
-		a.idCount += 1
+		c.SetID(a.idCount)
+		a.idCount++
 	}
 
 	a.Services = append(a.Services, s)
 }
 
+// Equal returns true when receiver has the same services and id as the argument.
 func (a *Accessory) Equal(other interface{}) bool {
 	if accessory, ok := other.(*Accessory); ok == true {
 		if len(a.Services) != len(accessory.Services) {
@@ -127,7 +128,7 @@ func (a *Accessory) Equal(other interface{}) bool {
 			}
 		}
 
-		return a.Id == accessory.Id
+		return a.ID == accessory.ID
 	}
 
 	return false

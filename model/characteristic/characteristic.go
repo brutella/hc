@@ -11,7 +11,7 @@ type ChangeFunc func(c *Characteristic, newValue, oldValue interface{})
 
 // Characteristic is a HomeKit characteristic.
 type Characteristic struct {
-	Id          int64    `json:"iid"` // managed by accessory
+	ID          int64    `json:"iid"` // managed by accessory
 	Type        CharType `json:"type"`
 	Permissions []string `json:"perms"`
 	Description string   `json:"description,omitempty"` // manufacturer description (optional)
@@ -55,7 +55,7 @@ func NewCharacteristic(value interface{}, format string, t CharType, permissions
 	}
 
 	return &Characteristic{
-		Id:                model.InvalidId,
+		ID:                model.InvalidID,
 		Value:             value,
 		Format:            format,
 		Type:              t,
@@ -90,7 +90,7 @@ func (c *Characteristic) OnRemoteChange(fn ChangeFunc) {
 	c.remoteChangeFuncs = append(c.remoteChangeFuncs, fn)
 }
 
-// Compareable
+// Equal returns true when receiver has the values as the argument.
 func (c *Characteristic) Equal(other interface{}) bool {
 	if characteristic, ok := other.(*Characteristic); ok == true {
 		// The value type (e.g. float32, bool,...) of property `Value` may be different even though
@@ -98,19 +98,19 @@ func (c *Characteristic) Equal(other interface{}) bool {
 		value := fmt.Sprintf("%+v", c.Value)
 		otherValue := fmt.Sprintf("%+v", characteristic.Value)
 
-		return value == otherValue && c.Id == characteristic.Id && c.Type == characteristic.Type && len(c.Permissions) == len(characteristic.Permissions) && c.Description == characteristic.Description && c.Format == characteristic.Format && c.Unit == characteristic.Unit && c.MaxLen == characteristic.MaxLen && c.MaxValue == characteristic.MaxValue && c.MinValue == characteristic.MinValue && c.MinStep == characteristic.MinStep && c.Events == characteristic.Events
+		return value == otherValue && c.ID == characteristic.ID && c.Type == characteristic.Type && len(c.Permissions) == len(characteristic.Permissions) && c.Description == characteristic.Description && c.Format == characteristic.Format && c.Unit == characteristic.Unit && c.MaxLen == characteristic.MaxLen && c.MaxValue == characteristic.MaxValue && c.MinValue == characteristic.MinValue && c.MinStep == characteristic.MinStep && c.Events == characteristic.Events
 	}
 
 	return false
 }
 
 // model.Characteristic
-func (c *Characteristic) SetId(id int64) {
-	c.Id = id
+func (c *Characteristic) SetID(id int64) {
+	c.ID = id
 }
 
-func (c *Characteristic) GetId() int64 {
-	return c.Id
+func (c *Characteristic) GetID() int64 {
+	return c.ID
 }
 
 func (c *Characteristic) GetValue() interface{} {

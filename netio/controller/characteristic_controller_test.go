@@ -27,8 +27,8 @@ func TestGetCharacteristic(t *testing.T) {
 	m := container.NewContainer()
 	m.AddAccessory(a)
 
-	aid := a.GetId()
-	cid := a.Info.Name.GetId()
+	aid := a.GetID()
+	cid := a.Info.Name.GetID()
 	values := getCharacteristicValues(aid, cid)
 	controller := NewCharacteristicController(m)
 	res, err := controller.HandleGetCharacteristics(values)
@@ -57,10 +57,10 @@ func TestPutCharacteristic(t *testing.T) {
 	m := container.NewContainer()
 	m.AddAccessory(a)
 
-	aid := a.GetId()
-	cid := a.Info.Name.GetId()
-	char := data.Characteristic{AccessoryId: aid, Id: cid, Value: "My"}
-	slice := make([]data.Characteristic, 0)
+	aid := a.GetID()
+	cid := a.Info.Name.GetID()
+	char := data.Characteristic{AccessoryID: aid, ID: cid, Value: "My"}
+	var slice []data.Characteristic
 	slice = append(slice, char)
 
 	chars := data.Characteristics{Characteristics: slice}

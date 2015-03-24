@@ -20,17 +20,17 @@ func TestPairingIntegration(t *testing.T) {
 
 	controller, err := NewSetupServerController(bridge, database)
 	assert.Nil(t, err)
-	client_database, _ := db.NewTempDatabase()
-	client, _ := netio.NewClient("Client", client_database)
-	client_controller := NewSetupClientController("001-02-003", client, client_database)
-	pairStartRequest := client_controller.InitialPairingRequest()
+	clientDatabase, _ := db.NewTempDatabase()
+	client, _ := netio.NewClient("Client", clientDatabase)
+	clientController := NewSetupClientController("001-02-003", client, clientDatabase)
+	pairStartRequest := clientController.InitialPairingRequest()
 
 	// 1) C -> S
 	pairStartResponse, err := HandleReaderForHandler(pairStartRequest, controller)
 	assert.Nil(t, err)
 
 	// 2) S -> C
-	pairVerifyRequest, err := HandleReaderForHandler(pairStartResponse, client_controller)
+	pairVerifyRequest, err := HandleReaderForHandler(pairStartResponse, clientController)
 	assert.Nil(t, err)
 
 	// 3) C -> S
@@ -38,7 +38,7 @@ func TestPairingIntegration(t *testing.T) {
 	assert.Nil(t, err)
 
 	// 4) S -> C
-	pairKeyRequest, err := HandleReaderForHandler(pairVerifyResponse, client_controller)
+	pairKeyRequest, err := HandleReaderForHandler(pairVerifyResponse, clientController)
 	assert.Nil(t, err)
 
 	// 5) C -> S
@@ -46,7 +46,7 @@ func TestPairingIntegration(t *testing.T) {
 	assert.Nil(t, err)
 
 	// 6) S -> C
-	request, err := HandleReaderForHandler(pairKeyRespond, client_controller)
+	request, err := HandleReaderForHandler(pairKeyRespond, clientController)
 	assert.Nil(t, err)
 	assert.Nil(t, request)
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/brutella/hc/db"
 )
 
+// Client is a HomeKit client.
 type Client struct {
 	entity db.Entity
 }
@@ -23,16 +24,18 @@ func NewClient(name string, database db.Database) (*Client, error) {
 	return &Client{entity}, err
 }
 
-// PairUsername returns a special formatted string (similar to a MAC address) based on the name.
-// HomeKit requires this format.
+// PairUsername returns the client username used for pairing.
+// The returned string is a MAC 48 address which is required by HomeKit.
 func (c *Client) PairUsername() string {
 	return MAC48Address(c.entity.Name())
 }
 
+// PairPrivateKey returns the client private key used for pairing
 func (c *Client) PairPrivateKey() []byte {
 	return c.entity.PrivateKey()
 }
 
+// PairPublicKey returns the client public key used for pairing
 func (c *Client) PairPublicKey() []byte {
 	return c.entity.PublicKey()
 }

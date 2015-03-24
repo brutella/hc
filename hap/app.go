@@ -19,6 +19,7 @@ import (
 	"github.com/gosexy/to"
 )
 
+// AppExitFunc is the function which is invoked when the app shuts down.
 type AppExitFunc func()
 
 // App encapsulates all components to create, publish and update accessories and
@@ -33,7 +34,7 @@ type App struct {
 	server server.Server
 
 	mutex     *sync.Mutex
-	mdns      *Service
+	mdns      *MDNSService
 	container *container.Container
 
 	exitFunc    AppExitFunc
@@ -52,22 +53,22 @@ func NewApp(conf Config) (*App, error) {
 	}
 
 	database := db.NewDatabaseWithStorage(storage)
-	bridge_config := netio.NewBridgeInfo(conf.BridgeName, conf.BridgePassword, conf.BridgeManufacturer, storage)
-	bridge, err := netio.NewBridge(bridge_config, database)
+	config := netio.NewBridgeInfo(conf.BridgeName, conf.BridgePassword, conf.BridgeManufacturer, storage)
+	bridge, err := netio.NewBridge(config, database)
 	if err != nil {
 		return nil, err
 	}
 
 	// Bridge appears in HomeKit and must provide the mandatory accessory info servie
 	info := model.Info{
-		Name:         bridge_config.Name,
-		SerialNumber: bridge_config.SerialNumber,
-		Manufacturer: bridge_config.Manufacturer,
+		Name:         config.Name,
+		SerialNumber: config.SerialNumber,
+		Manufacturer: config.Manufacturer,
 		Model:        "Bridge",
 	}
-	bridge_accessory := accessory.New(info)
+	accessory := accessory.New(info)
 	container := container.NewContainer()
-	container.AddAccessory(bridge_accessory)
+	container.AddAccessory(accessory)
 
 	app := App{
 		context:   netio.NewContextForBridge(bridge),
@@ -93,7 +94,7 @@ func (app *App) AddAccessory(a *accessory.Accessory) {
 				// is updated. Sometimes it's increment when a client changes a value.
 				// if app.mdns != nil {
 				//     log.Println("[VERB] Update TXT records")
-				//     app.mdns.state += 1
+				//     app.mdns.state++
 				//     app.mdns.Update()
 				// }
 
@@ -167,14 +168,14 @@ func (app *App) RunAndPublish(publish bool) {
 	port := to.Int64(s.Port())
 
 	app.mutex.Lock()
-	mdns := NewService(app.bridge.Name(), app.bridge.Id(), int(port))
+	mdns := NewMDNSService(app.bridge.Name(), app.bridge.ID(), int(port))
 	app.mdns = mdns
 	app.mutex.Unlock()
 
-	dns := app.Database.DnsWithName(app.bridge.Name())
+	dns := app.Database.DNSWithName(app.bridge.Name())
 	if dns == nil {
-		dns = db.NewDns(app.bridge.Name(), 1, 1)
-		app.Database.SaveDns(dns)
+		dns = db.NewDNS(app.bridge.Name(), 1, 1)
+		app.Database.SaveDNS(dns)
 	}
 	if publish {
 		app.mutex.Lock()
@@ -235,10 +236,10 @@ func (app *App) notifyListener(a *accessory.Accessory, c *characteristic.Charact
 
 // updateConfiguration increases the configuration value by 1 and re-announces the new TXT records
 func (app *App) updateConfiguration() {
-	dns := app.Database.DnsWithName(app.bridge.Name())
+	dns := app.Database.DNSWithName(app.bridge.Name())
 	if dns != nil {
 		dns.SetConfiguration(dns.Configuration() + 1)
-		app.Database.SaveDns(dns)
+		app.Database.SaveDNS(dns)
 		if app.IsReachable() {
 			app.mdns.Update()
 		}

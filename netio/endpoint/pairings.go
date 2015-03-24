@@ -17,6 +17,7 @@ type Pairing struct {
 	controller *pair.PairingController
 }
 
+// NewPairing returns a new handler for pairing enpdoint
 func NewPairing(controller *pair.PairingController) *Pairing {
 	handler := Pairing{
 		controller: controller,

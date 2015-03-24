@@ -5,6 +5,7 @@ import (
 	"github.com/brutella/hc/model/characteristic"
 )
 
+// AccessoryInfo is a service to describe an accessory.
 type AccessoryInfo struct {
 	*Service
 
@@ -34,29 +35,29 @@ func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName, 
 	name := characteristic.NewName(accessoryName)
 
 	service := New()
-	service.Type = TypeAccessoryInfo
-	service.AddCharacteristic(identify.Characteristic)
-	service.AddCharacteristic(serial.Characteristic)
-	service.AddCharacteristic(model.Characteristic)
-	service.AddCharacteristic(manufacturer.Characteristic)
-	service.AddCharacteristic(name.Characteristic)
+	service.Type = typeAccessoryInfo
+	service.addCharacteristic(identify.Characteristic)
+	service.addCharacteristic(serial.Characteristic)
+	service.addCharacteristic(model.Characteristic)
+	service.addCharacteristic(manufacturer.Characteristic)
+	service.addCharacteristic(name.Characteristic)
 
 	var firmware *characteristic.Revision
 	if firmwareRevision != "" {
 		firmware = characteristic.NewFirmwareRevision(firmwareRevision)
-		service.AddCharacteristic(firmware.Characteristic)
+		service.addCharacteristic(firmware.Characteristic)
 	}
 
 	var hardware *characteristic.Revision
 	if hardwareRevision != "" {
 		hardware = characteristic.NewHardwareRevision(hardwareRevision)
-		service.AddCharacteristic(hardware.Characteristic)
+		service.addCharacteristic(hardware.Characteristic)
 	}
 
 	var software *characteristic.Revision
 	if softwareRevision != "" {
 		software = characteristic.NewSoftwareRevision(softwareRevision)
-		service.AddCharacteristic(software.Characteristic)
+		service.addCharacteristic(software.Characteristic)
 	}
 
 	return &AccessoryInfo{service, identify, serial, model, manufacturer, name, firmware, hardware, software}

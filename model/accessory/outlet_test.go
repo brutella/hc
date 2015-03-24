@@ -17,7 +17,7 @@ var outlet_info = model.Info{
 func TestOutlet(t *testing.T) {
 	var o model.Outlet = NewOutlet(outlet_info)
 
-	assert.Equal(t, o.GetId(), model.InvalidId)
+	assert.Equal(t, o.GetID(), model.InvalidID)
 	assert.Equal(t, o.Name(), "My Outlet")
 	assert.Equal(t, o.SerialNumber(), "001")
 	assert.Equal(t, o.Manufacturer(), "brutella")

@@ -11,7 +11,7 @@ func TestPacketFromBytes(t *testing.T) {
 	var b bytes.Buffer
 	b.Write(data)
 
-	packets := PacketsFromBytes(&b)
+	packets := packetsFromBytes(&b)
 	assert.Equal(t, len(packets), 1)
 
 	packet := packets[0]
@@ -24,7 +24,7 @@ func TestMultiplePacketFromBytes(t *testing.T) {
 	var b bytes.Buffer
 	b.Write(data)
 
-	packets := PacketsWithSizeFromBytes(3, &b)
+	packets := packetsWithSizeFromBytes(3, &b)
 	assert.Equal(t, len(packets), 2)
 
 	assert.Equal(t, packets[0].length, 3)

@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-var info model.Info = model.Info{
+var info = model.Info{
 	Name:         "My Bridge",
 	SerialNumber: "001",
 	Manufacturer: "Google",
@@ -24,7 +24,7 @@ func TestCharacteristicNotification(t *testing.T) {
 	c := container.NewContainer()
 	c.AddAccessory(a)
 
-	buffer, err := EventBody(a, a.Info.Name.Characteristic)
+	buffer, err := Body(a, a.Info.Name.Characteristic)
 	assert.Nil(t, err)
 	assert.NotNil(t, buffer)
 	bytes, err := ioutil.ReadAll(buffer)

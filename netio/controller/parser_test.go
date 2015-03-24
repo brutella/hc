@@ -5,14 +5,14 @@ import (
 	"testing"
 )
 
-func TestParseId(t *testing.T) {
-	aid, cid, err := ParseAccessoryAndCharacterId("3.9")
+func TestParseID(t *testing.T) {
+	aid, cid, err := ParseAccessoryAndCharacterID("3.9")
 	assert.Nil(t, err)
 	assert.Equal(t, aid, 3)
 	assert.Equal(t, cid, 9)
 }
 
-func TestParseInvalidId(t *testing.T) {
-	_, _, err := ParseAccessoryAndCharacterId("random")
+func TestParseInvalidID(t *testing.T) {
+	_, _, err := ParseAccessoryAndCharacterID("random")
 	assert.NotNil(t, err)
 }

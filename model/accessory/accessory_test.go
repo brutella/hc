@@ -12,7 +12,7 @@ func TestAccessoryIdentifyChanged(t *testing.T) {
 
 	var identifyCalled = 0
 	a.OnIdentify(func() {
-		identifyCalled += 1
+		identifyCalled++
 	})
 
 	a.Info.Identify.SetValueFromRemote(true)

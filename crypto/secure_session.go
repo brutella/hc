@@ -3,9 +3,10 @@ package crypto
 import (
 	"bytes"
 	"encoding/binary"
-	"io"
-
 	"fmt"
+	"github.com/brutella/hc/crypto/chacha20poly1305"
+	"github.com/brutella/hc/crypto/hkdf"
+	"io"
 )
 
 // secureSession provide a secure session by encrypting and decrypting data
@@ -22,21 +23,21 @@ type secureSession struct {
 	readEncrypted bool
 }
 
-// NewSecureSessionFromSharedKey returns a session from a shared secret key
+// NewSecureSessionFromSharedKey returns a session from a shared private key
 func NewSecureSessionFromSharedKey(sharedKey [32]byte) (*secureSession, error) {
 	salt := []byte("Control-Salt")
-	info_out := []byte("Control-Read-Encryption-Key")
-	info_in := []byte("Control-Write-Encryption-Key")
+	out := []byte("Control-Read-Encryption-Key")
+	in := []byte("Control-Write-Encryption-Key")
 
 	var s = new(secureSession)
 	var err error
-	s.encryptKey, err = HKDF_SHA512(sharedKey[:], salt, info_out)
+	s.encryptKey, err = hkdf.Sha512(sharedKey[:], salt, out)
 	s.encryptCount = 0
 	if err != nil {
 		return nil, err
 	}
 
-	s.decryptKey, err = HKDF_SHA512(sharedKey[:], salt, info_in)
+	s.decryptKey, err = hkdf.Sha512(sharedKey[:], salt, in)
 	s.decryptCount = 0
 
 	return s, err
@@ -46,18 +47,18 @@ func NewSecureSessionFromSharedKey(sharedKey [32]byte) (*secureSession, error) {
 // This is only used int unit tests.
 func NewSecureClientSessionFromSharedKey(sharedKey [32]byte) (*secureSession, error) {
 	salt := []byte("Control-Salt")
-	info_out := []byte("Control-Write-Encryption-Key")
-	info_in := []byte("Control-Read-Encryption-Key")
+	out := []byte("Control-Write-Encryption-Key")
+	in := []byte("Control-Read-Encryption-Key")
 
 	var s = new(secureSession)
 	var err error
-	s.encryptKey, err = HKDF_SHA512(sharedKey[:], salt, info_out)
+	s.encryptKey, err = hkdf.Sha512(sharedKey[:], salt, out)
 	s.encryptCount = 0
 	if err != nil {
 		return nil, err
 	}
 
-	s.decryptKey, err = HKDF_SHA512(sharedKey[:], salt, info_in)
+	s.decryptKey, err = hkdf.Sha512(sharedKey[:], salt, in)
 	s.decryptCount = 0
 
 	return s, err
@@ -66,32 +67,32 @@ func NewSecureClientSessionFromSharedKey(sharedKey [32]byte) (*secureSession, er
 // Encrypt return the encrypted data by splitting it into packets
 // [ length (2 bytes)] [ data ] [ auth (16 bytes)]
 func (s *secureSession) Encrypt(r io.Reader) (io.Reader, error) {
-	packets := PacketsFromBytes(r)
-	var b bytes.Buffer
+	packets := packetsFromBytes(r)
+	var buf bytes.Buffer
 	for _, p := range packets {
-		var nonce_bytes [8]byte
-		binary.LittleEndian.PutUint64(nonce_bytes[:], s.encryptCount)
-		s.encryptCount += 1
+		var nonce [8]byte
+		binary.LittleEndian.PutUint64(nonce[:], s.encryptCount)
+		s.encryptCount++
 
-		length_bytes := make([]byte, 2)
-		binary.LittleEndian.PutUint16(length_bytes, uint16(p.length))
+		bLength := make([]byte, 2)
+		binary.LittleEndian.PutUint16(bLength, uint16(p.length))
 
-		encrypted, mac, err := Chacha20EncryptAndPoly1305Seal(s.encryptKey[:], nonce_bytes[:], p.value, length_bytes[:])
+		encrypted, mac, err := chacha20poly1305.EncryptAndSeal(s.encryptKey[:], nonce[:], p.value, bLength[:])
 		if err != nil {
 			return nil, err
 		}
 
-		b.Write(length_bytes[:])
-		b.Write(encrypted)
-		b.Write(mac[:])
+		buf.Write(bLength[:])
+		buf.Write(encrypted)
+		buf.Write(mac[:])
 	}
 
-	return &b, nil
+	return &buf, nil
 }
 
 // Decrypt returns the decrypted data
 func (s *secureSession) Decrypt(r io.Reader) (io.Reader, error) {
-	var b bytes.Buffer
+	var buf bytes.Buffer
 	for {
 		var length uint16
 		if err := binary.Read(r, binary.LittleEndian, &length); err != nil {
@@ -105,8 +106,8 @@ func (s *secureSession) Decrypt(r io.Reader) (io.Reader, error) {
 			return nil, fmt.Errorf("Packet size too big %d", length)
 		}
 
-		var buffer = make([]byte, length)
-		if err := binary.Read(r, binary.LittleEndian, &buffer); err != nil {
+		var b = make([]byte, length)
+		if err := binary.Read(r, binary.LittleEndian, &b); err != nil {
 			return nil, err
 		}
 
@@ -115,26 +116,26 @@ func (s *secureSession) Decrypt(r io.Reader) (io.Reader, error) {
 			return nil, err
 		}
 
-		var nonce_bytes [8]byte
-		binary.LittleEndian.PutUint64(nonce_bytes[:], s.decryptCount)
-		s.decryptCount += 1
+		var nonce [8]byte
+		binary.LittleEndian.PutUint64(nonce[:], s.decryptCount)
+		s.decryptCount++
 
-		length_bytes := make([]byte, 2)
-		binary.LittleEndian.PutUint16(length_bytes, uint16(length))
+		lengthBytes := make([]byte, 2)
+		binary.LittleEndian.PutUint16(lengthBytes, uint16(length))
 
-		decrypted, err := Chacha20DecryptAndPoly1305Verify(s.decryptKey[:], nonce_bytes[:], buffer, mac, length_bytes)
+		decrypted, err := chacha20poly1305.DecryptAndVerify(s.decryptKey[:], nonce[:], b, mac, lengthBytes)
 
 		if err != nil {
 			return nil, fmt.Errorf("Data encryption failed %s", err)
 		}
 
-		b.Write(decrypted)
+		buf.Write(decrypted)
 
-		// Finish when all bytes fit in buffer
+		// Finish when all bytes fit in b
 		if length < PacketLengthMax {
 			break
 		}
 	}
 
-	return &b, nil
+	return &buf, nil
 }

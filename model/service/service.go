@@ -5,44 +5,43 @@ import (
 	"github.com/brutella/hc/model/characteristic"
 )
 
-// Service represents an HomeKit service consisting of characteristics.
+// Service is an HomeKit service consisting of characteristics.
 type Service struct {
-	Id              int64                            `json:"iid"`
-	Type            ServiceType                      `json:"type"`
+	ID              int64                            `json:"iid"`
+	Type            serviceType                      `json:"type"`
 	Characteristics []*characteristic.Characteristic `json:"characteristics"`
 }
 
+// New returns a new service.
 func New() *Service {
 	s := Service{
-		Id:              model.InvalidId,
+		ID:              model.InvalidID,
 		Characteristics: []*characteristic.Characteristic{},
 	}
 
 	return &s
 }
 
-func (s *Service) AddCharacteristic(c *characteristic.Characteristic) {
-	s.Characteristics = append(s.Characteristics, c)
+// SetID sets the service id.
+func (s *Service) SetID(id int64) {
+	s.ID = id
 }
 
-// model.Service
-func (s *Service) SetId(id int64) {
-	s.Id = id
+// GetID returns the service id.
+func (s *Service) GetID() int64 {
+	return s.ID
 }
 
-func (s *Service) GetId() int64 {
-	return s.Id
-}
-
+// GetCharacteristics returns the characteristics which represent the service.
 func (s *Service) GetCharacteristics() []model.Characteristic {
-	result := make([]model.Characteristic, 0)
+	var result []model.Characteristic
 	for _, c := range s.Characteristics {
 		result = append(result, c)
 	}
 	return result
 }
 
-// Compareable
+// Equal returns true when receiver has the same characteristics, service id and service type as the argument.
 func (s *Service) Equal(other interface{}) bool {
 	if service, ok := other.(*Service); ok == true {
 		if len(s.Characteristics) != len(service.Characteristics) {
@@ -57,8 +56,12 @@ func (s *Service) Equal(other interface{}) bool {
 			}
 		}
 
-		return s.Id == service.Id && s.Type == service.Type
+		return s.ID == service.ID && s.Type == service.Type
 	}
 
 	return false
+}
+
+func (s *Service) addCharacteristic(c *characteristic.Characteristic) {
+	s.Characteristics = append(s.Characteristics, c)
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/model/characteristic"
 )
 
-type TempChangeFunc func(float64)
+// Thermostat is service to represent a thermostat.
 type Thermostat struct {
 	*Service
 
@@ -16,7 +16,7 @@ type Thermostat struct {
 	Mode       *characteristic.HeatingCoolingMode
 	TargetMode *characteristic.HeatingCoolingMode
 
-	targetTempChange TempChangeFunc
+	targetTempChange func(float64)
 }
 
 // NewThermometer returns a thermometer service.
@@ -31,24 +31,24 @@ func NewThermometer(name string, temperature, min, max, steps float64) *Thermost
 
 // NewThermostat returns a thermostat service.
 func NewThermostat(name string, temperature, min, max, steps float64) *Thermostat {
-	name_char := characteristic.NewName(name)
-	unit := model.TempUnitCelsius
-	unit_char := characteristic.NewTemperatureUnit(unit)
-	temp := characteristic.NewCurrentTemperatureCharacteristic(temperature, min, max, steps, string(unit))
-	targetTemp := characteristic.NewTargetTemperatureCharacteristic(temperature, min, max, steps, string(unit))
+	nameChar := characteristic.NewName(name)
+	tempUnit := model.TempUnitCelsius
+	unitChar := characteristic.NewTemperatureUnit(tempUnit)
+	temp := characteristic.NewCurrentTemperatureCharacteristic(temperature, min, max, steps, string(tempUnit))
+	targetTemp := characteristic.NewTargetTemperatureCharacteristic(temperature, min, max, steps, string(tempUnit))
 	mode := characteristic.NewCurrentHeatingCoolingMode(model.HeatCoolModeOff)
 	targetMode := characteristic.NewTargetHeatingCoolingMode(model.HeatCoolModeOff)
 
 	service := New()
-	service.Type = TypeThermostat
-	service.AddCharacteristic(name_char.Characteristic)
-	service.AddCharacteristic(unit_char.Characteristic)
-	service.AddCharacteristic(temp.Characteristic)
-	service.AddCharacteristic(targetTemp.Characteristic)
-	service.AddCharacteristic(mode.Characteristic)
-	service.AddCharacteristic(targetMode.Characteristic)
+	service.Type = typeThermostat
+	service.addCharacteristic(nameChar.Characteristic)
+	service.addCharacteristic(unitChar.Characteristic)
+	service.addCharacteristic(temp.Characteristic)
+	service.addCharacteristic(targetTemp.Characteristic)
+	service.addCharacteristic(mode.Characteristic)
+	service.addCharacteristic(targetMode.Characteristic)
 
-	t := Thermostat{service, name_char, unit_char, temp, targetTemp, mode, targetMode, nil}
+	t := Thermostat{service, nameChar, unitChar, temp, targetTemp, mode, targetMode, nil}
 
 	return &t
 }

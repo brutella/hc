@@ -9,7 +9,7 @@ type testAddr struct {
 	addr string
 }
 
-func NewAddr(addr string) testAddr {
+func newAddr(addr string) testAddr {
 	return testAddr{addr: addr}
 }
 
@@ -21,6 +21,6 @@ func (a testAddr) String() string {
 }
 
 func TestPortFromAddr(t *testing.T) {
-	port := ExtractPort(NewAddr("[::]:12345"))
+	port := ExtractPort(newAddr("[::]:12345"))
 	assert.Equal(t, port, "12345")
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/brutella/hc/model/characteristic"
 )
 
+// LightBulb is a service to represent a light bulb.
 type LightBulb struct {
 	*Service
 	On         *characteristic.On
@@ -15,19 +16,19 @@ type LightBulb struct {
 
 // NewLightBulb returns a light bulb service.
 func NewLightBulb(name string, on bool) *LightBulb {
-	on_char := characteristic.NewOn(on)
-	name_char := characteristic.NewName(name)
+	onChar := characteristic.NewOn(on)
+	nameChar := characteristic.NewName(name)
 	brightness := characteristic.NewBrightness(100) // 100%
 	saturation := characteristic.NewSaturation(0.0)
 	hue := characteristic.NewHue(0.0)
 
 	service := New()
-	service.Type = TypeLightBulb
-	service.AddCharacteristic(on_char.Characteristic)
-	service.AddCharacteristic(name_char.Characteristic)
-	service.AddCharacteristic(brightness.Characteristic)
-	service.AddCharacteristic(saturation.Characteristic)
-	service.AddCharacteristic(hue.Characteristic)
+	service.Type = typeLightBulb
+	service.addCharacteristic(onChar.Characteristic)
+	service.addCharacteristic(nameChar.Characteristic)
+	service.addCharacteristic(brightness.Characteristic)
+	service.addCharacteristic(saturation.Characteristic)
+	service.addCharacteristic(hue.Characteristic)
 
-	return &LightBulb{service, on_char, name_char, brightness, saturation, hue}
+	return &LightBulb{service, onChar, nameChar, brightness, saturation, hue}
 }

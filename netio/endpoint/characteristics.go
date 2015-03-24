@@ -10,7 +10,7 @@ import (
 	"sync"
 )
 
-// Handles the /characteristics endpoint
+// Characteristics handles the /characteristics endpoint
 //
 // This endpoint is not session based and the same for all connections because
 // the encryption/decryption is handled by the connection automatically.
@@ -21,6 +21,7 @@ type Characteristics struct {
 	mutex      *sync.Mutex
 }
 
+// NewCharacteristics returns a new handler for characteristics endpoint
 func NewCharacteristics(c netio.CharacteristicsHandler, mutex *sync.Mutex) *Characteristics {
 	handler := Characteristics{
 		controller: c,

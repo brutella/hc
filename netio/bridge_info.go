@@ -18,31 +18,31 @@ type BridgeInfo struct {
 	// The password the user has to enter when adding the accessory to HomeKit
 	Password string
 	// The id which appears inthe mDNS TXT entry
-	Id string
+	ID string
 }
 
 // NewBridgeInfo returns a BridgeInfo object.
 //
 // The BridgeInfo.SerialNumber is loaded from the storage, or created if not found.
-// The BridgeInfo.Id is based on the serial number bytes.
+// The BridgeInfo.ID is based on the serial number bytes.
 func NewBridgeInfo(name, password, manufacturer string, storage common.Storage) BridgeInfo {
 	serial := common.GetSerialNumberForAccessoryName(name, storage)
 	return BridgeInfo{
 		SerialNumber: serial,
 		Password:     password,
 		Name:         name,
-		Id:           MAC48Address(serial),
+		ID:           MAC48Address(serial),
 		Manufacturer: manufacturer,
 	}
 }
 
-// Returns a MAC-48-like address from the argument string
+// MAC48Address returns a MAC-48-like address from the argument string
 func MAC48Address(input string) string {
 	h := md5.New()
 	h.Write([]byte(input))
 	result := h.Sum(nil)
 
-	c := make([]string, 0)
+	var c []string
 	c = append(c, toHex(result[0]))
 	c = append(c, toHex(result[1]))
 	c = append(c, toHex(result[2]))

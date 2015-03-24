@@ -3,6 +3,7 @@ package pair
 import (
 	"github.com/brutella/hc/common"
 	"github.com/brutella/hc/crypto"
+	"github.com/brutella/hc/crypto/chacha20poly1305"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/netio"
 
@@ -12,12 +13,18 @@ import (
 	"io"
 )
 
+// VerifyClientController verifies the stored accessory public key and negotiates a shared secret
+// which is used encrypt the upcoming session.
+//
+// Verification fails when the accessory is not known, the public key for the accessory was not found,
+// or the packet's seal could not be verified.
 type VerifyClientController struct {
 	client   *netio.Client
 	database db.Database
 	session  *VerifySession
 }
 
+// NewVerifyClientController returns a new verify client controller.
 func NewVerifyClientController(client *netio.Client, database db.Database) *VerifyClientController {
 	controller := VerifyClientController{
 		client:   client,
@@ -28,16 +35,17 @@ func NewVerifyClientController(client *netio.Client, database db.Database) *Veri
 	return &controller
 }
 
+// Handle processes a container to verify if an accessory is paired correctly.
 func (verify *VerifyClientController) Handle(in common.Container) (common.Container, error) {
 	var out common.Container
 	var err error
 
-	method := PairMethodType(in.GetByte(TagPairingMethod))
+	method := pairMethodType(in.GetByte(TagPairingMethod))
 
 	// It is valid that method is not sent
 	// If method is sent then it must be 0x00
 	if method != PairingMethodDefault {
-		return nil, ErrInvalidPairMethod(method)
+		return nil, errInvalidPairMethod(method)
 	}
 
 	seq := VerifyStepType(in.GetByte(TagSequence))
@@ -47,14 +55,14 @@ func (verify *VerifyClientController) Handle(in common.Container) (common.Contai
 	case VerifyStepFinishResponse:
 		out, err = verify.handlePairVerifyStepFinishResponse(in)
 	default:
-		return nil, ErrInvalidVerifyStep(seq)
+		return nil, errInvalidVerifyStep(seq)
 	}
 
 	return out, err
 }
 
-// Client -> Server
-// - Public key `A`
+// InitialKeyVerifyRequest returns the first request the client sends to an accessory to start the paring verifcation process.
+// The request contains the client public key and sequence set to VerifyStepStartRequest.
 func (verify *VerifyClientController) InitialKeyVerifyRequest() io.Reader {
 	out := common.NewTLV8Container()
 	out.SetByte(TagPairingMethod, 0)
@@ -99,7 +107,7 @@ func (verify *VerifyClientController) handlePairStepVerifyResponse(in common.Con
 	var mac [16]byte
 	copy(mac[:], data[len(message):]) // 16 byte (MAC)
 
-	decryptedBytes, err := crypto.Chacha20DecryptAndPoly1305Verify(verify.session.EncryptionKey[:], []byte("PV-Msg02"), message, mac, nil)
+	decryptedBytes, err := chacha20poly1305.DecryptAndVerify(verify.session.EncryptionKey[:], []byte("PV-Msg02"), message, mac, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +124,7 @@ func (verify *VerifyClientController) handlePairStepVerifyResponse(in common.Con
 	fmt.Println("   Signature:", hex.EncodeToString(signature))
 
 	// Validate signature
-	material := make([]byte, 0)
+	var material []byte
 	material = append(material, verify.session.OtherPublicKey[:]...)
 	material = append(material, username...)
 	material = append(material, verify.session.PublicKey[:]...)
@@ -135,7 +143,7 @@ func (verify *VerifyClientController) handlePairStepVerifyResponse(in common.Con
 	}
 
 	out := common.NewTLV8Container()
-	out.SetByte(TagPairingMethod, PairingMethodDefault)
+	out.SetByte(TagPairingMethod, PairingMethodDefault.Byte())
 	out.SetByte(TagSequence, VerifyStepFinishRequest.Byte())
 
 	encryptedOut := common.NewTLV8Container()
@@ -153,7 +161,7 @@ func (verify *VerifyClientController) handlePairStepVerifyResponse(in common.Con
 
 	encryptedOut.SetBytes(TagSignature, signature)
 
-	encryptedBytes, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(verify.session.EncryptionKey[:], []byte("PV-Msg03"), encryptedOut.BytesBuffer().Bytes(), nil)
+	encryptedBytes, mac, _ := chacha20poly1305.EncryptAndSeal(verify.session.EncryptionKey[:], []byte("PV-Msg03"), encryptedOut.BytesBuffer().Bytes(), nil)
 
 	out.SetBytes(TagEncryptedData, append(encryptedBytes, mac[:]...))
 
@@ -163,7 +171,7 @@ func (verify *VerifyClientController) handlePairStepVerifyResponse(in common.Con
 // Server -> Client
 // - only error ocde (optional)
 func (verify *VerifyClientController) handlePairVerifyStepFinishResponse(in common.Container) (common.Container, error) {
-	code := ErrCode(in.GetByte(TagErrCode))
+	code := errCode(in.GetByte(TagErrCode))
 	if code != ErrCodeNo {
 		fmt.Printf("Unexpected error %v\n", code)
 	}

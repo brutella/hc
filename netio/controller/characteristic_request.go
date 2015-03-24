@@ -5,9 +5,9 @@ import (
 	"net/url"
 )
 
-func getCharacteristicValues(accessoryId, characteristicId int64) url.Values {
+func getCharacteristicValues(accessoryID, characteristicID int64) url.Values {
 	values := url.Values{}
-	values.Set("id", fmt.Sprintf("%d.%d", accessoryId, characteristicId))
+	values.Set("id", fmt.Sprintf("%d.%d", accessoryID, characteristicID))
 
 	return values
 }

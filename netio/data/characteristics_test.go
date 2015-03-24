@@ -13,8 +13,8 @@ func TestEventCharacteristicFromJSON(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, len(chars.Characteristics), 1)
 	var char = chars.Characteristics[0]
-	assert.Equal(t, char.AccessoryId, 2)
-	assert.Equal(t, char.Id, 13)
+	assert.Equal(t, char.AccessoryID, 2)
+	assert.Equal(t, char.ID, 13)
 	assert.Equal(t, char.Events, true)
 	assert.Nil(t, char.Value)
 }

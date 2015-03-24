@@ -38,7 +38,7 @@ func TestStoreInSubdirectory(t *testing.T) {
 
 	defer f.Close()
 
-	var buffer []byte = make([]byte, 32)
+	var buffer = make([]byte, 32)
 	n, _ := f.Read(buffer)
 	assert.Equal(t, buffer[:n], []byte("ASDF"))
 }

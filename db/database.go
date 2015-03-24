@@ -17,14 +17,14 @@ type Database interface {
 	// DeleteEntity deletes a entity from the database
 	DeleteEntity(entity Entity)
 
-	// DnsWithName returns the dns references by name
-	DnsWithName(name string) Dns
+	// DNSWithName returns the dns references by name
+	DNSWithName(name string) DNS
 
-	// SaveDns saves the dns in the database
-	SaveDns(dns Dns) error
+	// SaveDNS saves the dns in the database
+	SaveDNS(dns DNS) error
 
-	// DeleteDns deletes a dns from the database
-	DeleteDns(dns Dns)
+	// DeleteDNS deletes a dns from the database
+	DeleteDNS(dns DNS)
 }
 
 type database struct {
@@ -57,15 +57,15 @@ func NewDatabaseWithStorage(storage common.Storage) Database {
 // EntityWithName returns a entity for a specific name
 // The method tries to load the ltpk from disk and returns initialized client object.
 // The method returns nil when no file for this client could be found.
-func (m *database) EntityWithName(name string) Entity {
+func (db *database) EntityWithName(name string) Entity {
 	publicKeyFile := publicKeyFileForEntityName(name)
 	privateKeyFile := privateKeyFileForEntityName(name)
 
-	public, err_public := m.storage.Get(publicKeyFile)
+	public, err := db.storage.Get(publicKeyFile)
 	// Ignore error for private key which is optional
-	private, _ := m.storage.Get(privateKeyFile)
+	private, _ := db.storage.Get(privateKeyFile)
 
-	if len(public) > 0 && err_public == nil {
+	if len(public) > 0 && err == nil {
 		return NewEntity(name, public, private)
 	}
 
@@ -73,20 +73,20 @@ func (m *database) EntityWithName(name string) Entity {
 }
 
 // SaveEntity stores the long-term public key of the entity as {entity-name}.ltpk to disk.
-func (m *database) SaveEntity(entity Entity) error {
+func (db *database) SaveEntity(entity Entity) error {
 	name := entity.Name()
 	if len(entity.PublicKey()) == 0 {
 		return fmt.Errorf("No public key to save for entity%s\n", name)
 	}
 
 	publicKeyFile := publicKeyFileForEntityName(name)
-	err := m.storage.Set(publicKeyFile, entity.PublicKey())
+	err := db.storage.Set(publicKeyFile, entity.PublicKey())
 	if err != nil {
 		return err
 	}
 
 	privateKeyFile := privateKeyFileForEntityName(name)
-	return m.storage.Set(privateKeyFile, entity.PrivateKey())
+	return db.storage.Set(privateKeyFile, entity.PrivateKey())
 }
 
 func (db *database) DeleteEntity(entity Entity) {
@@ -102,37 +102,37 @@ func publicKeyFileForEntityName(name string) string {
 	return name + ".publicKey"
 }
 
-func (db *database) DnsWithName(name string) Dns {
-	c_data, err := db.storage.Get(configurationKeyForDnsName(name))
-	s_data, err := db.storage.Get(stateKeyForDnsName(name))
+func (db *database) DNSWithName(name string) DNS {
+	config, err := db.storage.Get(configurationKeyForDNSName(name))
+	state, err := db.storage.Get(stateKeyForDNSName(name))
 
-	if len(c_data) > 0 && err == nil && len(s_data) > 0 {
-		return NewDns(name, to.Int64(string(c_data)), to.Int64(string(s_data)))
+	if len(config) > 0 && err == nil && len(state) > 0 {
+		return NewDNS(name, to.Int64(string(config)), to.Int64(string(state)))
 	}
 
 	return nil
 }
 
-func (db *database) SaveDns(dns Dns) error {
-	configuration := to.String(dns.Configuration())
+func (db *database) SaveDNS(dns DNS) error {
+	config := to.String(dns.Configuration())
 	state := to.String(dns.State())
-	err := db.storage.Set(configurationKeyForDnsName(dns.Name()), []byte(configuration))
+	err := db.storage.Set(configurationKeyForDNSName(dns.Name()), []byte(config))
 	if err != nil {
 		return err
 	}
 
-	return db.storage.Set(stateKeyForDnsName(dns.Name()), []byte(state))
+	return db.storage.Set(stateKeyForDNSName(dns.Name()), []byte(state))
 }
 
-func (db *database) DeleteDns(dns Dns) {
-	db.storage.Delete(configurationKeyForDnsName(dns.Name()))
-	db.storage.Delete(stateKeyForDnsName(dns.Name()))
+func (db *database) DeleteDNS(dns DNS) {
+	db.storage.Delete(configurationKeyForDNSName(dns.Name()))
+	db.storage.Delete(stateKeyForDNSName(dns.Name()))
 }
 
-func configurationKeyForDnsName(name string) string {
+func configurationKeyForDNSName(name string) string {
 	return name + ".configuration"
 }
 
-func stateKeyForDnsName(name string) string {
+func stateKeyForDNSName(name string) string {
 	return name + ".state"
 }

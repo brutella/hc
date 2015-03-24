@@ -23,7 +23,7 @@ type PairSetup struct {
 	context  netio.HAPContext
 }
 
-// NewPairSetup returns a new pair setup.
+// NewPairSetup returns a new handler for pairing endpoint
 func NewPairSetup(bridge *netio.Bridge, database db.Database, context netio.HAPContext) *PairSetup {
 	handler := PairSetup{
 		bridge:   bridge,

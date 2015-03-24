@@ -2,21 +2,21 @@ package netio
 
 import (
 	"net"
-	_ "time"
 )
 
-// TCPHAPListener listens for new connection and creates HAPConnections for new connections
-type TCPHAPListener struct {
+// HAPTCPListener listens for new connection and creates HAPConnections for new connections
+type HAPTCPListener struct {
 	*net.TCPListener
 	context HAPContext
 }
 
-func NewTCPHAPListener(l *net.TCPListener, context HAPContext) *TCPHAPListener {
-	return &TCPHAPListener{l, context}
+// NewHAPTCPListener returns a new hap tcp listener.
+func NewHAPTCPListener(l *net.TCPListener, context HAPContext) *HAPTCPListener {
+	return &HAPTCPListener{l, context}
 }
 
 // Accept creates and returns a HAPConnection.
-func (l *TCPHAPListener) Accept() (c net.Conn, err error) {
+func (l *HAPTCPListener) Accept() (c net.Conn, err error) {
 	conn, err := l.AcceptTCP()
 	if err != nil {
 		return

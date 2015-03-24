@@ -35,14 +35,14 @@ func ED25519Signature(key, data []byte) ([]byte, error) {
 }
 
 // ED25519GenerateKey return a public and private ED25519 key pair from a string.
-func ED25519GenerateKey(str string) ([]byte /* public */, []byte /* secret */, error) {
+func ED25519GenerateKey(str string) ([]byte /* public */, []byte /* private */, error) {
 	b := bytes.NewBuffer([]byte(str))
 	if len(str) < 32 {
 		zeros := make([]byte, 32-len(str))
 		b.Write(zeros)
 	}
 
-	public, secret, err := ed25519.GenerateKey(bytes.NewReader(b.Bytes()))
+	public, private, err := ed25519.GenerateKey(bytes.NewReader(b.Bytes()))
 
-	return public[:], secret[:], err
+	return public[:], private[:], err
 }

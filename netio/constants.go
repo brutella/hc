@@ -1,14 +1,23 @@
 package netio
 
 const (
-	MethodGET  = "GET"
+	// MethodGET is the HTTP Get method
+	MethodGET = "GET"
+
+	// MethodPOST is the HTTP Post method
 	MethodPOST = "POST"
-	MethodPUT  = "PUT"
-	MethodDEL  = "DEL"
+
+	// MethodPUT is the HTTP Put method
+	MethodPUT = "PUT"
+
+	// MethodDEL is the HTTP Delete method
+	MethodDEL = "DEL"
 )
 
 const (
-	// HTTP content type used for pairing
+	// HTTPContentTypePairingTLV8 is the HTTP content type for pairing
 	HTTPContentTypePairingTLV8 = "application/pairing+tlv8"
-	HTTPContentTypeHAPJson     = "application/hap+json"
+
+	// HTTPContentTypeHAPJson is the HTTP content type for json data
+	HTTPContentTypeHAPJson = "application/hap+json"
 )

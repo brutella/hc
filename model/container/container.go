@@ -24,9 +24,9 @@ func NewContainer() *Container {
 // This method ensures that the accessory ids are valid and unique withing the container.
 func (m *Container) AddAccessory(a *accessory.Accessory) {
 	// Set accessory id when invalid
-	if a.GetId() == model.InvalidId {
-		a.SetId(m.idCount)
-		m.idCount += 1
+	if a.GetID() == model.InvalidID {
+		a.SetID(m.idCount)
+		m.idCount++
 	}
 
 	m.Accessories = append(m.Accessories, a)
@@ -41,6 +41,7 @@ func (m *Container) RemoveAccessory(a *accessory.Accessory) {
 	}
 }
 
+// Equal returns true when receiver has the same accessories as the argument.
 func (m *Container) Equal(other interface{}) bool {
 	if container, ok := other.(*Container); ok == true {
 		if len(m.Accessories) != len(container.Accessories) {

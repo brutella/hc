@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	// Defines the max length of encrypted packets
+	// PacketLengthMax is the max length of encrypted packets
 	PacketLengthMax = 0x400
 )
 
@@ -14,10 +14,9 @@ type packet struct {
 	value  []byte
 }
 
-// PacketsWithSizeFromBytes returns lv (tlv without t(ype)) packets
-func PacketsWithSizeFromBytes(length int, r io.Reader) []packet {
-	packets := make([]packet, 0)
-
+// packetsWithSizeFromBytes returns lv (tlv without t(ype)) packets
+func packetsWithSizeFromBytes(length int, r io.Reader) []packet {
+	var packets []packet
 	for {
 		var value = make([]byte, length)
 		n, err := r.Read(value)
@@ -40,7 +39,7 @@ func PacketsWithSizeFromBytes(length int, r io.Reader) []packet {
 	return packets
 }
 
-// PacketsFromBytes returns packets with length PacketLengthMax
-func PacketsFromBytes(r io.Reader) []packet {
-	return PacketsWithSizeFromBytes(PacketLengthMax, r)
+// packetsFromBytes returns packets with length PacketLengthMax
+func packetsFromBytes(r io.Reader) []packet {
+	return packetsWithSizeFromBytes(PacketLengthMax, r)
 }

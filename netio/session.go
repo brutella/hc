@@ -4,7 +4,7 @@ import (
 	"net"
 )
 
-// A session contains objects used to handle the data communication.
+// Session contains objects (encrypter, decrypter, pairing handler,...) used to handle the data communication.
 type Session interface {
 	// Decrypter returns decrypter for incoming data, may be nil
 	Decrypter() Decrypter
@@ -42,7 +42,7 @@ type session struct {
 }
 
 // NewSession returns a session for a connection.
-func NewSession(connection net.Conn) *session {
+func NewSession(connection net.Conn) Session {
 	s := session{
 		connection: connection,
 	}

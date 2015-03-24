@@ -108,7 +108,7 @@ func (ctx *context) DeleteSessionForConnection(c net.Conn) {
 
 // Returns a list of active connections
 func (ctx *context) ActiveConnections() []net.Conn {
-	connections := make([]net.Conn, 0)
+	var connections []net.Conn
 	ctx.mutex.Lock()
 	defer ctx.mutex.Unlock()
 	for _, v := range ctx.storage {

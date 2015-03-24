@@ -39,20 +39,20 @@ func TestDeleteEntity(t *testing.T) {
 	assert.Nil(t, entity)
 }
 
-func TestLoadDns(t *testing.T) {
+func TestLoadDNS(t *testing.T) {
 	db, _ := NewDatabase(os.TempDir())
-	dns := NewDns("My Name", 10, 20)
-	db.SaveDns(dns)
-	entity := db.DnsWithName("My Name")
+	dns := NewDNS("My Name", 10, 20)
+	db.SaveDNS(dns)
+	entity := db.DNSWithName("My Name")
 	assert.NotNil(t, entity)
 	assert.Equal(t, entity.Configuration(), 10)
 	assert.Equal(t, entity.State(), 20)
 }
 
-func TestDeleteDns(t *testing.T) {
+func TestDeleteDNS(t *testing.T) {
 	db, _ := NewDatabase(os.TempDir())
-	dns := NewDns("My Name", 10, 20)
-	db.SaveDns(dns)
-	db.DeleteDns(dns)
-	assert.Nil(t, db.DnsWithName("My Name"))
+	dns := NewDNS("My Name", 10, 20)
+	db.SaveDNS(dns)
+	db.DeleteDNS(dns)
+	assert.Nil(t, db.DNSWithName("My Name"))
 }

@@ -1,4 +1,4 @@
-package crypto
+package chacha20poly1305
 
 import (
 	"encoding/binary"

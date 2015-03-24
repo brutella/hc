@@ -3,6 +3,8 @@ package pair
 import (
 	"github.com/brutella/hc/common"
 	"github.com/brutella/hc/crypto"
+	"github.com/brutella/hc/crypto/chacha20poly1305"
+	"github.com/brutella/hc/crypto/hkdf"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/netio"
 	"github.com/brutella/log"
@@ -12,7 +14,7 @@ import (
 	"errors"
 )
 
-// SetupServerController handles pairing with a entity using SRP.
+// SetupServerController handles pairing with a cliet using SRP.
 // The entity has to known the bridge password to successfully pair.
 // When pairing was successful, the entity's public key (refered as ltpk - long term public key)
 // is stored in the database.
@@ -21,7 +23,7 @@ import (
 type SetupServerController struct {
 	bridge   *netio.Bridge
 	session  *SetupServerSession
-	step     PairStepType
+	step     pairStepType
 	database db.Database
 }
 
@@ -46,41 +48,42 @@ func NewSetupServerController(bridge *netio.Bridge, database db.Database) (*Setu
 	return &controller, nil
 }
 
+// Handle processes a container to pair (exchange keys) with a client.
 func (setup *SetupServerController) Handle(in common.Container) (out common.Container, err error) {
-	method := PairMethodType(in.GetByte(TagPairingMethod))
+	method := pairMethodType(in.GetByte(TagPairingMethod))
 
 	// It is valid that pair method is not sent
 	// If method set then it must be 0x00
 	if method != PairingMethodDefault {
-		return nil, ErrInvalidPairMethod(method)
+		return nil, errInvalidPairMethod(method)
 	}
 
-	seq := PairStepType(in.GetByte(TagSequence))
+	seq := pairStepType(in.GetByte(TagSequence))
 
 	switch seq {
 	case PairStepStartRequest:
 		if setup.step != PairStepWaiting {
 			setup.reset()
-			return nil, ErrInvalidInternalPairStep(setup.step)
+			return nil, errInvalidInternalPairStep(setup.step)
 		}
 
 		out, err = setup.handlePairStart(in)
 	case PairStepVerifyRequest:
 		if setup.step != PairStepStartResponse {
 			setup.reset()
-			return nil, ErrInvalidInternalPairStep(setup.step)
+			return nil, errInvalidInternalPairStep(setup.step)
 		}
 
 		out, err = setup.handlePairVerify(in)
 	case PairStepKeyExchangeRequest:
 		if setup.step != PairStepVerifyResponse {
 			setup.reset()
-			return nil, ErrInvalidInternalPairStep(setup.step)
+			return nil, errInvalidInternalPairStep(setup.step)
 		}
 
 		out, err = setup.handleKeyExchange(in)
 	default:
-		return nil, ErrInvalidPairStep(seq)
+		return nil, errInvalidPairStep(seq)
 	}
 
 	return out, err
@@ -177,15 +180,15 @@ func (setup *SetupServerController) handleKeyExchange(in common.Container) (comm
 	log.Println("[VERB] ->     Message:", hex.EncodeToString(message))
 	log.Println("[VERB] ->     MAC:", hex.EncodeToString(mac[:]))
 
-	decrypted, err := crypto.Chacha20DecryptAndPoly1305Verify(setup.session.EncryptionKey[:], []byte("PS-Msg05"), message, mac, nil)
+	decrypted, err := chacha20poly1305.DecryptAndVerify(setup.session.EncryptionKey[:], []byte("PS-Msg05"), message, mac, nil)
 
 	if err != nil {
 		setup.reset()
 		log.Println("[ERRO]", err)
 		out.SetByte(TagErrCode, ErrCodeUnknown.Byte()) // return error 1
 	} else {
-		decrypted_buffer := bytes.NewBuffer(decrypted)
-		in, err := common.NewTLV8ContainerFromReader(decrypted_buffer)
+		decryptedBuf := bytes.NewBuffer(decrypted)
+		in, err := common.NewTLV8ContainerFromReader(decryptedBuf)
 		if err != nil {
 			return nil, err
 		}
@@ -198,8 +201,8 @@ func (setup *SetupServerController) handleKeyExchange(in common.Container) (comm
 		log.Println("[VERB] ->     Signature:", hex.EncodeToString(signature))
 
 		// Calculate hash `H`
-		hash, _ := crypto.HKDF_SHA512(setup.session.PrivateKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
-		material := make([]byte, 0)
+		hash, _ := hkdf.Sha512(setup.session.PrivateKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
+		var material []byte
 		material = append(material, hash[:]...)
 		material = append(material, []byte(username)...)
 		material = append(material, clientltpk...)
@@ -219,7 +222,7 @@ func (setup *SetupServerController) handleKeyExchange(in common.Container) (comm
 			ltsk := setup.bridge.PairPrivateKey()
 
 			// Send username, ltpk, signature as encrypted message
-			hash, err := crypto.HKDF_SHA512(setup.session.PrivateKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
+			hash, err := hkdf.Sha512(setup.session.PrivateKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))
 			material = make([]byte, 0)
 			material = append(material, hash[:]...)
 			material = append(material, []byte(setup.session.Username)...)
@@ -240,7 +243,7 @@ func (setup *SetupServerController) handleKeyExchange(in common.Container) (comm
 			log.Println("[VERB] <-     ltpk:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TagPublicKey)))
 			log.Println("[VERB] <-     Signature:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TagSignature)))
 
-			encrypted, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(setup.session.EncryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)
+			encrypted, mac, _ := chacha20poly1305.EncryptAndSeal(setup.session.EncryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)
 			out.SetByte(TagPairingMethod, 0)
 			out.SetByte(TagSequence, PairStepKeyExchangeRequest.Byte())
 			out.SetBytes(TagEncryptedData, append(encrypted, mac[:]...))

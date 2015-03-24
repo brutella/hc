@@ -8,17 +8,18 @@ import (
 )
 
 type fileStorage struct {
-	dir_path string
+	dirPath string
 }
 
-func NewTempFileStorage() (*fileStorage, error) {
+// NewTempFileStorage returns a new storage inside temporary folder.
+func NewTempFileStorage() (Storage, error) {
 	dir := RandomHexString()
 	return NewFileStorage(path.Join(os.TempDir(), dir))
 }
 
 // NewFileStorage create a file storage for the specified directory.
 // The folder is created if necessary. Every key-value pair is stored in a seperate file.
-func NewFileStorage(dir string) (*fileStorage, error) {
+func NewFileStorage(dir string) (Storage, error) {
 	path, err := filepath.Abs(dir)
 	if err != nil {
 		return nil, err
@@ -27,7 +28,7 @@ func NewFileStorage(dir string) (*fileStorage, error) {
 	// Why 0777?
 	// Read http://unix.stackexchange.com/questions/21251/why-do-directories-need-the-executable-x-permission-to-be-opened
 	err = os.MkdirAll(path, 0777)
-	return &fileStorage{dir_path: path}, err
+	return &fileStorage{dirPath: path}, err
 }
 
 // Set sets the value for a specific key.
@@ -55,7 +56,7 @@ func (f *fileStorage) Get(key string) ([]byte, error) {
 	defer file.Close()
 
 	var b bytes.Buffer
-	var buffer []byte = make([]byte, 32)
+	var buffer = make([]byte, 32)
 	for {
 		n, _ := file.Read(buffer)
 		if n > 0 {
@@ -75,7 +76,7 @@ func (f *fileStorage) Delete(key string) error {
 
 // Private
 func (f *fileStorage) dir() string {
-	return f.dir_path
+	return f.dirPath
 }
 
 func (f *fileStorage) filePathToFile(file string) string {

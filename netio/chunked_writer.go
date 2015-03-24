@@ -15,9 +15,8 @@ func NewChunkedWriter(wr io.Writer, chunk int) io.Writer {
 }
 
 func (w *chunkedWriter) Write(p []byte) (int, error) {
-	var max int = len(p)
-
-	var nn int = 0
+	var max = len(p)
+	var nn int
 	var end int
 	for nn < max {
 		end = nn + w.chunk

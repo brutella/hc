@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// RandomHexString returns a random hex string.
 func RandomHexString() string {
 	t := time.Now().Format(time.RFC3339Nano)
 

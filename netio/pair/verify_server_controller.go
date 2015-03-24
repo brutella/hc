@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/brutella/hc/common"
 	"github.com/brutella/hc/crypto"
+	"github.com/brutella/hc/crypto/chacha20poly1305"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/netio"
 	"github.com/brutella/log"
@@ -23,6 +24,7 @@ type VerifyServerController struct {
 	step     VerifyStepType
 }
 
+// NewVerifyServerController returns a new verify server controller.
 func NewVerifyServerController(database db.Database, context netio.HAPContext) *VerifyServerController {
 	controller := VerifyServerController{
 		database: database,
@@ -33,24 +35,28 @@ func NewVerifyServerController(database db.Database, context netio.HAPContext) *
 
 	return &controller
 }
+
+// SharedKey returns the shared key which was negotiated with the client.
 func (verify *VerifyServerController) SharedKey() [32]byte {
 	return verify.session.SharedKey
 }
 
+// KeyVerified returns true when key was successfully verified.
 func (verify *VerifyServerController) KeyVerified() bool {
 	return verify.step == VerifyStepFinishResponse
 }
 
+// Handle processes a container to verify if a client is paired correctly.
 func (verify *VerifyServerController) Handle(in common.Container) (common.Container, error) {
 	var out common.Container
 	var err error
 
-	method := PairMethodType(in.GetByte(TagPairingMethod))
+	method := pairMethodType(in.GetByte(TagPairingMethod))
 
 	// It is valid that method is not sent
 	// If method is sent then it must be 0x00
 	if method != PairingMethodDefault {
-		return nil, ErrInvalidPairMethod(method)
+		return nil, errInvalidPairMethod(method)
 	}
 
 	seq := VerifyStepType(in.GetByte(TagSequence))
@@ -58,19 +64,19 @@ func (verify *VerifyServerController) Handle(in common.Container) (common.Contai
 	switch seq {
 	case VerifyStepStartRequest:
 		if verify.step != VerifyStepWaiting {
-			verify.Reset()
-			return nil, ErrInvalidInternalVerifyStep(verify.step)
+			verify.reset()
+			return nil, errInvalidInternalVerifyStep(verify.step)
 		}
 		out, err = verify.handlePairVerifyStart(in)
 	case VerifyStepFinishRequest:
 		if verify.step != VerifyStepStartResponse {
-			verify.Reset()
-			return nil, ErrInvalidInternalVerifyStep(verify.step)
+			verify.reset()
+			return nil, errInvalidInternalVerifyStep(verify.step)
 		}
 
 		out, err = verify.handlePairVerifyFinish(in)
 	default:
-		return nil, ErrInvalidVerifyStep(seq)
+		return nil, errInvalidVerifyStep(seq)
 	}
 
 	return out, err
@@ -91,7 +97,7 @@ func (verify *VerifyServerController) handlePairVerifyStart(in common.Container)
 	clientPublicKey := in.GetBytes(TagPublicKey)
 	log.Println("[VERB] ->     A:", hex.EncodeToString(clientPublicKey))
 	if len(clientPublicKey) != 32 {
-		return nil, ErrInvalidClientKeyLength
+		return nil, errInvalidClientKeyLength
 	}
 
 	var otherPublicKey [32]byte
@@ -101,7 +107,7 @@ func (verify *VerifyServerController) handlePairVerifyStart(in common.Container)
 	verify.session.SetupEncryptionKey([]byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
 
 	bridge := verify.context.GetBridge()
-	material := make([]byte, 0)
+	var material []byte
 	material = append(material, verify.session.PublicKey[:]...)
 	material = append(material, bridge.PairUsername()...)
 	material = append(material, clientPublicKey...)
@@ -116,7 +122,7 @@ func (verify *VerifyServerController) handlePairVerifyStart(in common.Container)
 	encryptedOut.SetString(TagUsername, bridge.PairUsername())
 	encryptedOut.SetBytes(TagSignature, signature)
 
-	encryptedBytes, mac, _ := crypto.Chacha20EncryptAndPoly1305Seal(verify.session.EncryptionKey[:], []byte("PV-Msg02"), encryptedOut.BytesBuffer().Bytes(), nil)
+	encryptedBytes, mac, _ := chacha20poly1305.EncryptAndSeal(verify.session.EncryptionKey[:], []byte("PV-Msg02"), encryptedOut.BytesBuffer().Bytes(), nil)
 
 	out := common.NewTLV8Container()
 	out.SetByte(TagSequence, verify.step.Byte())
@@ -151,13 +157,13 @@ func (verify *VerifyServerController) handlePairVerifyFinish(in common.Container
 	log.Println("[VERB] ->     Message:", hex.EncodeToString(message))
 	log.Println("[VERB] ->     MAC:", hex.EncodeToString(mac[:]))
 
-	decryptedBytes, err := crypto.Chacha20DecryptAndPoly1305Verify(verify.session.EncryptionKey[:], []byte("PV-Msg03"), message, mac, nil)
+	decryptedBytes, err := chacha20poly1305.DecryptAndVerify(verify.session.EncryptionKey[:], []byte("PV-Msg03"), message, mac, nil)
 
 	out := common.NewTLV8Container()
 	out.SetByte(TagSequence, verify.step.Byte())
 
 	if err != nil {
-		verify.Reset()
+		verify.reset()
 		log.Println("[ERRO]", err)
 		out.SetByte(TagErrCode, ErrCodeAuthenticationFailed.Byte()) // return error 2
 	} else {
@@ -180,14 +186,14 @@ func (verify *VerifyServerController) handlePairVerifyFinish(in common.Container
 			return nil, fmt.Errorf("No LTPK available for client %s", username)
 		}
 
-		material := make([]byte, 0)
+		var material []byte
 		material = append(material, verify.session.OtherPublicKey[:]...)
 		material = append(material, []byte(username)...)
 		material = append(material, verify.session.PublicKey[:]...)
 
 		if crypto.ValidateED25519Signature(entity.PublicKey(), material, signature) == false {
 			log.Println("[WARN] signature is invalid")
-			verify.Reset()
+			verify.reset()
 			out.SetByte(TagErrCode, ErrCodeUnknownPeer.Byte()) // return error 4
 		} else {
 			log.Println("[VERB] signature is valid")
@@ -197,6 +203,6 @@ func (verify *VerifyServerController) handlePairVerifyFinish(in common.Container
 	return out, nil
 }
 
-func (verify *VerifyServerController) Reset() {
+func (verify *VerifyServerController) reset() {
 	verify.step = VerifyStepWaiting
 }

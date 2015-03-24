@@ -1,12 +1,13 @@
 package pair
 
 import (
-	"github.com/brutella/hc/crypto"
+	"github.com/brutella/hc/crypto/hkdf"
 
 	"crypto/sha512"
 	"github.com/tadglines/go-pkgs/crypto/srp"
 )
 
+// SetupClientSession holds the keys to pair with an accessory.
 type SetupClientSession struct {
 	session       *srp.ClientSession
 	PublicKey     []byte   // A
@@ -15,6 +16,7 @@ type SetupClientSession struct {
 	EncryptionKey [32]byte // K
 }
 
+// NewSetupClientSession returns a new setup client session
 func NewSetupClientSession(username string, password string) *SetupClientSession {
 	rp, _ := srp.NewSRP(SRPGroup, sha512.New, KeyDerivativeFuncRFC2945(sha512.New, []byte(username)))
 
@@ -26,6 +28,7 @@ func NewSetupClientSession(username string, password string) *SetupClientSession
 	return &hap
 }
 
+// GenerateKeys generates public and private keys based on server's salt and public key.
 func (s *SetupClientSession) GenerateKeys(salt []byte, otherPublicKey []byte) error {
 	privateKey, err := s.session.ComputeKey(salt, otherPublicKey)
 	if err == nil {
@@ -37,18 +40,16 @@ func (s *SetupClientSession) GenerateKeys(salt []byte, otherPublicKey []byte) er
 	return err
 }
 
-// Validates `M2` from server
+// IsServerProofValid returns true when the server proof `M2` is valid.
 func (s *SetupClientSession) IsServerProofValid(proof []byte) bool {
 	return s.session.VerifyServerAuthenticator(proof)
 }
 
-// Calculates encryption key `K` based on salt and info
-//
-// Only 32 bytes are used from HKDF-SHA512
-func (p *SetupClientSession) SetupEncryptionKey(salt []byte, info []byte) error {
-	hash, err := crypto.HKDF_SHA512(p.PrivateKey, salt, info)
+// SetupEncryptionKey calculates encryption key `K` based on salt and info.
+func (s *SetupClientSession) SetupEncryptionKey(salt []byte, info []byte) error {
+	hash, err := hkdf.Sha512(s.PrivateKey, salt, info)
 	if err == nil {
-		p.EncryptionKey = hash
+		s.EncryptionKey = hash
 	}
 
 	return err

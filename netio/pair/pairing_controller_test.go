@@ -16,25 +16,25 @@ func TestUnknownPairingMethod(t *testing.T) {
 	database, _ := db.NewDatabase(os.TempDir())
 	controller := NewPairingController(database)
 
-	tlv8_out, err := controller.Handle(tlv8)
+	out, err := controller.Handle(tlv8)
 	assert.NotNil(t, err)
-	assert.Nil(t, tlv8_out)
+	assert.Nil(t, out)
 }
 
 func TestAddPairing(t *testing.T) {
-	tlv8 := common.NewTLV8Container()
-	tlv8.SetByte(TagPairingMethod, PairingMethodAdd)
-	tlv8.SetByte(TagSequence, 0x01)
-	tlv8.SetString(TagUsername, "Unit Test")
-	tlv8.SetBytes(TagPublicKey, []byte{0x01, 0x02})
+	in := common.NewTLV8Container()
+	in.SetByte(TagPairingMethod, PairingMethodAdd.Byte())
+	in.SetByte(TagSequence, 0x01)
+	in.SetString(TagUsername, "Unit Test")
+	in.SetBytes(TagPublicKey, []byte{0x01, 0x02})
 
 	database, _ := db.NewDatabase(os.TempDir())
 	controller := NewPairingController(database)
 
-	tlv8_out, err := controller.Handle(tlv8)
+	out, err := controller.Handle(in)
 	assert.Nil(t, err)
-	assert.NotNil(t, tlv8_out)
-	assert.Equal(t, tlv8_out.GetByte(TagSequence), byte(0x2))
+	assert.NotNil(t, out)
+	assert.Equal(t, out.GetByte(TagSequence), byte(0x2))
 }
 
 func TestDeletePairing(t *testing.T) {
@@ -43,18 +43,18 @@ func TestDeletePairing(t *testing.T) {
 	database, _ := db.NewDatabase(os.TempDir())
 	database.SaveEntity(entity)
 
-	tlv8 := common.NewTLV8Container()
-	tlv8.SetByte(TagPairingMethod, PairingMethodDelete)
-	tlv8.SetByte(TagSequence, 0x01)
-	tlv8.SetString(TagUsername, username)
+	in := common.NewTLV8Container()
+	in.SetByte(TagPairingMethod, PairingMethodDelete.Byte())
+	in.SetByte(TagSequence, 0x01)
+	in.SetString(TagUsername, username)
 
 	controller := NewPairingController(database)
 
-	tlv8_out, err := controller.Handle(tlv8)
+	out, err := controller.Handle(in)
 	assert.Nil(t, err)
-	assert.NotNil(t, tlv8_out)
-	assert.Equal(t, tlv8_out.GetByte(TagSequence), byte(0x2))
+	assert.NotNil(t, out)
+	assert.Equal(t, out.GetByte(TagSequence), byte(0x2))
 
-	saved_entity := database.EntityWithName(username)
-	assert.Nil(t, saved_entity)
+	savedEntity := database.EntityWithName(username)
+	assert.Nil(t, savedEntity)
 }

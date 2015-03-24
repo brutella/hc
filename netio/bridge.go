@@ -17,9 +17,9 @@ type Bridge struct {
 // number which should be unique for every bridge.
 func NewBridge(info BridgeInfo, database db.Database) (*Bridge, error) {
 	var err error
-	entity := database.EntityWithName(info.Id)
+	entity := database.EntityWithName(info.ID)
 	if entity == nil {
-		entity, err = db.NewRandomEntityWithName(info.Id)
+		entity, err = db.NewRandomEntityWithName(info.ID)
 		if err == nil {
 			err = database.SaveEntity(entity)
 		}
@@ -33,9 +33,9 @@ func (b *Bridge) Name() string {
 	return b.info.Name
 }
 
-// Id returns the bridge id which is used as username for pairing.
-func (b *Bridge) Id() string {
-	return b.info.Id
+// ID returns the bridge id which is used as username for pairing.
+func (b *Bridge) ID() string {
+	return b.info.ID
 }
 
 // Password returns the bridge password
@@ -43,16 +43,17 @@ func (b *Bridge) Password() string {
 	return b.info.Password
 }
 
+// PairUsername returns the username used for pairing, which is actually the return value of ID().
 func (b *Bridge) PairUsername() string {
-	return b.Id()
+	return b.ID()
 }
 
-// PrivateKey returns the bridge private key
+// PairPrivateKey returns the private key used for pairing.
 func (b *Bridge) PairPrivateKey() []byte {
 	return b.entity.PrivateKey()
 }
 
-// PublicKey returns the bridge public key
+// PairPublicKey returns the bridge public key used for pairing.
 func (b *Bridge) PairPublicKey() []byte {
 	return b.entity.PublicKey()
 }

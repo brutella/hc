@@ -15,7 +15,7 @@ import (
 
 // New returns an event response for a characteristic from an accessory.
 func New(a *accessory.Accessory, c *characteristic.Characteristic) (*http.Response, error) {
-	body, err := EventBody(a, c)
+	body, err := Body(a, c)
 	if err != nil {
 		return nil, err
 	}
@@ -47,10 +47,10 @@ func FixProtocolSpecifier(b []byte) []byte {
 	return []byte(strings.Replace(string(b), "HTTP/1.0", "EVENT/1.0", 1))
 }
 
-// EventBody returns the json body for an event response as bytes.
-func EventBody(a *accessory.Accessory, c *characteristic.Characteristic) (*bytes.Buffer, error) {
+// Body returns the json body for an event response as bytes.
+func Body(a *accessory.Accessory, c *characteristic.Characteristic) (*bytes.Buffer, error) {
 	chars := data.NewCharacteristics()
-	char := data.Characteristic{AccessoryId: a.GetId(), Id: c.GetId(), Value: c.GetValue()}
+	char := data.Characteristic{AccessoryID: a.GetID(), ID: c.GetID(), Value: c.GetValue()}
 	chars.AddCharacteristic(char)
 
 	result, err := json.Marshal(chars)

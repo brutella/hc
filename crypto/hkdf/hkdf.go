@@ -1,4 +1,4 @@
-package crypto
+package hkdf
 
 import (
 	"crypto/sha512"
@@ -6,8 +6,8 @@ import (
 	"io"
 )
 
-// HKDF_SHA512 returns a 256-bit key
-func HKDF_SHA512(master, salt, info []byte) ([32]byte, error) {
+// Sha512 returns a 256-bit key
+func Sha512(master, salt, info []byte) ([32]byte, error) {
 	hash := sha512.New
 	hkdf := hkdf.New(hash, master, salt, info)
 

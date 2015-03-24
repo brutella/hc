@@ -17,6 +17,7 @@ func NewContainerController(m *container.Container) *ContainerController {
 	return &ContainerController{container: m}
 }
 
+// HandleGetAccessories returns the container as json bytes.
 func (c *ContainerController) HandleGetAccessories(r io.Reader) (io.Reader, error) {
 	result, err := json.Marshal(c.container)
 	return bytes.NewBuffer(result), err

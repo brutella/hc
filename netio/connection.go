@@ -11,12 +11,11 @@ import (
 	"io/ioutil"
 )
 
-// A connection based on HAP protocol which encrypts and decrypts the data.
+// HAPConnection is a connection connection based on HAP protocol which encrypts and decrypts the data.
 //
-// For every connection, a new session is created in the context. The session
-// uses the Cryptographer to encrypt and decrypt data.
-// The Cryptographer is created by one of the endpoint handlers after pairing has been
-// verified. After that the communication is encrypted.
+// For every connection, a new session is created in the context. The session uses the Cryptographer
+// to encrypt and decrypt data. The Cryptographer is created by one of the endpoint handlers after
+// pairing has been verified. After that the communication is encrypted.
 //
 // When the connection is closed, the related session is removed from the context.
 type HAPConnection struct {
@@ -113,29 +112,34 @@ func (con *HAPConnection) Close() error {
 	return con.connection.Close()
 }
 
+// LocalAddr calls LocalAddr() of the underlying connection
 func (con *HAPConnection) LocalAddr() net.Addr {
 	return con.connection.LocalAddr()
 }
 
+// RemoteAddr calls RemoteAddr() of the underlying connection
 func (con *HAPConnection) RemoteAddr() net.Addr {
 	return con.connection.RemoteAddr()
 }
 
+// SetDeadline calls SetDeadline() of the underlying connection
 func (con *HAPConnection) SetDeadline(t time.Time) error {
 	return con.connection.SetReadDeadline(t)
 }
 
+// SetReadDeadline calls SetReadDeadline() of the underlying connection
 func (con *HAPConnection) SetReadDeadline(t time.Time) error {
 	return con.connection.SetReadDeadline(t)
 }
 
+// SetWriteDeadline calls SetWriteDeadline() of the underlying connection
 func (con *HAPConnection) SetWriteDeadline(t time.Time) error {
 	return con.connection.SetWriteDeadline(t)
 }
 
 // getEncrypter returns the session's Encrypter, otherwise nil
-func (c *HAPConnection) getEncrypter() Encrypter {
-	session := c.context.GetSessionForConnection(c.connection)
+func (con *HAPConnection) getEncrypter() Encrypter {
+	session := con.context.GetSessionForConnection(con.connection)
 	if session != nil {
 		return session.Encrypter()
 	}
@@ -144,8 +148,8 @@ func (c *HAPConnection) getEncrypter() Encrypter {
 }
 
 // getDecrypter returns the session's Decrypter, otherwise nil
-func (c *HAPConnection) getDecrypter() Decrypter {
-	session := c.context.GetSessionForConnection(c.connection)
+func (con *HAPConnection) getDecrypter() Decrypter {
+	session := con.context.GetSessionForConnection(con.connection)
 	if session != nil {
 		return session.Decrypter()
 	}

@@ -7,7 +7,7 @@ import (
 	"github.com/brutella/log"
 )
 
-// Implements pairing json of format
+// Pairing implements pairing json of format
 //     {
 //       "guestName": <string>,
 //       "guestPublicKey": <string>
@@ -17,11 +17,13 @@ type Pairing struct {
 	GuestPublicKey string `json:"guestPublicKey"`
 }
 
-// PairingController handles pairing with a client. The client's public key is stored in the database.
+// PairingController handles un-/pairing with a client by simply exchanging
+// the keys going through the pairing process.
 type PairingController struct {
 	database db.Database
 }
 
+// NewPairingController returns a pairing controller.
 func NewPairingController(database db.Database) *PairingController {
 	c := PairingController{
 		database: database,
@@ -30,8 +32,9 @@ func NewPairingController(database db.Database) *PairingController {
 	return &c
 }
 
+// Handle processes a container to pair with a new client without going through the pairing process.
 func (c *PairingController) Handle(cont common.Container) (common.Container, error) {
-	method := PairMethodType(cont.GetByte(TagPairingMethod))
+	method := pairMethodType(cont.GetByte(TagPairingMethod))
 	username := cont.GetString(TagUsername)
 	publicKey := cont.GetBytes(TagPublicKey)
 

@@ -9,13 +9,13 @@ func serialFilenameForName(name string) string {
 // When no serial number is stored for this name yet, a new one is created
 // using RandomHexString()
 func GetSerialNumberForAccessoryName(name string, storage Storage) string {
-	serial_file := serialFilenameForName(name)
-	serial_bytes, _ := storage.Get(serial_file)
-	serial := string(serial_bytes)
-	if len(serial) == 0 {
-		serial = RandomHexString()
-		storage.Set(serial_file, []byte(serial))
+	filename := serialFilenameForName(name)
+	b, _ := storage.Get(filename)
+	str := string(b)
+	if len(str) == 0 {
+		str = RandomHexString()
+		storage.Set(filename, []byte(str))
 	}
 
-	return serial
+	return str
 }

@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-// Handles the /pair-verify endpoint and returns TLV8 encoded data
+// PairVerify handles the /pair-verify endpoint and returns TLV8 encoded data
 //
 // This endoint is session based and handles requests based on their connections.
 // Which means that there is one pair verify controller for every connection.
@@ -22,6 +22,7 @@ type PairVerify struct {
 	database db.Database
 }
 
+// NewPairVerify returns a new handler for pair verify endpoint
 func NewPairVerify(context netio.HAPContext, database db.Database) *PairVerify {
 	handler := PairVerify{
 		context:  context,

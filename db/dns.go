@@ -1,7 +1,7 @@
 package db
 
-// Dns represents the mDNS TXT records of a HomeKit bridge.
-type Dns interface {
+// DNS contains the mDNS TXT records of a HomeKit bridge.
+type DNS interface {
 	// Name returns the bridge name
 	Name() string
 
@@ -24,8 +24,8 @@ type dns struct {
 	state         int64
 }
 
-// NewDns returns a dns with name, configuration and state.
-func NewDns(name string, configuration, state int64) *dns {
+// NewDNS returns a dns with name, configuration and state.
+func NewDNS(name string, configuration, state int64) DNS {
 	return &dns{name, configuration, state}
 }
 

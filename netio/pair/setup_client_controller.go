@@ -3,6 +3,8 @@ package pair
 import (
 	"github.com/brutella/hc/common"
 	"github.com/brutella/hc/crypto"
+	"github.com/brutella/hc/crypto/chacha20poly1305"
+	"github.com/brutella/hc/crypto/hkdf"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/netio"
 	"github.com/brutella/log"
@@ -13,12 +15,14 @@ import (
 	"io"
 )
 
+// SetupClientController handles pairing with an accessory using SRP.
 type SetupClientController struct {
 	client   *netio.Client
 	session  *SetupClientSession
 	database db.Database
 }
 
+// NewSetupClientController returns a new setup client controller.
 func NewSetupClientController(password string, client *netio.Client, database db.Database) *SetupClientController {
 	session := NewSetupClientSession("Pair-Setup", password)
 	controller := SetupClientController{
@@ -29,6 +33,8 @@ func NewSetupClientController(password string, client *netio.Client, database db
 	return &controller
 }
 
+// InitialPairingRequest returns the first request the client sends to an accessory to start the paring process.
+// The request contains the sequence set to PairStepStartRequest.
 func (setup *SetupClientController) InitialPairingRequest() io.Reader {
 	out := common.NewTLV8Container()
 	out.SetByte(TagPairingMethod, 0)
@@ -37,22 +43,23 @@ func (setup *SetupClientController) InitialPairingRequest() io.Reader {
 	return out.BytesBuffer()
 }
 
+// Handle processes a container to pair (exchange keys) with an accessory.
 func (setup *SetupClientController) Handle(in common.Container) (common.Container, error) {
-	method := PairMethodType(in.GetByte(TagPairingMethod))
+	method := pairMethodType(in.GetByte(TagPairingMethod))
 
 	// It is valid that method is not sent
 	// If method is sent then it must be 0x00
 	if method != PairingMethodDefault {
-		return nil, ErrInvalidPairMethod(method)
+		return nil, errInvalidPairMethod(method)
 	}
 
-	code := ErrCode(in.GetByte(TagErrCode))
+	code := errCode(in.GetByte(TagErrCode))
 	if code != ErrCodeNo {
 		log.Println("[ERRO]", code)
 		return nil, code.Error()
 	}
 
-	seq := PairStepType(in.GetByte(TagSequence))
+	seq := pairStepType(in.GetByte(TagSequence))
 
 	var out common.Container
 	var err error
@@ -65,7 +72,7 @@ func (setup *SetupClientController) Handle(in common.Container) (common.Containe
 	case PairStepKeyExchangeResponse:
 		out, err = setup.handleKeyExchange(in)
 	default:
-		return nil, ErrInvalidPairStep(seq)
+		return nil, errInvalidPairStep(seq)
 	}
 
 	return out, err
@@ -141,8 +148,8 @@ func (setup *SetupClientController) handlePairStepVerifyResponse(in common.Conta
 	fmt.Println("        K:", hex.EncodeToString(setup.session.EncryptionKey[:]))
 
 	// 2) Send username, LTPK, signature as encrypted message
-	hash, err := crypto.HKDF_SHA512(setup.session.PrivateKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
-	material := make([]byte, 0)
+	hash, err := hkdf.Sha512(setup.session.PrivateKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
+	var material []byte
 	material = append(material, hash[:]...)
 	material = append(material, setup.client.PairUsername()...)
 	material = append(material, setup.client.PairPublicKey()...)
@@ -157,7 +164,7 @@ func (setup *SetupClientController) handlePairStepVerifyResponse(in common.Conta
 	encryptedOut.SetBytes(TagPublicKey, []byte(setup.client.PairPublicKey()))
 	encryptedOut.SetBytes(TagSignature, []byte(signature))
 
-	encryptedBytes, tag, err := crypto.Chacha20EncryptAndPoly1305Seal(setup.session.EncryptionKey[:], []byte("PS-Msg05"), encryptedOut.BytesBuffer().Bytes(), nil)
+	encryptedBytes, tag, err := chacha20poly1305.EncryptAndSeal(setup.session.EncryptionKey[:], []byte("PS-Msg05"), encryptedOut.BytesBuffer().Bytes(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -190,13 +197,13 @@ func (setup *SetupClientController) handleKeyExchange(in common.Container) (comm
 	fmt.Println("->     Message:", hex.EncodeToString(message))
 	fmt.Println("->     MAC:", hex.EncodeToString(mac[:]))
 
-	decrypted, err := crypto.Chacha20DecryptAndPoly1305Verify(setup.session.EncryptionKey[:], []byte("PS-Msg06"), message, mac, nil)
+	decrypted, err := chacha20poly1305.DecryptAndVerify(setup.session.EncryptionKey[:], []byte("PS-Msg06"), message, mac, nil)
 
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		decrypted_buffer := bytes.NewBuffer(decrypted)
-		in, err := common.NewTLV8ContainerFromReader(decrypted_buffer)
+		decryptedBuf := bytes.NewBuffer(decrypted)
+		in, err := common.NewTLV8ContainerFromReader(decryptedBuf)
 		if err != nil {
 			fmt.Println(err)
 		}

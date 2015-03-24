@@ -4,6 +4,7 @@ import (
 	"github.com/brutella/hc/model/characteristic"
 )
 
+// Switch is a service to represent a switch.
 type Switch struct {
 	*Service
 	On   *characteristic.On
@@ -12,13 +13,13 @@ type Switch struct {
 
 // NewSwitch returns a switch service.
 func NewSwitch(name string, on bool) *Switch {
-	on_char := characteristic.NewOn(on)
-	name_char := characteristic.NewName(name)
+	onChar := characteristic.NewOn(on)
+	nameChar := characteristic.NewName(name)
 
 	service := New()
-	service.Type = TypeSwitch
-	service.AddCharacteristic(on_char.Characteristic)
-	service.AddCharacteristic(name_char.Characteristic)
+	service.Type = typeSwitch
+	service.addCharacteristic(onChar.Characteristic)
+	service.addCharacteristic(nameChar.Characteristic)
 
-	return &Switch{service, on_char, name_char}
+	return &Switch{service, onChar, nameChar}
 }

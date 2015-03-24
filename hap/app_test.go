@@ -18,7 +18,7 @@ var info = model.Info{
 }
 
 // TODO(brutella) Decide when to update DNS
-// func TestDnsUpdate(t *testing.T) {
+// func TestDNSUpdate(t *testing.T) {
 //     conf := NewConfig()
 //     conf.DatabaseDir = os.TempDir()
 //
@@ -27,23 +27,23 @@ var info = model.Info{
 //     assert.NotNil(t, app)
 //
 //     name := app.bridge.Name()
-//     dns := db.NewDns(name, 1, 1)
-//     app.Database.SaveDns(dns)
+//     dns := db.NewDNS(name, 1, 1)
+//     app.Database.SaveDNS(dns)
 //     configuration := dns.Configuration()
 //
 //     sw1 := accessory.NewSwitch(info)
 //     app.AddAccessory(sw1.Accessory)
 //
-//     // Dns must not change because service is not published yet
-//     assert.Equal(t, app.Database.DnsWithName(name).Configuration(), configuration)
+//     // DNS must not change because service is not published yet
+//     assert.Equal(t, app.Database.DNSWithName(name).Configuration(), configuration)
 //
 //     sw2 := accessory.NewSwitch(info)
 //     app.PerformBatchUpdates(func() {
 //         app.AddAccessory(sw2.Accessory)
-//         assert.Equal(t, app.Database.DnsWithName(name).Configuration(), configuration)
+//         assert.Equal(t, app.Database.DNSWithName(name).Configuration(), configuration)
 //     })
 //
-//     assert.Equal(t, app.Database.DnsWithName(name).Configuration(), configuration + 1)
+//     assert.Equal(t, app.Database.DNSWithName(name).Configuration(), configuration + 1)
 // }
 
 func TestReachabililty(t *testing.T) {

@@ -17,36 +17,36 @@ var info = model.Info{
 
 func TestContainer(t *testing.T) {
 	acc1 := accessory.New(info)
-	assert.Equal(t, acc1.GetId(), model.InvalidId)
+	assert.Equal(t, acc1.GetID(), model.InvalidID)
 
 	info.Name = "Accessory2"
 	acc2 := accessory.New(info)
-	assert.Equal(t, acc2.GetId(), model.InvalidId)
+	assert.Equal(t, acc2.GetID(), model.InvalidID)
 
 	c := NewContainer()
 	c.AddAccessory(acc1)
 	c.AddAccessory(acc2)
 
 	assert.Equal(t, len(c.Accessories), 2)
-	assert.NotEqual(t, acc1.GetId(), model.InvalidId)
-	assert.NotEqual(t, acc2.GetId(), model.InvalidId)
-	assert.NotEqual(t, acc1.GetId(), acc2.GetId())
+	assert.NotEqual(t, acc1.GetID(), model.InvalidID)
+	assert.NotEqual(t, acc2.GetID(), model.InvalidID)
+	assert.NotEqual(t, acc1.GetID(), acc2.GetID())
 
 	c.RemoveAccessory(acc2)
 	assert.Equal(t, len(c.Accessories), 1)
 }
 
-func TestValidAccessoryId(t *testing.T) {
+func TestValidAccessoryID(t *testing.T) {
 	acc1 := accessory.New(info)
-	assert.Equal(t, acc1.GetId(), model.InvalidId)
+	assert.Equal(t, acc1.GetID(), model.InvalidID)
 
 	c := NewContainer()
 	c.AddAccessory(acc1)
-	id := acc1.GetId()
-	assert.NotEqual(t, id, model.InvalidId)
+	id := acc1.GetID()
+	assert.NotEqual(t, id, model.InvalidID)
 	c.RemoveAccessory(acc1)
 	c.AddAccessory(acc1)
-	assert.Equal(t, acc1.GetId(), id)
+	assert.Equal(t, acc1.GetID(), id)
 }
 
 func TestRemoveAccessory(t *testing.T) {

@@ -6,7 +6,7 @@ import (
 )
 
 // ListenAndServe creates a http.Server which to handle TCP connection.
-// The server uses a TCPHAPListener to accept incoming connections.
+// The server uses a HAPTCPListener to accept incoming connections.
 //
 // Overview over components
 //       [server]  --------------------------> [mux]
@@ -33,7 +33,7 @@ func ListenAndServe(addr string, handler http.Handler, context HAPContext) error
 		return err
 	}
 
-	listener := NewTCPHAPListener(ln.(*net.TCPListener), context)
+	listener := NewHAPTCPListener(ln.(*net.TCPListener), context)
 
 	return server.Serve(listener)
 }

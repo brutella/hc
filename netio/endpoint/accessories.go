@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-// Handles the /accessories endpoint and returns all accessories as JSON
+// Accessories handles the /accessories endpoint and returns all accessories as JSON
 //
 // This endpoint is not session based and the same for all connections because
 // the encryption/decryption is handled by the connection automatically.
@@ -20,6 +20,7 @@ type Accessories struct {
 	mutex      *sync.Mutex
 }
 
+// NewAccessories returns a new handler for accessories endpoint
 func NewAccessories(c netio.AccessoriesHandler, mutex *sync.Mutex) *Accessories {
 	handler := Accessories{
 		controller: c,

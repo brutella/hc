@@ -1,16 +1,17 @@
 package service
 
-type ServiceType string
+// serviceType is the type for all HomeKit service types.
+type serviceType string
 
 // HomeKit defined service types.
 const (
-	TypeAccessoryInfo    = ServiceType("3E")
-	TypeGarageDoorOpener = ServiceType("41")
-	TypeLightBulb        = ServiceType("43")
-	TypeLockManagement   = ServiceType("44")
-	TypeLockMechanism    = ServiceType("45")
-	TypeOutlet           = ServiceType("47")
-	TypeSwitch           = ServiceType("49")
-	TypeThermostat       = ServiceType("4A")
-	TypeFan              = ServiceType("40")
+	typeAccessoryInfo    = serviceType("3E")
+	typeGarageDoorOpener = serviceType("41")
+	typeLightBulb        = serviceType("43")
+	typeLockManagement   = serviceType("44")
+	typeLockMechanism    = serviceType("45")
+	typeOutlet           = serviceType("47")
+	typeSwitch           = serviceType("49")
+	typeThermostat       = serviceType("4A")
+	typeFan              = serviceType("40")
 )

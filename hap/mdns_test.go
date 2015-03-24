@@ -6,7 +6,7 @@ import (
 )
 
 func TestMDNS(t *testing.T) {
-	mdns := NewService("My MDNS Service", "1234", 5010)
+	mdns := NewMDNSService("My MDNS Service", "1234", 5010)
 	assert.Equal(t, mdns.txtRecords(), []string{
 		"pv=1.0",
 		"id=1234",

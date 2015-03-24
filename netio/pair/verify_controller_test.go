@@ -22,15 +22,15 @@ func TestInvalidPublicKey(t *testing.T) {
 	controller := NewVerifyServerController(database, context)
 
 	client, _ := netio.NewClient("HomeKit Client", database)
-	client_controller := NewVerifyClientController(client, database)
+	clientController := NewVerifyClientController(client, database)
 
-	req := client_controller.InitialKeyVerifyRequest()
-	req_tlv, err := common.NewTLV8ContainerFromReader(req)
+	req := clientController.InitialKeyVerifyRequest()
+	reqContainer, err := common.NewTLV8ContainerFromReader(req)
 	assert.Nil(t, err)
-	req_tlv.SetByte(TagPublicKey, byte(0x01))
+	reqContainer.SetByte(TagPublicKey, byte(0x01))
 	// 1) C -> S
-	_, err = HandleReaderForHandler(req_tlv.BytesBuffer(), controller)
-	assert.Equal(t, err, ErrInvalidClientKeyLength)
+	_, err = HandleReaderForHandler(reqContainer.BytesBuffer(), controller)
+	assert.Equal(t, err, errInvalidClientKeyLength)
 }
 
 // Tests the pairing key verification
@@ -44,25 +44,25 @@ func TestPairVerifyIntegration(t *testing.T) {
 	context := netio.NewContextForBridge(bridge)
 	controller := NewVerifyServerController(database, context)
 
-	client_database, _ := db.NewTempDatabase()
-	bridge_entity := db.NewEntity(bridge.PairUsername(), bridge.PairPublicKey(), nil)
-	err = client_database.SaveEntity(bridge_entity)
+	clientDatabase, _ := db.NewTempDatabase()
+	bridgeEntity := db.NewEntity(bridge.PairUsername(), bridge.PairPublicKey(), nil)
+	err = clientDatabase.SaveEntity(bridgeEntity)
 	assert.Nil(t, err)
 
-	client, _ := netio.NewClient("HomeKit Client", client_database)
-	client_entity := db.NewEntity(client.PairUsername(), client.PairPublicKey(), nil)
-	err = database.SaveEntity(client_entity)
+	client, _ := netio.NewClient("HomeKit Client", clientDatabase)
+	clientEntity := db.NewEntity(client.PairUsername(), client.PairPublicKey(), nil)
+	err = database.SaveEntity(clientEntity)
 	assert.Nil(t, err)
 
-	client_controller := NewVerifyClientController(client, client_database)
+	clientController := NewVerifyClientController(client, clientDatabase)
 
-	tlvVerifyStepStartRequest := client_controller.InitialKeyVerifyRequest()
+	tlvVerifyStepStartRequest := clientController.InitialKeyVerifyRequest()
 	// 1) C -> S
 	tlvVerifyStepStartResponse, err := HandleReaderForHandler(tlvVerifyStepStartRequest, controller)
 	assert.Nil(t, err)
 
 	// 2) S -> C
-	tlvFinishRequest, err := HandleReaderForHandler(tlvVerifyStepStartResponse, client_controller)
+	tlvFinishRequest, err := HandleReaderForHandler(tlvVerifyStepStartResponse, clientController)
 	assert.Nil(t, err)
 
 	// 3) C -> S
@@ -70,7 +70,7 @@ func TestPairVerifyIntegration(t *testing.T) {
 	assert.Nil(t, err)
 
 	// 4) S -> C
-	response, err := HandleReaderForHandler(tlvFinishRespond, client_controller)
+	response, err := HandleReaderForHandler(tlvFinishRespond, clientController)
 	assert.Nil(t, err)
 	assert.Nil(t, response)
 }

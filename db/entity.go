@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/crypto"
 )
 
-// Entity represents a HomeKit entity (e.g. iOS device or HomeKit bridge).
+// Entity is a HomeKit entity (e.g. iOS device or HomeKit bridge).
 type Entity interface {
 	// Name returns the entity name
 	Name() string
@@ -32,10 +32,11 @@ type entity struct {
 	privateKey []byte
 }
 
+// NewRandomEntityWithName returns an entity with a random private and public keys
 func NewRandomEntityWithName(name string) (Entity, error) {
-	public_bytes, private_bytes, err := generateKeyPairs()
-	if err == nil && len(public_bytes) > 0 && len(private_bytes) > 0 {
-		return NewEntity(name, public_bytes, private_bytes), nil
+	public, private, err := generateKeyPairs()
+	if err == nil && len(public) > 0 && len(private) > 0 {
+		return NewEntity(name, public, private), nil
 	}
 
 	return nil, err
@@ -73,6 +74,6 @@ func (c *entity) PrivateKey() []byte {
 // generateKeyPairs generates random public and private key pairs
 func generateKeyPairs() ([]byte, []byte, error) {
 	str := common.RandomHexString()
-	public, secret, err := crypto.ED25519GenerateKey(str)
-	return public, secret, err
+	public, private, err := crypto.ED25519GenerateKey(str)
+	return public, private, err
 }

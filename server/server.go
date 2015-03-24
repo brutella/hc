@@ -26,20 +26,22 @@ type Server interface {
 	Port() string
 
 	// OnStop calls the function when the server stops
-	OnStop(fn ServerExitFunc)
+	OnStop(fn ExitFunc)
 
 	// Stop stops the server
 	Stop()
 }
 
-type ServerExitFunc func()
+// ExitFunc is the function which is invoked when the server shuts down.
+type ExitFunc func()
+
 type hkServer struct {
 	context  netio.HAPContext
 	database db.Database
 	bridge   *netio.Bridge
 	mux      *http.ServeMux
 
-	exitFunc ServerExitFunc
+	exitFunc ExitFunc
 
 	mutex     *sync.Mutex
 	container *container.Container
@@ -49,7 +51,7 @@ type hkServer struct {
 }
 
 // NewServer returns a server
-func NewServer(hap_ctx netio.HAPContext, d db.Database, c *container.Container, b *netio.Bridge, mutex *sync.Mutex) *hkServer {
+func NewServer(ctx netio.HAPContext, d db.Database, c *container.Container, b *netio.Bridge, mutex *sync.Mutex) Server {
 	// os gives us a free Port when Port is ""
 	ln, err := net.Listen("tcp", "")
 	if err != nil {
@@ -58,7 +60,7 @@ func NewServer(hap_ctx netio.HAPContext, d db.Database, c *container.Container, 
 	port := ExtractPort(ln.Addr())
 
 	s := hkServer{
-		context:   hap_ctx,
+		context:   ctx,
 		database:  d,
 		container: c,
 		bridge:    b,
@@ -73,7 +75,7 @@ func NewServer(hap_ctx netio.HAPContext, d db.Database, c *container.Container, 
 	return &s
 }
 
-func (s *hkServer) OnStop(fn ServerExitFunc) {
+func (s *hkServer) OnStop(fn ExitFunc) {
 	s.exitFunc = fn
 }
 
@@ -100,14 +102,14 @@ func (s *hkServer) Port() string {
 // dnssdCommand returns a dns-sd command string to publish the server via dns-sd on OS X
 func (s *hkServer) dnssdCommand() string {
 	hostname, _ := os.Hostname()
-	return fmt.Sprintf("dns-sd -P %s _hap local %s %s 192.168.0.14 pv=1.0 id=%s c#=1 s#=1 sf=1 ff=0 md=%s\n", s.bridge.Name(), s.port, hostname, s.bridge.Id(), s.bridge.Name())
+	return fmt.Sprintf("dns-sd -P %s _hap local %s %s 192.168.0.14 pv=1.0 id=%s c#=1 s#=1 sf=1 ff=0 md=%s\n", s.bridge.Name(), s.port, hostname, s.bridge.ID(), s.bridge.Name())
 }
 
 // listenAndServe returns a http.Server to listen on a specific address
 func (s *hkServer) listenAndServe(addr string, handler http.Handler, context netio.HAPContext) error {
 	server := http.Server{Addr: addr, Handler: handler}
-	// Use a TCPHAPListener
-	listener := netio.NewTCPHAPListener(s.listener, context)
+	// Use a HAPTCPListener
+	listener := netio.NewHAPTCPListener(s.listener, context)
 	return server.Serve(listener)
 }
 
@@ -133,13 +135,13 @@ func (s *hkServer) addrString() string {
 
 // setupEndpoints creates controller objects to handle HAP endpoints
 func (s *hkServer) setupEndpoints() {
-	container_controller := controller.NewContainerController(s.container)
-	characteristics_controller := controller.NewCharacteristicController(s.container)
-	pairing_controller := pair.NewPairingController(s.database)
+	containerController := controller.NewContainerController(s.container)
+	characteristicsController := controller.NewCharacteristicController(s.container)
+	pairingController := pair.NewPairingController(s.database)
 
 	s.mux.Handle("/pair-setup", endpoint.NewPairSetup(s.bridge, s.database, s.context))
 	s.mux.Handle("/pair-verify", endpoint.NewPairVerify(s.context, s.database))
-	s.mux.Handle("/accessories", endpoint.NewAccessories(container_controller, s.mutex))
-	s.mux.Handle("/characteristics", endpoint.NewCharacteristics(characteristics_controller, s.mutex))
-	s.mux.Handle("/pairings", endpoint.NewPairing(pairing_controller))
+	s.mux.Handle("/accessories", endpoint.NewAccessories(containerController, s.mutex))
+	s.mux.Handle("/characteristics", endpoint.NewCharacteristics(characteristicsController, s.mutex))
+	s.mux.Handle("/pairings", endpoint.NewPairing(pairingController))
 }

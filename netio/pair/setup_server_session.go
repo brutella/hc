@@ -1,7 +1,7 @@
 package pair
 
 import (
-	"github.com/brutella/hc/crypto"
+	"github.com/brutella/hc/crypto/hkdf"
 
 	"crypto/sha512"
 	"github.com/tadglines/go-pkgs/crypto/srp"
@@ -9,6 +9,7 @@ import (
 	"errors"
 )
 
+// SetupServerSession holds the keys to pair with a client.
 type SetupServerSession struct {
 	session       *srp.ServerSession
 	Salt          []byte   // s
@@ -18,16 +19,17 @@ type SetupServerSession struct {
 	Username      []byte
 }
 
+// NewSetupServerSession return a new setup server session.
 func NewSetupServerSession(username, password string) (*SetupServerSession, error) {
 	var err error
-	pair_name := []byte("Pair-Setup")
-	srp, err := srp.NewSRP(SRPGroup, sha512.New, KeyDerivativeFuncRFC2945(sha512.New, []byte(pair_name)))
+	pairName := []byte("Pair-Setup")
+	srp, err := srp.NewSRP(SRPGroup, sha512.New, KeyDerivativeFuncRFC2945(sha512.New, []byte(pairName)))
 
 	if err == nil {
 		srp.SaltLength = 16
 		salt, v, err := srp.ComputeVerifier([]byte(password))
 		if err == nil {
-			session := srp.NewServerSession([]byte(pair_name), salt, v)
+			session := srp.NewServerSession([]byte(pairName), salt, v)
 			pairing := SetupServerSession{
 				session:   session,
 				Salt:      salt,
@@ -64,7 +66,7 @@ func (p *SetupServerSession) SetupPrivateKeyFromClientPublicKey(key []byte) erro
 //
 // Only 32 bytes are used from HKDF-SHA512
 func (p *SetupServerSession) SetupEncryptionKey(salt []byte, info []byte) error {
-	hash, err := crypto.HKDF_SHA512(p.PrivateKey, salt, info)
+	hash, err := hkdf.Sha512(p.PrivateKey, salt, info)
 	if err == nil {
 		p.EncryptionKey = hash
 	}

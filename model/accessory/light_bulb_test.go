@@ -17,7 +17,7 @@ func TestLightBulb(t *testing.T) {
 
 	var bulb model.LightBulb = NewLightBulb(info)
 
-	assert.Equal(t, bulb.GetId(), model.InvalidId)
+	assert.Equal(t, bulb.GetID(), model.InvalidID)
 	assert.Equal(t, bulb.Name(), "My Light Bulb")
 	assert.Equal(t, bulb.SerialNumber(), "001")
 	assert.Equal(t, bulb.Manufacturer(), "Google")
@@ -38,9 +38,9 @@ func TestLightBulbCallbacks(t *testing.T) {
 
 	light := NewLightBulb(info)
 
-	var newBrightness int = 0
-	var newSaturation float64 = 0
-	var newHue float64 = 0
+	var newBrightness int
+	var newSaturation float64
+	var newHue float64
 	light.OnBrightnessChanged(func(value int) {
 		newBrightness = value
 	})
