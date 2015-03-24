@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"github.com/codahale/chacha20"
-	"github.com/tonnerre/golang-go.crypto/poly1305"
+	"github.com/golang/crypto/poly1305"
 )
 
 // Chacha20DecryptAndPoly1305Verify returns the chacha20 decrypted messages.
@@ -14,7 +14,7 @@ import (
 // Nonce should be 8 byte.
 func Chacha20DecryptAndPoly1305Verify(key, nonce, message []byte, mac [16]byte, add []byte) ([]byte, error) {
 
-	chacha20, err := chacha20.NewCipher(key, nonce)
+	chacha20, err := chacha20.New(key, nonce)
 	if err != nil {
 		panic(err)
 	}
@@ -62,7 +62,7 @@ func Chacha20DecryptAndPoly1305Verify(key, nonce, message []byte, mac [16]byte, 
 // Nonce should be 8 byte
 func Chacha20EncryptAndPoly1305Seal(key, nonce, message []byte, add []byte) ([]byte /*encrypted*/, [16]byte /*mac*/, error) {
 
-	chacha20, err := chacha20.NewCipher(key, nonce)
+	chacha20, err := chacha20.New(key, nonce)
 	if err != nil {
 		panic(err)
 	}

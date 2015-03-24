@@ -103,9 +103,7 @@ HomeControl depends on the following libraries
 - `github.com/stretchr/testify` to get asserts in unit tests
 - `github.com/tadglines/go-pkgs/crypto/srp` for *SRP* algorithm
 - `github.com/codahale/chacha20` for *chacha20 poly1305* algorithm
-- `github.com/tonnerre/golang-go.crypto/poly1305`for *chacha20 poly1305* algorithm
-- `github.com/tonnerre/golang-go.crypto/curve25519` for *curve25519* key generation
-- `github.com/tonnerre/golang-go.crypto/hkdf`
+- `github.com/golang/crypto`for *chacha20 poly1305* algorithm and *curve25519* key generation
 - `github.com/agl/ed25519` for *ed25519* signature
 - `github.com/gosexy/to` for type conversion
 - `github.com/oleksandr/bonjour` for mDNS

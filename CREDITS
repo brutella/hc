@@ -56,7 +56,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 ===============================================================================
-github.com/tonnerre/golang-go.crypto
+github.com/golang/crypto
 ===============================================================================
 Copyright (c) 2009 The Go Authors. All rights reserved.
 

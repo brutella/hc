@@ -2,7 +2,7 @@ package crypto
 
 import (
 	"crypto/rand"
-	"github.com/tonnerre/golang-go.crypto/curve25519"
+	"github.com/golang/crypto/curve25519"
 )
 
 const (
