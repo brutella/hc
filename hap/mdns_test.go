@@ -15,5 +15,6 @@ func TestMDNS(t *testing.T) {
 		"sf=1",
 		"ff=0",
 		"md=My MDNS Service",
+		"ci=1",
 	})
 }

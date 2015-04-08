@@ -14,14 +14,15 @@ import (
 
 // MDNSService represents a mDNS service.
 type MDNSService struct {
-	name          string
-	port          int
-	protocol      string // Protocol version (pv) (Default 1.0)
-	id            string
-	configuration int64 // c#
-	state         int64 // s#
-	mfiCompliant  bool  // ff
-	status        int64 // sf
+	name               string
+	port               int
+	protocol           string // Protocol version (pv) (Default 1.0)
+	id                 string
+	configuration      int64 // c#
+	state              int64 // s#
+	mfiCompliant       bool  // ff
+	status             int64 // sf
+	categoryIdentifier int64 // ci; default 1 (Other)
 
 	server *bonjour.Server
 }
@@ -29,14 +30,15 @@ type MDNSService struct {
 // NewMDNSService returns a new service based for the bridge name, id and port.
 func NewMDNSService(name, id string, port int) *MDNSService {
 	return &MDNSService{
-		name:          name,
-		port:          port,
-		protocol:      "1.0",
-		id:            id,
-		configuration: 1,
-		state:         1,
-		mfiCompliant:  false,
-		status:        1,
+		name:               name,
+		port:               port,
+		protocol:           "1.0",
+		id:                 id,
+		configuration:      1,
+		state:              1,
+		mfiCompliant:       false,
+		status:             1,
+		categoryIdentifier: 1,
 	}
 }
 
@@ -108,5 +110,6 @@ func (s *MDNSService) txtRecords() []string {
 		fmt.Sprintf("sf=%d", s.status),
 		fmt.Sprintf("ff=%d", to.Int64(s.mfiCompliant)),
 		fmt.Sprintf("md=%s", s.name),
+		fmt.Sprintf("ci=%d", s.categoryIdentifier),
 	}
 }
