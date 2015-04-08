@@ -143,7 +143,6 @@ func (verify *VerifyClientController) handlePairStepVerifyResponse(in common.Con
 	}
 
 	out := common.NewTLV8Container()
-	out.SetByte(TagPairingMethod, PairingMethodDefault.Byte())
 	out.SetByte(TagSequence, VerifyStepFinishRequest.Byte())
 
 	encryptedOut := common.NewTLV8Container()

@@ -244,7 +244,6 @@ func (setup *SetupServerController) handleKeyExchange(in common.Container) (comm
 			log.Println("[VERB] <-     Signature:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TagSignature)))
 
 			encrypted, mac, _ := chacha20poly1305.EncryptAndSeal(setup.session.EncryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)
-			out.SetByte(TagPairingMethod, 0)
 			out.SetByte(TagSequence, PairStepKeyExchangeRequest.Byte())
 			out.SetBytes(TagEncryptedData, append(encrypted, mac[:]...))
 
