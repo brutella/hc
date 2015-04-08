@@ -32,11 +32,22 @@ type Characteristic struct {
 	localChangeFuncs  []ChangeFunc
 }
 
-func WriteOnlyPermissions(permissions []string) bool {
+// writeOnlyPermissions returns true when permissions only include write permission
+func writeOnlyPermissions(permissions []string) bool {
 	if len(permissions) == 1 {
 		return permissions[0] == PermWrite
 	}
 	return false
+}
+
+// noWritePermissions returns true when permissions include no write permission
+func noWritePermissions(permissions []string) bool {
+	for _, value := range permissions {
+		if value == PermWrite {
+			return false
+		}
+	}
+	return true
 }
 
 // NewCharacteristic returns a characteristic
@@ -50,7 +61,7 @@ func NewCharacteristic(value interface{}, format string, t CharType, permissions
 		permissions = PermsAll()
 	}
 
-	if WriteOnlyPermissions(permissions) == true {
+	if writeOnlyPermissions(permissions) == true {
 		value = nil
 	}
 
@@ -120,7 +131,11 @@ func (c *Characteristic) GetValue() interface{} {
 // Private
 
 func (c *Characteristic) isWriteOnly() bool {
-	return WriteOnlyPermissions(c.Permissions)
+	return writeOnlyPermissions(c.Permissions)
+}
+
+func (c *Characteristic) hasWritePermissions() bool {
+	return noWritePermissions(c.Permissions) == false
 }
 
 // Sets the value of the characteristic
@@ -138,6 +153,11 @@ func (c *Characteristic) setValue(value interface{}, remote bool) {
 
 	// Ignore when new value is same
 	if c.Value == value {
+		return
+	}
+
+	// Ignore new values from remote when permissions don't allow write
+	if remote == true && c.hasWritePermissions() == false {
 		return
 	}
 

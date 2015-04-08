@@ -73,6 +73,27 @@ func TestNoValueChange(t *testing.T) {
 	assert.False(t, changed)
 }
 
+func TestReadOnlyValue(t *testing.T) {
+	c := NewCharacteristic(5, FormatInt, CharTypePowerState, PermsRead())
+
+	remoteChanged := false
+	localChanged := false
+	c.OnRemoteChange(func(c *Characteristic, new, old interface{}) {
+		remoteChanged = true
+	})
+
+	c.OnLocalChange(func(c *Characteristic, new, old interface{}) {
+		localChanged = true
+	})
+
+	c.SetValue(10)
+	c.SetValueFromRemote(11)
+
+	assert.Equal(t, c.GetValue(), 10)
+	assert.False(t, remoteChanged)
+	assert.True(t, localChanged)
+}
+
 func TestEqual(t *testing.T) {
 	c1 := NewCharacteristic(5, FormatInt, CharTypePowerState, nil)
 	c2 := NewCharacteristic(5, FormatInt, CharTypePowerState, nil)
