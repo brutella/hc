@@ -144,4 +144,5 @@ func (s *hkServer) setupEndpoints() {
 	s.mux.Handle("/accessories", endpoint.NewAccessories(containerController, s.mutex))
 	s.mux.Handle("/characteristics", endpoint.NewCharacteristics(characteristicsController, s.mutex))
 	s.mux.Handle("/pairings", endpoint.NewPairing(pairingController))
+	s.mux.Handle("/identify", endpoint.NewIdentify())
 }
