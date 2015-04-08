@@ -3,7 +3,8 @@ package model
 type TempUnit string
 
 const (
-	TempUnitCelsius = TempUnit("celsius")
+	TempUnitCelsius    = TempUnit("celsius")
+	TempUnitFahrenheit = TempUnit("fahrenheit")
 )
 
 // A Thermometer measures the temperature.

@@ -9,7 +9,7 @@ type TemperatureUnit struct {
 }
 
 func NewTemperatureUnit(unit model.TempUnit) *TemperatureUnit {
-	b := ByteFromUnit(unit)
+	b := ByteFromTempUnit(unit)
 	c := TemperatureUnit{NewByteCharacteristic(b, PermsAll())}
 	c.Type = CharTypeTemperatureUnits
 	return &c

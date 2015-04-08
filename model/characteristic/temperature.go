@@ -5,7 +5,7 @@ type TemperatureCharacteristic struct {
 	value float64
 }
 
-func NewTemperatureTemperatureCharacteristic(value, min, max, steps float64, unit string, charType CharType, permissions []string) *TemperatureCharacteristic {
+func NewTemperatureCharacteristic(value, min, max, steps float64, unit string, charType CharType, permissions []string) *TemperatureCharacteristic {
 	t := TemperatureCharacteristic{NewFloatMinMaxSteps(value, min, max, steps, permissions), value}
 	t.Unit = unit
 	t.Type = charType
@@ -13,11 +13,11 @@ func NewTemperatureTemperatureCharacteristic(value, min, max, steps float64, uni
 }
 
 func NewCurrentTemperatureCharacteristic(value, min, max, steps float64, unit string) *TemperatureCharacteristic {
-	return NewTemperatureTemperatureCharacteristic(value, min, max, steps, unit, CharTypeTemperatureCurrent, PermsRead())
+	return NewTemperatureCharacteristic(value, min, max, steps, unit, CharTypeTemperatureCurrent, PermsRead())
 }
 
 func NewTargetTemperatureCharacteristic(value, min, max, steps float64, unit string) *TemperatureCharacteristic {
-	return NewTemperatureTemperatureCharacteristic(value, min, max, steps, unit, CharTypeTemperatureTarget, PermsAll())
+	return NewTemperatureCharacteristic(value, min, max, steps, unit, CharTypeTemperatureTarget, PermsAll())
 }
 
 func (t *TemperatureCharacteristic) SetTemperature(value float64) {

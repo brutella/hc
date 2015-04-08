@@ -11,12 +11,12 @@ const (
 	// 15: 1111 -> read, write, events, bonjour
 	// 13: 1101 -> read, events, bonjour
 
-	PermRead  = "pr" // can be read
-	PermWrite = "pw" // can be written
+	PermRead   = "pr" // can be read
+	PermWrite  = "pw" // can be written
+	PermEvents = "ev" // sends events
 
 	// Unused
-	PermEvents  = "ev"
-	PermBonjour = "bonjour" // TODO never used by accessory simulator
+	PermBonjour = "bonjour"
 )
 
 // PermsAll returns read, write and event permissions
@@ -45,7 +45,8 @@ func PermsWriteOnly() []string {
 }
 
 const (
-	TempUnitCelsiusByte = 0x00
+	TempUnitCelsiusByte    = 0x00
+	TempUnitFahrenheitByte = 0x01
 
 	UnitPercentage = "percentage"
 	// UnitPercentByte = 0x01 // TODO not sure
@@ -53,11 +54,13 @@ const (
 	// UnitArcDegreesByte = 0x02 // TODO not sure
 )
 
-// ByteFromUnit returns the byte representing the argument TempUnit.
-func ByteFromUnit(unit model.TempUnit) byte {
+// ByteFromTempUnit returns the byte representing the argument TempUnit.
+func ByteFromTempUnit(unit model.TempUnit) byte {
 	switch unit {
 	case model.TempUnitCelsius:
 		return TempUnitCelsiusByte
+	case model.TempUnitFahrenheit:
+		return TempUnitFahrenheitByte
 	}
 
 	return 0x00
