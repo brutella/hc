@@ -3,8 +3,9 @@ package controller
 import (
 	"github.com/brutella/hc/model"
 	"github.com/brutella/hc/model/accessory"
+	"github.com/brutella/hc/model/characteristic"
 	"github.com/brutella/hc/model/container"
-	_ "github.com/brutella/hc/model/service"
+	"github.com/brutella/hc/model/service"
 	"github.com/brutella/hc/netio/data"
 
 	"bytes"
@@ -45,21 +46,35 @@ func TestGetCharacteristic(t *testing.T) {
 	}
 }
 
+func toSwitchService(obj interface{}) *service.Switch {
+	return obj.(*service.Switch)
+}
+
 func TestPutCharacteristic(t *testing.T) {
 	info := model.Info{
-		Name:         "My Bridge",
+		Name:         "My Switch",
 		SerialNumber: "001",
 		Manufacturer: "Google",
 		Model:        "Bridge",
 	}
 
-	a := accessory.New(info)
-	m := container.NewContainer()
-	m.AddAccessory(a)
+	a := accessory.NewSwitch(info)
+	a.SetOn(false)
 
-	aid := a.GetID()
-	cid := a.Info.Name.GetID()
-	char := data.Characteristic{AccessoryID: aid, ID: cid, Value: "My"}
+	m := container.NewContainer()
+	m.AddAccessory(a.Accessory)
+
+	// find on characteristic with type CharTypePowerState
+	var cid int64
+	for _, s := range a.Accessory.Services {
+		for _, c := range s.Characteristics {
+			if c.Type == characteristic.CharTypePowerState {
+				cid = c.ID
+			}
+		}
+	}
+	assert.NotEqual(t, 0, cid, "Could not find power state characteristic")
+	char := data.Characteristic{AccessoryID: 1, ID: cid, Value: true}
 	var slice []data.Characteristic
 	slice = append(slice, char)
 
@@ -72,5 +87,5 @@ func TestPutCharacteristic(t *testing.T) {
 	controller := NewCharacteristicController(m)
 	err = controller.HandleUpdateCharacteristics(&buffer)
 	assert.Nil(t, err)
-	assert.Equal(t, a.Info.Name.Value, "My")
+	assert.Equal(t, a.IsOn(), true)
 }

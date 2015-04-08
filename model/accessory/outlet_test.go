@@ -42,16 +42,3 @@ func TestOutletOnChanged(t *testing.T) {
 	assert.True(t, o.IsOn())
 	assert.True(t, newValue)
 }
-
-func TestOutletInUseChanged(t *testing.T) {
-	o := NewOutlet(outlet_info)
-
-	var newValue = false
-	o.InUseStateChanged(func(value bool) {
-		newValue = value
-	})
-
-	o.outlet.InUse.SetValueFromRemote(true)
-	assert.True(t, o.IsInUse())
-	assert.True(t, newValue)
-}
