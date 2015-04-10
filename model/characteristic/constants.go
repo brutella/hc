@@ -83,6 +83,7 @@ const (
 	FormatInt    = "int"    // minValue, maxValue and minStep appear
 	FormatFloat  = "float"  // minValue, maxValue, minStep and precision appear
 	FormatByte   = "uint8"
+	FormatTLV8   = "tlv8"
 )
 
 type CharType string

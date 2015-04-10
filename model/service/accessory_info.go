@@ -23,11 +23,11 @@ type AccessoryInfo struct {
 
 // NewInfo returns a accessory info
 func NewInfo(info model.Info) *AccessoryInfo {
-	return NewAccessoryInfo(info.Name, info.SerialNumber, info.Manufacturer, info.Model, info.Firmware, info.Hardware, info.Software)
+	return NewAccessoryInfo(info.Name, info.SerialNumber, info.Manufacturer, info.Model, info.Firmware, info.Hardware, info.Software, info.LogFile)
 }
 
 // NewAccessoryInfo returns a accessory info
-func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName, firmwareRevision, hardwareRevision, softwareRevision string) *AccessoryInfo {
+func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName, firmwareRevision, hardwareRevision, softwareRevision, logFile string) *AccessoryInfo {
 	identify := characteristic.NewIdentify()
 	serial := characteristic.NewSerialNumber(serialNumber)
 	model := characteristic.NewModel(modelName)
@@ -58,6 +58,11 @@ func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName, 
 	if softwareRevision != "" {
 		software = characteristic.NewSoftwareRevision(softwareRevision)
 		service.addCharacteristic(software.Characteristic)
+	}
+
+	if logFile != "" {
+		log := characteristic.NewLog(logFile)
+		service.addCharacteristic(log.Characteristic)
 	}
 
 	return &AccessoryInfo{service, identify, serial, model, manufacturer, name, firmware, hardware, software}

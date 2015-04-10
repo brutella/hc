@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"sync"
+    slog "log"
 
 	"github.com/brutella/hc/common"
 	"github.com/brutella/hc/db"
@@ -59,12 +62,25 @@ func NewApp(conf Config) (*App, error) {
 		return nil, err
 	}
 
+	// Setup log output
+	logFile, err := filepath.Abs(conf.LogFile)
+    if conf.LogFile != "" && err == nil {
+        f, err := os.OpenFile(logFile, os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
+        if err == nil {
+            // defer f.Close()
+            slog.SetOutput(f)
+            slog.Println("Start")
+        }
+        log.Println("Test")
+    }
+
 	// Bridge appears in HomeKit and must provide the mandatory accessory info servie
 	info := model.Info{
 		Name:         config.Name,
 		SerialNumber: config.SerialNumber,
 		Manufacturer: config.Manufacturer,
 		Model:        "Bridge",
+		LogFile:      logFile,
 	}
 	accessory := accessory.New(info)
 	container := container.NewContainer()

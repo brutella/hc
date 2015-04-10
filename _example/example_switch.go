@@ -12,7 +12,7 @@ import (
 // which periodically toggles the switch's on state.
 func main() {
 	// Disable verbose logging
-	log.Verbose = false
+    // log.Verbose = false
 
 	conf := hap.NewConfig()
 	// Path to database directory to store bridge informations (serial number, crypto keys,...)
@@ -59,6 +59,8 @@ func main() {
 	// Add the switch to the app
 	app.AddAccessory(sw.Accessory)
 
+
+    log.Println("Starting...")
 	// Run the app
 	app.Run()
 }
