@@ -27,6 +27,9 @@ type Database interface {
 	DeleteDNS(dns DNS)
 }
 
+// StdDatabase is the standard database
+var StdDatabase Database
+
 type database struct {
 	storage common.Storage
 }

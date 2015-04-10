@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"io/ioutil"
+	slog "log"
 	"os"
 	"path/filepath"
 	"sync"
-    slog "log"
 
 	"github.com/brutella/hc/common"
 	"github.com/brutella/hc/db"
@@ -56,7 +56,7 @@ func NewApp(conf Config) (*App, error) {
 	}
 
 	database := db.NewDatabaseWithStorage(storage)
-	config := netio.NewBridgeInfo(conf.BridgeName, conf.BridgePassword, conf.BridgeManufacturer, storage)
+	config := netio.NewAccessoryInfo(conf.BridgeName, conf.BridgePassword, conf.BridgeManufacturer, storage)
 	bridge, err := netio.NewBridge(config, database)
 	if err != nil {
 		return nil, err
@@ -64,15 +64,15 @@ func NewApp(conf Config) (*App, error) {
 
 	// Setup log output
 	logFile, err := filepath.Abs(conf.LogFile)
-    if conf.LogFile != "" && err == nil {
-        f, err := os.OpenFile(logFile, os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
-        if err == nil {
-            // defer f.Close()
-            slog.SetOutput(f)
-            slog.Println("Start")
-        }
-        log.Println("Test")
-    }
+	if conf.LogFile != "" && err == nil {
+		f, err := os.OpenFile(logFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+		if err == nil {
+			// defer f.Close()
+			slog.SetOutput(f)
+			slog.Println("Start")
+		}
+		log.Println("Test")
+	}
 
 	// Bridge appears in HomeKit and must provide the mandatory accessory info servie
 	info := model.Info{
@@ -87,7 +87,7 @@ func NewApp(conf Config) (*App, error) {
 	container.AddAccessory(accessory)
 
 	app := App{
-		context:   netio.NewContextForBridge(bridge),
+		context:   netio.NewContextForSecuredDevice(bridge),
 		bridge:    bridge,
 		Storage:   storage,
 		Database:  database,

@@ -17,13 +17,13 @@ import (
 
 // SetupClientController handles pairing with an accessory using SRP.
 type SetupClientController struct {
-	client   *netio.Client
+	client   netio.Device
 	session  *SetupClientSession
 	database db.Database
 }
 
 // NewSetupClientController returns a new setup client controller.
-func NewSetupClientController(password string, client *netio.Client, database db.Database) *SetupClientController {
+func NewSetupClientController(password string, client netio.Device, database db.Database) *SetupClientController {
 	session := NewSetupClientSession("Pair-Setup", password)
 	controller := SetupClientController{
 		client:   client,

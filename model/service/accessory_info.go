@@ -28,6 +28,20 @@ func NewInfo(info model.Info) *AccessoryInfo {
 
 // NewAccessoryInfo returns a accessory info
 func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName, firmwareRevision, hardwareRevision, softwareRevision, logFile string) *AccessoryInfo {
+
+	if len(accessoryName) == 0 {
+		accessoryName = "Undefined"
+	}
+	if len(serialNumber) == 0 {
+		serialNumber = "Undefined"
+	}
+	if len(manufacturerName) == 0 {
+		manufacturerName = "Undefined"
+	}
+	if len(modelName) == 0 {
+		modelName = "Undefined"
+	}
+
 	identify := characteristic.NewIdentify()
 	serial := characteristic.NewSerialNumber(serialNumber)
 	model := characteristic.NewModel(modelName)

@@ -21,11 +21,11 @@ type BridgeInfo struct {
 	ID string
 }
 
-// NewBridgeInfo returns a BridgeInfo object.
+// NewAccessoryInfo returns a BridgeInfo object.
 //
 // The BridgeInfo.SerialNumber is loaded from the storage, or created if not found.
 // The BridgeInfo.ID is based on the serial number bytes.
-func NewBridgeInfo(name, password, manufacturer string, storage common.Storage) BridgeInfo {
+func NewAccessoryInfo(name, password, manufacturer string, storage common.Storage) BridgeInfo {
 	serial := common.GetSerialNumberForAccessoryName(name, storage)
 	return BridgeInfo{
 		SerialNumber: serial,

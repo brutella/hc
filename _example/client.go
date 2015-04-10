@@ -29,7 +29,7 @@ func sendTLV8(b io.Reader, endpoint string) (io.Reader, error) {
 
 func main() {
 	database, _ := db.NewDatabase("./data")
-	c, _ := netio.NewClient("Golang Client", database)
+	c, _ := netio.NewDevice("Golang Client", database)
 	client := pair.NewSetupClientController("740-51-881", c, database)
 	pairStartRequest := client.InitialPairingRequest()
 

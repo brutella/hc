@@ -9,7 +9,7 @@ import (
 
 func TestNewBridge(t *testing.T) {
 	storage, _ := common.NewTempFileStorage()
-	info := NewBridgeInfo("Test Bridge", "719-47-107", "Matthias H.", storage)
+	info := NewAccessoryInfo("Test Bridge", "719-47-107", "Matthias H.", storage)
 	db := db.NewDatabaseWithStorage(storage)
 	bridge, err := NewBridge(info, db)
 	assert.Nil(t, err)

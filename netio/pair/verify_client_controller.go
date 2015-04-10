@@ -19,13 +19,13 @@ import (
 // Verification fails when the accessory is not known, the public key for the accessory was not found,
 // or the packet's seal could not be verified.
 type VerifyClientController struct {
-	client   *netio.Client
+	client   netio.Device
 	database db.Database
 	session  *VerifySession
 }
 
 // NewVerifyClientController returns a new verify client controller.
-func NewVerifyClientController(client *netio.Client, database db.Database) *VerifyClientController {
+func NewVerifyClientController(client netio.Device, database db.Database) *VerifyClientController {
 	controller := VerifyClientController{
 		client:   client,
 		database: database,
