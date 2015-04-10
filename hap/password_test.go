@@ -20,3 +20,13 @@ func TestLongPassword(t *testing.T) {
 	_, err := NewPassword("000112221")
 	assert.NotNil(t, err)
 }
+
+func TestNonNumberPassword(t *testing.T) {
+	_, err := NewPassword("0001122a")
+	assert.NotNil(t, err)
+}
+
+func TestInvalidPassword(t *testing.T) {
+	_, err := NewPassword("12345678")
+	assert.NotNil(t, err)
+}

@@ -17,9 +17,6 @@ import (
 	"github.com/gosexy/to"
 )
 
-// OnStopFunc is the function which is invoked when the transport stops.
-type OnStopFunc func()
-
 type ipTransport struct {
 	context netio.HAPContext
 	server  server.Server
@@ -36,35 +33,35 @@ type ipTransport struct {
 	container *container.Container
 }
 
-func NewIPTransport(password string, as ...*accessory.Accessory) (Transport, error) {
-	if len(as) == 0 {
-		log.Fatalf("Invalid number of acccessories %d", len(as))
-	}
-
+// NewIPTransport creates a transport to provide accessories over IP.
+// The pairing is secured using a 8-numbers password.
+// If more than one accessory is provided, the first becomes a bridge in HomeKit.
+// It's fine to provide an accessory with no explicit services as bridge.
+//
+// The tranport stores all data (crypto keys, ids) in a folder named exactly as first accessory.
+// Renaming existing accessories or changing the order of the accessories, makes the stored
+// data inaccessible to the tranport. In this case new crypto keys are created and the accessory
+// appears as a new one on clients. It's also not recommended to create a new transport for
+// accessory with exisiting name.
+func NewIPTransport(password string, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
 	// Find a name for the transport automatically
-	var name string
-	for _, a := range as {
-		if len(name) == 0 {
-			name = a.Name()
-		}
+	name := a.Name()
+	if len(name) == 0 {
+		log.Fatal("Invalid empty name for first accessory")
 	}
 
-	if len(name) == 0 {
-		log.Fatal("IP Transport has no name")
+	hapPassword, err := NewPassword(password)
+	if err != nil {
+		return nil, err
 	}
 
 	storage, err := common.NewFileStorage(name)
 	if err != nil {
 		return nil, err
 	}
-    
-    uuid := transportUUIDInStorage(storage)
-	database := db.NewDatabaseWithStorage(storage)
-	hapPassword, err := NewPassword(password)
-	if err != nil {
-		return nil, err
-	}
 
+	uuid := transportUUIDInStorage(storage)
+	database := db.NewDatabaseWithStorage(storage)
 	device, err := netio.NewSecuredDevice(uuid, hapPassword, database)
 
 	t := &ipTransport{
@@ -76,6 +73,7 @@ func NewIPTransport(password string, as ...*accessory.Accessory) (Transport, err
 		context:   netio.NewContextForSecuredDevice(device),
 	}
 
+	t.addAccessory(a)
 	for _, a := range as {
 		t.addAccessory(a)
 	}

@@ -12,10 +12,11 @@ import (
 // Accessory Pairing Username must be unique and persistent (currently derived
 // from persistent serial number)
 func main() {
-	info := model.Info{
+	switchInfo := model.Info{
 		Name: "Lamp",
 	}
-	sw := accessory.NewSwitch(info)
+	sw := accessory.NewSwitch(switchInfo)
+    
 	t, err := hap.NewIPTransport("00102003", sw.Accessory)
 
 	if err != nil {
