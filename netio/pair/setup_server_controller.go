@@ -21,25 +21,25 @@ import (
 //
 // Pairing may fail because the password is wrong or the key exchange failed (e.g. packet seals or SRP key authenticator is wrong, ...).
 type SetupServerController struct {
-	bridge   *netio.Bridge
+	device   netio.SecuredDevice
 	session  *SetupServerSession
 	step     pairStepType
 	database db.Database
 }
 
 // NewSetupServerController returns a new pair setup controller.
-func NewSetupServerController(bridge *netio.Bridge, database db.Database) (*SetupServerController, error) {
-	if len(bridge.PairPrivateKey()) == 0 {
+func NewSetupServerController(device netio.SecuredDevice, database db.Database) (*SetupServerController, error) {
+	if len(device.PrivateKey()) == 0 {
 		return nil, errors.New("no private key for pairing available")
 	}
 
-	session, err := NewSetupServerSession(bridge.PairUsername(), bridge.Password())
+	session, err := NewSetupServerSession(device.Name(), device.Password())
 	if err != nil {
 		return nil, err
 	}
 
 	controller := SetupServerController{
-		bridge:   bridge,
+		device:   device,
 		session:  session,
 		database: database,
 		step:     PairStepWaiting,
@@ -218,8 +218,8 @@ func (setup *SetupServerController) handleKeyExchange(in common.Container) (comm
 			setup.database.SaveEntity(entity)
 			log.Printf("[INFO] Stored ltpk '%s' for entity '%s'\n", hex.EncodeToString(clientltpk), username)
 
-			ltpk := setup.bridge.PairPublicKey()
-			ltsk := setup.bridge.PairPrivateKey()
+			ltpk := setup.device.PublicKey()
+			ltsk := setup.device.PrivateKey()
 
 			// Send username, ltpk, signature as encrypted message
 			hash, err := hkdf.Sha512(setup.session.PrivateKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))

@@ -7,12 +7,12 @@ import (
 	"testing"
 )
 
-func TestNewClient(t *testing.T) {
+func TestNewDevice(t *testing.T) {
 	db, _ := db.NewDatabase(os.TempDir())
-	client, err := NewClient("Test Client", db)
+	client, err := NewDevice("Test Client", db)
 	assert.Nil(t, err)
-	assert.True(t, len(client.PairPublicKey()) > 0)
-	assert.True(t, len(client.PairPrivateKey()) > 0)
+	assert.True(t, len(client.PublicKey()) > 0)
+	assert.True(t, len(client.PrivateKey()) > 0)
 
 	entity := db.EntityWithName("Test Client")
 	assert.Equal(t, entity.Name(), "Test Client")

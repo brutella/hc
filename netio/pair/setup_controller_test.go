@@ -14,14 +14,13 @@ func TestPairingIntegration(t *testing.T) {
 	storage, err := common.NewTempFileStorage()
 	assert.Nil(t, err)
 	database := db.NewDatabaseWithStorage(storage)
-	info := netio.NewBridgeInfo("Macbook Bridge", "001-02-003", "Matthias H.", storage)
-	bridge, err := netio.NewBridge(info, database)
+	bridge, err := netio.NewSecuredDevice("Macbook Bridge", "001-02-003", database)
 	assert.Nil(t, err)
 
 	controller, err := NewSetupServerController(bridge, database)
 	assert.Nil(t, err)
 	clientDatabase, _ := db.NewTempDatabase()
-	client, _ := netio.NewClient("Client", clientDatabase)
+	client, _ := netio.NewDevice("Client", clientDatabase)
 	clientController := NewSetupClientController("001-02-003", client, clientDatabase)
 	pairStartRequest := clientController.InitialPairingRequest()
 

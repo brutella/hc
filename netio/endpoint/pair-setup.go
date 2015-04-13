@@ -18,15 +18,15 @@ import (
 type PairSetup struct {
 	http.Handler
 
-	bridge   *netio.Bridge
+	device   netio.SecuredDevice
 	database db.Database
 	context  netio.HAPContext
 }
 
 // NewPairSetup returns a new handler for pairing endpoint
-func NewPairSetup(bridge *netio.Bridge, database db.Database, context netio.HAPContext) *PairSetup {
+func NewPairSetup(device netio.SecuredDevice, database db.Database, context netio.HAPContext) *PairSetup {
 	handler := PairSetup{
-		bridge:   bridge,
+		device:   device,
 		database: database,
 		context:  context,
 	}
@@ -44,7 +44,7 @@ func (handler *PairSetup) ServeHTTP(response http.ResponseWriter, request *http.
 	if controller == nil {
 		log.Println("[VERB] Create new pair setup controller")
 		var err error
-		controller, err = pair.NewSetupServerController(handler.bridge, handler.database)
+		controller, err = pair.NewSetupServerController(handler.device, handler.database)
 		if err != nil {
 			log.Println(err)
 		}

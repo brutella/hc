@@ -8,7 +8,6 @@ import (
 	"github.com/brutella/hc/netio/endpoint"
 	"github.com/brutella/hc/netio/pair"
 
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -38,7 +37,7 @@ type ExitFunc func()
 type hkServer struct {
 	context  netio.HAPContext
 	database db.Database
-	bridge   *netio.Bridge
+	device   netio.SecuredDevice
 	mux      *http.ServeMux
 
 	exitFunc ExitFunc
@@ -51,7 +50,7 @@ type hkServer struct {
 }
 
 // NewServer returns a server
-func NewServer(ctx netio.HAPContext, d db.Database, c *container.Container, b *netio.Bridge, mutex *sync.Mutex) Server {
+func NewServer(ctx netio.HAPContext, d db.Database, c *container.Container, device netio.SecuredDevice, mutex *sync.Mutex) Server {
 	// os gives us a free Port when Port is ""
 	ln, err := net.Listen("tcp", "")
 	if err != nil {
@@ -63,7 +62,7 @@ func NewServer(ctx netio.HAPContext, d db.Database, c *container.Container, b *n
 		context:   ctx,
 		database:  d,
 		container: c,
-		bridge:    b,
+		device:    device,
 		mux:       http.NewServeMux(),
 		mutex:     mutex,
 		listener:  ln.(*net.TCPListener),
@@ -97,12 +96,6 @@ func (s *hkServer) Stop() {
 
 func (s *hkServer) Port() string {
 	return s.port
-}
-
-// dnssdCommand returns a dns-sd command string to publish the server via dns-sd on OS X
-func (s *hkServer) dnssdCommand() string {
-	hostname, _ := os.Hostname()
-	return fmt.Sprintf("dns-sd -P %s _hap local %s %s 192.168.0.14 pv=1.0 id=%s c#=1 s#=1 sf=1 ff=0 md=%s\n", s.bridge.Name(), s.port, hostname, s.bridge.ID(), s.bridge.Name())
 }
 
 // listenAndServe returns a http.Server to listen on a specific address
@@ -139,7 +132,7 @@ func (s *hkServer) setupEndpoints() {
 	characteristicsController := controller.NewCharacteristicController(s.container)
 	pairingController := pair.NewPairingController(s.database)
 
-	s.mux.Handle("/pair-setup", endpoint.NewPairSetup(s.bridge, s.database, s.context))
+	s.mux.Handle("/pair-setup", endpoint.NewPairSetup(s.device, s.database, s.context))
 	s.mux.Handle("/pair-verify", endpoint.NewPairVerify(s.context, s.database))
 	s.mux.Handle("/accessories", endpoint.NewAccessories(containerController, s.mutex))
 	s.mux.Handle("/characteristics", endpoint.NewCharacteristics(characteristicsController, s.mutex))

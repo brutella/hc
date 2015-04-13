@@ -1,6 +1,6 @@
 # HomeControl
 
-*HomeControl* is an implementation of the HomeKit Accessory Protocol (HAP) to create HomeKit bridges. A HomeKit bridge makes non-HomeKit accessories available to HomeKit by acting as a middleman.
+*HomeControl* is an implementation of the HomeKit Accessory Protocol (HAP) to create HomeKit accessories. *HomeControl* supports HomeKit bridges, which makes non-HomeKit accessories available to HomeKit by acting as a middleman.
 
 ### NOTICE
 
@@ -20,7 +20,7 @@ Read the API documentation here: http://godoc.org/github.com/brutella/hc
 
 ## Example
 
-Minimal implementation of a HomeKit bridge
+Create a simple on/off switch which is accessible via IP and secured using the password *00102003*.
 
 ```go
 package main
@@ -28,71 +28,50 @@ package main
 import (
     "log"
     "github.com/brutella/hc/hap"
+    "github.com/brutella/hc/model/accessory"
 )
 
 func main() {
-    conf := hap.NewConfig()
-
-    // Path to folder where data is stored
-    conf.DatabaseDir = "./data"
-
-    // Create an app
-    app, err := hap.NewApp(conf)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    // Run it
-    app.Run()
+	info := model.Info{
+		Name: "Lamp",
+	}
+	sw := accessory.NewSwitch(info)
+    
+	t, err := hap.NewIPTransport("00102003", sw.Accessory)
+	if err != nil {
+		log.Fatal(err)
+	}
+    
+	t.Start()
 }
 ```
 
 You should change some default values for your own needs
 
 ```go
-// Name of the bridge which appears in the accessory browser on iOS; default "GoBridge"
-conf.BridgeName = "TestBridge"
-
-// Password the user has to enter when adding the accessory to HomeKit
-// Default "00102003"
-pwd, _ := hap.NewPassword("11122333")
-conf.BridgePassword = pwd 
-
-// Bridge manufacturer name
-conf.BridgeManufacturer = "Apple Inc."
-```
-
-### Add Accessories
-
-Now lets add a switch accessory which can be switched on and off.
-
-```go
-import "github.com/brutella/hc/model/accessory"
-
-info := accessory.Info{
-    Name: "My Switch",
-    SerialNumber: "001",
-    Manufacturer: "Google",
-    Model: "Switchy",
+info := model.Info{
+    SerialNumber: "051AC-23AAM1",
+	Manufacturer: "Apple",
+    Model: "AB",
+    Firwmare: "1.0.1",
 }
-
-sw := accessory.NewSwitch(info)    
-app.AddAccessory(sw.Accessory)
 ```
 
-You can use the `OnStateChanged` callback to get notified, when a HomeKit client (iOS device) changes the value of the `on` characteristic.
+### Callbacks
+
+When the power state is changed by a client, you get a callback.
 
 ```go
 sw.OnStateChanged(func(on bool) {
-    if on == true {
-        log.Println("Switch on")
-    } else {
-        log.Println("Switch off")
-    }
+	if on == true {
+		log.Println("Client changed switch to on")
+	} else {
+		log.Println("Client changed switch to off")
+	}
 })
 ```
 
-When the `on` characteristic is changed by the accessory itself e.g. when the switch is turned on "the analog way", you should notify the clients by manually setting the state.
+When the switch is turned on "the analog way", you should notify the clients by manually setting the state.
 
 	sw.SetOn(true)
 
@@ -110,8 +89,7 @@ HomeControl depends on the following libraries
 
 ## TODOs
 
-- Put vendor packages into vendor dir
-- Rethink serial number generation
+- Better random uuid
 
 ## HomeKit Accessories
 
@@ -142,7 +120,7 @@ The metdata dump in iOS 8.3 (found by [@KhaosT](https://twitter.com/khaost/statu
 
 Matthias Hochgatterer
 
-Github: [https://github.com/brutella/](https://github.com/brutella/)
+Github: [https://github.com/brutella](https://github.com/brutella/)
 
 Twitter: [https://twitter.com/brutella](https://twitter.com/brutella)
 

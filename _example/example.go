@@ -4,35 +4,25 @@ import (
 	"github.com/brutella/hc/hap"
 	"github.com/brutella/hc/model"
 	"github.com/brutella/hc/model/accessory"
-	"github.com/brutella/log"
+
+	"log"
 	"time"
 )
 
-// This sample demonstrates how to create a HomeKit bridge for a switch accessory
-// which periodically toggles the switch's on state.
+// Accessory Pairing Username must be unique and persistent (currently derived
+// from persistent serial number)
 func main() {
-	// Disable verbose logging
-	log.Verbose = false
+	switchInfo := model.Info{
+		Name: "Lamp",
+	}
+	sw := accessory.NewSwitch(switchInfo)
+    
+	t, err := hap.NewIPTransport("00102003", sw.Accessory)
 
-	conf := hap.NewConfig()
-	// Path to database directory to store bridge informations (serial number, crypto keys,...)
-	conf.DatabaseDir = "./data"
-
-	// Create a new app
-	app, err := hap.NewApp(conf)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	info := model.Info{
-		Name:         "My Switch",
-		SerialNumber: "001",
-		Manufacturer: "Google",
-		Model:        "Switchy",
-	}
-
-	// Create a switch accessory
-	sw := accessory.NewSwitch(info)
 	// Log to console when client (e.g. iOS app) changes the value of the on characteristic
 	sw.OnStateChanged(func(on bool) {
 		if on == true {
@@ -56,9 +46,5 @@ func main() {
 		}
 	}()
 
-	// Add the switch to the app
-	app.AddAccessory(sw.Accessory)
-
-	// Run the app
-	app.Run()
+	t.Start()
 }

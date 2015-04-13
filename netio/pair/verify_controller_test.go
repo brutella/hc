@@ -14,14 +14,13 @@ func TestInvalidPublicKey(t *testing.T) {
 	storage, err := common.NewTempFileStorage()
 	assert.Nil(t, err)
 	database := db.NewDatabaseWithStorage(storage)
-	info := netio.NewBridgeInfo("Macbook Bridge", "001-02-003", "Matthias H.", storage)
-	bridge, err := netio.NewBridge(info, database)
+	bridge, err := netio.NewSecuredDevice("Macbook Bridge", "001-02-003", database)
 	assert.Nil(t, err)
-	context := netio.NewContextForBridge(bridge)
+	context := netio.NewContextForSecuredDevice(bridge)
 
 	controller := NewVerifyServerController(database, context)
 
-	client, _ := netio.NewClient("HomeKit Client", database)
+	client, _ := netio.NewDevice("HomeKit Client", database)
 	clientController := NewVerifyClientController(client, database)
 
 	req := clientController.InitialKeyVerifyRequest()
@@ -38,19 +37,18 @@ func TestPairVerifyIntegration(t *testing.T) {
 	storage, err := common.NewTempFileStorage()
 	assert.Nil(t, err)
 	database := db.NewDatabaseWithStorage(storage)
-	info := netio.NewBridgeInfo("Macbook Bridge", "001-02-003", "Matthias H.", storage)
-	bridge, err := netio.NewBridge(info, database)
+	bridge, err := netio.NewSecuredDevice("Macbook Bridge", "001-02-003", database)
 	assert.Nil(t, err)
-	context := netio.NewContextForBridge(bridge)
+	context := netio.NewContextForSecuredDevice(bridge)
 	controller := NewVerifyServerController(database, context)
 
 	clientDatabase, _ := db.NewTempDatabase()
-	bridgeEntity := db.NewEntity(bridge.PairUsername(), bridge.PairPublicKey(), nil)
+	bridgeEntity := db.NewEntity(bridge.Name(), bridge.PublicKey(), nil)
 	err = clientDatabase.SaveEntity(bridgeEntity)
 	assert.Nil(t, err)
 
-	client, _ := netio.NewClient("HomeKit Client", clientDatabase)
-	clientEntity := db.NewEntity(client.PairUsername(), client.PairPublicKey(), nil)
+	client, _ := netio.NewDevice("HomeKit Client", clientDatabase)
+	clientEntity := db.NewEntity(client.Name(), client.PublicKey(), nil)
 	err = database.SaveEntity(clientEntity)
 	assert.Nil(t, err)
 

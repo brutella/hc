@@ -1,6 +1,6 @@
 package model
 
-// Info contains basic information about an accessory.
+// Info contains basic information about an accessory
 type Info struct {
 	Name         string
 	SerialNumber string
@@ -9,4 +9,5 @@ type Info struct {
 	Firmware     string
 	Software     string
 	Hardware     string
+	LogFile      string // TODO remove
 }

@@ -34,8 +34,8 @@ type HAPContext interface {
 	ActiveConnections() []net.Conn
 
 	// Setter and getter for bridge
-	SetBridge(b *Bridge)
-	GetBridge() *Bridge
+	SetSecuredDevice(b SecuredDevice)
+	GetSecuredDevice() SecuredDevice
 }
 
 // HAPContext implementation
@@ -46,13 +46,13 @@ type context struct {
 	mutex *sync.Mutex
 }
 
-// NewContextForBridge returns a new HAPContext
-func NewContextForBridge(b *Bridge) HAPContext {
+// NewContextForSecuredDevice returns a new HAPContext
+func NewContextForSecuredDevice(b SecuredDevice) HAPContext {
 	ctx := context{
 		storage: map[interface{}]interface{}{},
 		mutex:   &sync.Mutex{},
 	}
-	ctx.SetBridge(b)
+	ctx.SetSecuredDevice(b)
 	return &ctx
 }
 
@@ -120,10 +120,10 @@ func (ctx *context) ActiveConnections() []net.Conn {
 	return connections
 }
 
-func (ctx *context) SetBridge(b *Bridge) {
-	ctx.Set("bridge", b)
+func (ctx *context) SetSecuredDevice(d SecuredDevice) {
+	ctx.Set("device", d)
 }
 
-func (ctx *context) GetBridge() *Bridge {
-	return ctx.Get("bridge").(*Bridge)
+func (ctx *context) GetSecuredDevice() SecuredDevice {
+	return ctx.Get("device").(SecuredDevice)
 }

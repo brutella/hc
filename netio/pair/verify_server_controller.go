@@ -106,12 +106,12 @@ func (verify *VerifyServerController) handlePairVerifyStart(in common.Container)
 	verify.session.GenerateSharedKeyWithOtherPublicKey(otherPublicKey)
 	verify.session.SetupEncryptionKey([]byte("Pair-Verify-Encrypt-Salt"), []byte("Pair-Verify-Encrypt-Info"))
 
-	bridge := verify.context.GetBridge()
+	device := verify.context.GetSecuredDevice()
 	var material []byte
 	material = append(material, verify.session.PublicKey[:]...)
-	material = append(material, bridge.PairUsername()...)
+	material = append(material, device.Name()...)
 	material = append(material, clientPublicKey...)
-	signature, err := crypto.ED25519Signature(bridge.PairPrivateKey(), material)
+	signature, err := crypto.ED25519Signature(device.PrivateKey(), material)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -119,7 +119,7 @@ func (verify *VerifyServerController) handlePairVerifyStart(in common.Container)
 
 	// Encrypt
 	encryptedOut := common.NewTLV8Container()
-	encryptedOut.SetString(TagUsername, bridge.PairUsername())
+	encryptedOut.SetString(TagUsername, device.Name())
 	encryptedOut.SetBytes(TagSignature, signature)
 
 	encryptedBytes, mac, _ := chacha20poly1305.EncryptAndSeal(verify.session.EncryptionKey[:], []byte("PV-Msg02"), encryptedOut.BytesBuffer().Bytes(), nil)

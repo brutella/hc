@@ -53,7 +53,6 @@ func (m *Container) Equal(other interface{}) bool {
 				return false
 			}
 		}
-
 		return true
 	}
 
