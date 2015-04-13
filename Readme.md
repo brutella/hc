@@ -50,6 +50,7 @@ You should change some default values for your own needs
 
 ```go
 info := model.Info{
+    Name: "Lamp",
     SerialNumber: "051AC-23AAM1",
 	Manufacturer: "Apple",
     Model: "AB",
