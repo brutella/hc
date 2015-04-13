@@ -11,5 +11,3 @@ type Storage interface {
 	// Get returns bytes for a key
 	Get(key string) ([]byte, error)
 }
-
-var StdStorage Storage
