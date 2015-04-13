@@ -4,6 +4,7 @@ import (
 	"github.com/brutella/hc/db"
 )
 
+// Device is a HomeKit device with a name, private and public key.
 type Device interface {
 	// Name returns the username used for pairing
 	Name() string

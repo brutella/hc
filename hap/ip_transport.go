@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"io/ioutil"
 	"log"
+	"os"
+	"os/signal"
 	"sync"
 
 	"github.com/brutella/hc/common"
@@ -85,6 +87,7 @@ func NewIPTransport(password string, a *accessory.Accessory, as ...*accessory.Ac
 
 func (t *ipTransport) Start() {
 	s := server.NewServer(t.context, t.database, t.container, t.device, t.mutex)
+	t.server = s
 	port := to.Int64(s.Port())
 
 	mdns := NewMDNSService(t.name, t.device.Name(), int(port))
@@ -97,9 +100,8 @@ func (t *ipTransport) Start() {
 	}
 	mdns.Publish()
 
-	s.OnStop(func() {
-		t.Stop()
-	})
+	t.stopOnKill()
+
 	err := s.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
@@ -112,10 +114,33 @@ func (t *ipTransport) OnStop(fn OnStopFunc) {
 
 // Stop stops the ip transport by unpublishing the mDNS service.
 func (t *ipTransport) Stop() {
-	t.mdns.Stop()
+	if t.server != nil {
+		t.server.Stop()
+	}
+
+	if t.mdns != nil {
+		t.mdns.Stop()
+	}
+
 	if t.stopFunc != nil {
 		t.stopFunc()
 	}
+}
+
+// stopOnKill calls Stop on interrupt or kill signals
+func (t *ipTransport) stopOnKill() {
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt)
+	signal.Notify(c, os.Kill)
+
+	go func() {
+		select {
+		case <-c:
+			log.Println("[INFO] Teardown server")
+			t.Stop()
+			os.Exit(1)
+		}
+	}()
 }
 
 func (t *ipTransport) addAccessory(a *accessory.Accessory) {
@@ -163,16 +188,16 @@ func (t *ipTransport) notifyListener(a *accessory.Accessory, c *characteristic.C
 // transportUUIDInStorage returns the uuid stored in storage or
 // creates a new random uuid and stores it.
 func transportUUIDInStorage(storage util.Storage) string {
-	b_uuid, err := storage.Get("uuid")
-	if len(b_uuid) == 0 || err != nil {
+	uuid, err := storage.Get("uuid")
+	if len(uuid) == 0 || err != nil {
 		str := util.RandomHexString()
-		b_uuid = []byte(netio.MAC48Address(str))
-		err := storage.Set("uuid", b_uuid)
+		uuid = []byte(netio.MAC48Address(str))
+		err := storage.Set("uuid", uuid)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
-	return string(b_uuid)
+	return string(uuid)
 }
 
 // updateConfiguration increases the configuration value by 1 and re-announces the new TXT records.

@@ -46,7 +46,7 @@ func main() {
 	}()
     
     t.OnStop(func() {
-        m.Close()
+        log.Println("Transport stopped")
     })
 
 	t.Start()

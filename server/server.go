@@ -11,8 +11,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"os"
-	"os/signal"
 	"sync"
 )
 
@@ -24,23 +22,15 @@ type Server interface {
 	// Port returns the port on which the server listens to
 	Port() string
 
-	// OnStop calls the function when the server stops
-	OnStop(fn ExitFunc)
-
 	// Stop stops the server
 	Stop()
 }
-
-// ExitFunc is the function which is invoked when the server shuts down.
-type ExitFunc func()
 
 type hkServer struct {
 	context  netio.HAPContext
 	database db.Database
 	device   netio.SecuredDevice
 	mux      *http.ServeMux
-
-	exitFunc ExitFunc
 
 	mutex     *sync.Mutex
 	container *container.Container
@@ -74,23 +64,13 @@ func NewServer(ctx netio.HAPContext, d db.Database, c *container.Container, devi
 	return &s
 }
 
-func (s *hkServer) OnStop(fn ExitFunc) {
-	s.exitFunc = fn
-}
-
 func (s *hkServer) ListenAndServe() error {
-	s.teardownOnStop()
-
 	return s.listenAndServe(s.addrString(), s.mux, s.context)
 }
 
 func (s *hkServer) Stop() {
 	for _, c := range s.context.ActiveConnections() {
 		c.Close()
-	}
-
-	if s.exitFunc != nil {
-		s.exitFunc()
 	}
 }
 
@@ -104,22 +84,6 @@ func (s *hkServer) listenAndServe(addr string, handler http.Handler, context net
 	// Use a HAPTCPListener
 	listener := netio.NewHAPTCPListener(s.listener, context)
 	return server.Serve(listener)
-}
-
-// teardownOnStop calls Stop on interrupt or kill signals
-func (s *hkServer) teardownOnStop() {
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt)
-	signal.Notify(c, os.Kill)
-
-	go func() {
-		select {
-		case <-c:
-			log.Println("[INFO] Teardown server")
-			s.Stop()
-			os.Exit(1)
-		}
-	}()
 }
 
 func (s *hkServer) addrString() string {
