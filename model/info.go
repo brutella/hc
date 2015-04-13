@@ -9,5 +9,4 @@ type Info struct {
 	Firmware     string
 	Software     string
 	Hardware     string
-	LogFile      string // TODO remove
 }
