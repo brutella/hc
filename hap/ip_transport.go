@@ -85,7 +85,7 @@ func (t *ipTransport) Start() {
 	s := server.NewServer(t.context, t.database, t.container, t.device, t.mutex)
 	port := to.Int64(s.Port())
 
-	mdns := NewMDNSService(t.name, t.device.PairUsername(), int(port))
+	mdns := NewMDNSService(t.name, t.device.Name(), int(port))
 	t.mdns = mdns
 
 	dns := t.database.DNSWithName(t.name)

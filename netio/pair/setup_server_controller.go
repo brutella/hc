@@ -29,11 +29,11 @@ type SetupServerController struct {
 
 // NewSetupServerController returns a new pair setup controller.
 func NewSetupServerController(device netio.SecuredDevice, database db.Database) (*SetupServerController, error) {
-	if len(device.PairPrivateKey()) == 0 {
+	if len(device.PrivateKey()) == 0 {
 		return nil, errors.New("no private key for pairing available")
 	}
 
-	session, err := NewSetupServerSession(device.PairUsername(), device.Password())
+	session, err := NewSetupServerSession(device.Name(), device.Password())
 	if err != nil {
 		return nil, err
 	}
@@ -218,8 +218,8 @@ func (setup *SetupServerController) handleKeyExchange(in common.Container) (comm
 			setup.database.SaveEntity(entity)
 			log.Printf("[INFO] Stored ltpk '%s' for entity '%s'\n", hex.EncodeToString(clientltpk), username)
 
-			ltpk := setup.device.PairPublicKey()
-			ltsk := setup.device.PairPrivateKey()
+			ltpk := setup.device.PublicKey()
+			ltsk := setup.device.PrivateKey()
 
 			// Send username, ltpk, signature as encrypted message
 			hash, err := hkdf.Sha512(setup.session.PrivateKey, []byte("Pair-Setup-Accessory-Sign-Salt"), []byte("Pair-Setup-Accessory-Sign-Info"))

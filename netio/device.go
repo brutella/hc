@@ -5,14 +5,14 @@ import (
 )
 
 type Device interface {
-	// PairUsername returns the username used for pairing
-	PairUsername() string
+	// Name returns the username used for pairing
+	Name() string
 
-	// PairPrivateKey returns the client private key used for pairing
-	PairPrivateKey() []byte
+	// PrivateKey returns the client private key used for pairing
+	PrivateKey() []byte
 
-	// PairPublicKey returns the client public key used for pairing
-	PairPublicKey() []byte
+	// PublicKey returns the client public key used for pairing
+	PublicKey() []byte
 }
 
 type device struct {
@@ -34,16 +34,16 @@ func NewDevice(name string, database db.Database) (Device, error) {
 	return &device{entity}, err
 }
 
-func (d *device) PairUsername() string {
+func (d *device) Name() string {
 	return d.entity.Name()
 }
 
 // PairPrivateKey returns the client private key used for pairing
-func (d *device) PairPrivateKey() []byte {
+func (d *device) PrivateKey() []byte {
 	return d.entity.PrivateKey()
 }
 
 // PairPublicKey returns the client public key used for pairing
-func (d *device) PairPublicKey() []byte {
+func (d *device) PublicKey() []byte {
 	return d.entity.PublicKey()
 }

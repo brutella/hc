@@ -151,17 +151,17 @@ func (setup *SetupClientController) handlePairStepVerifyResponse(in common.Conta
 	hash, err := hkdf.Sha512(setup.session.PrivateKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
 	var material []byte
 	material = append(material, hash[:]...)
-	material = append(material, setup.client.PairUsername()...)
-	material = append(material, setup.client.PairPublicKey()...)
+	material = append(material, setup.client.Name()...)
+	material = append(material, setup.client.PublicKey()...)
 
-	signature, err := crypto.ED25519Signature(setup.client.PairPrivateKey(), material)
+	signature, err := crypto.ED25519Signature(setup.client.PrivateKey(), material)
 	if err != nil {
 		return nil, err
 	}
 
 	encryptedOut := common.NewTLV8Container()
-	encryptedOut.SetString(TagUsername, setup.client.PairUsername())
-	encryptedOut.SetBytes(TagPublicKey, []byte(setup.client.PairPublicKey()))
+	encryptedOut.SetString(TagUsername, setup.client.Name())
+	encryptedOut.SetBytes(TagPublicKey, []byte(setup.client.PublicKey()))
 	encryptedOut.SetBytes(TagSignature, []byte(signature))
 
 	encryptedBytes, tag, err := chacha20poly1305.EncryptAndSeal(setup.session.EncryptionKey[:], []byte("PS-Msg05"), encryptedOut.BytesBuffer().Bytes(), nil)
