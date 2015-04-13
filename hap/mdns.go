@@ -53,7 +53,7 @@ func (s *MDNSService) Publish() error {
 	if err != nil {
 		return err
 	}
-	log.Println("[INFO] Bridge IP is", ip)
+	log.Println("[INFO] Accessory IP is", ip)
 
 	// Host should end with '.'
 	hostname, _ := os.Hostname()

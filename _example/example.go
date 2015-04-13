@@ -45,8 +45,8 @@ func main() {
 		}
 	}()
     
-    t.OnStop(func() {
-        log.Println("Transport stopped")
+    hap.OnTermination(func(){
+        t.Stop()
     })
 
 	t.Start()

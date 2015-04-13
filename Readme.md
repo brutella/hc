@@ -43,6 +43,10 @@ func main() {
 		log.Fatal(err)
 	}
     
+    hap.OnTermination(func(){
+        t.Stop()
+    })
+    
 	t.Start()
 }
 ```

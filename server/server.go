@@ -35,8 +35,9 @@ type hkServer struct {
 	mutex     *sync.Mutex
 	container *container.Container
 
-	port     string
-	listener *net.TCPListener
+	port        string
+	listener    *net.TCPListener
+	hapListener *netio.HAPTCPListener
 }
 
 // NewServer returns a server
@@ -72,6 +73,8 @@ func (s *hkServer) Stop() {
 	for _, c := range s.context.ActiveConnections() {
 		c.Close()
 	}
+	// Stop listener
+	s.hapListener.Close()
 }
 
 func (s *hkServer) Port() string {
@@ -83,6 +86,7 @@ func (s *hkServer) listenAndServe(addr string, handler http.Handler, context net
 	server := http.Server{Addr: addr, Handler: handler}
 	// Use a HAPTCPListener
 	listener := netio.NewHAPTCPListener(s.listener, context)
+	s.hapListener = listener
 	return server.Serve(listener)
 }
 

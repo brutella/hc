@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"io/ioutil"
 	"log"
-	"os"
-	"os/signal"
 	"sync"
 
 	"github.com/brutella/hc/common"
@@ -27,8 +25,6 @@ type ipTransport struct {
 
 	storage  util.Storage
 	database db.Database
-
-	stopFunc OnStopFunc
 
 	name      string
 	device    netio.SecuredDevice
@@ -99,48 +95,19 @@ func (t *ipTransport) Start() {
 		t.database.SaveDNS(dns)
 	}
 	mdns.Publish()
-
-	t.stopOnKill()
-
-	err := s.ListenAndServe()
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func (t *ipTransport) OnStop(fn OnStopFunc) {
-	t.stopFunc = fn
+	// Listen until server.Stop() is called
+	s.ListenAndServe()
 }
 
 // Stop stops the ip transport by unpublishing the mDNS service.
 func (t *ipTransport) Stop() {
-	if t.server != nil {
-		t.server.Stop()
-	}
-
 	if t.mdns != nil {
 		t.mdns.Stop()
 	}
 
-	if t.stopFunc != nil {
-		t.stopFunc()
+	if t.server != nil {
+		t.server.Stop()
 	}
-}
-
-// stopOnKill calls Stop on interrupt or kill signals
-func (t *ipTransport) stopOnKill() {
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt)
-	signal.Notify(c, os.Kill)
-
-	go func() {
-		select {
-		case <-c:
-			log.Println("[INFO] Teardown server")
-			t.Stop()
-			os.Exit(1)
-		}
-	}()
 }
 
 func (t *ipTransport) addAccessory(a *accessory.Accessory) {
