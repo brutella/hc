@@ -36,7 +36,7 @@ func NewSetupClientController(password string, client netio.Device, database db.
 // InitialPairingRequest returns the first request the client sends to an accessory to start the paring process.
 // The request contains the sequence set to PairStepStartRequest.
 func (setup *SetupClientController) InitialPairingRequest() io.Reader {
-	out := common.NewTLV8Container()
+	out := util.NewTLV8Container()
 	out.SetByte(TagPairingMethod, 0)
 	out.SetByte(TagSequence, PairStepStartRequest.Byte())
 
@@ -44,7 +44,7 @@ func (setup *SetupClientController) InitialPairingRequest() io.Reader {
 }
 
 // Handle processes a container to pair (exchange keys) with an accessory.
-func (setup *SetupClientController) Handle(in common.Container) (common.Container, error) {
+func (setup *SetupClientController) Handle(in util.Container) (util.Container, error) {
 	method := pairMethodType(in.GetByte(TagPairingMethod))
 
 	// It is valid that method is not sent
@@ -61,7 +61,7 @@ func (setup *SetupClientController) Handle(in common.Container) (common.Containe
 
 	seq := pairStepType(in.GetByte(TagSequence))
 
-	var out common.Container
+	var out util.Container
 	var err error
 
 	switch seq {
@@ -85,7 +85,7 @@ func (setup *SetupClientController) Handle(in common.Container) (common.Containe
 // Client -> Server
 // - A: client public key
 // - M1: proof
-func (setup *SetupClientController) handlePairStepStartResponse(in common.Container) (common.Container, error) {
+func (setup *SetupClientController) handlePairStepStartResponse(in util.Container) (util.Container, error) {
 	salt := in.GetBytes(TagSalt)
 	serverPublicKey := in.GetBytes(TagPublicKey)
 
@@ -115,7 +115,7 @@ func (setup *SetupClientController) handlePairStepStartResponse(in common.Contai
 	fmt.Println("<-     A:", hex.EncodeToString(publicKey))
 	fmt.Println("<-     M1:", hex.EncodeToString(proof))
 
-	out := common.NewTLV8Container()
+	out := util.NewTLV8Container()
 	out.SetByte(TagPairingMethod, 0)
 	out.SetByte(TagSequence, PairStepVerifyRequest.Byte())
 	out.SetBytes(TagPublicKey, publicKey)
@@ -132,7 +132,7 @@ func (setup *SetupClientController) handlePairStepStartResponse(in common.Contai
 // - M2: proof
 // or
 // - auth error
-func (setup *SetupClientController) handlePairStepVerifyResponse(in common.Container) (common.Container, error) {
+func (setup *SetupClientController) handlePairStepVerifyResponse(in util.Container) (util.Container, error) {
 	serverProof := in.GetBytes(TagProof)
 	fmt.Println("->     M2:", hex.EncodeToString(serverProof))
 
@@ -159,7 +159,7 @@ func (setup *SetupClientController) handlePairStepVerifyResponse(in common.Conta
 		return nil, err
 	}
 
-	encryptedOut := common.NewTLV8Container()
+	encryptedOut := util.NewTLV8Container()
 	encryptedOut.SetString(TagUsername, setup.client.Name())
 	encryptedOut.SetBytes(TagPublicKey, []byte(setup.client.PublicKey()))
 	encryptedOut.SetBytes(TagSignature, []byte(signature))
@@ -169,7 +169,7 @@ func (setup *SetupClientController) handlePairStepVerifyResponse(in common.Conta
 		return nil, err
 	}
 
-	out := common.NewTLV8Container()
+	out := util.NewTLV8Container()
 	out.SetByte(TagPairingMethod, 0)
 	out.SetByte(TagSequence, PairStepKeyExchangeRequest.Byte())
 	out.SetBytes(TagEncryptedData, append(encryptedBytes, tag[:]...))
@@ -189,7 +189,7 @@ func (setup *SetupClientController) handlePairStepVerifyResponse(in common.Conta
 //
 // Server -> Client
 // - encrpyted tlv8: bridge LTPK, bridge name, signature (of hash `H2`, bridge name, LTPK)
-func (setup *SetupClientController) handleKeyExchange(in common.Container) (common.Container, error) {
+func (setup *SetupClientController) handleKeyExchange(in util.Container) (util.Container, error) {
 	data := in.GetBytes(TagEncryptedData)
 	message := data[:(len(data) - 16)]
 	var mac [16]byte
@@ -203,7 +203,7 @@ func (setup *SetupClientController) handleKeyExchange(in common.Container) (comm
 		fmt.Println(err)
 	} else {
 		decryptedBuf := bytes.NewBuffer(decrypted)
-		in, err := common.NewTLV8ContainerFromReader(decryptedBuf)
+		in, err := util.NewTLV8ContainerFromReader(decryptedBuf)
 		if err != nil {
 			fmt.Println(err)
 		}

@@ -28,14 +28,14 @@ func (bs *Bytes) Bytes() []byte {
 }
 
 func tlv8FromBytes(b []byte) []byte {
-	c := common.NewTLV8Container()
+	c := util.NewTLV8Container()
 	c.SetBytes(0x00, b)
 	return c.BytesBuffer().Bytes()
 }
 
 func bytesFromTLV8(b []byte) ([]byte, error) {
 	buf := bytes.NewBuffer(b)
-	c, err := common.NewTLV8ContainerFromReader(buf)
+	c, err := util.NewTLV8ContainerFromReader(buf)
 	if err != nil {
 		return nil, err
 	}

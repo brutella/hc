@@ -47,8 +47,8 @@ func (verify *VerifyServerController) KeyVerified() bool {
 }
 
 // Handle processes a container to verify if a client is paired correctly.
-func (verify *VerifyServerController) Handle(in common.Container) (common.Container, error) {
-	var out common.Container
+func (verify *VerifyServerController) Handle(in util.Container) (util.Container, error) {
+	var out util.Container
 	var err error
 
 	method := pairMethodType(in.GetByte(TagPairingMethod))
@@ -91,7 +91,7 @@ func (verify *VerifyServerController) Handle(in common.Container) (common.Contai
 // Server -> Client
 // - B: server public key
 // - signature: from server session public key, server name, client session public key
-func (verify *VerifyServerController) handlePairVerifyStart(in common.Container) (common.Container, error) {
+func (verify *VerifyServerController) handlePairVerifyStart(in util.Container) (util.Container, error) {
 	verify.step = VerifyStepStartResponse
 
 	clientPublicKey := in.GetBytes(TagPublicKey)
@@ -118,13 +118,13 @@ func (verify *VerifyServerController) handlePairVerifyStart(in common.Container)
 	}
 
 	// Encrypt
-	encryptedOut := common.NewTLV8Container()
+	encryptedOut := util.NewTLV8Container()
 	encryptedOut.SetString(TagUsername, device.Name())
 	encryptedOut.SetBytes(TagSignature, signature)
 
 	encryptedBytes, mac, _ := chacha20poly1305.EncryptAndSeal(verify.session.EncryptionKey[:], []byte("PV-Msg02"), encryptedOut.BytesBuffer().Bytes(), nil)
 
-	out := common.NewTLV8Container()
+	out := util.NewTLV8Container()
 	out.SetByte(TagSequence, verify.step.Byte())
 	out.SetBytes(TagPublicKey, verify.session.PublicKey[:])
 	out.SetBytes(TagEncryptedData, append(encryptedBytes, mac[:]...))
@@ -147,7 +147,7 @@ func (verify *VerifyServerController) handlePairVerifyStart(in common.Container)
 // Server -> Client
 // - only sequence number
 // - error code (optional)
-func (verify *VerifyServerController) handlePairVerifyFinish(in common.Container) (common.Container, error) {
+func (verify *VerifyServerController) handlePairVerifyFinish(in util.Container) (util.Container, error) {
 	verify.step = VerifyStepFinishResponse
 
 	data := in.GetBytes(TagEncryptedData)
@@ -159,7 +159,7 @@ func (verify *VerifyServerController) handlePairVerifyFinish(in common.Container
 
 	decryptedBytes, err := chacha20poly1305.DecryptAndVerify(verify.session.EncryptionKey[:], []byte("PV-Msg03"), message, mac, nil)
 
-	out := common.NewTLV8Container()
+	out := util.NewTLV8Container()
 	out.SetByte(TagSequence, verify.step.Byte())
 
 	if err != nil {
@@ -167,7 +167,7 @@ func (verify *VerifyServerController) handlePairVerifyFinish(in common.Container
 		log.Println("[ERRO]", err)
 		out.SetByte(TagErrCode, ErrCodeAuthenticationFailed.Byte()) // return error 2
 	} else {
-		in, err := common.NewTLV8ContainerFromReader(bytes.NewBuffer(decryptedBytes))
+		in, err := util.NewTLV8ContainerFromReader(bytes.NewBuffer(decryptedBytes))
 		if err != nil {
 			return nil, err
 		}

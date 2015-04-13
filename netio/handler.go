@@ -8,7 +8,7 @@ import (
 
 // A ContainerHandler abstracts request/response communication
 type ContainerHandler interface {
-	Handle(common.Container) (common.Container, error)
+	Handle(util.Container) (util.Container, error)
 }
 
 // A PairVerifyHandler is a ContainerHandler which negotations a shared key.

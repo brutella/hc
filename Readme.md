@@ -106,11 +106,11 @@ The library supports the following accessory types
 The metdata dump in iOS 8.3 (found by [@KhaosT](https://twitter.com/khaost/status/567621750494474241)) includes a list of required and optional characteristics.
 
 <table>
-    <tr><th>Accessory</th><th>Required</th><th>Optional</th><tr>
+    <tr><th>Service</th><th>Required</th><th>Optional</th><tr>
     <tr><td>Accessory Information</td><td>name, manufacturer, model, serial-number, identify</td><td>firmware.revision, hardware.revision, software.revision</td><tr>
     <tr><td>Switch</td><td>on</td><td>name</td><tr>
     <tr><td>Outlet</td><td>on, outlet-in-use</td><td>name</td><tr>
-    <tr><td>Fan</td><td>on</td><td>name, rotatino.direction, rotation.speed</td><tr>
+    <tr><td>Fan</td><td>on</td><td>name, rotation.direction, rotation.speed</td><tr>
     <tr><td>Thermostat</td><td>heating-cooling.current, heating-cooling.target, temperature.current, temperature.target, temperature.units</td><td>name, relative-humidity.current, relative-humidity.target, temperature.cooling-threshold, temperature.heating-threshold</td><tr>
     <tr><td>Garage Door Opener</td><td>door-state.current, door-state.target, obstruction-detected</td><td>lock-mechanism.current-state, lock-mechanism.target-state, name</td><tr>
     <tr><td>Light Bulb</td><td>on</td><td>name, brightness, hue, saturation</td><tr>

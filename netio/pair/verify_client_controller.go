@@ -36,8 +36,8 @@ func NewVerifyClientController(client netio.Device, database db.Database) *Verif
 }
 
 // Handle processes a container to verify if an accessory is paired correctly.
-func (verify *VerifyClientController) Handle(in common.Container) (common.Container, error) {
-	var out common.Container
+func (verify *VerifyClientController) Handle(in util.Container) (util.Container, error) {
+	var out util.Container
 	var err error
 
 	method := pairMethodType(in.GetByte(TagPairingMethod))
@@ -64,7 +64,7 @@ func (verify *VerifyClientController) Handle(in common.Container) (common.Contai
 // InitialKeyVerifyRequest returns the first request the client sends to an accessory to start the paring verifcation process.
 // The request contains the client public key and sequence set to VerifyStepStartRequest.
 func (verify *VerifyClientController) InitialKeyVerifyRequest() io.Reader {
-	out := common.NewTLV8Container()
+	out := util.NewTLV8Container()
 	out.SetByte(TagPairingMethod, 0)
 	out.SetByte(TagSequence, VerifyStepStartRequest.Byte())
 	out.SetBytes(TagPublicKey, verify.session.PublicKey[:])
@@ -84,7 +84,7 @@ func (verify *VerifyClientController) InitialKeyVerifyRequest() io.Reader {
 // - encrypted message
 //      - username
 //      - signature: from client session public key, server name, server session public key,
-func (verify *VerifyClientController) handlePairStepVerifyResponse(in common.Container) (common.Container, error) {
+func (verify *VerifyClientController) handlePairStepVerifyResponse(in util.Container) (util.Container, error) {
 	serverPublicKey := in.GetBytes(TagPublicKey)
 	if len(serverPublicKey) != 32 {
 		return nil, fmt.Errorf("Invalid server public key size %d", len(serverPublicKey))
@@ -112,7 +112,7 @@ func (verify *VerifyClientController) handlePairStepVerifyResponse(in common.Con
 		return nil, err
 	}
 
-	decryptedIn, err := common.NewTLV8ContainerFromReader(bytes.NewBuffer(decryptedBytes))
+	decryptedIn, err := util.NewTLV8ContainerFromReader(bytes.NewBuffer(decryptedBytes))
 	if err != nil {
 		return nil, err
 	}
@@ -142,10 +142,10 @@ func (verify *VerifyClientController) handlePairStepVerifyResponse(in common.Con
 		return nil, fmt.Errorf("Could not validate signature")
 	}
 
-	out := common.NewTLV8Container()
+	out := util.NewTLV8Container()
 	out.SetByte(TagSequence, VerifyStepFinishRequest.Byte())
 
-	encryptedOut := common.NewTLV8Container()
+	encryptedOut := util.NewTLV8Container()
 	encryptedOut.SetString(TagUsername, verify.client.Name())
 
 	material = make([]byte, 0)
@@ -169,7 +169,7 @@ func (verify *VerifyClientController) handlePairStepVerifyResponse(in common.Con
 
 // Server -> Client
 // - only error ocde (optional)
-func (verify *VerifyClientController) handlePairVerifyStepFinishResponse(in common.Container) (common.Container, error) {
+func (verify *VerifyClientController) handlePairVerifyStepFinishResponse(in util.Container) (util.Container, error) {
 	code := errCode(in.GetByte(TagErrCode))
 	if code != ErrCodeNo {
 		fmt.Printf("Unexpected error %v\n", code)

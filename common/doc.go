@@ -1,2 +1,2 @@
-// Package common provides basic structures.
-package common
+// Package util provides utilities.
+package util

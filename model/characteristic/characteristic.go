@@ -81,7 +81,6 @@ func (c *Characteristic) SetValue(value interface{}) {
 }
 
 func (c *Characteristic) SetValueFromRemote(value interface{}) {
-	// Make sure that the new value is of same type the old value
 	c.setValue(value, true)
 }
 

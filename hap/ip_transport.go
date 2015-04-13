@@ -23,7 +23,7 @@ type ipTransport struct {
 	mutex   *sync.Mutex
 	mdns    *MDNSService
 
-	storage  common.Storage
+	storage  util.Storage
 	database db.Database
 
 	stopFunc OnStopFunc
@@ -44,7 +44,7 @@ type ipTransport struct {
 // appears as a new one on clients. It's also not recommended to create a new transport for
 // accessory with exisiting name.
 func NewIPTransport(password string, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
-	// Find a name for the transport automatically
+	// Find transport name which is visible in mDNS
 	name := a.Name()
 	if len(name) == 0 {
 		log.Fatal("Invalid empty name for first accessory")
@@ -55,11 +55,13 @@ func NewIPTransport(password string, a *accessory.Accessory, as ...*accessory.Ac
 		return nil, err
 	}
 
-	storage, err := common.NewFileStorage(name)
+	storage, err := util.NewFileStorage(name)
 	if err != nil {
 		return nil, err
 	}
 
+	// Find transport uuid which appears as "id" txt record in mDNS and
+	// must be unique and stay the same over time
 	uuid := transportUUIDInStorage(storage)
 	database := db.NewDatabaseWithStorage(storage)
 	device, err := netio.NewSecuredDevice(uuid, hapPassword, database)
@@ -158,10 +160,12 @@ func (t *ipTransport) notifyListener(a *accessory.Accessory, c *characteristic.C
 	}
 }
 
-func transportUUIDInStorage(storage common.Storage) string {
+// transportUUIDInStorage returns the uuid stored in storage or
+// creates a new random uuid and stores it.
+func transportUUIDInStorage(storage util.Storage) string {
 	b_uuid, err := storage.Get("uuid")
 	if len(b_uuid) == 0 || err != nil {
-		str := common.RandomHexString()
+		str := util.RandomHexString()
 		b_uuid = []byte(netio.MAC48Address(str))
 		err := storage.Set("uuid", b_uuid)
 		if err != nil {

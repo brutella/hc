@@ -11,7 +11,7 @@ import (
 
 // Tests the pairing key verification
 func TestInvalidPublicKey(t *testing.T) {
-	storage, err := common.NewTempFileStorage()
+	storage, err := util.NewTempFileStorage()
 	assert.Nil(t, err)
 	database := db.NewDatabaseWithStorage(storage)
 	bridge, err := netio.NewSecuredDevice("Macbook Bridge", "001-02-003", database)
@@ -24,7 +24,7 @@ func TestInvalidPublicKey(t *testing.T) {
 	clientController := NewVerifyClientController(client, database)
 
 	req := clientController.InitialKeyVerifyRequest()
-	reqContainer, err := common.NewTLV8ContainerFromReader(req)
+	reqContainer, err := util.NewTLV8ContainerFromReader(req)
 	assert.Nil(t, err)
 	reqContainer.SetByte(TagPublicKey, byte(0x01))
 	// 1) C -> S
@@ -34,7 +34,7 @@ func TestInvalidPublicKey(t *testing.T) {
 
 // Tests the pairing key verification
 func TestPairVerifyIntegration(t *testing.T) {
-	storage, err := common.NewTempFileStorage()
+	storage, err := util.NewTempFileStorage()
 	assert.Nil(t, err)
 	database := db.NewDatabaseWithStorage(storage)
 	bridge, err := netio.NewSecuredDevice("Macbook Bridge", "001-02-003", database)

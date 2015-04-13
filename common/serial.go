@@ -1,4 +1,4 @@
-package common
+package util
 
 // SerialFilenameForName returns the serial file name for a name
 func serialFilenameForName(name string) string {

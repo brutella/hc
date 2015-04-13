@@ -49,7 +49,7 @@ func NewSetupServerController(device netio.SecuredDevice, database db.Database) 
 }
 
 // Handle processes a container to pair (exchange keys) with a client.
-func (setup *SetupServerController) Handle(in common.Container) (out common.Container, err error) {
+func (setup *SetupServerController) Handle(in util.Container) (out util.Container, err error) {
 	method := pairMethodType(in.GetByte(TagPairingMethod))
 
 	// It is valid that pair method is not sent
@@ -95,8 +95,8 @@ func (setup *SetupServerController) Handle(in common.Container) (out common.Cont
 // Server -> Client
 // - B: server public key
 // - s: salt
-func (setup *SetupServerController) handlePairStart(in common.Container) (common.Container, error) {
-	out := common.NewTLV8Container()
+func (setup *SetupServerController) handlePairStart(in util.Container) (util.Container, error) {
+	out := util.NewTLV8Container()
 	setup.step = PairStepStartResponse
 
 	out.SetByte(TagSequence, setup.step.Byte())
@@ -117,9 +117,9 @@ func (setup *SetupServerController) handlePairStart(in common.Container) (common
 // - M2: proof
 // or
 // - auth error
-func (setup *SetupServerController) handlePairVerify(in common.Container) (common.Container, error) {
+func (setup *SetupServerController) handlePairVerify(in util.Container) (util.Container, error) {
 	setup.step = PairStepVerifyResponse
-	out := common.NewTLV8Container()
+	out := util.NewTLV8Container()
 	out.SetByte(TagSequence, setup.step.Byte())
 
 	clientPublicKey := in.GetBytes(TagPublicKey)
@@ -166,8 +166,8 @@ func (setup *SetupServerController) handlePairVerify(in common.Container) (commo
 //
 // Server -> Client
 // - encrpyted tlv8: bridge ltpk, bridge name, signature (of hash, bridge name, ltpk)
-func (setup *SetupServerController) handleKeyExchange(in common.Container) (common.Container, error) {
-	out := common.NewTLV8Container()
+func (setup *SetupServerController) handleKeyExchange(in util.Container) (util.Container, error) {
+	out := util.NewTLV8Container()
 
 	setup.step = PairStepKeyExchangeResponse
 
@@ -188,7 +188,7 @@ func (setup *SetupServerController) handleKeyExchange(in common.Container) (comm
 		out.SetByte(TagErrCode, ErrCodeUnknown.Byte()) // return error 1
 	} else {
 		decryptedBuf := bytes.NewBuffer(decrypted)
-		in, err := common.NewTLV8ContainerFromReader(decryptedBuf)
+		in, err := util.NewTLV8ContainerFromReader(decryptedBuf)
 		if err != nil {
 			return nil, err
 		}
@@ -234,7 +234,7 @@ func (setup *SetupServerController) handleKeyExchange(in common.Container) (comm
 				return nil, err
 			}
 
-			tlvPairKeyExchange := common.NewTLV8Container()
+			tlvPairKeyExchange := util.NewTLV8Container()
 			tlvPairKeyExchange.SetBytes(TagUsername, setup.session.Username)
 			tlvPairKeyExchange.SetBytes(TagPublicKey, ltpk)
 			tlvPairKeyExchange.SetBytes(TagSignature, []byte(signature))

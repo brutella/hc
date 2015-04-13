@@ -10,7 +10,7 @@ import (
 )
 
 func TestUnknownPairingMethod(t *testing.T) {
-	tlv8 := common.NewTLV8Container()
+	tlv8 := util.NewTLV8Container()
 	tlv8.SetByte(TagPairingMethod, 0x09)
 
 	database, _ := db.NewDatabase(os.TempDir())
@@ -22,7 +22,7 @@ func TestUnknownPairingMethod(t *testing.T) {
 }
 
 func TestAddPairing(t *testing.T) {
-	in := common.NewTLV8Container()
+	in := util.NewTLV8Container()
 	in.SetByte(TagPairingMethod, PairingMethodAdd.Byte())
 	in.SetByte(TagSequence, 0x01)
 	in.SetString(TagUsername, "Unit Test")
@@ -43,7 +43,7 @@ func TestDeletePairing(t *testing.T) {
 	database, _ := db.NewDatabase(os.TempDir())
 	database.SaveEntity(entity)
 
-	in := common.NewTLV8Container()
+	in := util.NewTLV8Container()
 	in.SetByte(TagPairingMethod, PairingMethodDelete.Byte())
 	in.SetByte(TagSequence, 0x01)
 	in.SetString(TagUsername, username)

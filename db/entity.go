@@ -73,7 +73,7 @@ func (c *entity) PrivateKey() []byte {
 
 // generateKeyPairs generates random public and private key pairs
 func generateKeyPairs() ([]byte, []byte, error) {
-	str := common.RandomHexString()
+	str := util.RandomHexString()
 	public, private, err := crypto.ED25519GenerateKey(str)
 	return public, private, err
 }

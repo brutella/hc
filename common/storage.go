@@ -1,4 +1,4 @@
-package common
+package util
 
 // Storage stores bytes for a key.
 type Storage interface {

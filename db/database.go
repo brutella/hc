@@ -28,18 +28,18 @@ type Database interface {
 }
 
 type database struct {
-	storage common.Storage
+	storage util.Storage
 }
 
 // NewTempDatabase returns a temp database
 func NewTempDatabase() (Database, error) {
-	storage, err := common.NewTempFileStorage()
+	storage, err := util.NewTempFileStorage()
 	return NewDatabaseWithStorage(storage), err
 }
 
 // NewDatabase returns a database which stores data into the folder specified by the argument string.
 func NewDatabase(path string) (Database, error) {
-	storage, err := common.NewFileStorage(path)
+	storage, err := util.NewFileStorage(path)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func NewDatabase(path string) (Database, error) {
 }
 
 // NewDatabaseWithStorage returns a database which uses the argument storage to store data.
-func NewDatabaseWithStorage(storage common.Storage) Database {
+func NewDatabaseWithStorage(storage util.Storage) Database {
 	c := database{storage: storage}
 
 	return &c

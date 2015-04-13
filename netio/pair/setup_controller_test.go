@@ -11,7 +11,7 @@ import (
 
 // Tests the pairing setup
 func TestPairingIntegration(t *testing.T) {
-	storage, err := common.NewTempFileStorage()
+	storage, err := util.NewTempFileStorage()
 	assert.Nil(t, err)
 	database := db.NewDatabaseWithStorage(storage)
 	bridge, err := netio.NewSecuredDevice("Macbook Bridge", "001-02-003", database)
