@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"log"
+	"net"
 	"sync"
 
 	"github.com/brutella/hc/common"
@@ -115,27 +116,32 @@ func (t *ipTransport) addAccessory(a *accessory.Accessory) {
 
 	for _, s := range a.Services {
 		for _, c := range s.Characteristics {
-			onChange := func(c *characteristic.Characteristic, new, old interface{}) {
-				// (brutella) It's not clear yet when the state (s#) field in the TXT records
-				// is updated. Sometimes it's increment when a client changes a value.
-
-				// When a characteristic value changes and events are enabled for this characteristic
-				// all listeners are notified. Since we don't track which client is interested in
-				// which characteristic change event, we send them to all active connections.
+			// When a characteristic value changes and events are enabled for this characteristic
+			// all listeners are notified. Since we don't track which client is interested in
+			// which characteristic change event, we send them to all active connections.
+			onConnChange := func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
 				if c.Events == true {
-					t.notifyListener(a, c)
+					t.notifyListener(a, c, conn)
 				}
 			}
+			c.OnConnChange(onConnChange)
 
-			c.OnLocalChange(onChange)
-			c.OnRemoteChange(onChange)
+			onChange := func(c *characteristic.Characteristic, new, old interface{}) {
+				if c.Events == true {
+					t.notifyListener(a, c, nil)
+				}
+			}
+			c.OnChange(onChange)
 		}
 	}
 }
 
-func (t *ipTransport) notifyListener(a *accessory.Accessory, c *characteristic.Characteristic) {
+func (t *ipTransport) notifyListener(a *accessory.Accessory, c *characteristic.Characteristic, except net.Conn) {
 	conns := t.context.ActiveConnections()
-	for _, con := range conns {
+	for _, conn := range conns {
+		if conn == except {
+			continue
+		}
 		resp, err := event.New(a, c)
 		if err != nil {
 			log.Fatal(err)
@@ -147,8 +153,8 @@ func (t *ipTransport) notifyListener(a *accessory.Accessory, c *characteristic.C
 		resp.Write(buffer)
 		bytes, err := ioutil.ReadAll(buffer)
 		bytes = event.FixProtocolSpecifier(bytes)
-		log.Println("[VERB] <- ", string(bytes))
-		con.Write(bytes)
+		log.Printf("[VERB] %s <- %s", conn.RemoteAddr(), string(bytes))
+		conn.Write(bytes)
 	}
 }
 

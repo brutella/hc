@@ -2,7 +2,7 @@ package accessory
 
 import (
 	"github.com/brutella/hc/model"
-
+	"github.com/brutella/hc/model/characteristic"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -17,7 +17,6 @@ var info = model.Info{
 func TestSwitch(t *testing.T) {
 	var s model.Switch = NewSwitch(info)
 
-	assert.Equal(t, s.GetID(), model.InvalidID)
 	assert.Equal(t, s.Name(), "My Switch")
 	assert.Equal(t, s.SerialNumber(), "001")
 	assert.Equal(t, s.Manufacturer(), "Google")
@@ -38,7 +37,7 @@ func TestSwitchOnChanged(t *testing.T) {
 		newValue = value
 	})
 
-	s.switcher.On.SetValueFromRemote(true)
+	s.switcher.On.SetValueFromConnection(true, characteristic.TestConn)
 	assert.True(t, s.IsOn())
 	assert.True(t, newValue)
 }

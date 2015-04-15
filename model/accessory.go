@@ -4,12 +4,6 @@ package model
 type Accessory interface {
 	Compareable
 
-	// GetID returns the accessory id
-	GetID() int64
-
-	// GetServices returns the services which represent the accessory
-	GetServices() []Service
-
 	// Name returns accessory name
 	Name() string
 

@@ -4,6 +4,7 @@ import (
 	"github.com/brutella/hc/model"
 	"github.com/brutella/hc/model/characteristic"
 	"github.com/brutella/hc/model/service"
+	"net"
 )
 
 // Accessory implements the model.Accessory interface and contains the data
@@ -33,7 +34,7 @@ func New(info model.Info) *Accessory {
 
 	a.AddService(i.Service)
 
-	i.Identify.OnRemoteChange(func(c *characteristic.Characteristic, new, old interface{}) {
+	i.Identify.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
 		if a.onIdentify != nil {
 			a.onIdentify()
 		}
@@ -50,8 +51,8 @@ func (a *Accessory) GetID() int64 {
 	return a.ID
 }
 
-func (a *Accessory) GetServices() []model.Service {
-	result := make([]model.Service, 0)
+func (a *Accessory) GetServices() []*service.Service {
+	result := make([]*service.Service, 0)
 	for _, s := range a.Services {
 		result = append(result, s)
 	}

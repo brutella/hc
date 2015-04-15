@@ -31,7 +31,7 @@ func NewAccessories(c netio.AccessoriesHandler, mutex *sync.Mutex) *Accessories 
 }
 
 func (handler *Accessories) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	log.Println("[VERB] GET /accessories")
+	log.Printf("[VERB] %v GET /accessories", request.RemoteAddr)
 	response.Header().Set("Content-Type", netio.HTTPContentTypeHAPJson)
 
 	handler.mutex.Lock()

@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/brutella/hc/model"
+	"github.com/brutella/hc/model/characteristic"
 	"github.com/brutella/hc/model/container"
 	"github.com/brutella/hc/netio/data"
 	"github.com/brutella/log"
@@ -11,6 +11,7 @@ import (
 
 	"io"
 	"io/ioutil"
+	"net"
 	"net/url"
 )
 
@@ -50,7 +51,7 @@ func (ctr *CharacteristicController) HandleGetCharacteristics(form url.Values) (
 
 // HandleUpdateCharacteristics handles an update characteristic request. The bytes must represent
 // a data.Characteristics json.
-func (ctr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader) error {
+func (ctr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader, conn net.Conn) error {
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		return err
@@ -72,7 +73,7 @@ func (ctr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader) er
 		}
 
 		if c.Value != nil {
-			characteristic.SetValueFromRemote(c.Value)
+			characteristic.SetValueFromConnection(c.Value, conn)
 		}
 
 		if events, ok := c.Events.(bool); ok == true {
@@ -84,7 +85,7 @@ func (ctr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader) er
 }
 
 // GetCharacteristic returns the characteristic with the specified accessory and characteristic id.
-func (ctr *CharacteristicController) GetCharacteristic(accessoryID int64, characteristicID int64) model.Characteristic {
+func (ctr *CharacteristicController) GetCharacteristic(accessoryID int64, characteristicID int64) *characteristic.Characteristic {
 	for _, a := range ctr.container.Accessories {
 		if a.GetID() == accessoryID {
 			for _, s := range a.GetServices() {

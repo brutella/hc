@@ -2,6 +2,7 @@ package accessory
 
 import (
 	"github.com/brutella/hc/model"
+	"github.com/brutella/hc/model/characteristic"
 
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -17,7 +18,6 @@ func TestLightBulb(t *testing.T) {
 
 	var bulb model.LightBulb = NewLightBulb(info)
 
-	assert.Equal(t, bulb.GetID(), model.InvalidID)
 	assert.Equal(t, bulb.Name(), "My Light Bulb")
 	assert.Equal(t, bulb.SerialNumber(), "001")
 	assert.Equal(t, bulb.Manufacturer(), "Google")
@@ -53,9 +53,9 @@ func TestLightBulbCallbacks(t *testing.T) {
 		newSaturation = value
 	})
 
-	light.bulb.Brightness.SetValueFromRemote(80)
-	light.bulb.Hue.SetValueFromRemote(15.5)
-	light.bulb.Saturation.SetValueFromRemote(22.4)
+	light.bulb.Brightness.SetValueFromConnection(80, characteristic.TestConn)
+	light.bulb.Hue.SetValueFromConnection(15.5, characteristic.TestConn)
+	light.bulb.Saturation.SetValueFromConnection(22.4, characteristic.TestConn)
 	assert.Equal(t, newBrightness, 80)
 	assert.Equal(t, newHue, 15.5)
 	assert.Equal(t, newSaturation, 22.4)

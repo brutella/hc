@@ -27,7 +27,7 @@ func NewPairing(controller *pair.PairingController) *Pairing {
 }
 
 func (handler *Pairing) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	log.Println("[VERB] POST /pairings")
+	log.Printf("[VERB] %v POST /pairings", request.RemoteAddr)
 	response.Header().Set("Content-Type", netio.HTTPContentTypePairingTLV8)
 
 	res, err := pair.HandleReaderForHandler(request.Body, handler.controller)

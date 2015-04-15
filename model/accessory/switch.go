@@ -4,6 +4,7 @@ import (
 	"github.com/brutella/hc/model"
 	"github.com/brutella/hc/model/characteristic"
 	"github.com/brutella/hc/model/service"
+	"net"
 )
 
 type switcher struct {
@@ -22,7 +23,7 @@ func NewSwitch(info model.Info) *switcher {
 
 	sw := switcher{accessory, s, nil}
 
-	s.On.OnRemoteChange(func(c *characteristic.Characteristic, new, old interface{}) {
+	s.On.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
 		if sw.onChanged != nil {
 			sw.onChanged(s.On.On())
 		}

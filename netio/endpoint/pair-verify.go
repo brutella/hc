@@ -33,7 +33,7 @@ func NewPairVerify(context netio.HAPContext, database db.Database) *PairVerify {
 }
 
 func (handler *PairVerify) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	log.Println("[VERB] POST /pair-verify")
+	log.Printf("[VERB] %v POST /pair-verify", request.RemoteAddr)
 	response.Header().Set("Content-Type", netio.HTTPContentTypePairingTLV8)
 
 	key := handler.context.GetConnectionKey(request)

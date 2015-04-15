@@ -4,6 +4,7 @@ import (
 	"github.com/brutella/hc/model"
 	"github.com/brutella/hc/model/characteristic"
 	"github.com/brutella/hc/model/service"
+	"net"
 )
 
 type outlet struct {
@@ -23,13 +24,13 @@ func NewOutlet(info model.Info) *outlet {
 
 	sw := outlet{accessory, s, nil, nil}
 
-	s.On.OnRemoteChange(func(c *characteristic.Characteristic, new, old interface{}) {
+	s.On.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
 		if sw.onChanged != nil {
 			sw.onChanged(s.On.On())
 		}
 	})
 
-	s.InUse.OnRemoteChange(func(c *characteristic.Characteristic, new, old interface{}) {
+	s.InUse.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
 		if sw.inUseChanged != nil {
 			sw.inUseChanged(s.InUse.InUse())
 		}

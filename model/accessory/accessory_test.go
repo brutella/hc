@@ -2,6 +2,7 @@ package accessory
 
 import (
 	"github.com/brutella/hc/model"
+	"github.com/brutella/hc/model/characteristic"
 
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -15,7 +16,7 @@ func TestAccessoryIdentifyChanged(t *testing.T) {
 		identifyCalled++
 	})
 
-	a.Info.Identify.SetValueFromRemote(true)
+	a.Info.Identify.SetValueFromConnection(true, characteristic.TestConn)
 	// Identify is set to false immediately
 	assert.Nil(t, a.Info.Identify.GetValue())
 	assert.Equal(t, identifyCalled, 1)

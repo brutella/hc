@@ -24,7 +24,7 @@ type PairSetup struct {
 }
 
 // NewPairSetup returns a new handler for pairing endpoint
-func NewPairSetup(device netio.SecuredDevice, database db.Database, context netio.HAPContext) *PairSetup {
+func NewPairSetup(context netio.HAPContext, device netio.SecuredDevice, database db.Database) *PairSetup {
 	handler := PairSetup{
 		device:   device,
 		database: database,
@@ -35,7 +35,7 @@ func NewPairSetup(device netio.SecuredDevice, database db.Database, context neti
 }
 
 func (handler *PairSetup) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	log.Println("[VERB] POST /pair-setup")
+	log.Printf("[VERB] %v POST /pair-setup", request.RemoteAddr)
 	response.Header().Set("Content-Type", netio.HTTPContentTypePairingTLV8)
 
 	key := handler.context.GetConnectionKey(request)

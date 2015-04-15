@@ -2,6 +2,7 @@ package characteristic
 
 import (
 	"github.com/stretchr/testify/assert"
+	"net"
 	"testing"
 )
 
@@ -25,7 +26,7 @@ func TestCharacteristicLocalDelegate(t *testing.T) {
 	var oldValue interface{}
 	var newValue interface{}
 
-	c.OnLocalChange(func(c *Characteristic, new, old interface{}) {
+	c.OnChange(func(c *Characteristic, new, old interface{}) {
 		newValue = new
 		oldValue = old
 	})
@@ -33,7 +34,7 @@ func TestCharacteristicLocalDelegate(t *testing.T) {
 	c.SetValue(10)
 	assert.Equal(t, oldValue, 5)
 	assert.Equal(t, newValue, 10)
-	c.SetValueFromRemote(20)
+	c.SetValueFromConnection(20, TestConn)
 	assert.Equal(t, oldValue, 5)
 	assert.Equal(t, newValue, 10)
 }
@@ -43,12 +44,13 @@ func TestCharacteristicRemoteDelegate(t *testing.T) {
 
 	var oldValue interface{}
 	var newValue interface{}
-	c.OnRemoteChange(func(c *Characteristic, new, old interface{}) {
+	c.OnConnChange(func(conn net.Conn, c *Characteristic, new, old interface{}) {
+		assert.Equal(t, conn, TestConn)
 		newValue = new
 		oldValue = old
 	})
 
-	c.SetValueFromRemote(10)
+	c.SetValueFromConnection(10, TestConn)
 	assert.Equal(t, oldValue, 5)
 	assert.Equal(t, newValue, 10)
 	c.SetValue(20)
@@ -60,16 +62,17 @@ func TestNoValueChange(t *testing.T) {
 	c := NewCharacteristic(5, FormatInt, CharTypePowerState, nil)
 
 	changed := false
-	c.OnRemoteChange(func(c *Characteristic, new, old interface{}) {
+	c.OnConnChange(func(conn net.Conn, c *Characteristic, new, old interface{}) {
+		assert.Equal(t, conn, TestConn)
 		changed = true
 	})
 
-	c.OnLocalChange(func(c *Characteristic, new, old interface{}) {
+	c.OnChange(func(c *Characteristic, new, old interface{}) {
 		changed = true
 	})
 
 	c.SetValue(5)
-	c.SetValueFromRemote(5)
+	c.SetValueFromConnection(5, TestConn)
 	assert.False(t, changed)
 }
 
@@ -78,16 +81,17 @@ func TestReadOnlyValue(t *testing.T) {
 
 	remoteChanged := false
 	localChanged := false
-	c.OnRemoteChange(func(c *Characteristic, new, old interface{}) {
+	c.OnConnChange(func(conn net.Conn, c *Characteristic, new, old interface{}) {
+		assert.Equal(t, conn, TestConn)
 		remoteChanged = true
 	})
 
-	c.OnLocalChange(func(c *Characteristic, new, old interface{}) {
+	c.OnChange(func(c *Characteristic, new, old interface{}) {
 		localChanged = true
 	})
 
 	c.SetValue(10)
-	c.SetValueFromRemote(11)
+	c.SetValueFromConnection(11, TestConn)
 
 	assert.Equal(t, c.GetValue(), 10)
 	assert.False(t, remoteChanged)

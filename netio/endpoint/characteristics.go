@@ -19,13 +19,15 @@ type Characteristics struct {
 
 	controller netio.CharacteristicsHandler
 	mutex      *sync.Mutex
+	context    netio.HAPContext
 }
 
 // NewCharacteristics returns a new handler for characteristics endpoint
-func NewCharacteristics(c netio.CharacteristicsHandler, mutex *sync.Mutex) *Characteristics {
+func NewCharacteristics(context netio.HAPContext, c netio.CharacteristicsHandler, mutex *sync.Mutex) *Characteristics {
 	handler := Characteristics{
 		controller: c,
 		mutex:      mutex,
+		context:    context,
 	}
 
 	return &handler
@@ -38,12 +40,14 @@ func (handler *Characteristics) ServeHTTP(response http.ResponseWriter, request 
 	handler.mutex.Lock()
 	switch request.Method {
 	case netio.MethodGET:
-		log.Println("[VERB] GET /characteristics")
+		log.Printf("[VERB] %v GET /characteristics", request.RemoteAddr)
 		request.ParseForm()
 		res, err = handler.controller.HandleGetCharacteristics(request.Form)
 	case netio.MethodPUT:
-		log.Println("[VERB] PUT /characteristics")
-		err = handler.controller.HandleUpdateCharacteristics(request.Body)
+		log.Printf("[VERB] %v PUT /characteristics", request.RemoteAddr)
+		session := handler.context.GetSessionForRequest(request)
+		conn := session.Connection()
+		err = handler.controller.HandleUpdateCharacteristics(request.Body, conn)
 	default:
 		log.Println("[WARN] Cannot handle HTTP method", request.Method)
 	}

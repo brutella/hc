@@ -100,10 +100,10 @@ func (s *hkServer) setupEndpoints() {
 	characteristicsController := controller.NewCharacteristicController(s.container)
 	pairingController := pair.NewPairingController(s.database)
 
-	s.mux.Handle("/pair-setup", endpoint.NewPairSetup(s.device, s.database, s.context))
+	s.mux.Handle("/pair-setup", endpoint.NewPairSetup(s.context, s.device, s.database))
 	s.mux.Handle("/pair-verify", endpoint.NewPairVerify(s.context, s.database))
 	s.mux.Handle("/accessories", endpoint.NewAccessories(containerController, s.mutex))
-	s.mux.Handle("/characteristics", endpoint.NewCharacteristics(characteristicsController, s.mutex))
+	s.mux.Handle("/characteristics", endpoint.NewCharacteristics(s.context, characteristicsController, s.mutex))
 	s.mux.Handle("/pairings", endpoint.NewPairing(pairingController))
 	s.mux.Handle("/identify", endpoint.NewIdentify())
 }

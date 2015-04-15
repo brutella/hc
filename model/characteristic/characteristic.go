@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"github.com/brutella/hc/model"
 	"github.com/gosexy/to"
+	"net"
 	"reflect"
 )
 
+type ConnChangeFunc func(conn net.Conn, c *Characteristic, newValue, oldValue interface{})
 type ChangeFunc func(c *Characteristic, newValue, oldValue interface{})
 
 // Characteristic is a HomeKit characteristic.
@@ -28,8 +30,8 @@ type Characteristic struct {
 	// unused
 	Events bool `json:"-"`
 
-	remoteChangeFuncs []ChangeFunc
-	localChangeFuncs  []ChangeFunc
+	connChangeFuncs  []ConnChangeFunc
+	localChangeFuncs []ChangeFunc
 }
 
 // writeOnlyPermissions returns true when permissions only include write permission
@@ -66,22 +68,22 @@ func NewCharacteristic(value interface{}, format string, t CharType, permissions
 	}
 
 	return &Characteristic{
-		ID:                model.InvalidID,
-		Value:             value,
-		Format:            format,
-		Type:              t,
-		Permissions:       permissions,
-		remoteChangeFuncs: make([]ChangeFunc, 0),
-		localChangeFuncs:  make([]ChangeFunc, 0),
+		ID:               model.InvalidID,
+		Value:            value,
+		Format:           format,
+		Type:             t,
+		Permissions:      permissions,
+		connChangeFuncs:  make([]ConnChangeFunc, 0),
+		localChangeFuncs: make([]ChangeFunc, 0),
 	}
 }
 
 func (c *Characteristic) SetValue(value interface{}) {
-	c.setValue(value, false)
+	c.setValue(value, nil)
 }
 
-func (c *Characteristic) SetValueFromRemote(value interface{}) {
-	c.setValue(value, true)
+func (c *Characteristic) SetValueFromConnection(value interface{}, conn net.Conn) {
+	c.setValue(value, conn)
 }
 
 func (c *Characteristic) SetEventsEnabled(enable bool) {
@@ -92,12 +94,12 @@ func (c *Characteristic) EventsEnabled() bool {
 	return c.Events
 }
 
-func (c *Characteristic) OnLocalChange(fn ChangeFunc) {
+func (c *Characteristic) OnChange(fn ChangeFunc) {
 	c.localChangeFuncs = append(c.localChangeFuncs, fn)
 }
 
-func (c *Characteristic) OnRemoteChange(fn ChangeFunc) {
-	c.remoteChangeFuncs = append(c.remoteChangeFuncs, fn)
+func (c *Characteristic) OnConnChange(fn ConnChangeFunc) {
+	c.connChangeFuncs = append(c.connChangeFuncs, fn)
 }
 
 // Equal returns true when receiver has the values as the argument.
@@ -142,7 +144,7 @@ func (c *Characteristic) hasWritePermissions() bool {
 // E.g. Type of characteristic value int, calling setValue("10.5") sets the value to int(10)
 //
 // When permissions are write only, this methods does not set the Value field.
-func (c *Characteristic) setValue(value interface{}, remote bool) {
+func (c *Characteristic) setValue(value interface{}, conn net.Conn) {
 	if c.Value != nil {
 		converted, err := to.Convert(value, reflect.TypeOf(c.Value).Kind())
 		if err == nil {
@@ -156,7 +158,7 @@ func (c *Characteristic) setValue(value interface{}, remote bool) {
 	}
 
 	// Ignore new values from remote when permissions don't allow write
-	if remote == true && c.hasWritePermissions() == false {
+	if c.hasWritePermissions() == false && conn != nil {
 		return
 	}
 
@@ -167,8 +169,8 @@ func (c *Characteristic) setValue(value interface{}, remote bool) {
 		c.Value = nil
 	}
 
-	if remote == true {
-		c.onChange(c.remoteChangeFuncs, value, old)
+	if conn != nil {
+		c.onConnChange(c.connChangeFuncs, conn, value, old)
 	} else {
 		c.onChange(c.localChangeFuncs, value, old)
 	}
@@ -177,5 +179,11 @@ func (c *Characteristic) setValue(value interface{}, remote bool) {
 func (c *Characteristic) onChange(funcs []ChangeFunc, newValue, oldValue interface{}) {
 	for _, fn := range funcs {
 		fn(c, newValue, oldValue)
+	}
+}
+
+func (c *Characteristic) onConnChange(funcs []ConnChangeFunc, conn net.Conn, newValue, oldValue interface{}) {
+	for _, fn := range funcs {
+		fn(conn, c, newValue, oldValue)
 	}
 }

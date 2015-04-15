@@ -4,6 +4,7 @@ import (
 	"github.com/brutella/hc/model"
 	"github.com/brutella/hc/model/characteristic"
 	"github.com/brutella/hc/model/service"
+	"net"
 )
 
 type lightBulb struct {
@@ -25,25 +26,25 @@ func NewLightBulb(info model.Info) *lightBulb {
 
 	lightBulb := lightBulb{accessory, bulb, nil, nil, nil, nil}
 
-	bulb.On.OnRemoteChange(func(c *characteristic.Characteristic, new, old interface{}) {
+	bulb.On.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
 		if lightBulb.onChanged != nil {
 			lightBulb.onChanged(bulb.On.On())
 		}
 	})
 
-	bulb.Brightness.OnRemoteChange(func(c *characteristic.Characteristic, new, old interface{}) {
+	bulb.Brightness.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
 		if lightBulb.brightnessChanged != nil {
 			lightBulb.brightnessChanged(bulb.Brightness.IntValue())
 		}
 	})
 
-	bulb.Hue.OnRemoteChange(func(c *characteristic.Characteristic, new, old interface{}) {
+	bulb.Hue.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
 		if lightBulb.hueChanged != nil {
 			lightBulb.hueChanged(bulb.Hue.FloatValue())
 		}
 	})
 
-	bulb.Saturation.OnRemoteChange(func(c *characteristic.Characteristic, new, old interface{}) {
+	bulb.Saturation.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
 		if lightBulb.saturationChanged != nil {
 			lightBulb.saturationChanged(bulb.Saturation.FloatValue())
 		}

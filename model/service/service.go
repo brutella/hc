@@ -33,8 +33,8 @@ func (s *Service) GetID() int64 {
 }
 
 // GetCharacteristics returns the characteristics which represent the service.
-func (s *Service) GetCharacteristics() []model.Characteristic {
-	var result []model.Characteristic
+func (s *Service) GetCharacteristics() []*characteristic.Characteristic {
+	var result []*characteristic.Characteristic
 	for _, c := range s.Characteristics {
 		result = append(result, c)
 	}

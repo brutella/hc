@@ -16,6 +16,6 @@ func NewIdentify() *Identify {
 }
 
 func (handler *Identify) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	log.Println("[VERB] POST /identify")
+	log.Printf("[VERB] %v POST /identify", request.RemoteAddr)
 	response.WriteHeader(http.StatusNoContent)
 }

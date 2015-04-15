@@ -3,6 +3,7 @@ package netio
 import (
 	"github.com/brutella/hc/common"
 	"io"
+	"net"
 	"net/url"
 )
 
@@ -26,5 +27,5 @@ type AccessoriesHandler interface {
 // A CharacteristicsHandler handles get and update characteristic
 type CharacteristicsHandler interface {
 	HandleGetCharacteristics(url.Values) (io.Reader, error)
-	HandleUpdateCharacteristics(io.Reader) error
+	HandleUpdateCharacteristics(io.Reader, net.Conn) error
 }

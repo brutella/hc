@@ -94,7 +94,7 @@ func TestPutCharacteristic(t *testing.T) {
 	buffer.Write(b)
 
 	controller := NewCharacteristicController(m)
-	err = controller.HandleUpdateCharacteristics(&buffer)
+	err = controller.HandleUpdateCharacteristics(&buffer, characteristic.TestConn)
 	assert.Nil(t, err)
 	assert.Equal(t, a.IsOn(), true)
 }
