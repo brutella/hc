@@ -41,12 +41,12 @@ func NewThermostat(name string, temperature, min, max, steps float64) *Thermosta
 
 	service := New()
 	service.Type = typeThermostat
-	service.addCharacteristic(nameChar.Characteristic)
-	service.addCharacteristic(unitChar.Characteristic)
-	service.addCharacteristic(temp.Characteristic)
-	service.addCharacteristic(targetTemp.Characteristic)
 	service.addCharacteristic(mode.Characteristic)
 	service.addCharacteristic(targetMode.Characteristic)
+	service.addCharacteristic(temp.Characteristic)
+	service.addCharacteristic(targetTemp.Characteristic)
+	service.addCharacteristic(unitChar.Characteristic)
+	service.addCharacteristic(nameChar.Characteristic)
 
 	t := Thermostat{service, nameChar, unitChar, temp, targetTemp, mode, targetMode, nil}
 

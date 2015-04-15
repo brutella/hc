@@ -50,11 +50,11 @@ func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName, 
 
 	service := New()
 	service.Type = typeAccessoryInfo
-	service.addCharacteristic(identify.Characteristic)
-	service.addCharacteristic(serial.Characteristic)
-	service.addCharacteristic(model.Characteristic)
-	service.addCharacteristic(manufacturer.Characteristic)
 	service.addCharacteristic(name.Characteristic)
+	service.addCharacteristic(manufacturer.Characteristic)
+	service.addCharacteristic(model.Characteristic)
+	service.addCharacteristic(serial.Characteristic)
+	service.addCharacteristic(identify.Characteristic)
 
 	var firmware *characteristic.Revision
 	if firmwareRevision != "" {

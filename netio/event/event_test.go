@@ -29,7 +29,7 @@ func TestCharacteristicNotification(t *testing.T) {
 	assert.NotNil(t, buffer)
 	bytes, err := ioutil.ReadAll(buffer)
 	assert.Nil(t, err)
-	assert.Equal(t, string(bytes), `{"characteristics":[{"aid":1,"iid":6,"value":"My Bridge"}]}`)
+	assert.Equal(t, string(bytes), `{"characteristics":[{"aid":1,"iid":2,"value":"My Bridge"}]}`)
 }
 
 func TestCharacteristicNotificationResponse(t *testing.T) {

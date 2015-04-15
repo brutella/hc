@@ -122,6 +122,8 @@ The metdata dump in iOS 8.3 (found by [@KhaosT](https://twitter.com/khaost/statu
     <tr><td>Lock Mechanism</td><td>lock-mechanism.current-state, lock-mechanism.target-state</td><td>name</td><tr>
 </table>
 
+The order of the characteristics should be considered when implementing accessories. The HomeKit framework on iOS uses the same order as in the json. I assume that the clients will use the same order.
+
 # Contact
 
 Matthias Hochgatterer
