@@ -4,20 +4,20 @@ package model
 type Characteristic interface {
 	Compareable
 
-	// GetID returns the characteristic's id
+	// GetID returns the characteristic id
 	GetID() int64
 
-	// GetValue returns the raw value
+	// GetValue returns the characteristic value
 	GetValue() interface{}
 
-	// SetValueFromRemote sets the value
-	// Only call this method when a client (e.g. iOS device) changes the value
+	// SetValueFromRemote sets the characteristic value
+	// Only call this method when a client changes the value
 	// Otherwise use the provided setter methods ( e.g. `switch.SetOn(true)`)
 	SetValueFromRemote(interface{})
 
 	// SetEventsEnabled dis-/enables events for the characteristic
 	SetEventsEnabled(enable bool)
 
-	// EventsEnabled returns true when events for this characteristic are enabled, otherwise false
+	// EventsEnabled returns if characteristic has event notifications enabled
 	EventsEnabled() bool
 }

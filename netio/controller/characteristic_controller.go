@@ -26,10 +26,10 @@ func NewCharacteristicController(m *container.Container) *CharacteristicControll
 }
 
 // HandleGetCharacteristics handles a get characteristic request.
-func (contr *CharacteristicController) HandleGetCharacteristics(form url.Values) (io.Reader, error) {
+func (ctr *CharacteristicController) HandleGetCharacteristics(form url.Values) (io.Reader, error) {
 	var b bytes.Buffer
 	aid, cid, err := ParseAccessoryAndCharacterID(form.Get("id"))
-	containerChar := contr.GetCharacteristic(aid, cid)
+	containerChar := ctr.GetCharacteristic(aid, cid)
 	if containerChar == nil {
 		log.Printf("[WARN] No characteristic found with aid %d and iid %d\n", aid, cid)
 		return &b, nil
@@ -50,7 +50,7 @@ func (contr *CharacteristicController) HandleGetCharacteristics(form url.Values)
 
 // HandleUpdateCharacteristics handles an update characteristic request. The bytes must represent
 // a data.Characteristics json.
-func (contr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader) error {
+func (ctr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader) error {
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		return err
@@ -65,18 +65,18 @@ func (contr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader) 
 	log.Println("[VERB]", string(b))
 
 	for _, c := range chars.Characteristics {
-		containerChar := contr.GetCharacteristic(c.AccessoryID, c.ID)
-		if containerChar == nil {
+		characteristic := ctr.GetCharacteristic(c.AccessoryID, c.ID)
+		if characteristic == nil {
 			log.Printf("[ERRO] Could not find characteristic with aid %d and iid %d\n", c.AccessoryID, c.ID)
 			continue
 		}
 
 		if c.Value != nil {
-			containerChar.SetValueFromRemote(c.Value)
+			characteristic.SetValueFromRemote(c.Value)
 		}
 
 		if events, ok := c.Events.(bool); ok == true {
-			containerChar.SetEventsEnabled(events)
+			characteristic.SetEventsEnabled(events)
 		}
 	}
 
@@ -84,8 +84,8 @@ func (contr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader) 
 }
 
 // GetCharacteristic returns the characteristic with the specified accessory and characteristic id.
-func (contr *CharacteristicController) GetCharacteristic(accessoryID int64, characteristicID int64) model.Characteristic {
-	for _, a := range contr.container.Accessories {
+func (ctr *CharacteristicController) GetCharacteristic(accessoryID int64, characteristicID int64) model.Characteristic {
+	for _, a := range ctr.container.Accessories {
 		if a.GetID() == accessoryID {
 			for _, s := range a.GetServices() {
 				for _, c := range s.GetCharacteristics() {

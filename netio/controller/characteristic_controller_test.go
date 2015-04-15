@@ -10,10 +10,19 @@ import (
 
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
+	"net/url"
 	"testing"
 )
+
+func idsString(accessoryID, characteristicID int64) url.Values {
+	values := url.Values{}
+	values.Set("id", fmt.Sprintf("%d.%d", accessoryID, characteristicID))
+
+	return values
+}
 
 func TestGetCharacteristic(t *testing.T) {
 	info := model.Info{
@@ -30,7 +39,7 @@ func TestGetCharacteristic(t *testing.T) {
 
 	aid := a.GetID()
 	cid := a.Info.Name.GetID()
-	values := getCharacteristicValues(aid, cid)
+	values := idsString(aid, cid)
 	controller := NewCharacteristicController(m)
 	res, err := controller.HandleGetCharacteristics(values)
 	assert.Nil(t, err)
