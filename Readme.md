@@ -14,7 +14,9 @@ Read the API documentation here: http://godoc.org/github.com/brutella/hc
 
 ## Features
 
-- Complete implementation of HAP (only some accessory types are missing)
+- Full implementation of the HomeKit Accessory Protocol in pure Go
+    - Built-in service announcement via mDNS
+    - Support for switch, outlet, light bulb, thermostat accessory
 - Optional logging with https://github.com/brutella/log
 - Runs on multiple platforms (already in use on Linux and OS X)
 
@@ -59,13 +61,13 @@ info := model.Info{
     SerialNumber: "051AC-23AAM1",
 	Manufacturer: "Apple",
     Model: "AB",
-    Firwmare: "1.0.1",
+    Firmware: "1.0.1",
 }
 ```
 
 ### Callbacks
 
-When the power state is changed by a client, you get a callback.
+You get a callback when the power state is changed by a client.
 
 ```go
 sw.OnStateChanged(func(on bool) {
@@ -77,7 +79,7 @@ sw.OnStateChanged(func(on bool) {
 })
 ```
 
-When the switch is turned on "the analog way", you should notify the clients by manually setting the state.
+When the switch is turned on "the analog way", you should set the state of the accessory.
 
 	sw.SetOn(true)
 
