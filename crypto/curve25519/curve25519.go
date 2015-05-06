@@ -2,7 +2,7 @@ package curve25519
 
 import (
 	"crypto/rand"
-	"github.com/golang/crypto/curve25519"
+	"golang.org/x/crypto/curve25519"
 )
 
 const (
