@@ -1,8 +1,8 @@
 package db
 
 import (
-	"github.com/brutella/hc/util"
 	"github.com/brutella/hc/crypto"
+	"github.com/brutella/hc/util"
 )
 
 // Entity is a HomeKit entity (e.g. iOS device or HomeKit bridge).

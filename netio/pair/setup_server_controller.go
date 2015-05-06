@@ -1,12 +1,12 @@
 package pair
 
 import (
-	"github.com/brutella/hc/util"
 	"github.com/brutella/hc/crypto"
 	"github.com/brutella/hc/crypto/chacha20poly1305"
 	"github.com/brutella/hc/crypto/hkdf"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/netio"
+	"github.com/brutella/hc/util"
 	"github.com/brutella/log"
 
 	"bytes"
