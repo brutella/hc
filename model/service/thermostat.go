@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/model/characteristic"
 )
 
-// Thermostat is service to represent a thermostat.
+// Thermostat is svc to represent a thermostat.
 type Thermostat struct {
 	*Service
 
@@ -19,7 +19,7 @@ type Thermostat struct {
 	targetTempChange func(float64)
 }
 
-// NewThermometer returns a thermometer service.
+// NewThermometer returns a thermometer svc.
 func NewThermometer(name string, temperature, min, max, steps float64) *Thermostat {
 	thermostat := NewThermostat(name, temperature, min, max, steps)
 
@@ -29,7 +29,7 @@ func NewThermometer(name string, temperature, min, max, steps float64) *Thermost
 	return thermostat
 }
 
-// NewThermostat returns a thermostat service.
+// NewThermostat returns a thermostat svc.
 func NewThermostat(name string, temperature, min, max, steps float64) *Thermostat {
 	nameChar := characteristic.NewName(name)
 	tempUnit := model.TempUnitCelsius
@@ -39,16 +39,16 @@ func NewThermostat(name string, temperature, min, max, steps float64) *Thermosta
 	mode := characteristic.NewCurrentHeatingCoolingMode(model.HeatCoolModeOff)
 	targetMode := characteristic.NewTargetHeatingCoolingMode(model.HeatCoolModeOff)
 
-	service := New()
-	service.Type = typeThermostat
-	service.addCharacteristic(mode.Characteristic)
-	service.addCharacteristic(targetMode.Characteristic)
-	service.addCharacteristic(temp.Characteristic)
-	service.addCharacteristic(targetTemp.Characteristic)
-	service.addCharacteristic(unitChar.Characteristic)
-	service.addCharacteristic(nameChar.Characteristic)
+	svc := New()
+	svc.Type = typeThermostat
+	svc.addCharacteristic(mode.Characteristic)
+	svc.addCharacteristic(targetMode.Characteristic)
+	svc.addCharacteristic(temp.Characteristic)
+	svc.addCharacteristic(targetTemp.Characteristic)
+	svc.addCharacteristic(unitChar.Characteristic)
+	svc.addCharacteristic(nameChar.Characteristic)
 
-	t := Thermostat{service, nameChar, unitChar, temp, targetTemp, mode, targetMode, nil}
+	t := Thermostat{svc, nameChar, unitChar, temp, targetTemp, mode, targetMode, nil}
 
 	return &t
 }
