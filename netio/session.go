@@ -1,19 +1,20 @@
 package netio
 
 import (
+	"github.com/brutella/hc/crypto"
 	"net"
 )
 
 // Session contains objects (encrypter, decrypter, pairing handler,...) used to handle the data communication.
 type Session interface {
 	// Decrypter returns decrypter for incoming data, may be nil
-	Decrypter() Decrypter
+	Decrypter() crypto.Decrypter
 
 	// Encrypter returns encrypter for outgoing data, may be nil
-	Encrypter() Encrypter
+	Encrypter() crypto.Encrypter
 
 	// SetCryptographer sets the new cryptographer used for en-/decryption
-	SetCryptographer(c Cryptographer)
+	SetCryptographer(c crypto.Cryptographer)
 
 	// PairSetupHandler returns the pairing setup handler
 	PairSetupHandler() ContainerHandler
@@ -32,13 +33,13 @@ type Session interface {
 }
 
 type session struct {
-	cryptographer     Cryptographer
+	cryptographer     crypto.Cryptographer
 	pairStartHandler  ContainerHandler
 	pairVerifyHandler PairVerifyHandler
 	connection        net.Conn
 
 	// Temporary variable to reference next cryptographer
-	nextCryptographer Cryptographer
+	nextCryptographer crypto.Cryptographer
 }
 
 // NewSession returns a session for a connection.
@@ -54,7 +55,7 @@ func (s *session) Connection() net.Conn {
 	return s.connection
 }
 
-func (s *session) Decrypter() Decrypter {
+func (s *session) Decrypter() crypto.Decrypter {
 	// Return the next cryptographer when possible
 	// This allows sessions to switch encryption
 	if s.nextCryptographer != nil {
@@ -65,7 +66,7 @@ func (s *session) Decrypter() Decrypter {
 	return s.cryptographer
 }
 
-func (s *session) Encrypter() Encrypter {
+func (s *session) Encrypter() crypto.Encrypter {
 	return s.cryptographer
 }
 
@@ -77,7 +78,7 @@ func (s *session) PairVerifyHandler() PairVerifyHandler {
 	return s.pairVerifyHandler
 }
 
-func (s *session) SetCryptographer(c Cryptographer) {
+func (s *session) SetCryptographer(c crypto.Cryptographer) {
 	// Temporarily set the cryptographer as the nextCryptographer
 	// The nextCryptographer is used the next time Decrypter() is called.
 	// Otherwise the Encrypter() encrypts differently than the previous Decrypter()

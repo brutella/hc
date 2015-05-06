@@ -23,8 +23,8 @@ type secureSession struct {
 	readEncrypted bool
 }
 
-// NewSecureSessionFromSharedKey returns a session from a shared private key
-func NewSecureSessionFromSharedKey(sharedKey [32]byte) (*secureSession, error) {
+// NewSecureSessionFromSharedKey returns a session from a shared private key.
+func NewSecureSessionFromSharedKey(sharedKey [32]byte) (Cryptographer, error) {
 	salt := []byte("Control-Salt")
 	out := []byte("Control-Read-Encryption-Key")
 	in := []byte("Control-Write-Encryption-Key")
@@ -43,9 +43,9 @@ func NewSecureSessionFromSharedKey(sharedKey [32]byte) (*secureSession, error) {
 	return s, err
 }
 
-// NewSecureClientSessionFromSharedKey returns a session from a shared secret key to simulate a clien.
-// This is only used int unit tests.
-func NewSecureClientSessionFromSharedKey(sharedKey [32]byte) (*secureSession, error) {
+// NewSecureClientSessionFromSharedKey returns a session from a shared secret key to simulate a HomeKit client.
+// This is currently only used for testing.
+func NewSecureClientSessionFromSharedKey(sharedKey [32]byte) (Cryptographer, error) {
 	salt := []byte("Control-Salt")
 	out := []byte("Control-Write-Encryption-Key")
 	in := []byte("Control-Read-Encryption-Key")

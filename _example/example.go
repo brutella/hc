@@ -9,9 +9,7 @@ import (
 	"time"
 )
 
-// Accessory Pairing Username must be unique and persistent (currently derived
-// from persistent serial number)
-func main() {    
+func main() {
 	switchInfo := model.Info{
 		Name: "Lamp",
 	}
@@ -44,10 +42,10 @@ func main() {
 			time.Sleep(5 * time.Second)
 		}
 	}()
-    
-    hap.OnTermination(func(){
-        t.Stop()
-    })
+
+	hap.OnTermination(func() {
+		t.Stop()
+	})
 
 	t.Start()
 }

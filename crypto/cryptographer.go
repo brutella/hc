@@ -1,4 +1,4 @@
-package netio
+package crypto
 
 import (
 	"io"

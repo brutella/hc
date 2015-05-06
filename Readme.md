@@ -1,24 +1,23 @@
 # HomeControl
 
-*HomeControl* is an implementation of the HomeKit Accessory Protocol (HAP) to create HomeKit accessories. *HomeControl* supports HomeKit bridges, which makes non-HomeKit accessories available to HomeKit by acting as a middleman.
+[HomeControl][homecontrol] is an implementation of the [HomeKit][homekit] Accessory Protocol (HAP) to create your own HomeKit accessory and bridges. HomeKit bridges make non-HomeKit accessories available to HomeKit by acting as a middleman.
 
-### NOTICE
+**NOTICE**
 
-The HomeControl API is still subject to change because HomeKit is not ready for prime time.
+The HomeControl API is still subject to change because HomeKit is not ready for prime time yet.
 
 ## Overview
 
-HomeKit is a set of protocols and libraries to access accessories used for Home Automation. Unfortunately the protocol is not open source and the official documentation is only available to MFi members. HomeControl is a complete implementation of the HAP in Go and does not depend on any OS.
-
-Read the API documentation here: http://godoc.org/github.com/brutella/hc
+[HomeKit][homekit] is a set of protocols and libraries to access accessories for Home Automation. Unfortunately the protocol is not open source and the official documentation is only available to MFi members. HomeControl is a complete implementation of the protocol in Go and does not depend on any OS.
 
 ## Features
 
 - Full implementation of the HomeKit Accessory Protocol in pure Go
-    - Built-in service announcement via mDNS
     - Support for switch, outlet, light bulb, thermostat accessory
+- Built-in service announcement via mDNS
 - Optional logging with https://github.com/brutella/log
 - Runs on multiple platforms (already in use on Linux and OS X)
+- Documentation: http://godoc.org/github.com/brutella/hc
 
 ## Example
 
@@ -83,6 +82,8 @@ When the switch is turned on "the analog way", you should set the state of the a
 
 	sw.SetOn(true)
 
+A complete example is available in `_example/example.go`.
+
 ## Dependencies
 
 HomeControl depends on the following libraries
@@ -101,7 +102,7 @@ HomeControl depends on the following libraries
 
 ## HomeKit Accessories
 
-The library supports the following accessory types
+HomeControl currently supports the following accessory types
 
 - Switch
 - Outlet
@@ -124,7 +125,7 @@ The metdata dump in iOS 8.3 (found by [@KhaosT](https://twitter.com/khaost/statu
     <tr><td>Lock Mechanism</td><td>lock-mechanism.current-state, lock-mechanism.target-state</td><td>name</td><tr>
 </table>
 
-The order of the characteristics should be considered when implementing accessories. The HomeKit framework on iOS uses the same order as in the json. I assume that the clients will use the same order.
+The HomeKit framework on iOS uses the same order as in the json. I assume that clients displays them in the same order to the user.
 
 # Contact
 
@@ -138,3 +139,6 @@ Twitter: [https://twitter.com/brutella](https://twitter.com/brutella)
 # License
 
 HomeControl is available under a non-commercial license. See the LICENSE file for more info.
+
+[homecontrol]: http://selfcoded.com/homecontrol/
+[homekit]: https://developer.apple.com/homekit/

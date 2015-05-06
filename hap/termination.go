@@ -5,6 +5,7 @@ import (
 	"os/signal"
 )
 
+// TermFunc defines the function which is executed on termination
 type TermFunc func()
 
 // OnTermination calls a function when the app receives an interrupt of kill signal

@@ -10,7 +10,7 @@ type Identify struct {
 	http.Handler
 }
 
-// NewPairing returns a new handler for pairing enpdoint
+// NewIdentify returns a new handler for pairing enpdoint
 func NewIdentify() *Identify {
 	return &Identify{}
 }

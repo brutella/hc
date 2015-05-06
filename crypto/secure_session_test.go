@@ -23,11 +23,13 @@ func TestCrypto(t *testing.T) {
 	b.Write(data)
 
 	// Set count to min 2 bytes to test byte order handling
-	server.encryptCount = 128
+	secServer := server.(*secureSession)
+	secServer.encryptCount = 128
 	encrypted, err := server.Encrypt(&b)
 	assert.Nil(t, err)
 
-	client.decryptCount = 128
+	secClient := client.(*secureSession)
+	secClient.decryptCount = 128
 	decrypted, err := client.Decrypt(encrypted)
 	assert.Nil(t, err)
 	orig, err := ioutil.ReadAll(decrypted)
@@ -48,15 +50,17 @@ func TestCryptoMaxPacketCount(t *testing.T) {
 
 	var b bytes.Buffer
 	b.Write(data)
-	server.encryptCount = math.MaxUint64
+	secServer := server.(*secureSession)
+	secServer.encryptCount = math.MaxUint64
 	encrypted, err := server.Encrypt(&b)
 	assert.Nil(t, err)
-	assert.Equal(t, server.encryptCount, uint64(0))
+	assert.Equal(t, secServer.encryptCount, uint64(0))
 
-	client.decryptCount = math.MaxUint64
+	secClient := client.(*secureSession)
+	secClient.decryptCount = math.MaxUint64
 	decrypted, err := client.Decrypt(encrypted)
 	assert.Nil(t, err)
-	assert.Equal(t, client.decryptCount, uint64(0))
+	assert.Equal(t, secClient.decryptCount, uint64(0))
 	orig, err := ioutil.ReadAll(decrypted)
 	assert.Nil(t, err)
 	assert.Equal(t, orig, data)

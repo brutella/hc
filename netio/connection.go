@@ -2,6 +2,7 @@ package netio
 
 import (
 	"bytes"
+	"github.com/brutella/hc/crypto"
 	"github.com/brutella/log"
 	"net"
 	"time"
@@ -138,7 +139,7 @@ func (con *HAPConnection) SetWriteDeadline(t time.Time) error {
 }
 
 // getEncrypter returns the session's Encrypter, otherwise nil
-func (con *HAPConnection) getEncrypter() Encrypter {
+func (con *HAPConnection) getEncrypter() crypto.Encrypter {
 	session := con.context.GetSessionForConnection(con.connection)
 	if session != nil {
 		return session.Encrypter()
@@ -148,7 +149,7 @@ func (con *HAPConnection) getEncrypter() Encrypter {
 }
 
 // getDecrypter returns the session's Decrypter, otherwise nil
-func (con *HAPConnection) getDecrypter() Decrypter {
+func (con *HAPConnection) getDecrypter() crypto.Decrypter {
 	session := con.context.GetSessionForConnection(con.connection)
 	if session != nil {
 		return session.Decrypter()
