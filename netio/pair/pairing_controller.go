@@ -2,8 +2,8 @@ package pair
 
 import (
 	"fmt"
-	"github.com/brutella/hc/util"
 	"github.com/brutella/hc/db"
+	"github.com/brutella/hc/util"
 	"github.com/brutella/log"
 )
 

@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/model/characteristic"
 )
 
-// Thermostat is svc to represent a thermostat.
+// Thermostat is service to represent a thermostat.
 type Thermostat struct {
 	*Service
 
@@ -19,7 +19,7 @@ type Thermostat struct {
 	targetTempChange func(float64)
 }
 
-// NewThermometer returns a thermometer svc.
+// NewThermometer returns a thermometer service.
 func NewThermometer(name string, temperature, min, max, steps float64) *Thermostat {
 	thermostat := NewThermostat(name, temperature, min, max, steps)
 
@@ -29,7 +29,7 @@ func NewThermometer(name string, temperature, min, max, steps float64) *Thermost
 	return thermostat
 }
 
-// NewThermostat returns a thermostat svc.
+// NewThermostat returns a thermostat service.
 func NewThermostat(name string, temperature, min, max, steps float64) *Thermostat {
 	nameChar := characteristic.NewName(name)
 	tempUnit := model.TempUnitCelsius

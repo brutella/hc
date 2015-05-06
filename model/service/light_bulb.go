@@ -4,7 +4,7 @@ import (
 	"github.com/brutella/hc/model/characteristic"
 )
 
-// LightBulb is a svc to represent a light bulb.
+// LightBulb is a service to represent a light bulb.
 type LightBulb struct {
 	*Service
 	On         *characteristic.On
@@ -14,7 +14,7 @@ type LightBulb struct {
 	Hue        *characteristic.Hue
 }
 
-// NewLightBulb returns a light bulb svc.
+// NewLightBulb returns a light bulb service.
 func NewLightBulb(name string, on bool) *LightBulb {
 	onChar := characteristic.NewOn(on)
 	nameChar := characteristic.NewName(name)
