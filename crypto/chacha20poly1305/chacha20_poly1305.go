@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"github.com/codahale/chacha20"
-	"github.com/golang/crypto/poly1305"
+	"golang.org/x/crypto/poly1305"
 )
 
 // DecryptAndVerify returns the chacha20 decrypted messages.

@@ -2,7 +2,7 @@ package hkdf
 
 import (
 	"crypto/sha512"
-	"github.com/golang/crypto/hkdf"
+	"golang.org/x/crypto/hkdf"
 	"io"
 )
 
