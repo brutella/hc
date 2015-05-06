@@ -1,7 +1,7 @@
 package pair
 
 import (
-	"github.com/brutella/hc/common"
+	"github.com/brutella/hc/util"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/netio"
 

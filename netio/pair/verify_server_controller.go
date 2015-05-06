@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
-	"github.com/brutella/hc/common"
+	"github.com/brutella/hc/util"
 	"github.com/brutella/hc/crypto"
 	"github.com/brutella/hc/crypto/chacha20poly1305"
 	"github.com/brutella/hc/db"

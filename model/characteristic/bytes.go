@@ -3,7 +3,7 @@ package characteristic
 import (
 	"bytes"
 	"encoding/base64"
-	"github.com/brutella/hc/common"
+	"github.com/brutella/hc/util"
 )
 
 type Bytes struct {

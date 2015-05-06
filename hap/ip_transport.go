@@ -7,7 +7,7 @@ import (
 	"net"
 	"sync"
 
-	"github.com/brutella/hc/common"
+	"github.com/brutella/hc/util"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/model/accessory"
 	"github.com/brutella/hc/model/characteristic"

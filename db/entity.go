@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/brutella/hc/common"
+	"github.com/brutella/hc/util"
 	"github.com/brutella/hc/crypto"
 )
 

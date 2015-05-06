@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	"github.com/brutella/hc/common"
+	"github.com/brutella/hc/util"
 	"github.com/gosexy/to"
 )
 
