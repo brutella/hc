@@ -47,7 +47,8 @@ func NewServer(ctx netio.HAPContext, d db.Database, c *container.Container, devi
 	if err != nil {
 		log.Fatal(err)
 	}
-	port := ExtractPort(ln.Addr())
+
+	_, port, _ := net.SplitHostPort(ln.Addr().String())
 
 	s := hkServer{
 		context:   ctx,
