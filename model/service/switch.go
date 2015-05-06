@@ -16,10 +16,10 @@ func NewSwitch(name string, on bool) *Switch {
 	onChar := characteristic.NewOn(on)
 	nameChar := characteristic.NewName(name)
 
-	service := New()
-	service.Type = typeSwitch
-	service.addCharacteristic(onChar.Characteristic)
-	service.addCharacteristic(nameChar.Characteristic)
+	svc := New()
+	svc.Type = typeSwitch
+	svc.addCharacteristic(onChar.Characteristic)
+	svc.addCharacteristic(nameChar.Characteristic)
 
-	return &Switch{service, onChar, nameChar}
+	return &Switch{svc, onChar, nameChar}
 }

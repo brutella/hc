@@ -48,31 +48,31 @@ func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName, 
 	manufacturer := characteristic.NewManufacturer(manufacturerName)
 	name := characteristic.NewName(accessoryName)
 
-	service := New()
-	service.Type = typeAccessoryInfo
-	service.addCharacteristic(name.Characteristic)
-	service.addCharacteristic(manufacturer.Characteristic)
-	service.addCharacteristic(model.Characteristic)
-	service.addCharacteristic(serial.Characteristic)
-	service.addCharacteristic(identify.Characteristic)
+	svc := New()
+	svc.Type = typeAccessoryInfo
+	svc.addCharacteristic(name.Characteristic)
+	svc.addCharacteristic(manufacturer.Characteristic)
+	svc.addCharacteristic(model.Characteristic)
+	svc.addCharacteristic(serial.Characteristic)
+	svc.addCharacteristic(identify.Characteristic)
 
 	var firmware *characteristic.Revision
 	if firmwareRevision != "" {
 		firmware = characteristic.NewFirmwareRevision(firmwareRevision)
-		service.addCharacteristic(firmware.Characteristic)
+		svc.addCharacteristic(firmware.Characteristic)
 	}
 
 	var hardware *characteristic.Revision
 	if hardwareRevision != "" {
 		hardware = characteristic.NewHardwareRevision(hardwareRevision)
-		service.addCharacteristic(hardware.Characteristic)
+		svc.addCharacteristic(hardware.Characteristic)
 	}
 
 	var software *characteristic.Revision
 	if softwareRevision != "" {
 		software = characteristic.NewSoftwareRevision(softwareRevision)
-		service.addCharacteristic(software.Characteristic)
+		svc.addCharacteristic(software.Characteristic)
 	}
 
-	return &AccessoryInfo{service, identify, serial, model, manufacturer, name, firmware, hardware, software}
+	return &AccessoryInfo{svc, identify, serial, model, manufacturer, name, firmware, hardware, software}
 }
