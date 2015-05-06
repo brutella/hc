@@ -2,11 +2,11 @@ package hap
 
 import ()
 
-// Transport provides ressources over a network
+// Transport provides accessories over a network.
 type Transport interface {
-	// Start starts the transpor.t
+	// Start starts the transport
 	Start()
 
-	// Stop stops the transport.
+	// Stop stops the transport
 	Stop()
 }

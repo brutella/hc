@@ -42,12 +42,12 @@ func NewMDNSService(name, id string, port int) *MDNSService {
 	}
 }
 
-// IsPublished returns true when the HAP service is published.
+// IsPublished returns true when the service is published.
 func (s *MDNSService) IsPublished() bool {
 	return s.server != nil
 }
 
-// Publish announces the HAP service for the machine's ip address on a random port used mDNS.
+// Publish announces the service for the machine's ip address on a random port using mDNS.
 func (s *MDNSService) Publish() error {
 	ip, err := GetFirstLocalIPAddress()
 	if err != nil {

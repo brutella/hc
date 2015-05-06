@@ -1,6 +1,6 @@
 package model
 
-// The Accessory interface forms the basis for all HomeKit accessories.
+// Accessory is the base interface for all HomeKit accessories.
 type Accessory interface {
 	Compareable
 

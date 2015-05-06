@@ -35,13 +35,12 @@ type ipTransport struct {
 // NewIPTransport creates a transport to provide accessories over IP.
 // The pairing is secured using a 8-numbers password.
 // If more than one accessory is provided, the first becomes a bridge in HomeKit.
-// It's fine to provide an accessory with no explicit services as bridge.
+// It's fine when the bridge has no explicit services.
 //
-// The tranport stores all data (crypto keys, ids) in a folder named exactly as first accessory.
-// Renaming existing accessories or changing the order of the accessories, makes the stored
+// All accessory specific data (crypto keys, ids) is stored in a folder named after the first accessory.
+// So changing the order of the accessories or renaming the first accessory makes the stored
 // data inaccessible to the tranport. In this case new crypto keys are created and the accessory
-// appears as a new one on clients. It's also not recommended to create a new transport for
-// accessory with exisiting name.
+// appears as a new one to clients.
 func NewIPTransport(password string, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
 	// Find transport name which is visible in mDNS
 	name := a.Name()
