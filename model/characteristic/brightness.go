@@ -5,9 +5,9 @@ type Brightness struct {
 }
 
 func NewBrightness(value int) *Brightness {
-	integer := NewInt(value, 0, 100, 1, PermsAll())
-	integer.Unit = UnitPercentage
-	integer.Type = CharTypeBrightness
+	i := NewInt(value, 0, 100, 1, PermsAll())
+	i.Unit = UnitPercentage
+	i.Type = CharTypeBrightness
 
-	return &Brightness{integer}
+	return &Brightness{i}
 }

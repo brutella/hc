@@ -7,7 +7,6 @@ import (
 	"net"
 	"sync"
 
-	"github.com/brutella/hc/util"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/model/accessory"
 	"github.com/brutella/hc/model/characteristic"
@@ -15,6 +14,7 @@ import (
 	"github.com/brutella/hc/netio"
 	"github.com/brutella/hc/netio/event"
 	"github.com/brutella/hc/server"
+	"github.com/brutella/hc/util"
 	"github.com/gosexy/to"
 )
 
