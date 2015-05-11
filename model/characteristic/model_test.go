@@ -1,14 +1,22 @@
 package characteristic
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestModel(t *testing.T) {
 	m := NewModel("Late 2014")
-	assert.Equal(t, m.Type, CharTypeModel)
-	assert.Equal(t, m.Model(), "Late 2014")
+
+	if is, want := m.Type, CharTypeModel; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if is, want := m.Model(), "Late 2014"; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
 	m.SetModel("Early 2015")
-	assert.Equal(t, m.Model(), "Early 2015")
+
+	if is, want := m.Model(), "Early 2015"; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }

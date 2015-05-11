@@ -1,13 +1,19 @@
 package characteristic
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestOn(t *testing.T) {
 	b := NewOn(true)
-	assert.True(t, b.On())
+
+	if is, want := b.On(), true; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
 	b.SetOn(false)
-	assert.False(t, b.On())
+
+	if is, want := b.On(), false; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }

@@ -1,14 +1,22 @@
 package characteristic
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestManufacturer(t *testing.T) {
 	m := NewManufacturer("Apple")
-	assert.Equal(t, m.Type, CharTypeManufacturer)
-	assert.Equal(t, m.Manufacturer(), "Apple")
+
+	if is, want := m.Type, CharTypeManufacturer; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if is, want := m.Manufacturer(), "Apple"; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
 	m.SetManufacturer("Google")
-	assert.Equal(t, m.Manufacturer(), "Google")
+
+	if is, want := m.Manufacturer(), "Google"; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }

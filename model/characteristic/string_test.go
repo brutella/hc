@@ -1,13 +1,18 @@
 package characteristic
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestString(t *testing.T) {
 	str := NewString("A String")
-	assert.Equal(t, str.StringValue(), "A String")
+	if is, want := str.StringValue(), "A String"; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
 	str.SetString("My String")
-	assert.Equal(t, str.StringValue(), "My String")
+
+	if is, want := str.StringValue(), "My String"; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }

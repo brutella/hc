@@ -11,13 +11,22 @@ func TestCharacteristicSetValuesOfWrongType(t *testing.T) {
 	c := NewCharacteristic(value, FormatInt, CharTypePowerState, nil)
 
 	c.SetValue(float64(20.5))
-	assert.Equal(t, c.Value, 20)
+
+	if is, want := c.Value, 20; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 
 	c.SetValue("91")
-	assert.Equal(t, c.Value, 91)
+
+	if is, want := c.Value, 91; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 
 	c.SetValue(true)
-	assert.Equal(t, c.Value, 1)
+
+	if is, want := c.Value, 1; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }
 
 func TestCharacteristicLocalDelegate(t *testing.T) {
@@ -32,11 +41,14 @@ func TestCharacteristicLocalDelegate(t *testing.T) {
 	})
 
 	c.SetValue(10)
-	assert.Equal(t, oldValue, 5)
-	assert.Equal(t, newValue, 10)
 	c.SetValueFromConnection(20, TestConn)
-	assert.Equal(t, oldValue, 5)
-	assert.Equal(t, newValue, 10)
+
+	if is, want := oldValue, 5; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if is, want := newValue, 10; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }
 
 func TestCharacteristicRemoteDelegate(t *testing.T) {
@@ -51,11 +63,14 @@ func TestCharacteristicRemoteDelegate(t *testing.T) {
 	})
 
 	c.SetValueFromConnection(10, TestConn)
-	assert.Equal(t, oldValue, 5)
-	assert.Equal(t, newValue, 10)
 	c.SetValue(20)
-	assert.Equal(t, oldValue, 5)
-	assert.Equal(t, newValue, 10)
+
+	if is, want := oldValue, 5; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if is, want := newValue, 10; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }
 
 func TestNoValueChange(t *testing.T) {
@@ -63,7 +78,9 @@ func TestNoValueChange(t *testing.T) {
 
 	changed := false
 	c.OnConnChange(func(conn net.Conn, c *Characteristic, new, old interface{}) {
-		assert.Equal(t, conn, TestConn)
+		if conn != TestConn {
+			t.Fatal(conn)
+		}
 		changed = true
 	})
 
@@ -73,7 +90,10 @@ func TestNoValueChange(t *testing.T) {
 
 	c.SetValue(5)
 	c.SetValueFromConnection(5, TestConn)
-	assert.False(t, changed)
+
+	if changed != false {
+		t.Fatal(changed)
+	}
 }
 
 func TestReadOnlyValue(t *testing.T) {
@@ -93,9 +113,15 @@ func TestReadOnlyValue(t *testing.T) {
 	c.SetValue(10)
 	c.SetValueFromConnection(11, TestConn)
 
-	assert.Equal(t, c.GetValue(), 10)
-	assert.False(t, remoteChanged)
-	assert.True(t, localChanged)
+	if is, want := c.GetValue(), 10; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if remoteChanged != false {
+		t.Fatal(remoteChanged)
+	}
+	if localChanged != true {
+		t.Fatal(localChanged)
+	}
 }
 
 func TestEqual(t *testing.T) {

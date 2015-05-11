@@ -1,39 +1,74 @@
 package characteristic
 
 import (
-	"github.com/stretchr/testify/assert"
 	"net"
 	"testing"
 )
 
 func TestWriteOnlyIdentifyCharacteristic(t *testing.T) {
 	i := NewIdentify()
-	assert.Equal(t, i.Type, CharTypeIdentify)
-	assert.Nil(t, i.GetValue())
+
+	if is, want := i.Type, CharTypeIdentify; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	if x := i.GetValue(); x != nil {
+		t.Fatal(x)
+	}
+
 	i.SetBool(true)
-	assert.Nil(t, i.GetValue())
+
+	if x := i.GetValue(); x != nil {
+		t.Fatal(x)
+	}
+
 	i.SetValueFromConnection(true, TestConn)
-	assert.Nil(t, i.GetValue())
+
+	if x := i.GetValue(); x != nil {
+		t.Fatal(x)
+	}
+
 	i.SetValue(true)
-	assert.Nil(t, i.GetValue())
+
+	if x := i.GetValue(); x != nil {
+		t.Fatal(x)
+	}
 }
 
 func TestWriteOnlyCharacteristicRemoteDelegate(t *testing.T) {
-	c := NewIdentify()
+	i := NewIdentify()
 
 	var oldValue interface{}
 	var newValue interface{}
-	c.OnConnChange(func(conn net.Conn, c *Characteristic, new, old interface{}) {
+	i.OnConnChange(func(conn net.Conn, c *Characteristic, new, old interface{}) {
 		newValue = new
 		oldValue = old
 	})
 
-	c.SetValueFromConnection(true, TestConn)
-	assert.Equal(t, oldValue, nil)
-	assert.Equal(t, newValue, true)
-	assert.Nil(t, c.GetValue())
-	c.SetValueFromConnection(false, TestConn)
-	assert.Equal(t, oldValue, nil)
-	assert.Equal(t, newValue, false)
-	assert.Nil(t, c.GetValue())
+	i.SetValueFromConnection(true, TestConn)
+	if oldValue != nil {
+		t.Fatal(oldValue)
+	}
+
+	if newValue != true {
+		t.Fatal(newValue)
+	}
+
+	if x := i.GetValue(); x != nil {
+		t.Fatal(x)
+	}
+
+	i.SetValueFromConnection(false, TestConn)
+
+	if oldValue != nil {
+		t.Fatal(oldValue)
+	}
+
+	if newValue != false {
+		t.Fatal(newValue)
+	}
+
+	if x := i.GetValue(); x != nil {
+		t.Fatal(x)
+	}
 }

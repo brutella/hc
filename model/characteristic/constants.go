@@ -90,60 +90,60 @@ type CharType string
 
 // HomeKit defined charactersitic types
 const (
-	CharTypeUnknown = "0" // not specified in HAP
+	CharTypeUnknown CharType = "0" // not specified in HAP
 
 	// name service
-	CharTypeName = "23" // 13
+	CharTypeName CharType = "23" // 13
 
 	// info service
-	CharTypeModel        = "21" // 1
-	CharTypeManufacturer = "20" // 1
-	CharTypeSerialNumber = "30" // 1
-	CharTypeIdentify     = "14" // 2
+	CharTypeModel        CharType = "21" // 1
+	CharTypeManufacturer CharType = "20" // 1
+	CharTypeSerialNumber CharType = "30" // 1
+	CharTypeIdentify     CharType = "14" // 2
 
-	CharTypeLogs                     = "1F" // 15
-	CharTypeVersion                  = "37" // 2
-	CharTypeAdministratorOnlyAccesss = "1"  // 15
-	CharTypeFirmwareRevision         = "52" // 13?
-	CharTypeHardwareRevision         = "53" // 13?
-	CharTypeSoftwareRevision         = "54" // 13?
+	CharTypeLogs                     CharType = "1F" // 15
+	CharTypeVersion                  CharType = "37" // 2
+	CharTypeAdministratorOnlyAccesss CharType = "1"  // 15
+	CharTypeFirmwareRevision         CharType = "52" // 13?
+	CharTypeHardwareRevision         CharType = "53" // 13?
+	CharTypeSoftwareRevision         CharType = "54" // 13?
 
 	// Light bulb service
-	CharTypeBrightness = "8"  // 15
-	CharTypeHue        = "13" // 15
-	CharTypeSaturation = "2F" // 15
+	CharTypeBrightness CharType = "8"  // 15
+	CharTypeHue        CharType = "13" // 15
+	CharTypeSaturation CharType = "2F" // 15
 
 	// switch/outlet service
-	CharTypePowerState = "25" // 15
+	CharTypePowerState CharType = "25" // 15
 
-	CharTypeInUse         = "26" // 13
-	CharTypeAudioFeedback = "5"  // 15
+	CharTypeInUse         CharType = "26" // 13
+	CharTypeAudioFeedback CharType = "5"  // 15
 
 	// garage door opener
-	CharTypeObstructionDetected                  = "24" // 13
-	CharTypeDoorStateTarget                      = "32" // 15
-	CharTypeDoorStateCurrent                     = "E"  // 13
-	CharTypeLockMechanismTargetState             = "1E" // 15
-	CharTypeLockMechanismCurrentState            = "1D" // 13
-	CharTypeLockMechanismLastKnownAction         = "1C" // 13
-	CharTypeLockMechanismAdditionalAuthorization = "1B"
-	CharTypeLockManagementControlPoint           = "19" // 2
-	CharTypeLockManagementAutoSecureTimeout      = "1A"
+	CharTypeObstructionDetected                  CharType = "24" // 13
+	CharTypeDoorStateTarget                      CharType = "32" // 15
+	CharTypeDoorStateCurrent                     CharType = "E"  // 13
+	CharTypeLockMechanismTargetState             CharType = "1E" // 15
+	CharTypeLockMechanismCurrentState            CharType = "1D" // 13
+	CharTypeLockMechanismLastKnownAction         CharType = "1C" // 13
+	CharTypeLockMechanismAdditionalAuthorization CharType = "1B"
+	CharTypeLockManagementControlPoint           CharType = "19" // 2
+	CharTypeLockManagementAutoSecureTimeout      CharType = "1A"
 
-	CharTypeRotationDirection = "28"
-	CharTypeRotationSpeed     = "29"
+	CharTypeRotationDirection CharType = "28"
+	CharTypeRotationSpeed     CharType = "29"
 
-	CharTypeTemperatureUnits   = "36" // 15
-	CharTypeTemperatureTarget  = "35" // 15
-	CharTypeTemperatureCurrent = "11" // 13
+	CharTypeTemperatureUnits   CharType = "36" // 15
+	CharTypeTemperatureTarget  CharType = "35" // 15
+	CharTypeTemperatureCurrent CharType = "11" // 13
 
-	CharTypeRelativeHumidityTarget  = "34" // 15
-	CharTypeRelativeHumidityCurrent = "10" // 13
+	CharTypeRelativeHumidityTarget  CharType = "34" // 15
+	CharTypeRelativeHumidityCurrent CharType = "10" // 13
 
-	CharTypeHeatingThreshold          = "12" // 15
-	CharTypeCoolingThreshold          = "D"  // 15
-	CharTypeHeatingCoolingModeTarget  = "33" // 15
-	CharTypeHeatingCoolingModeCurrent = "F"  // 13
+	CharTypeHeatingThreshold          CharType = "12" // 15
+	CharTypeCoolingThreshold          CharType = "D"  // 15
+	CharTypeHeatingCoolingModeTarget  CharType = "33" // 15
+	CharTypeHeatingCoolingModeCurrent CharType = "F"  // 13
 
-	CharTypeMotionDetected = "22" // 13
+	CharTypeMotionDetected CharType = "22" // 13
 )

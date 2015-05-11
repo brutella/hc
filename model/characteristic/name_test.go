@@ -1,14 +1,22 @@
 package characteristic
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestName(t *testing.T) {
 	n := NewName("Test")
-	assert.Equal(t, n.Type, CharTypeName)
-	assert.Equal(t, n.Name(), "Test")
+
+	if is, want := n.Type, CharTypeName; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if is, want := n.Name(), "Test"; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
 	n.SetName("My Name")
-	assert.Equal(t, n.Name(), "My Name")
+
+	if is, want := n.Name(), "My Name"; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }

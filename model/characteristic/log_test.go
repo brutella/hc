@@ -2,22 +2,54 @@ package characteristic
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
 	"testing"
+	// "reflect"
 )
 
 func TestLogs(t *testing.T) {
 	dir := os.TempDir()
 	file := filepath.Join(dir, "test.log")
 	f, err := os.Create(file)
-	assert.Nil(t, err)
-	_, err = f.WriteString("This is a test string")
-	assert.Nil(t, err)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := f.WriteString("This is a test string"); err != nil {
+		t.Fatal(err)
+	}
 
 	n := NewLog(file)
-	assert.Equal(t, n.Type, CharTypeLogs)
-	_, err = json.Marshal(n)
-	assert.Nil(t, err)
+
+	if is, want := n.Type, CharTypeLogs; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	b, err := json.Marshal(n)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	h := map[string]interface{}{}
+
+	if err := json.Unmarshal(b, &h); err != nil {
+		t.Fatal(err)
+	}
+
+	s, ok := h["value"].(string)
+
+	if ok == false {
+		t.Fatal(ok)
+	}
+
+	b, err = bytesFromTLV8Base64(s)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	if is, want := string(b), "This is a test string"; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }

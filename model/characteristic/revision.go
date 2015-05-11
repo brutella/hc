@@ -16,7 +16,7 @@ func NewFirmwareRevision(revision string) *Revision {
 	return newRevision(revision, CharTypeFirmwareRevision)
 }
 
-func newRevision(revision, charType string) *Revision {
+func newRevision(revision string, charType CharType) *Revision {
 	str := NewString(revision)
 	str.Type = CharType(charType)
 	str.Permissions = PermsRead()

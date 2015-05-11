@@ -2,23 +2,33 @@ package characteristic
 
 import (
 	"github.com/brutella/hc/model"
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestHeatingCoolingMode(t *testing.T) {
 	b := NewCurrentHeatingCoolingMode(model.HeatCoolModeOff)
-	assert.Equal(t, b.HeatingCoolingMode(), model.HeatCoolModeOff)
+
+	if is, want := b.HeatingCoolingMode(), model.HeatCoolModeOff; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
 	b.SetHeatingCoolingMode(model.HeatCoolModeHeat)
-	assert.Equal(t, b.HeatingCoolingMode(), model.HeatCoolModeHeat)
+
+	if is, want := b.HeatingCoolingMode(), model.HeatCoolModeHeat; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }
 
 func TestCurrentHeatingCoolingMode(t *testing.T) {
 	b := NewCurrentHeatingCoolingMode(model.HeatCoolModeOff)
-	assert.Equal(t, b.Type, CharTypeHeatingCoolingModeCurrent)
+	if is, want := b.Type, CharTypeHeatingCoolingModeCurrent; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }
 
 func TestTargetHeatingCoolingMode(t *testing.T) {
 	b := NewTargetHeatingCoolingMode(model.HeatCoolModeOff)
-	assert.Equal(t, b.Type, CharTypeHeatingCoolingModeTarget)
+	if is, want := b.Type, CharTypeHeatingCoolingModeTarget; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }

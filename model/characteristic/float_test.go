@@ -1,13 +1,19 @@
 package characteristic
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestFloat(t *testing.T) {
 	float := NewFloat(20.2, PermsAll())
-	assert.Equal(t, float.FloatValue(), 20.2)
+
+	if is, want := float.FloatValue(), 20.2; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
 	float.SetFloat(10.1)
-	assert.Equal(t, float.FloatValue(), 10.1)
+
+	if is, want := float.FloatValue(), 10.1; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }
