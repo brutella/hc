@@ -1,7 +1,6 @@
 package characteristic
 
 import (
-	"github.com/stretchr/testify/assert"
 	"net"
 	"testing"
 )
@@ -57,7 +56,9 @@ func TestCharacteristicRemoteDelegate(t *testing.T) {
 	var oldValue interface{}
 	var newValue interface{}
 	c.OnConnChange(func(conn net.Conn, c *Characteristic, new, old interface{}) {
-		assert.Equal(t, conn, TestConn)
+		if conn != TestConn {
+			t.Fatal(conn)
+		}
 		newValue = new
 		oldValue = old
 	})
@@ -102,7 +103,9 @@ func TestReadOnlyValue(t *testing.T) {
 	remoteChanged := false
 	localChanged := false
 	c.OnConnChange(func(conn net.Conn, c *Characteristic, new, old interface{}) {
-		assert.Equal(t, conn, TestConn)
+		if conn != TestConn {
+			t.Fatal(conn)
+		}
 		remoteChanged = true
 	})
 
@@ -127,5 +130,7 @@ func TestReadOnlyValue(t *testing.T) {
 func TestEqual(t *testing.T) {
 	c1 := NewCharacteristic(5, FormatInt, CharTypePowerState, nil)
 	c2 := NewCharacteristic(5, FormatInt, CharTypePowerState, nil)
-	assert.True(t, c1.Equal(c2))
+	if c1.Equal(c2) == false {
+		t.Fatal("characteristics not the same")
+	}
 }
