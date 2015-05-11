@@ -2,9 +2,9 @@ package crypto
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"math"
+	"reflect"
 	"testing"
 )
 
@@ -17,7 +17,9 @@ func TestCrypto(t *testing.T) {
 		0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	server, err := NewSecureSessionFromSharedKey(key)
 	client, err := NewSecureClientSessionFromSharedKey(key)
-	assert.Nil(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	var b bytes.Buffer
 	b.Write(data)
@@ -26,15 +28,24 @@ func TestCrypto(t *testing.T) {
 	secServer := server.(*secureSession)
 	secServer.encryptCount = 128
 	encrypted, err := server.Encrypt(&b)
-	assert.Nil(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	secClient := client.(*secureSession)
 	secClient.decryptCount = 128
 	decrypted, err := client.Decrypt(encrypted)
-	assert.Nil(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	orig, err := ioutil.ReadAll(decrypted)
-	assert.Nil(t, err)
-	assert.Equal(t, orig, data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reflect.DeepEqual(orig, data) == false {
+		t.Fatal("invalid decryption")
+	}
 }
 
 func TestCryptoMaxPacketCount(t *testing.T) {
@@ -46,30 +57,48 @@ func TestCryptoMaxPacketCount(t *testing.T) {
 		0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	server, err := NewSecureSessionFromSharedKey(key)
 	client, err := NewSecureClientSessionFromSharedKey(key)
-	assert.Nil(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	var b bytes.Buffer
 	b.Write(data)
 	secServer := server.(*secureSession)
 	secServer.encryptCount = math.MaxUint64
 	encrypted, err := server.Encrypt(&b)
-	assert.Nil(t, err)
-	assert.Equal(t, secServer.encryptCount, uint64(0))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if secServer.encryptCount != 0 {
+		t.Fatal(secServer.encryptCount)
+	}
 
 	secClient := client.(*secureSession)
 	secClient.decryptCount = math.MaxUint64
 	decrypted, err := client.Decrypt(encrypted)
-	assert.Nil(t, err)
-	assert.Equal(t, secClient.decryptCount, uint64(0))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if secClient.decryptCount != 0 {
+		t.Fatal(secServer.encryptCount)
+	}
 	orig, err := ioutil.ReadAll(decrypted)
-	assert.Nil(t, err)
-	assert.Equal(t, orig, data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reflect.DeepEqual(orig, data) == false {
+		t.Fatal("invalid decryption")
+	}
 }
 
 func TestCryptoMaxPacketLength(t *testing.T) {
 	// 1044 bytes
 	data := []byte("1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz")
-	assert.Equal(t, len(data), 1044)
+	if len(data) != 1044 {
+		t.Fatal(len(data))
+	}
 
 	key := [32]byte{
 		0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
@@ -78,15 +107,27 @@ func TestCryptoMaxPacketLength(t *testing.T) {
 		0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	server, err := NewSecureSessionFromSharedKey(key)
 	client, err := NewSecureClientSessionFromSharedKey(key)
-	assert.Nil(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	var b bytes.Buffer
 	b.Write(data)
 	encrypted, err := server.Encrypt(&b)
-	assert.Nil(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	decrypted, err := client.Decrypt(encrypted)
-	assert.Nil(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	orig, err := ioutil.ReadAll(decrypted)
-	assert.Nil(t, err)
-	assert.Equal(t, orig, data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reflect.DeepEqual(orig, data) == false {
+		t.Fatal("invalid decryption")
+	}
 }
