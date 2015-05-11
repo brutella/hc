@@ -1,32 +1,39 @@
 package hap
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestPassword(t *testing.T) {
 	pwd, err := NewPassword("00011222")
-	assert.Nil(t, err)
-	assert.Equal(t, pwd, "000-11-222")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if pwd != "000-11-222" {
+		t.Fatal(pwd)
+	}
 }
 
 func TestShortPassword(t *testing.T) {
-	_, err := NewPassword("0001122")
-	assert.NotNil(t, err)
+	if _, err := NewPassword("0001122"); err == nil {
+		t.Fatal("expected error")
+	}
 }
 
 func TestLongPassword(t *testing.T) {
-	_, err := NewPassword("000112221")
-	assert.NotNil(t, err)
+	if _, err := NewPassword("000112221"); err == nil {
+		t.Fatal("expected error")
+	}
 }
 
 func TestNonNumberPassword(t *testing.T) {
-	_, err := NewPassword("0001122a")
-	assert.NotNil(t, err)
+	if _, err := NewPassword("0001122a"); err == nil {
+		t.Fatal("expected error")
+	}
 }
 
 func TestInvalidPassword(t *testing.T) {
-	_, err := NewPassword("12345678")
-	assert.NotNil(t, err)
+	if _, err := NewPassword("12345678"); err == nil {
+		t.Fatal("expected error")
+	}
 }
