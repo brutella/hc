@@ -1,15 +1,21 @@
 package util
 
 import (
-	"github.com/stretchr/testify/assert"
+	"reflect"
 	"testing"
 )
 
 func TestSerialForName(t *testing.T) {
 	storage, err := NewTempFileStorage()
-	assert.Nil(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	name := "My Accessory"
 	serial := GetSerialNumberForAccessoryName(name, storage)
-	serial2 := GetSerialNumberForAccessoryName(name, storage)
-	assert.Equal(t, serial, serial2)
+	same := GetSerialNumberForAccessoryName(name, storage)
+
+	if is, want := serial, same; reflect.DeepEqual(is, want) == false {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }

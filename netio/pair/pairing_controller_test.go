@@ -4,7 +4,6 @@ import (
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/util"
 
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 )
@@ -17,8 +16,13 @@ func TestUnknownPairingMethod(t *testing.T) {
 	controller := NewPairingController(database)
 
 	out, err := controller.Handle(tlv8)
-	assert.NotNil(t, err)
-	assert.Nil(t, out)
+
+	if err == nil {
+		t.Fatal("expected error for unknown pairing method")
+	}
+	if out != nil {
+		t.Fatal(out)
+	}
 }
 
 func TestAddPairing(t *testing.T) {
@@ -32,9 +36,15 @@ func TestAddPairing(t *testing.T) {
 	controller := NewPairingController(database)
 
 	out, err := controller.Handle(in)
-	assert.Nil(t, err)
-	assert.NotNil(t, out)
-	assert.Equal(t, out.GetByte(TagSequence), byte(0x2))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if out == nil {
+		t.Fatal("no response")
+	}
+	if is, want := out.GetByte(TagSequence), byte(0x2); is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }
 
 func TestDeletePairing(t *testing.T) {
@@ -51,10 +61,18 @@ func TestDeletePairing(t *testing.T) {
 	controller := NewPairingController(database)
 
 	out, err := controller.Handle(in)
-	assert.Nil(t, err)
-	assert.NotNil(t, out)
-	assert.Equal(t, out.GetByte(TagSequence), byte(0x2))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if out == nil {
+		t.Fatal("no response")
+	}
+	if is, want := out.GetByte(TagSequence), byte(0x2); is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 
 	savedEntity := database.EntityWithName(username)
-	assert.Nil(t, savedEntity)
+	if savedEntity != nil {
+		t.Fatal(savedEntity)
+	}
 }

@@ -11,7 +11,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/url"
 	"testing"
@@ -42,16 +41,29 @@ func TestGetCharacteristic(t *testing.T) {
 	values := idsString(aid, cid)
 	controller := NewCharacteristicController(m)
 	res, err := controller.HandleGetCharacteristics(values)
-	assert.Nil(t, err)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	b, err := ioutil.ReadAll(res)
-	assert.Nil(t, err)
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	var chars data.Characteristics
 	err = json.Unmarshal(b, &chars)
-	assert.Nil(t, err)
 
-	for _, c := range chars.Characteristics {
-		assert.Equal(t, c.Value, "My Bridge")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if is, want := len(chars.Characteristics), 1; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if x := chars.Characteristics[0].Value; x != "My Bridge" {
+		t.Fatal(x)
 	}
 }
 
@@ -82,19 +94,33 @@ func TestPutCharacteristic(t *testing.T) {
 			}
 		}
 	}
-	assert.NotEqual(t, 0, cid, "Could not find power state characteristic")
+
+	if cid == 0 {
+		t.Fatal("characteristic not found")
+	}
+
 	char := data.Characteristic{AccessoryID: 1, ID: cid, Value: true}
 	var slice []data.Characteristic
 	slice = append(slice, char)
 
 	chars := data.Characteristics{Characteristics: slice}
 	b, err := json.Marshal(chars)
-	assert.Nil(t, err)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	var buffer bytes.Buffer
 	buffer.Write(b)
 
 	controller := NewCharacteristicController(m)
 	err = controller.HandleUpdateCharacteristics(&buffer, characteristic.TestConn)
-	assert.Nil(t, err)
-	assert.Equal(t, a.IsOn(), true)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if is, want := a.IsOn(), true; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }

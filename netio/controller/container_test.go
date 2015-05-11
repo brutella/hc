@@ -7,7 +7,6 @@ import (
 
 	"bytes"
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"testing"
 )
@@ -29,12 +28,21 @@ func TestGetAccessories(t *testing.T) {
 
 	var b bytes.Buffer
 	r, err := controller.HandleGetAccessories(&b)
-	assert.Nil(t, err)
-	assert.NotNil(t, r)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	if r == nil {
+		t.Fatal("no response")
+	}
 
 	bytes, _ := ioutil.ReadAll(r)
 	var returnedContainer container.Container
-	err = json.Unmarshal(bytes, &returnedContainer)
-	assert.Nil(t, err)
-	assert.True(t, returnedContainer.Equal(m))
+	if err := json.Unmarshal(bytes, &returnedContainer); err != nil {
+		t.Fatal(err)
+	}
+
+	if returnedContainer.Equal(m) == false {
+		t.Fatal("containers not the same")
+	}
 }

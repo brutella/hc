@@ -2,20 +2,37 @@ package netio
 
 import (
 	"github.com/brutella/hc/db"
-	"github.com/stretchr/testify/assert"
 	"os"
+	"reflect"
 	"testing"
 )
 
 func TestNewDevice(t *testing.T) {
 	db, _ := db.NewDatabase(os.TempDir())
 	client, err := NewDevice("Test Client", db)
-	assert.Nil(t, err)
-	assert.True(t, len(client.PublicKey()) > 0)
-	assert.True(t, len(client.PrivateKey()) > 0)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	if x := len(client.PublicKey()); x == 0 {
+		t.Fatal(x)
+	}
+	if x := len(client.PrivateKey()); x == 0 {
+		t.Fatal(x)
+	}
 
 	entity := db.EntityWithName("Test Client")
-	assert.Equal(t, entity.Name(), "Test Client")
-	assert.True(t, len(entity.PublicKey()) > 0)
-	assert.True(t, len(entity.PrivateKey()) > 0)
+	if is, want := entity.Name(), "Test Client"; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	if is, want := entity.PublicKey(), client.PublicKey(); reflect.DeepEqual(is, want) == false {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if is, want := entity.PrivateKey(), client.PrivateKey(); reflect.DeepEqual(is, want) == false {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }

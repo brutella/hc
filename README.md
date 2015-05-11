@@ -88,7 +88,6 @@ A complete example is available in `_example/example.go`.
 
 HomeControl depends on the following libraries
 
-- `github.com/stretchr/testify` to get asserts in unit tests
 - `github.com/tadglines/go-pkgs/crypto/srp` for *SRP* algorithm
 - `github.com/codahale/chacha20` for *chacha20 poly1305* algorithm
 - `github.com/golang/crypto`for *chacha20 poly1305* algorithm and *curve25519* key generation

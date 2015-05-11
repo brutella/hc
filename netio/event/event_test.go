@@ -6,7 +6,6 @@ import (
 	"github.com/brutella/hc/model/container"
 
 	"bytes"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -25,25 +24,38 @@ func TestCharacteristicNotification(t *testing.T) {
 	c.AddAccessory(a)
 
 	buffer, err := Body(a, a.Info.Name.Characteristic)
-	assert.Nil(t, err)
-	assert.NotNil(t, buffer)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	bytes, err := ioutil.ReadAll(buffer)
-	assert.Nil(t, err)
-	assert.Equal(t, string(bytes), `{"characteristics":[{"aid":1,"iid":2,"value":"My Bridge"}]}`)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	if is, want := string(bytes), `{"characteristics":[{"aid":1,"iid":2,"value":"My Bridge"}]}`; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }
 
 func TestCharacteristicNotificationResponse(t *testing.T) {
 	a := accessory.New(info)
 	resp, err := New(a, a.Info.Name.Characteristic)
-	assert.Nil(t, err)
-	assert.NotNil(t, resp)
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	var buffer = new(bytes.Buffer)
 	resp.Write(buffer)
 
 	bytes, err := ioutil.ReadAll(buffer)
-	assert.Nil(t, err)
+
+	if err != nil {
+		t.Fatal(err)
+	}
 	bytes = FixProtocolSpecifier(bytes)
-	str := string(bytes)
-	assert.True(t, strings.HasPrefix(str, "EVENT/1.0 200 OK"))
+	if x := string(bytes); strings.HasPrefix(x, "EVENT/1.0 200 OK") == false {
+		t.Fatal(x)
+	}
 }

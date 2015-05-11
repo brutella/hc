@@ -1,58 +1,84 @@
 package util
 
 import (
-	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 )
 
 func TestFileStorage(t *testing.T) {
 	storage, err := NewTempFileStorage()
-	assert.Nil(t, err)
-	assert.NotNil(t, storage)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	err = storage.Set("test", []byte("ASDF"))
-	assert.Nil(t, err)
+	if err := storage.Set("test", []byte("ASDF")); err != nil {
+		t.Fatal(err)
+	}
 
 	read, err := storage.Get("test")
-	assert.Nil(t, err)
-	assert.Equal(t, read, []byte("ASDF"))
 
-	assert.Nil(t, storage.Delete("test"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if is, want := read, []byte("ASDF"); reflect.DeepEqual(is, want) == false {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if err := storage.Delete("test"); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestStoreInSubdirectory(t *testing.T) {
 	dir, _ := filepath.Abs(filepath.Join(os.TempDir(), "hap"))
 	storage, err := NewFileStorage(dir)
-	assert.Nil(t, err)
-	assert.NotNil(t, storage)
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	err = storage.Set("test", []byte("ASDF"))
-	assert.Nil(t, err)
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	path := filepath.Join(dir, "test")
 	f, err := os.OpenFile(path, os.O_RDONLY, 0776)
-	assert.Nil(t, err)
-	assert.NotNil(t, f)
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	defer f.Close()
 
 	var buffer = make([]byte, 32)
 	n, _ := f.Read(buffer)
-	assert.Equal(t, buffer[:n], []byte("ASDF"))
+
+	if is, want := buffer[:n], []byte("ASDF"); reflect.DeepEqual(is, want) == false {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }
 
 func TestDeleteUndefined(t *testing.T) {
 	storage, err := NewTempFileStorage()
-	assert.Nil(t, err)
-	assert.NotNil(t, storage.Delete("test"))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := storage.Delete("test"); err == nil {
+		t.Fatal("expected error")
+	}
 }
 
 func TestGetUndefined(t *testing.T) {
 	storage, err := NewTempFileStorage()
-	assert.Nil(t, err)
 
-	_, err = storage.Get("test")
-	assert.NotNil(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := storage.Get("test"); err == nil {
+		t.Fatal("expected error")
+	}
 }
