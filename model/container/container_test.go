@@ -3,8 +3,6 @@ package container
 import (
 	"github.com/brutella/hc/model"
 	"github.com/brutella/hc/model/accessory"
-
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -17,43 +15,66 @@ var info = model.Info{
 
 func TestContainer(t *testing.T) {
 	acc1 := accessory.New(info)
-	assert.Equal(t, acc1.GetID(), model.InvalidID)
-
 	info.Name = "Accessory2"
 	acc2 := accessory.New(info)
-	assert.Equal(t, acc2.GetID(), model.InvalidID)
+
+	if is, want := acc1.GetID(), model.InvalidID; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if is, want := acc2.GetID(), model.InvalidID; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 
 	c := NewContainer()
 	c.AddAccessory(acc1)
 	c.AddAccessory(acc2)
 
-	assert.Equal(t, len(c.Accessories), 2)
-	assert.NotEqual(t, acc1.GetID(), model.InvalidID)
-	assert.NotEqual(t, acc2.GetID(), model.InvalidID)
-	assert.NotEqual(t, acc1.GetID(), acc2.GetID())
+	if is, want := len(c.Accessories), 2; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if x := acc1.GetID(); x == model.InvalidID {
+		t.Fatal(x)
+	}
+	if x := acc2.GetID(); x == model.InvalidID {
+		t.Fatal(x)
+	}
+	if acc1.GetID() == acc2.GetID() {
+		t.Fatal("equal ids not allowed")
+	}
 
 	c.RemoveAccessory(acc2)
-	assert.Equal(t, len(c.Accessories), 1)
+
+	if is, want := len(c.Accessories), 1; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }
 
 func TestValidAccessoryID(t *testing.T) {
 	acc1 := accessory.New(info)
-	assert.Equal(t, acc1.GetID(), model.InvalidID)
-
 	c := NewContainer()
 	c.AddAccessory(acc1)
+
 	id := acc1.GetID()
-	assert.NotEqual(t, id, model.InvalidID)
 	c.RemoveAccessory(acc1)
 	c.AddAccessory(acc1)
-	assert.Equal(t, acc1.GetID(), id)
+
+	if is, want := acc1.GetID(), id; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }
 
-func TestRemoveAccessory(t *testing.T) {
+func TestAccessoryCount(t *testing.T) {
 	accessory := accessory.New(info)
 	c := NewContainer()
 	c.AddAccessory(accessory)
-	assert.Equal(t, len(c.Accessories), 1)
+
+	if is, want := len(c.Accessories), 1; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
 	c.RemoveAccessory(accessory)
-	assert.Equal(t, len(c.Accessories), 0)
+
+	if is, want := len(c.Accessories), 0; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }

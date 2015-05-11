@@ -3,4 +3,4 @@ package model
 import "math"
 
 // An invalid accessory/service/characteristic id
-const InvalidID = math.MaxInt64
+const InvalidID int64 = math.MaxInt64
