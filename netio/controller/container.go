@@ -22,3 +22,10 @@ func (ctr *ContainerController) HandleGetAccessories(r io.Reader) (io.Reader, er
 	result, err := json.Marshal(ctr.container)
 	return bytes.NewBuffer(result), err
 }
+
+// IdentifyAccessory calls Identify() for all accessories.
+func (ctr *ContainerController) IdentifyAccessory() {
+	for _, a := range ctr.container.Accessories {
+		a.Identify()
+	}
+}

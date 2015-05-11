@@ -35,9 +35,7 @@ func New(info model.Info) *Accessory {
 	a.AddService(i.Service)
 
 	i.Identify.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
-		if a.onIdentify != nil {
-			a.onIdentify()
-		}
+		a.Identify()
 	})
 
 	return a
@@ -101,6 +99,12 @@ func (a *Accessory) Software() string {
 
 func (a *Accessory) OnIdentify(fn func()) {
 	a.onIdentify = fn
+}
+
+func (a *Accessory) Identify() {
+	if a.onIdentify != nil {
+		a.onIdentify()
+	}
 }
 
 // Adds a service to the accessory and updates the ids of the service and the corresponding characteristics

@@ -19,13 +19,18 @@ type PairVerifyHandler interface {
 	KeyVerified() bool
 }
 
-// A AccessoriesHandler returns a list of accessories as json
+// A AccessoriesHandler returns a list of accessories as json.
 type AccessoriesHandler interface {
 	HandleGetAccessories(r io.Reader) (io.Reader, error)
 }
 
-// A CharacteristicsHandler handles get and update characteristic
+// A CharacteristicsHandler handles get and update characteristic.
 type CharacteristicsHandler interface {
 	HandleGetCharacteristics(url.Values) (io.Reader, error)
 	HandleUpdateCharacteristics(io.Reader, net.Conn) error
+}
+
+// IdentifyHandler calls Identify() on accessories.
+type IdentifyHandler interface {
+	IdentifyAccessory()
 }
