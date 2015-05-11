@@ -2,7 +2,6 @@ package service
 
 import (
 	"github.com/brutella/hc/model"
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -16,13 +15,31 @@ func TestAccessoryInfo(t *testing.T) {
 
 	i := NewInfo(info)
 
-	assert.Equal(t, i.Type, typeAccessoryInfo)
-	assert.Nil(t, i.Identify.GetValue())
-	assert.Equal(t, i.Serial.GetValue(), "001")
-	assert.Equal(t, i.Model.GetValue(), "Version 123")
-	assert.Equal(t, i.Manufacturer.GetValue(), "Matthias")
-	assert.Equal(t, i.Name.GetValue(), "Test Accessory")
-	assert.Nil(t, i.Firmware)
-	assert.Nil(t, i.Hardware)
-	assert.Nil(t, i.Software)
+	if is, want := i.Type, typeAccessoryInfo; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if x := i.Identify.GetValue(); x != nil {
+		t.Fatal(x)
+	}
+	if is, want := i.Serial.GetValue(), "001"; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if is, want := i.Model.GetValue(), "Version 123"; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if is, want := i.Manufacturer.GetValue(), "Matthias"; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if is, want := i.Name.GetValue(), "Test Accessory"; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if x := i.Firmware; x != nil {
+		t.Fatal(x)
+	}
+	if x := i.Hardware; x != nil {
+		t.Fatal(x)
+	}
+	if x := i.Software; x != nil {
+		t.Fatal(x)
+	}
 }
