@@ -3,8 +3,6 @@ package accessory
 import (
 	"github.com/brutella/hc/model"
 	"github.com/brutella/hc/model/characteristic"
-
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -18,14 +16,15 @@ func TestLightBulb(t *testing.T) {
 
 	var bulb model.LightBulb = NewLightBulb(info)
 
-	assert.Equal(t, bulb.Name(), "My Light Bulb")
-	assert.Equal(t, bulb.SerialNumber(), "001")
-	assert.Equal(t, bulb.Manufacturer(), "Google")
-	assert.Equal(t, bulb.Model(), "Switchy")
-	assert.Equal(t, bulb.Model(), "Switchy")
-	assert.Equal(t, bulb.GetBrightness(), 100)
+	if is, want := bulb.GetBrightness(), 100; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
 	bulb.SetBrightness(90)
-	assert.Equal(t, bulb.GetBrightness(), 90)
+
+	if is, want := bulb.GetBrightness(), 90; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }
 
 func TestLightBulbCallbacks(t *testing.T) {
@@ -56,7 +55,14 @@ func TestLightBulbCallbacks(t *testing.T) {
 	light.bulb.Brightness.SetValueFromConnection(80, characteristic.TestConn)
 	light.bulb.Hue.SetValueFromConnection(15.5, characteristic.TestConn)
 	light.bulb.Saturation.SetValueFromConnection(22.4, characteristic.TestConn)
-	assert.Equal(t, newBrightness, 80)
-	assert.Equal(t, newHue, 15.5)
-	assert.Equal(t, newSaturation, 22.4)
+
+	if is, want := newBrightness, 80; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if is, want := newHue, 15.5; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if is, want := newSaturation, 22.4; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }

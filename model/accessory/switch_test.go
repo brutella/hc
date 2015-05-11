@@ -3,7 +3,6 @@ package accessory
 import (
 	"github.com/brutella/hc/model"
 	"github.com/brutella/hc/model/characteristic"
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -17,16 +16,15 @@ var info = model.Info{
 func TestSwitch(t *testing.T) {
 	var s model.Switch = NewSwitch(info)
 
-	assert.Equal(t, s.Name(), "My Switch")
-	assert.Equal(t, s.SerialNumber(), "001")
-	assert.Equal(t, s.Manufacturer(), "Google")
-	assert.Equal(t, s.Model(), "Switchy")
-	assert.Equal(t, s.Firmware(), "")
-	assert.Equal(t, s.Hardware(), "")
-	assert.Equal(t, s.Software(), "")
-	assert.False(t, s.IsOn())
+	if is, want := s.IsOn(), false; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
 	s.SetOn(true)
-	assert.True(t, s.IsOn())
+
+	if is, want := s.IsOn(), true; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }
 
 func TestSwitchOnChanged(t *testing.T) {
@@ -38,6 +36,11 @@ func TestSwitchOnChanged(t *testing.T) {
 	})
 
 	s.switcher.On.SetValueFromConnection(true, characteristic.TestConn)
-	assert.True(t, s.IsOn())
-	assert.True(t, newValue)
+
+	if is, want := s.IsOn(), true; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if is, want := newValue, true; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }

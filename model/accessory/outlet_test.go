@@ -3,8 +3,6 @@ package accessory
 import (
 	"github.com/brutella/hc/model"
 	"github.com/brutella/hc/model/characteristic"
-
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -18,16 +16,22 @@ var outlet_info = model.Info{
 func TestOutlet(t *testing.T) {
 	var o model.Outlet = NewOutlet(outlet_info)
 
-	assert.Equal(t, o.Name(), "My Outlet")
-	assert.Equal(t, o.SerialNumber(), "001")
-	assert.Equal(t, o.Manufacturer(), "brutella")
-	assert.Equal(t, o.Model(), "Outletty")
-	assert.False(t, o.IsOn())
-	assert.False(t, o.IsInUse())
+	if is, want := o.IsOn(), false; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if is, want := o.IsInUse(), false; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
 	o.SetOn(true)
 	o.SetInUse(true)
-	assert.True(t, o.IsOn())
-	assert.True(t, o.IsInUse())
+
+	if is, want := o.IsOn(), true; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if is, want := o.IsInUse(), true; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }
 
 func TestOutletOnChanged(t *testing.T) {
@@ -39,6 +43,11 @@ func TestOutletOnChanged(t *testing.T) {
 	})
 
 	o.outlet.On.SetValueFromConnection(true, characteristic.TestConn)
-	assert.True(t, o.IsOn())
-	assert.True(t, newValue)
+
+	if is, want := o.IsOn(), true; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+	if is, want := newValue, true; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
 }
