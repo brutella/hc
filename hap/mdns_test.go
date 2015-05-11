@@ -17,7 +17,7 @@ func TestMDNS(t *testing.T) {
 		"md=My MDNS Service",
 		"ci=1",
 	}
-	if reflect.DeepEqual(mdns.txtRecords(), expect) == false {
+	if x := mdns.txtRecords(); reflect.DeepEqual(x, expect) == false {
 		t.Fatal(expect)
 	}
 }
