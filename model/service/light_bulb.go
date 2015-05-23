@@ -24,11 +24,11 @@ func NewLightBulb(name string, on bool) *LightBulb {
 
 	svc := New()
 	svc.Type = typeLightBulb
-	svc.addCharacteristic(onChar.Characteristic)
-	svc.addCharacteristic(nameChar.Characteristic)
-	svc.addCharacteristic(brightness.Characteristic)
-	svc.addCharacteristic(saturation.Characteristic)
-	svc.addCharacteristic(hue.Characteristic)
+	svc.AddCharacteristic(onChar.Characteristic)
+	svc.AddCharacteristic(nameChar.Characteristic)
+	svc.AddCharacteristic(brightness.Characteristic)
+	svc.AddCharacteristic(saturation.Characteristic)
+	svc.AddCharacteristic(hue.Characteristic)
 
 	return &LightBulb{svc, onChar, nameChar, brightness, saturation, hue}
 }

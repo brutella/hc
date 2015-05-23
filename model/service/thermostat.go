@@ -41,12 +41,12 @@ func NewThermostat(name string, temperature, min, max, steps float64) *Thermosta
 
 	svc := New()
 	svc.Type = typeThermostat
-	svc.addCharacteristic(mode.Characteristic)
-	svc.addCharacteristic(targetMode.Characteristic)
-	svc.addCharacteristic(temp.Characteristic)
-	svc.addCharacteristic(targetTemp.Characteristic)
-	svc.addCharacteristic(unitChar.Characteristic)
-	svc.addCharacteristic(nameChar.Characteristic)
+	svc.AddCharacteristic(mode.Characteristic)
+	svc.AddCharacteristic(targetMode.Characteristic)
+	svc.AddCharacteristic(temp.Characteristic)
+	svc.AddCharacteristic(targetTemp.Characteristic)
+	svc.AddCharacteristic(unitChar.Characteristic)
+	svc.AddCharacteristic(nameChar.Characteristic)
 
 	t := Thermostat{svc, nameChar, unitChar, temp, targetTemp, mode, targetMode, nil}
 

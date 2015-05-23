@@ -50,28 +50,28 @@ func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName, 
 
 	svc := New()
 	svc.Type = typeAccessoryInfo
-	svc.addCharacteristic(name.Characteristic)
-	svc.addCharacteristic(manufacturer.Characteristic)
-	svc.addCharacteristic(model.Characteristic)
-	svc.addCharacteristic(serial.Characteristic)
-	svc.addCharacteristic(identify.Characteristic)
+	svc.AddCharacteristic(name.Characteristic)
+	svc.AddCharacteristic(manufacturer.Characteristic)
+	svc.AddCharacteristic(model.Characteristic)
+	svc.AddCharacteristic(serial.Characteristic)
+	svc.AddCharacteristic(identify.Characteristic)
 
 	var firmware *characteristic.Revision
 	if firmwareRevision != "" {
 		firmware = characteristic.NewFirmwareRevision(firmwareRevision)
-		svc.addCharacteristic(firmware.Characteristic)
+		svc.AddCharacteristic(firmware.Characteristic)
 	}
 
 	var hardware *characteristic.Revision
 	if hardwareRevision != "" {
 		hardware = characteristic.NewHardwareRevision(hardwareRevision)
-		svc.addCharacteristic(hardware.Characteristic)
+		svc.AddCharacteristic(hardware.Characteristic)
 	}
 
 	var software *characteristic.Revision
 	if softwareRevision != "" {
 		software = characteristic.NewSoftwareRevision(softwareRevision)
-		svc.addCharacteristic(software.Characteristic)
+		svc.AddCharacteristic(software.Characteristic)
 	}
 
 	return &AccessoryInfo{svc, identify, serial, model, manufacturer, name, firmware, hardware, software}

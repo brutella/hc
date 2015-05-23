@@ -62,6 +62,6 @@ func (s *Service) Equal(other interface{}) bool {
 	return false
 }
 
-func (s *Service) addCharacteristic(c *characteristic.Characteristic) {
+func (s *Service) AddCharacteristic(c *characteristic.Characteristic) {
 	s.Characteristics = append(s.Characteristics, c)
 }

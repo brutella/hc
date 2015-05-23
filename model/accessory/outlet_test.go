@@ -19,17 +19,17 @@ func TestOutlet(t *testing.T) {
 	if is, want := o.IsOn(), false; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
-	if is, want := o.IsInUse(), false; is != want {
+	if is, want := o.IsInUse(), true; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 
 	o.SetOn(true)
-	o.SetInUse(true)
+	o.SetInUse(false)
 
 	if is, want := o.IsOn(), true; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
-	if is, want := o.IsInUse(), true; is != want {
+	if is, want := o.IsInUse(), false; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 }

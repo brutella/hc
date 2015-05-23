@@ -18,8 +18,8 @@ func NewSwitch(name string, on bool) *Switch {
 
 	svc := New()
 	svc.Type = typeSwitch
-	svc.addCharacteristic(onChar.Characteristic)
-	svc.addCharacteristic(nameChar.Characteristic)
+	svc.AddCharacteristic(onChar.Characteristic)
+	svc.AddCharacteristic(nameChar.Characteristic)
 
 	return &Switch{svc, onChar, nameChar}
 }
