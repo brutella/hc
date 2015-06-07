@@ -49,20 +49,6 @@ func TestContainer(t *testing.T) {
 	}
 }
 
-func TestValidAccessoryID(t *testing.T) {
-	acc1 := accessory.New(info)
-	c := NewContainer()
-	c.AddAccessory(acc1)
-
-	id := acc1.GetID()
-	c.RemoveAccessory(acc1)
-	c.AddAccessory(acc1)
-
-	if is, want := acc1.GetID(), id; is != want {
-		t.Fatalf("is=%v want=%v", is, want)
-	}
-}
-
 func TestAccessoryCount(t *testing.T) {
 	accessory := accessory.New(info)
 	c := NewContainer()

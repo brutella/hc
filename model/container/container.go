@@ -1,7 +1,6 @@
 package container
 
 import (
-	"github.com/brutella/hc/model"
 	"github.com/brutella/hc/model/accessory"
 )
 
@@ -23,12 +22,8 @@ func NewContainer() *Container {
 // AddAccessory adds an accessory to the container.
 // This method ensures that the accessory ids are valid and unique withing the container.
 func (m *Container) AddAccessory(a *accessory.Accessory) {
-	// Set accessory id when invalid
-	if a.GetID() == model.InvalidID {
-		a.SetID(m.idCount)
-		m.idCount++
-	}
-
+	a.SetID(m.idCount)
+	m.idCount++
 	m.Accessories = append(m.Accessories, a)
 }
 
