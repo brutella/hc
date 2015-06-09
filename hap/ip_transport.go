@@ -3,7 +3,6 @@ package hap
 import (
 	"bytes"
 	"io/ioutil"
-	"log"
 	"net"
 	"sync"
 
@@ -15,6 +14,7 @@ import (
 	"github.com/brutella/hc/netio/event"
 	"github.com/brutella/hc/server"
 	"github.com/brutella/hc/util"
+	"github.com/brutella/log"
 	"github.com/gosexy/to"
 )
 
