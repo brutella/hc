@@ -6,11 +6,18 @@
 
 [HomeKit][homekit] is a set of protocols and libraries to access accessories for Home Automation. Unfortunately the protocol is not open source and the official documentation is only available to MFi members. HomeControl is a complete implementation of the protocol in Go and does not depend on any OS.
 
+## HomeKit Client
+
+I've made an app for iPhone, iPad and Apple Watch called [Home][home] to control any HomeKit accessory. If you purchase Home on the [App Store][home-appstore], you not only support my work but also get an awesome iOS app. Thank you.
+
+[home]: http://selfcoded.com/home/
+[home-appstore]: http://itunes.apple.com/app/id995994352
+
 ## Features
 
 - Full implementation of the HomeKit Accessory Protocol in pure Go
     - Support for switch, outlet, light bulb, thermostat accessory
-- Built-in service announcement via mDNS using [bonjour](github.com/oleksandr/bonjour)
+- Built-in service announcement via mDNS using [bonjour](http://github.com/oleksandr/bonjour)
 - Optional logging with https://github.com/brutella/log
 - Runs on multiple platforms (already in use on Linux and OS X)
 - Documentation: http://godoc.org/github.com/brutella/hc
