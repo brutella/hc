@@ -20,14 +20,14 @@ type SetupServerSession struct {
 }
 
 // NewSetupServerSession return a new setup server session.
-func NewSetupServerSession(username, password string) (*SetupServerSession, error) {
+func NewSetupServerSession(username, pin string) (*SetupServerSession, error) {
 	var err error
 	pairName := []byte("Pair-Setup")
 	srp, err := srp.NewSRP(SRPGroup, sha512.New, KeyDerivativeFuncRFC2945(sha512.New, []byte(pairName)))
 
 	if err == nil {
 		srp.SaltLength = 16
-		salt, v, err := srp.ComputeVerifier([]byte(password))
+		salt, v, err := srp.ComputeVerifier([]byte(pin))
 		if err == nil {
 			session := srp.NewServerSession([]byte(pairName), salt, v)
 			pairing := SetupServerSession{

@@ -17,10 +17,10 @@ type SetupClientSession struct {
 }
 
 // NewSetupClientSession returns a new setup client session
-func NewSetupClientSession(username string, password string) *SetupClientSession {
+func NewSetupClientSession(username string, pin string) *SetupClientSession {
 	rp, _ := srp.NewSRP(SRPGroup, sha512.New, KeyDerivativeFuncRFC2945(sha512.New, []byte(username)))
 
-	client := rp.NewClientSession([]byte(username), []byte(password))
+	client := rp.NewClientSession([]byte(username), []byte(pin))
 	hap := SetupClientSession{
 		session: client,
 	}

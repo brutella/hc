@@ -23,8 +23,8 @@ type SetupClientController struct {
 }
 
 // NewSetupClientController returns a new setup client controller.
-func NewSetupClientController(password string, client netio.Device, database db.Database) *SetupClientController {
-	session := NewSetupClientSession("Pair-Setup", password)
+func NewSetupClientController(pin string, client netio.Device, database db.Database) *SetupClientController {
+	session := NewSetupClientSession("Pair-Setup", pin)
 	controller := SetupClientController{
 		client:   client,
 		session:  session,

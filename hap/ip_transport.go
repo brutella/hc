@@ -33,7 +33,7 @@ type ipTransport struct {
 }
 
 // NewIPTransport creates a transport to provide accessories over IP.
-// The pairing is secured using a 8-numbers password.
+// The pairing is secured using a 8-numbers pin.
 // If more than one accessory is provided, the first becomes a bridge in HomeKit.
 // It's fine when the bridge has no explicit services.
 //
@@ -41,14 +41,14 @@ type ipTransport struct {
 // So changing the order of the accessories or renaming the first accessory makes the stored
 // data inaccessible to the tranport. In this case new crypto keys are created and the accessory
 // appears as a new one to clients.
-func NewIPTransport(password string, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
+func NewIPTransport(pin string, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
 	// Find transport name which is visible in mDNS
 	name := a.Name()
 	if len(name) == 0 {
 		log.Fatal("Invalid empty name for first accessory")
 	}
 
-	hapPassword, err := NewPassword(password)
+	hapPin, err := NewPin(pin)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func NewIPTransport(password string, a *accessory.Accessory, as ...*accessory.Ac
 	// must be unique and stay the same over time
 	uuid := transportUUIDInStorage(storage)
 	database := db.NewDatabaseWithStorage(storage)
-	device, err := netio.NewSecuredDevice(uuid, hapPassword, database)
+	device, err := netio.NewSecuredDevice(uuid, hapPin, database)
 
 	t := &ipTransport{
 		database:  database,

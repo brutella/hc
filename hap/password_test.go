@@ -4,8 +4,8 @@ import (
 	"testing"
 )
 
-func TestPassword(t *testing.T) {
-	pwd, err := NewPassword("00011222")
+func TestPin(t *testing.T) {
+	pwd, err := NewPin("00011222")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -14,26 +14,26 @@ func TestPassword(t *testing.T) {
 	}
 }
 
-func TestShortPassword(t *testing.T) {
-	if _, err := NewPassword("0001122"); err == nil {
+func TestShortPin(t *testing.T) {
+	if _, err := NewPin("0001122"); err == nil {
 		t.Fatal("expected error")
 	}
 }
 
-func TestLongPassword(t *testing.T) {
-	if _, err := NewPassword("000112221"); err == nil {
+func TestLongPin(t *testing.T) {
+	if _, err := NewPin("000112221"); err == nil {
 		t.Fatal("expected error")
 	}
 }
 
-func TestNonNumberPassword(t *testing.T) {
-	if _, err := NewPassword("0001122a"); err == nil {
+func TestNonNumberPin(t *testing.T) {
+	if _, err := NewPin("0001122a"); err == nil {
 		t.Fatal("expected error")
 	}
 }
 
-func TestInvalidPassword(t *testing.T) {
-	if _, err := NewPassword("12345678"); err == nil {
+func TestInvalidPin(t *testing.T) {
+	if _, err := NewPin("12345678"); err == nil {
 		t.Fatal("expected error")
 	}
 }

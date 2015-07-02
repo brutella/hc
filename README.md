@@ -17,7 +17,7 @@
 
 ## API Example
 
-Create a simple on/off switch which is accessible via IP and secured using the password *00102003*.
+Create a simple on/off switch which is accessible via IP and secured using the pin *00102003*.
 
 ```go
 package main

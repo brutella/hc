@@ -15,11 +15,11 @@ import (
 )
 
 // SetupServerController handles pairing with a cliet using SRP.
-// The entity has to known the bridge password to successfully pair.
+// The entity has to known the bridge pin to successfully pair.
 // When pairing was successful, the entity's public key (refered as ltpk - long term public key)
 // is stored in the database.
 //
-// Pairing may fail because the password is wrong or the key exchange failed (e.g. packet seals or SRP key authenticator is wrong, ...).
+// Pairing may fail because the pin is wrong or the key exchange failed (e.g. packet seals or SRP key authenticator is wrong, ...).
 type SetupServerController struct {
 	device   netio.SecuredDevice
 	session  *SetupServerSession
@@ -33,7 +33,7 @@ func NewSetupServerController(device netio.SecuredDevice, database db.Database) 
 		return nil, errors.New("no private key for pairing available")
 	}
 
-	session, err := NewSetupServerSession(device.Name(), device.Password())
+	session, err := NewSetupServerSession(device.Name(), device.Pin())
 	if err != nil {
 		return nil, err
 	}

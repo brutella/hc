@@ -15,11 +15,11 @@ const (
 // KeyDerivativeFuncRFC2945 returns the SRP-6a key derivative function which does
 //      x = H(s | H(I | ":" | P))
 func KeyDerivativeFuncRFC2945(h srp.HashFunc, username []byte) srp.KeyDerivationFunc {
-	return func(salt, password []byte) []byte {
+	return func(salt, pin []byte) []byte {
 		h := h()
 		h.Write(username)
 		h.Write([]byte(":"))
-		h.Write(password)
+		h.Write(pin)
 		t2 := h.Sum(nil)
 		h.Reset()
 		h.Write(salt)
