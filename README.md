@@ -2,10 +2,6 @@
 
 [HomeControl][homecontrol] is an implementation of the [HomeKit][homekit] Accessory Protocol (HAP) to create your own HomeKit accessory and bridges. HomeKit bridges make non-HomeKit accessories available to HomeKit by acting as a middleman.
 
-**NOTICE**
-
-The HomeControl API is still subject to change because HomeKit is not ready for prime time yet.
-
 ## Overview
 
 [HomeKit][homekit] is a set of protocols and libraries to access accessories for Home Automation. Unfortunately the protocol is not open source and the official documentation is only available to MFi members. HomeControl is a complete implementation of the protocol in Go and does not depend on any OS.
@@ -14,12 +10,12 @@ The HomeControl API is still subject to change because HomeKit is not ready for 
 
 - Full implementation of the HomeKit Accessory Protocol in pure Go
     - Support for switch, outlet, light bulb, thermostat accessory
-- Built-in service announcement via mDNS
+- Built-in service announcement via mDNS using [bonjour](github.com/oleksandr/bonjour)
 - Optional logging with https://github.com/brutella/log
 - Runs on multiple platforms (already in use on Linux and OS X)
 - Documentation: http://godoc.org/github.com/brutella/hc
 
-## Example
+## API Example
 
 Create a simple on/off switch which is accessible via IP and secured using the password *00102003*.
 
@@ -66,7 +62,7 @@ info := model.Info{
 
 ### Callbacks
 
-You get a callback when the power state is changed by a client.
+You get a callback when the power state of a switch changed by a client.
 
 ```go
 sw.OnStateChanged(func(on bool) {
@@ -94,10 +90,6 @@ HomeControl depends on the following libraries
 - `github.com/agl/ed25519` for *ed25519* signature
 - `github.com/gosexy/to` for type conversion
 - `github.com/oleksandr/bonjour` for mDNS
-
-## TODOs
-
-- Better random uuid
 
 ## HomeKit Accessories
 
