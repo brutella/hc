@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 type fileStorage struct {
@@ -80,7 +81,8 @@ func (f *fileStorage) dir() string {
 }
 
 func (f *fileStorage) filePathToFile(file string) string {
-	return filepath.Join(f.dir(), file)
+	fname := removeInvalidFileNameCharacters(file)
+	return filepath.Join(f.dir(), fname)
 }
 
 func (f *fileStorage) fileForWrite(key string) (*os.File, error) {
@@ -89,4 +91,9 @@ func (f *fileStorage) fileForWrite(key string) (*os.File, error) {
 
 func (f *fileStorage) fileForRead(key string) (*os.File, error) {
 	return os.OpenFile(f.filePathToFile(key), os.O_RDONLY, 0666)
+}
+
+// Returns a string where invalid characters (e.g. colon ":" which is not allowed in file names on Window) are removed from fname
+func removeInvalidFileNameCharacters(fname string) string {
+	return strings.Replace(fname, ":", "", -1)
 }
