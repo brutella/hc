@@ -26,15 +26,20 @@ I've made an app for iPhone, iPad and Apple Watch called [Home][home] to control
 
 1. [Install Go](http://golang.org/doc/install)
 2. [Setup Go workspace](http://golang.org/doc/code.html#Organization)
-3. Clone [hklight](https://github.com/brutella/hklight) project 
+3. Create your own HomeKit bridge or clone an existing one (e.g.  [hklight](https://github.com/brutella/hklight))
 
         cd $GOPATH/src
+        
+        # Clone project
         git clone https://github.com/brutella/hklight && cd hklight
+        
+        # Install dependencies
         go get
+        
+        # Run the project
         go run hklightd.go
 
 4. Pair with your HomeKit App of choice (e.g. [Home][home-appstore])
-    
 
 ## API Example
 
