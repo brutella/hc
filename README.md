@@ -22,6 +22,20 @@ I've made an app for iPhone, iPad and Apple Watch called [Home][home] to control
 - Runs on multiple platforms (already in use on Linux and OS X)
 - Documentation: http://godoc.org/github.com/brutella/hc
 
+## Getting Started
+
+1. [Install Go](http://golang.org/doc/install)
+2. [Setup Go workspace](http://golang.org/doc/code.html#Organization)
+3. Clone [hklight](https://github.com/brutella/hklight) project 
+
+        cd $GOPATH/src
+        git clone https://github.com/brutella/hklight && cd hklight
+        go get
+        go run hklightd.go
+
+4. Pair with your HomeKit App of choice (e.g. [Home][home-appstore])
+    
+
 ## API Example
 
 Create a simple on/off switch which is accessible via IP and secured using the pin *00102003*.
