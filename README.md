@@ -144,6 +144,10 @@ The metdata dump in iOS 8.3 (found by [@KhaosT](https://twitter.com/khaost/statu
 
 The HomeKit framework on iOS uses the same order as in the json. I assume that clients displays them in the same order to the user.
 
+### iOS 9
+
+iOS 9 supports new type of accessories and includes new service and characteristic types. The new types are already available in *model/service/constants.go* and *model/characteristic/constants.go*. I will make changes to the library available in the *master* branch as soon as iOS 9 is publicly available. Until then those changes, which might break existing code, are availablen in the *iOS9* branch.
+
 # Contact
 
 Matthias Hochgatterer
