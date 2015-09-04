@@ -8,19 +8,19 @@ type HeatingCoolingMode struct {
 	*ByteCharacteristic
 }
 
-func NewHeatingCoolingMode(current model.HeatCoolModeType, charType CharType, permissions []string) *HeatingCoolingMode {
+func NewHeatingCoolingMode(current model.HeatCoolModeType, CharacteristicType CharacteristicType, permissions []string) *HeatingCoolingMode {
 	c := HeatingCoolingMode{NewByteCharacteristic(byte(current), permissions)}
-	c.Type = charType
+	c.Type = CharacteristicType
 
 	return &c
 }
 
 func NewCurrentHeatingCoolingMode(current model.HeatCoolModeType) *HeatingCoolingMode {
-	return NewHeatingCoolingMode(current, CharTypeHeatingCoolingModeCurrent, PermsRead())
+	return NewHeatingCoolingMode(current, TypeHeatingCoolingModeCurrent, PermsRead())
 }
 
 func NewTargetHeatingCoolingMode(current model.HeatCoolModeType) *HeatingCoolingMode {
-	return NewHeatingCoolingMode(current, CharTypeHeatingCoolingModeTarget, PermsAll())
+	return NewHeatingCoolingMode(current, TypeHeatingCoolingModeTarget, PermsAll())
 }
 
 func (c *HeatingCoolingMode) SetHeatingCoolingMode(mode model.HeatCoolModeType) {
@@ -38,7 +38,7 @@ func (c *HeatingCoolingMode) HeatingCoolingMode() model.HeatCoolModeType {
 //
 // func NewCurrentRelativeHumidityCharacteristic(value float64) *CurrentRelativeHumidityCharacteristic {
 //     c := CurrentRelativeHumidityCharacteristic{NewFloat(value), value}
-//     c.Type = CharTypeRelativeHumidityCurrent
+//     c.Type = TypeRelativeHumidityCurrent
 //     c.Permissions = PermsRead()
 //     return &c
 // }
@@ -50,7 +50,7 @@ func (c *HeatingCoolingMode) HeatingCoolingMode() model.HeatCoolModeType {
 //
 // func NewTargetRelativeHumidityCharacteristic(value, min, max, steps float64) *TargetRelativeHumidityCharacteristic {
 //     c := TargetRelativeHumidityCharacteristic{NewFloatMinMaxSteps(value, min, max, steps), value}
-//     c.Type = CharTypeRelativeHumidityTarget
+//     c.Type = TypeRelativeHumidityTarget
 //     c.Permissions = PermsAll()
 //     return &c
 // }
@@ -61,7 +61,7 @@ func (c *HeatingCoolingMode) HeatingCoolingMode() model.HeatCoolModeType {
 //
 // func NewCoolingThresholdTemperatureCharacteristic(value, min, max, steps float64) *CoolingThresholdTemperatureCharacteristic {
 //     c := CoolingThresholdTemperatureCharacteristic{NewFloatMinMaxSteps(value, min, max, steps), value}
-//     c.Type = CharTypeCoolingThreshold
+//     c.Type = TypeCoolingThreshold
 //     c.Permissions = PermsAll()
 //     return &c
 // }
@@ -72,7 +72,7 @@ func (c *HeatingCoolingMode) HeatingCoolingMode() model.HeatCoolModeType {
 //
 // func NewHeatingThresholdTemperatureCharacteristic(value, min, max, steps float64) *HeatingThresholdTemperatureCharacteristic {
 //     c := HeatingThresholdTemperatureCharacteristic{NewFloatMinMaxSteps(value, min, max, steps), value}
-//     c.Type = CharTypeHeatingThreshold
+//     c.Type = TypeHeatingThreshold
 //     c.Permissions = PermsAll()
 //     return &c
 // }

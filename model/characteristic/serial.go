@@ -6,7 +6,7 @@ type SerialNumber struct {
 
 func NewSerialNumber(serial string) *SerialNumber {
 	str := NewString(serial)
-	str.Type = CharTypeSerialNumber
+	str.Type = TypeSerialNumber
 	str.Permissions = PermsReadOnly()
 
 	return &SerialNumber{str}

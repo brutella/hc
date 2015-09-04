@@ -6,7 +6,7 @@ type Manufacturer struct {
 
 func NewManufacturer(name string) *Manufacturer {
 	str := NewString(name)
-	str.Type = CharTypeManufacturer
+	str.Type = TypeManufacturer
 	str.Permissions = PermsReadOnly()
 
 	return &Manufacturer{str}

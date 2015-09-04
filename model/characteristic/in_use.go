@@ -6,7 +6,7 @@ type InUse struct {
 
 func NewInUse(value bool) *InUse {
 	char := NewBool(value, PermsRead())
-	char.Type = CharTypeInUse
+	char.Type = TypeInUse
 	return &InUse{char}
 }
 

@@ -21,14 +21,14 @@ func TestHeatingCoolingMode(t *testing.T) {
 
 func TestCurrentHeatingCoolingMode(t *testing.T) {
 	b := NewCurrentHeatingCoolingMode(model.HeatCoolModeOff)
-	if is, want := b.Type, CharTypeHeatingCoolingModeCurrent; is != want {
+	if is, want := b.Type, TypeHeatingCoolingModeCurrent; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 }
 
 func TestTargetHeatingCoolingMode(t *testing.T) {
 	b := NewTargetHeatingCoolingMode(model.HeatCoolModeOff)
-	if is, want := b.Type, CharTypeHeatingCoolingModeTarget; is != want {
+	if is, want := b.Type, TypeHeatingCoolingModeTarget; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 }

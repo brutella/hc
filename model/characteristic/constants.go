@@ -86,64 +86,64 @@ const (
 	FormatTLV8   = "tlv8"
 )
 
-type CharType string
+type CharacteristicType string
 
 // HomeKit defined charactersitic types
 const (
-	CharTypeUnknown CharType = "0" // not specified in HAP
+	TypeUnknown CharacteristicType = "0" // not specified in HAP
 
 	// name service
-	CharTypeName CharType = "23" // 13
+	TypeName CharacteristicType = "23" // 13
 
 	// info service
-	CharTypeModel        CharType = "21" // 1
-	CharTypeManufacturer CharType = "20" // 1
-	CharTypeSerialNumber CharType = "30" // 1
-	CharTypeIdentify     CharType = "14" // 2
+	TypeModel        CharacteristicType = "21" // 1
+	TypeManufacturer CharacteristicType = "20" // 1
+	TypeSerialNumber CharacteristicType = "30" // 1
+	TypeIdentify     CharacteristicType = "14" // 2
 
-	CharTypeLogs                     CharType = "1F" // 15
-	CharTypeVersion                  CharType = "37" // 2
-	CharTypeAdministratorOnlyAccesss CharType = "1"  // 15
-	CharTypeFirmwareRevision         CharType = "52" // 13?
-	CharTypeHardwareRevision         CharType = "53" // 13?
-	CharTypeSoftwareRevision         CharType = "54" // 13?
+	TypeLogs                     CharacteristicType = "1F" // 15
+	TypeVersion                  CharacteristicType = "37" // 2
+	TypeAdministratorOnlyAccesss CharacteristicType = "1"  // 15
+	TypeFirmwareRevision         CharacteristicType = "52" // 13?
+	TypeHardwareRevision         CharacteristicType = "53" // 13?
+	TypeSoftwareRevision         CharacteristicType = "54" // 13?
 
 	// Light bulb service
-	CharTypeBrightness CharType = "8"  // 15
-	CharTypeHue        CharType = "13" // 15
-	CharTypeSaturation CharType = "2F" // 15
+	TypeBrightness CharacteristicType = "8"  // 15
+	TypeHue        CharacteristicType = "13" // 15
+	TypeSaturation CharacteristicType = "2F" // 15
 
 	// switch/outlet service
-	CharTypePowerState CharType = "25" // 15
+	TypePowerState CharacteristicType = "25" // 15
 
-	CharTypeInUse         CharType = "26" // 13
-	CharTypeAudioFeedback CharType = "5"  // 15
+	TypeInUse         CharacteristicType = "26" // 13
+	TypeAudioFeedback CharacteristicType = "5"  // 15
 
 	// garage door opener
-	CharTypeObstructionDetected                  CharType = "24" // 13
-	CharTypeDoorStateTarget                      CharType = "32" // 15
-	CharTypeDoorStateCurrent                     CharType = "E"  // 13
-	CharTypeLockMechanismTargetState             CharType = "1E" // 15
-	CharTypeLockMechanismCurrentState            CharType = "1D" // 13
-	CharTypeLockMechanismLastKnownAction         CharType = "1C" // 13
-	CharTypeLockMechanismAdditionalAuthorization CharType = "1B"
-	CharTypeLockManagementControlPoint           CharType = "19" // 2
-	CharTypeLockManagementAutoSecureTimeout      CharType = "1A"
+	TypeObstructionDetected                  CharacteristicType = "24" // 13
+	TypeDoorStateTarget                      CharacteristicType = "32" // 15
+	TypeDoorStateCurrent                     CharacteristicType = "E"  // 13
+	TypeLockMechanismTargetState             CharacteristicType = "1E" // 15
+	TypeLockMechanismCurrentState            CharacteristicType = "1D" // 13
+	TypeLockMechanismLastKnownAction         CharacteristicType = "1C" // 13
+	TypeLockMechanismAdditionalAuthorization CharacteristicType = "1B"
+	TypeLockManagementControlPoint           CharacteristicType = "19" // 2
+	TypeLockManagementAutoSecureTimeout      CharacteristicType = "1A"
 
-	CharTypeRotationDirection CharType = "28"
-	CharTypeRotationSpeed     CharType = "29"
+	TypeRotationDirection CharacteristicType = "28"
+	TypeRotationSpeed     CharacteristicType = "29"
 
-	CharTypeTemperatureUnits   CharType = "36" // 15
-	CharTypeTemperatureTarget  CharType = "35" // 15
-	CharTypeTemperatureCurrent CharType = "11" // 13
+	TypeTemperatureUnits   CharacteristicType = "36" // 15
+	TypeTemperatureTarget  CharacteristicType = "35" // 15
+	TypeTemperatureCurrent CharacteristicType = "11" // 13
 
-	CharTypeRelativeHumidityTarget  CharType = "34" // 15
-	CharTypeRelativeHumidityCurrent CharType = "10" // 13
+	TypeRelativeHumidityTarget  CharacteristicType = "34" // 15
+	TypeRelativeHumidityCurrent CharacteristicType = "10" // 13
 
-	CharTypeHeatingThreshold          CharType = "12" // 15
-	CharTypeCoolingThreshold          CharType = "D"  // 15
-	CharTypeHeatingCoolingModeTarget  CharType = "33" // 15
-	CharTypeHeatingCoolingModeCurrent CharType = "F"  // 13
+	TypeHeatingThreshold          CharacteristicType = "12" // 15
+	TypeCoolingThreshold          CharacteristicType = "D"  // 15
+	TypeHeatingCoolingModeTarget  CharacteristicType = "33" // 15
+	TypeHeatingCoolingModeCurrent CharacteristicType = "F"  // 13
 
-	CharTypeMotionDetected CharType = "22" // 13
+	TypeMotionDetected CharacteristicType = "22" // 13
 )

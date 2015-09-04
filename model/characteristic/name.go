@@ -6,7 +6,7 @@ type Name struct {
 
 func NewName(name string) *Name {
 	str := NewString(name)
-	str.Type = CharTypeName
+	str.Type = TypeName
 	str.Permissions = PermsRead()
 
 	return &Name{str}

@@ -7,7 +7,7 @@ import (
 func TestManufacturer(t *testing.T) {
 	m := NewManufacturer("Apple")
 
-	if is, want := m.Type, CharTypeManufacturer; is != want {
+	if is, want := m.Type, TypeManufacturer; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 	if is, want := m.Manufacturer(), "Apple"; is != want {

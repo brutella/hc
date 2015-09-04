@@ -7,7 +7,7 @@ import (
 func TestName(t *testing.T) {
 	n := NewName("Test")
 
-	if is, want := n.Type, CharTypeName; is != want {
+	if is, want := n.Type, TypeName; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 	if is, want := n.Name(), "Test"; is != want {

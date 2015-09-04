@@ -12,7 +12,7 @@ type Bytes struct {
 
 func NewBytes(b []byte) *Bytes {
 	s := NewString(tlv8Base64FromBytes(b))
-	s.Type = CharTypeUnknown
+	s.Type = TypeUnknown
 	s.Format = FormatTLV8
 
 	return &Bytes{s}

@@ -14,7 +14,7 @@ type ChangeFunc func(c *Characteristic, newValue, oldValue interface{})
 // Characteristic is a HomeKit characteristic.
 type Characteristic struct {
 	ID          int64    `json:"iid"` // managed by accessory
-	Type        CharType `json:"type"`
+	Type        CharacteristicType `json:"type"`
 	Permissions []string `json:"perms"`
 	Description string   `json:"description,omitempty"` // manufacturer description (optional)
 
@@ -58,7 +58,7 @@ func noWritePermissions(permissions []string) bool {
 // If permissions are write-only the setter methods (SetValue and SetValueFromRemote)
 // don't set the Value field. The OnLocalChange and OnRemoteChange have the new
 // value set as expect, but characteristics current and old value are nil.
-func NewCharacteristic(value interface{}, format string, t CharType, permissions []string) *Characteristic {
+func NewCharacteristic(value interface{}, format string, t CharacteristicType, permissions []string) *Characteristic {
 	if len(permissions) == 0 {
 		permissions = PermsAll()
 	}

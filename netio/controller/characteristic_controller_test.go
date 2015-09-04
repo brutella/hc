@@ -85,11 +85,11 @@ func TestPutCharacteristic(t *testing.T) {
 	m := container.NewContainer()
 	m.AddAccessory(a.Accessory)
 
-	// find on characteristic with type CharTypePowerState
+	// find on characteristic with type TypePowerState
 	var cid int64
 	for _, s := range a.Accessory.Services {
 		for _, c := range s.Characteristics {
-			if c.Type == characteristic.CharTypePowerState {
+			if c.Type == characteristic.TypePowerState {
 				cid = c.ID
 			}
 		}

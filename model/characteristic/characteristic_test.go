@@ -7,7 +7,7 @@ import (
 
 func TestCharacteristicSetValuesOfWrongType(t *testing.T) {
 	var value int = 5
-	c := NewCharacteristic(value, FormatInt, CharTypePowerState, nil)
+	c := NewCharacteristic(value, FormatInt, TypePowerState, nil)
 
 	c.SetValue(float64(20.5))
 
@@ -29,7 +29,7 @@ func TestCharacteristicSetValuesOfWrongType(t *testing.T) {
 }
 
 func TestCharacteristicLocalDelegate(t *testing.T) {
-	c := NewCharacteristic(5, FormatInt, CharTypePowerState, nil)
+	c := NewCharacteristic(5, FormatInt, TypePowerState, nil)
 
 	var oldValue interface{}
 	var newValue interface{}
@@ -51,7 +51,7 @@ func TestCharacteristicLocalDelegate(t *testing.T) {
 }
 
 func TestCharacteristicRemoteDelegate(t *testing.T) {
-	c := NewCharacteristic(5, FormatInt, CharTypePowerState, nil)
+	c := NewCharacteristic(5, FormatInt, TypePowerState, nil)
 
 	var oldValue interface{}
 	var newValue interface{}
@@ -75,7 +75,7 @@ func TestCharacteristicRemoteDelegate(t *testing.T) {
 }
 
 func TestNoValueChange(t *testing.T) {
-	c := NewCharacteristic(5, FormatInt, CharTypePowerState, nil)
+	c := NewCharacteristic(5, FormatInt, TypePowerState, nil)
 
 	changed := false
 	c.OnConnChange(func(conn net.Conn, c *Characteristic, new, old interface{}) {
@@ -98,7 +98,7 @@ func TestNoValueChange(t *testing.T) {
 }
 
 func TestReadOnlyValue(t *testing.T) {
-	c := NewCharacteristic(5, FormatInt, CharTypePowerState, PermsRead())
+	c := NewCharacteristic(5, FormatInt, TypePowerState, PermsRead())
 
 	remoteChanged := false
 	localChanged := false
@@ -128,8 +128,8 @@ func TestReadOnlyValue(t *testing.T) {
 }
 
 func TestEqual(t *testing.T) {
-	c1 := NewCharacteristic(5, FormatInt, CharTypePowerState, nil)
-	c2 := NewCharacteristic(5, FormatInt, CharTypePowerState, nil)
+	c1 := NewCharacteristic(5, FormatInt, TypePowerState, nil)
+	c2 := NewCharacteristic(5, FormatInt, TypePowerState, nil)
 	if c1.Equal(c2) == false {
 		t.Fatal("characteristics not the same")
 	}

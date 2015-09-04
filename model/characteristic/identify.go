@@ -6,7 +6,7 @@ type Identify struct {
 
 func NewIdentify() *Identify {
 	b := NewBool(false, PermsWriteOnly())
-	b.Type = CharTypeIdentify
+	b.Type = TypeIdentify
 
 	return &Identify{b}
 }

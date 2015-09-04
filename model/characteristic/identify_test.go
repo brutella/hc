@@ -8,7 +8,7 @@ import (
 func TestWriteOnlyIdentifyCharacteristic(t *testing.T) {
 	i := NewIdentify()
 
-	if is, want := i.Type, CharTypeIdentify; is != want {
+	if is, want := i.Type, TypeIdentify; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 

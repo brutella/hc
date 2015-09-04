@@ -37,7 +37,7 @@ type Log struct {
 func NewLog(filePath string) *Log {
 	m := &fileMarshaler{filePath}
 	c := NewBytes([]byte{})
-	c.Type = CharTypeLogs
+	c.Type = TypeLogs
 	c.Permissions = PermsRead()
 	// Value is represented by an object which returns the file content as base64 string
 	c.Value = m

@@ -22,7 +22,7 @@ func TestLogs(t *testing.T) {
 
 	n := NewLog(file)
 
-	if is, want := n.Type, CharTypeLogs; is != want {
+	if is, want := n.Type, TypeLogs; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 

@@ -7,7 +7,7 @@ import (
 func TestModel(t *testing.T) {
 	m := NewModel("Late 2014")
 
-	if is, want := m.Type, CharTypeModel; is != want {
+	if is, want := m.Type, TypeModel; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 	if is, want := m.Model(), "Late 2014"; is != want {

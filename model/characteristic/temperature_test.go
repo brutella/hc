@@ -31,7 +31,7 @@ func TestTemperatureCharacteristic(t *testing.T) {
 func TestCurrentTemperatureCharacteristic(t *testing.T) {
 	temp := NewCurrentTemperatureCharacteristic(20.2, 0, 100, 1, "celsius")
 
-	if is, want := temp.Type, CharTypeTemperatureCurrent; is != want {
+	if is, want := temp.Type, TypeTemperatureCurrent; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 	if x := temp.Permissions; reflect.DeepEqual(x, PermsRead()) == false {
@@ -42,7 +42,7 @@ func TestCurrentTemperatureCharacteristic(t *testing.T) {
 func TestTargetTemperatureCharacteristic(t *testing.T) {
 	temp := NewTargetTemperatureCharacteristic(20.2, 0, 100, 1, "celsius")
 
-	if is, want := temp.Type, CharTypeTemperatureTarget; is != want {
+	if is, want := temp.Type, TypeTemperatureTarget; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 	if x := temp.Permissions; reflect.DeepEqual(x, PermsAll()) == false {

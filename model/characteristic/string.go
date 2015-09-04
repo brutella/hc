@@ -5,7 +5,7 @@ type String struct {
 }
 
 func NewString(value string) *String {
-	return &String{NewCharacteristic(value, FormatString, CharTypeUnknown, nil)}
+	return &String{NewCharacteristic(value, FormatString, TypeUnknown, nil)}
 }
 
 func (s *String) SetString(str string) {

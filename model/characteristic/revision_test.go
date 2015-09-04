@@ -7,7 +7,7 @@ import (
 func TestHardwareRevisionCharacteristic(t *testing.T) {
 	hw := NewHardwareRevision("1.0")
 
-	if is, want := hw.Type, CharTypeHardwareRevision; is != want {
+	if is, want := hw.Type, TypeHardwareRevision; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 	if is, want := hw.Revision(), "1.0"; is != want {
@@ -24,7 +24,7 @@ func TestHardwareRevisionCharacteristic(t *testing.T) {
 func TestFirmwareRevisionCharacteristic(t *testing.T) {
 	hw := NewFirmwareRevision("1.0")
 
-	if is, want := hw.Type, CharTypeFirmwareRevision; is != want {
+	if is, want := hw.Type, TypeFirmwareRevision; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 }
@@ -32,7 +32,7 @@ func TestFirmwareRevisionCharacteristic(t *testing.T) {
 func TestSoftwareRevisionCharacteristic(t *testing.T) {
 	hw := NewSoftwareRevision("1.0")
 
-	if is, want := hw.Type, CharTypeSoftwareRevision; is != want {
+	if is, want := hw.Type, TypeSoftwareRevision; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 }

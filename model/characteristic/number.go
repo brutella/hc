@@ -5,7 +5,7 @@ type Number struct {
 }
 
 func NewNumber(value, min, max, step interface{}, format string, permissions []string) *Number {
-	n := Number{NewCharacteristic(value, format, CharTypeUnknown, permissions)}
+	n := Number{NewCharacteristic(value, format, TypeUnknown, permissions)}
 	n.MinValue = min
 	n.MaxValue = max
 	n.MinStep = step

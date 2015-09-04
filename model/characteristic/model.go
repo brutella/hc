@@ -6,7 +6,7 @@ type Model struct {
 
 func NewModel(model string) *Model {
 	str := NewString(model)
-	str.Type = CharTypeModel
+	str.Type = TypeModel
 	str.Permissions = PermsReadOnly()
 
 	return &Model{str}

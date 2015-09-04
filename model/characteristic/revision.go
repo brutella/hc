@@ -5,20 +5,20 @@ type Revision struct {
 }
 
 func NewHardwareRevision(revision string) *Revision {
-	return newRevision(revision, CharTypeHardwareRevision)
+	return newRevision(revision, TypeHardwareRevision)
 }
 
 func NewSoftwareRevision(revision string) *Revision {
-	return newRevision(revision, CharTypeSoftwareRevision)
+	return newRevision(revision, TypeSoftwareRevision)
 }
 
 func NewFirmwareRevision(revision string) *Revision {
-	return newRevision(revision, CharTypeFirmwareRevision)
+	return newRevision(revision, TypeFirmwareRevision)
 }
 
-func newRevision(revision string, charType CharType) *Revision {
+func newRevision(revision string, characteristicType CharacteristicType) *Revision {
 	str := NewString(revision)
-	str.Type = CharType(charType)
+	str.Type = CharacteristicType(characteristicType)
 	str.Permissions = PermsRead()
 
 	return &Revision{str}
