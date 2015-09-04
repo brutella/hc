@@ -16,11 +16,11 @@ func NewHeatingCoolingMode(current model.HeatCoolModeType, CharacteristicType Ch
 }
 
 func NewCurrentHeatingCoolingMode(current model.HeatCoolModeType) *HeatingCoolingMode {
-	return NewHeatingCoolingMode(current, TypeHeatingCoolingModeCurrent, PermsRead())
+	return NewHeatingCoolingMode(current, TypeCurrentHeatingCoolingMode, PermsRead())
 }
 
 func NewTargetHeatingCoolingMode(current model.HeatCoolModeType) *HeatingCoolingMode {
-	return NewHeatingCoolingMode(current, TypeHeatingCoolingModeTarget, PermsAll())
+	return NewHeatingCoolingMode(current, TypeTargetHeatingCoolingMode, PermsAll())
 }
 
 func (c *HeatingCoolingMode) SetHeatingCoolingMode(mode model.HeatCoolModeType) {
@@ -38,7 +38,7 @@ func (c *HeatingCoolingMode) HeatingCoolingMode() model.HeatCoolModeType {
 //
 // func NewCurrentRelativeHumidityCharacteristic(value float64) *CurrentRelativeHumidityCharacteristic {
 //     c := CurrentRelativeHumidityCharacteristic{NewFloat(value), value}
-//     c.Type = TypeRelativeHumidityCurrent
+//     c.Type = TypeCurrentRelativeHumidity
 //     c.Permissions = PermsRead()
 //     return &c
 // }
@@ -50,7 +50,7 @@ func (c *HeatingCoolingMode) HeatingCoolingMode() model.HeatCoolModeType {
 //
 // func NewTargetRelativeHumidityCharacteristic(value, min, max, steps float64) *TargetRelativeHumidityCharacteristic {
 //     c := TargetRelativeHumidityCharacteristic{NewFloatMinMaxSteps(value, min, max, steps), value}
-//     c.Type = TypeRelativeHumidityTarget
+//     c.Type = TypeTargetRelativeHumidity
 //     c.Permissions = PermsAll()
 //     return &c
 // }
@@ -72,7 +72,7 @@ func (c *HeatingCoolingMode) HeatingCoolingMode() model.HeatCoolModeType {
 //
 // func NewHeatingThresholdTemperatureCharacteristic(value, min, max, steps float64) *HeatingThresholdTemperatureCharacteristic {
 //     c := HeatingThresholdTemperatureCharacteristic{NewFloatMinMaxSteps(value, min, max, steps), value}
-//     c.Type = TypeHeatingThreshold
+//     c.Type = TypeHeatingThresholdTemperature
 //     c.Permissions = PermsAll()
 //     return &c
 // }

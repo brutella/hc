@@ -13,11 +13,11 @@ func NewTemperatureCharacteristic(value, min, max, steps float64, unit string, C
 }
 
 func NewCurrentTemperatureCharacteristic(value, min, max, steps float64, unit string) *TemperatureCharacteristic {
-	return NewTemperatureCharacteristic(value, min, max, steps, unit, TypeTemperatureCurrent, PermsRead())
+	return NewTemperatureCharacteristic(value, min, max, steps, unit, TypeCurrentTemperature, PermsRead())
 }
 
 func NewTargetTemperatureCharacteristic(value, min, max, steps float64, unit string) *TemperatureCharacteristic {
-	return NewTemperatureCharacteristic(value, min, max, steps, unit, TypeTemperatureTarget, PermsAll())
+	return NewTemperatureCharacteristic(value, min, max, steps, unit, TypeTargetTemperature, PermsAll())
 }
 
 func (t *TemperatureCharacteristic) SetTemperature(value float64) {

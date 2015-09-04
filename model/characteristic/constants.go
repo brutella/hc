@@ -5,18 +5,9 @@ import (
 )
 
 const (
-
-	// Encoded in HomeKit Accessory Simulator.app as bits
-	// 2:  0010 -> write
-	// 15: 1111 -> read, write, events, bonjour
-	// 13: 1101 -> read, events, bonjour
-
 	PermRead   = "pr" // can be read
 	PermWrite  = "pw" // can be written
 	PermEvents = "ev" // sends events
-
-	// Unused
-	PermBonjour = "bonjour"
 )
 
 // PermsAll returns read, write and event permissions
@@ -92,58 +83,75 @@ type CharacteristicType string
 const (
 	TypeUnknown CharacteristicType = "0" // not specified in HAP
 
-	// name service
-	TypeName CharacteristicType = "23" // 13
-
-	// info service
-	TypeModel        CharacteristicType = "21" // 1
-	TypeManufacturer CharacteristicType = "20" // 1
-	TypeSerialNumber CharacteristicType = "30" // 1
-	TypeIdentify     CharacteristicType = "14" // 2
-
-	TypeLogs                     CharacteristicType = "1F" // 15
-	TypeVersion                  CharacteristicType = "37" // 2
-	TypeAdministratorOnlyAccesss CharacteristicType = "1"  // 15
-	TypeFirmwareRevision         CharacteristicType = "52" // 13?
-	TypeHardwareRevision         CharacteristicType = "53" // 13?
-	TypeSoftwareRevision         CharacteristicType = "54" // 13?
-
-	// Light bulb service
-	TypeBrightness CharacteristicType = "8"  // 15
-	TypeHue        CharacteristicType = "13" // 15
-	TypeSaturation CharacteristicType = "2F" // 15
-
-	// switch/outlet service
-	TypePowerState CharacteristicType = "25" // 15
-
-	TypeInUse         CharacteristicType = "26" // 13
-	TypeAudioFeedback CharacteristicType = "5"  // 15
-
-	// garage door opener
-	TypeObstructionDetected                  CharacteristicType = "24" // 13
-	TypeDoorStateTarget                      CharacteristicType = "32" // 15
-	TypeDoorStateCurrent                     CharacteristicType = "E"  // 13
-	TypeLockMechanismTargetState             CharacteristicType = "1E" // 15
-	TypeLockMechanismCurrentState            CharacteristicType = "1D" // 13
-	TypeLockMechanismLastKnownAction         CharacteristicType = "1C" // 13
-	TypeLockMechanismAdditionalAuthorization CharacteristicType = "1B"
-	TypeLockManagementControlPoint           CharacteristicType = "19" // 2
-	TypeLockManagementAutoSecureTimeout      CharacteristicType = "1A"
-
-	TypeRotationDirection CharacteristicType = "28"
-	TypeRotationSpeed     CharacteristicType = "29"
-
-	TypeTemperatureUnits   CharacteristicType = "36" // 15
-	TypeTemperatureTarget  CharacteristicType = "35" // 15
-	TypeTemperatureCurrent CharacteristicType = "11" // 13
-
-	TypeRelativeHumidityTarget  CharacteristicType = "34" // 15
-	TypeRelativeHumidityCurrent CharacteristicType = "10" // 13
-
-	TypeHeatingThreshold          CharacteristicType = "12" // 15
-	TypeCoolingThreshold          CharacteristicType = "D"  // 15
-	TypeHeatingCoolingModeTarget  CharacteristicType = "33" // 15
-	TypeHeatingCoolingModeCurrent CharacteristicType = "F"  // 13
-
-	TypeMotionDetected CharacteristicType = "22" // 13
+	TypeAdministratorOnlyAccesss        CharacteristicType = "1"  // rwn
+	TypeAirParticulateDensityType       CharacteristicType = "64" // rn
+	TypeAirParticulateSize              CharacteristicType = "65" // rn
+	TypeAirQuality                      CharacteristicType = "95" // rn
+	TypeAudioFeedback                   CharacteristicType = "5"  // rwn
+	TypeBatteryLevel                    CharacteristicType = "68" // rn
+	TypeBrightness                      CharacteristicType = "8"  // rwn
+	TypeCarbonDioxideDetected           CharacteristicType = "92" // rn
+	TypeCarbonDioxideLevel              CharacteristicType = "93" // rn
+	TypeCarbonDioxidePeakLevel          CharacteristicType = "94" // rn
+	TypeCarbonMonoxideDetected          CharacteristicType = "69" // rn
+	TypeCarbonMonoxideLevel             CharacteristicType = "90" // rn
+	TypeChargingState                   CharacteristicType = "8F" // rn
+	TypeContactSensorState              CharacteristicType = "6A" // rn
+	TypeCoolingThreshold                CharacteristicType = "D"  // rwn
+	TypeCurrentAmbientLightLevel        CharacteristicType = "6B" //rn
+	TypeCurrentDoorState                CharacteristicType = "E"  // rn
+	TypeCurrentHeatingCoolingMode       CharacteristicType = "F"  // rn
+	TypeCurrentHorizontalTiltAngle      CharacteristicType = "6C" // rn
+	TypeCurrentPosition                 CharacteristicType = "6D" // rn
+	TypeCurrentRelativeHumidity         CharacteristicType = "10" // rn
+	TypeCurrentTemperature              CharacteristicType = "11" // rn
+	TypeCurrentVerticalTiltAngle        CharacteristicType = "6E" // rn
+	TypeFirmwareRevision                CharacteristicType = "52" // rn
+	TypeHardwareRevision                CharacteristicType = "53" // rn
+	TypeHeatingThresholdTemperature     CharacteristicType = "12" // rwn
+	TypeHoldPositiong                   CharacteristicType = "6F" // w
+	TypeHue                             CharacteristicType = "13" // rwn
+	TypeIdentify                        CharacteristicType = "14" // w
+	TypeLeakDetected                    CharacteristicType = "70" // rn
+	TypeLockControlPoint                CharacteristicType = "19" // w
+	TypeLockMechanismCurrentState       CharacteristicType = "1D" // rn
+	TypeLockMechanismLastKnownAction    CharacteristicType = "1C" // rn
+	TypeLockManagementAutoSecureTimeout CharacteristicType = "1A" // rwn
+	TypeLockMechanismTargetState        CharacteristicType = "1E" // rwn
+	TypeLogs                            CharacteristicType = "1F" // rn
+	TypeManufacturer                    CharacteristicType = "20" // r
+	TypeModel                           CharacteristicType = "21" // r
+	TypeMotionDetected                  CharacteristicType = "22" // rn
+	TypeName                            CharacteristicType = "23" // rn
+	TypeObstructionDetected             CharacteristicType = "24" // rn
+	TypeOccupancyDetected               CharacteristicType = "71" // rn
+	TypePowerState                      CharacteristicType = "25" // rwn
+	TypeOutletInUse                     CharacteristicType = "26" // rn
+	TypePositionState                   CharacteristicType = "72" // rn
+	TypeProgrammableSwitchEvent         CharacteristicType = "73" // rn
+	TypeProgrammableSwitchOutputState   CharacteristicType = "74" // rwn
+	TypeReachable                       CharacteristicType = "63" // rn
+	TypeRotationDirection               CharacteristicType = "28" // rwn
+	TypeRotationSpeed                   CharacteristicType = "29" // rwn
+	TypeSaturation                      CharacteristicType = "2F" // rwn
+	TypeSecuritySystemAlarmType         CharacteristicType = "8E" // rn
+	TypeSecuritySystemCurrentState      CharacteristicType = "66" // rn
+	TypeSecuritySystemTargetState       CharacteristicType = "67" // rwn
+	TypeSerialNumber                    CharacteristicType = "30" // r
+	TypeSmokeDetected                   CharacteristicType = "76" // rn
+	TypeSoftwareRevision                CharacteristicType = "54" // rn
+	TypeStatusActive                    CharacteristicType = "75" // rn
+	TypeStatusFault                     CharacteristicType = "77" // rn
+	TypeStatusJammed                    CharacteristicType = "78" // rn
+	TypeStatusLowBattery                CharacteristicType = "79" // rn
+	TypeStatusTampered                  CharacteristicType = "7A" // rn
+	TypeTargetDoorState                 CharacteristicType = "32" // rwn
+	TypeTargetHeatingCoolingMode        CharacteristicType = "33" // rwn
+	TypeTargetHorizontalTiltAngle       CharacteristicType = "7B" // rwn
+	TypeTargetPosition                  CharacteristicType = "7C" // rwn
+	TypeTargetRelativeHumidity          CharacteristicType = "34" // rwn
+	TypeTargetTemperature               CharacteristicType = "35" // rwn
+	TypeTargetVerticalTiltAngle         CharacteristicType = "7D" // rwn
+	TypeTemperatureDisplayUnits         CharacteristicType = "36" // rwn
+	TypeVersion                         CharacteristicType = "37" // rwn
 )

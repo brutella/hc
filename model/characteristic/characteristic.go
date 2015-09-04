@@ -13,10 +13,10 @@ type ChangeFunc func(c *Characteristic, newValue, oldValue interface{})
 
 // Characteristic is a HomeKit characteristic.
 type Characteristic struct {
-	ID          int64    `json:"iid"` // managed by accessory
+	ID          int64              `json:"iid"` // managed by accessory
 	Type        CharacteristicType `json:"type"`
-	Permissions []string `json:"perms"`
-	Description string   `json:"description,omitempty"` // manufacturer description (optional)
+	Permissions []string           `json:"perms"`
+	Description string             `json:"description,omitempty"` // manufacturer description (optional)
 
 	Value  interface{} `json:"value,omitempty"` // nil for write-only characteristics
 	Format string      `json:"format"`
