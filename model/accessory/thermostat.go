@@ -11,16 +11,6 @@ type thermostat struct {
 	thermostat *service.Thermostat
 }
 
-// NewThermometer returns a thermometer  which implements model.Thermometer.
-func NewThermometer(info model.Info, temp, min, max, steps float64) *thermostat {
-	accessory := New(info)
-	t := service.NewThermometer(info.Name, temp, min, max, steps)
-
-	accessory.AddService(t.Service)
-
-	return &thermostat{accessory, t}
-}
-
 // NewThermostat returns a thermostat which implements model.Thermostat.
 func NewThermostat(info model.Info, temp, min, max, steps float64) *thermostat {
 	accessory := New(info)
