@@ -129,16 +129,16 @@ func (verify *VerifyClientController) handlePairStepVerifyResponse(in util.Conta
 	material = append(material, username...)
 	material = append(material, verify.session.PublicKey[:]...)
 
-	entity := verify.database.EntityWithName(username)
-	if entity == nil {
+	var entity db.Entity
+	if entity, err = verify.database.EntityWithName(username); err != nil {
 		return nil, fmt.Errorf("Server %s is unknown", username)
 	}
 
-	if len(entity.PublicKey()) == 0 {
+	if len(entity.PublicKey) == 0 {
 		return nil, fmt.Errorf("No LTPK available for client %s", username)
 	}
 
-	if crypto.ValidateED25519Signature(entity.PublicKey(), material, signature) == false {
+	if crypto.ValidateED25519Signature(entity.PublicKey, material, signature) == false {
 		return nil, fmt.Errorf("Could not validate signature")
 	}
 

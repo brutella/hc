@@ -177,12 +177,12 @@ func (verify *VerifyServerController) handlePairVerifyFinish(in util.Container) 
 		log.Println("[VERB]     client:", username)
 		log.Println("[VERB]  signature:", hex.EncodeToString(signature))
 
-		entity := verify.database.EntityWithName(username)
-		if entity == nil {
+		entity, err := verify.database.EntityWithName(username)
+		if err != nil {
 			return nil, fmt.Errorf("Client %s is unknown", username)
 		}
 
-		if len(entity.PublicKey()) == 0 {
+		if len(entity.PublicKey) == 0 {
 			return nil, fmt.Errorf("No LTPK available for client %s", username)
 		}
 
@@ -191,7 +191,7 @@ func (verify *VerifyServerController) handlePairVerifyFinish(in util.Container) 
 		material = append(material, []byte(username)...)
 		material = append(material, verify.session.PublicKey[:]...)
 
-		if crypto.ValidateED25519Signature(entity.PublicKey(), material, signature) == false {
+		if crypto.ValidateED25519Signature(entity.PublicKey, material, signature) == false {
 			log.Println("[WARN] signature is invalid")
 			verify.reset()
 			out.SetByte(TagErrCode, ErrCodeUnknownPeer.Byte()) // return error 4

@@ -67,12 +67,12 @@ func TestDeletePairing(t *testing.T) {
 	if out == nil {
 		t.Fatal("no response")
 	}
+
 	if is, want := out.GetByte(TagSequence), byte(0x2); is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 
-	savedEntity := database.EntityWithName(username)
-	if savedEntity != nil {
-		t.Fatal(savedEntity)
+	if _, err := database.EntityWithName(username); err == nil {
+		t.Fatal("expected error")
 	}
 }

@@ -8,8 +8,12 @@ import (
 )
 
 func TestNewDevice(t *testing.T) {
-	db, _ := db.NewDatabase(os.TempDir())
-	client, err := NewDevice("Test Client", db)
+	var e db.Entity
+	var client Device
+	var err error
+
+	database, _ := db.NewDatabase(os.TempDir())
+	client, err = NewDevice("Test Client", database)
 
 	if err != nil {
 		t.Fatal(err)
@@ -21,18 +25,21 @@ func TestNewDevice(t *testing.T) {
 		t.Fatal(x)
 	}
 
-	entity := db.EntityWithName("Test Client")
-	if is, want := entity.Name(), "Test Client"; is != want {
+	if e, err = database.EntityWithName("Test Client"); err != nil {
+		t.Fatal(err)
+	}
+
+	if is, want := e.Name, "Test Client"; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 
 	if err != nil {
 		t.Fatal(err)
 	}
-	if is, want := entity.PublicKey(), client.PublicKey(); reflect.DeepEqual(is, want) == false {
+	if is, want := e.PublicKey, client.PublicKey(); reflect.DeepEqual(is, want) == false {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
-	if is, want := entity.PrivateKey(), client.PrivateKey(); reflect.DeepEqual(is, want) == false {
+	if is, want := e.PrivateKey, client.PrivateKey(); reflect.DeepEqual(is, want) == false {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 }

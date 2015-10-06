@@ -89,11 +89,6 @@ func (t *ipTransport) Start() {
 	mdns := NewMDNSService(t.name, t.device.Name(), int(port))
 	t.mdns = mdns
 
-	dns := t.database.DNSWithName(t.name)
-	if dns == nil {
-		dns = db.NewDNS(t.name, 1, 1)
-		t.database.SaveDNS(dns)
-	}
 	mdns.Publish()
 	// Listen until server.Stop() is called
 	s.ListenAndServe()
@@ -170,17 +165,4 @@ func transportUUIDInStorage(storage util.Storage) string {
 		}
 	}
 	return string(uuid)
-}
-
-// updateConfiguration increases the configuration value by 1 and re-announces the new TXT records.
-// This method is currently not used.
-func (t *ipTransport) updateConfiguration() {
-	dns := t.database.DNSWithName(t.name)
-	if dns != nil {
-		dns.SetConfiguration(dns.Configuration() + 1)
-		t.database.SaveDNS(dns)
-		if t.mdns != nil {
-			t.mdns.Update()
-		}
-	}
 }
