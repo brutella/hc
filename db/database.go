@@ -6,7 +6,7 @@ import (
 	"github.com/brutella/hc/util"
 )
 
-// Database stores entities and dns persistently.
+// Database stores entities
 type Database interface {
 	// EntityWithName returns the entity referenced by name
 	EntityWithName(name string) (Entity, error)
