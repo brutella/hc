@@ -1,19 +1,17 @@
-// Package event implements event notifications used to notify clients when characteristic value changed.
-package event
+package netio
 
 import (
 	"bytes"
 	"encoding/json"
 	"github.com/brutella/hc/model/accessory"
 	"github.com/brutella/hc/model/characteristic"
-	"github.com/brutella/hc/netio"
 	"github.com/brutella/hc/netio/data"
 	"io/ioutil"
 	"net/http"
 	"strings"
 )
 
-// New returns an event response for a characteristic from an accessory.
+// New returns an notification response for a characteristic from an accessory.
 func New(a *accessory.Accessory, c *characteristic.Characteristic) (*http.Response, error) {
 	body, err := Body(a, c)
 	if err != nil {
@@ -28,7 +26,7 @@ func New(a *accessory.Accessory, c *characteristic.Characteristic) (*http.Respon
 	resp.Body = ioutil.NopCloser(body)
 	resp.ContentLength = int64(body.Len())
 	resp.Header = map[string][]string{}
-	resp.Header.Set("Content-Type", netio.HTTPContentTypeHAPJson)
+	resp.Header.Set("Content-Type", HTTPContentTypeHAPJson)
 	// (brutella) Not sure if Date header must be set
 	// resp.Header.Set("Date", netio.CurrentRFC1123Date())
 
@@ -47,7 +45,7 @@ func FixProtocolSpecifier(b []byte) []byte {
 	return []byte(strings.Replace(string(b), "HTTP/1.0", "EVENT/1.0", 1))
 }
 
-// Body returns the json body for an event response as bytes.
+// Body returns the json body for an notification response as bytes.
 func Body(a *accessory.Accessory, c *characteristic.Characteristic) (*bytes.Buffer, error) {
 	chars := data.NewCharacteristics()
 	char := data.Characteristic{AccessoryID: a.GetID(), ID: c.GetID(), Value: c.GetValue()}

@@ -1,4 +1,4 @@
-package event
+package netio
 
 import (
 	"github.com/brutella/hc/model"
