@@ -23,7 +23,7 @@ import (
 type SetupServerController struct {
 	device   netio.SecuredDevice
 	session  *SetupServerSession
-	step     pairStepType
+	step     PairStepType
 	database db.Database
 }
 
@@ -50,7 +50,7 @@ func NewSetupServerController(device netio.SecuredDevice, database db.Database) 
 
 // Handle processes a container to pair (exchange keys) with a client.
 func (setup *SetupServerController) Handle(in util.Container) (out util.Container, err error) {
-	method := pairMethodType(in.GetByte(TagPairingMethod))
+	method := PairMethodType(in.GetByte(TagPairingMethod))
 
 	// It is valid that pair method is not sent
 	// If method set then it must be 0x00
@@ -58,7 +58,7 @@ func (setup *SetupServerController) Handle(in util.Container) (out util.Containe
 		return nil, errInvalidPairMethod(method)
 	}
 
-	seq := pairStepType(in.GetByte(TagSequence))
+	seq := PairStepType(in.GetByte(TagSequence))
 
 	switch seq {
 	case PairStepStartRequest:
@@ -246,8 +246,6 @@ func (setup *SetupServerController) handleKeyExchange(in util.Container) (util.C
 			encrypted, mac, _ := chacha20poly1305.EncryptAndSeal(setup.session.EncryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)
 			out.SetByte(TagSequence, PairStepKeyExchangeRequest.Byte())
 			out.SetBytes(TagEncryptedData, append(encrypted, mac[:]...))
-
-			setup.reset()
 		}
 	}
 

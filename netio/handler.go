@@ -16,7 +16,6 @@ type ContainerHandler interface {
 type PairVerifyHandler interface {
 	ContainerHandler
 	SharedKey() [32]byte
-	KeyVerified() bool
 }
 
 // A AccessoriesHandler returns a list of accessories as json.

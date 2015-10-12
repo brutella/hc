@@ -2,8 +2,10 @@ package endpoint
 
 import (
 	"github.com/brutella/hc/db"
+	"github.com/brutella/hc/event"
 	"github.com/brutella/hc/netio"
 	"github.com/brutella/hc/netio/pair"
+	"github.com/brutella/hc/util"
 	"github.com/brutella/log"
 
 	"io"
@@ -15,49 +17,65 @@ import (
 // This endoint is session based and handles requests based on their connections.
 // Which means that there is one pair setup controller for every connection.
 // This is required to support simultaneous pairing connections.
+//
+// When pairing finished, the DevicePaired event is sent using an event emitter.
 type PairSetup struct {
 	http.Handler
 
 	device   netio.SecuredDevice
 	database db.Database
 	context  netio.HAPContext
+	emitter  event.Emitter
 }
 
 // NewPairSetup returns a new handler for pairing endpoint
-func NewPairSetup(context netio.HAPContext, device netio.SecuredDevice, database db.Database) *PairSetup {
-	handler := PairSetup{
+func NewPairSetup(context netio.HAPContext, device netio.SecuredDevice, database db.Database, emitter event.Emitter) *PairSetup {
+	endpoint := PairSetup{
 		device:   device,
 		database: database,
 		context:  context,
+		emitter:  emitter,
 	}
 
-	return &handler
+	return &endpoint
 }
 
-func (handler *PairSetup) ServeHTTP(response http.ResponseWriter, request *http.Request) {
+func (endpoint *PairSetup) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	log.Printf("[VERB] %v POST /pair-setup", request.RemoteAddr)
 	response.Header().Set("Content-Type", netio.HTTPContentTypePairingTLV8)
 
-	key := handler.context.GetConnectionKey(request)
-	session := handler.context.Get(key).(netio.Session)
-	controller := session.PairSetupHandler()
-	if controller == nil {
+	var err error
+	var in util.Container
+	var out util.Container
+
+	key := endpoint.context.GetConnectionKey(request)
+	session := endpoint.context.Get(key).(netio.Session)
+	ctrl := session.PairSetupHandler()
+	if ctrl == nil {
 		log.Println("[VERB] Create new pair setup controller")
-		var err error
-		controller, err = pair.NewSetupServerController(handler.device, handler.database)
-		if err != nil {
+
+		if ctrl, err = pair.NewSetupServerController(endpoint.device, endpoint.database); err != nil {
 			log.Println(err)
 		}
 
-		session.SetPairSetupHandler(controller)
+		session.SetPairSetupHandler(ctrl)
 	}
 
-	res, err := pair.HandleReaderForHandler(request.Body, controller)
+	if in, err = util.NewTLV8ContainerFromReader(request.Body); err == nil {
+		out, err = ctrl.Handle(in)
+	}
 
 	if err != nil {
 		log.Println("[ERRO]", err)
 		response.WriteHeader(http.StatusInternalServerError)
 	} else {
-		io.Copy(response, res)
+		io.Copy(response, out.BytesBuffer())
+
+		// Send event when key exchange is done
+		b := out.GetByte(pair.TagSequence)
+		switch pair.PairStepType(b) {
+		case pair.PairStepKeyExchangeResponse:
+			endpoint.emitter.Emit(event.DevicePaired{})
+		}
 	}
 }

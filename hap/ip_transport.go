@@ -7,11 +7,11 @@ import (
 	"sync"
 
 	"github.com/brutella/hc/db"
+	"github.com/brutella/hc/event"
 	"github.com/brutella/hc/model/accessory"
 	"github.com/brutella/hc/model/characteristic"
 	"github.com/brutella/hc/model/container"
 	"github.com/brutella/hc/netio"
-	"github.com/brutella/hc/netio/event"
 	"github.com/brutella/hc/server"
 	"github.com/brutella/hc/util"
 	"github.com/brutella/log"
@@ -30,6 +30,8 @@ type ipTransport struct {
 	name      string
 	device    netio.SecuredDevice
 	container *container.Container
+
+	emitter event.Emitter
 }
 
 // NewIPTransport creates a transport to provide accessories over IP.
@@ -71,6 +73,7 @@ func NewIPTransport(pin string, a *accessory.Accessory, as ...*accessory.Accesso
 		container: container.NewContainer(),
 		mutex:     &sync.Mutex{},
 		context:   netio.NewContextForSecuredDevice(device),
+		emitter:   event.NewEmitter(),
 	}
 
 	t.addAccessory(a)
@@ -78,18 +81,26 @@ func NewIPTransport(pin string, a *accessory.Accessory, as ...*accessory.Accesso
 		t.addAccessory(a)
 	}
 
+	t.emitter.AddListener(t)
+
 	return t, err
 }
 
 func (t *ipTransport) Start() {
-	s := server.NewServer(t.context, t.database, t.container, t.device, t.mutex)
+	s := server.NewServer(t.context, t.database, t.container, t.device, t.mutex, t.emitter)
 	t.server = s
 	port := to.Int64(s.Port())
 
 	mdns := NewMDNSService(t.name, t.device.Name(), int(port))
 	t.mdns = mdns
 
+	if t.isPaired() {
+		// Paired accessories must not be reachable for other clients since iOS 9
+		mdns.SetReachable(false)
+	}
+
 	mdns.Publish()
+
 	// Listen until server.Stop() is called
 	s.ListenAndServe()
 }
@@ -102,6 +113,26 @@ func (t *ipTransport) Stop() {
 
 	if t.server != nil {
 		t.server.Stop()
+	}
+}
+
+// isPaired returns true when the transport is already paired
+func (t *ipTransport) isPaired() bool {
+
+	// If more than one entity is stored in the database, we are paired with a device.
+	// The transport itself is a device and is stored in the database, therefore
+	// we have to check for more than one entity.
+	if es, err := t.database.Entities(); err == nil && len(es) > 1 {
+		return true
+	}
+
+	return false
+}
+
+func (t *ipTransport) updateMDNSReachability() {
+	if mdns := t.mdns; mdns != nil {
+		mdns.SetReachable(t.isPaired() == false)
+		mdns.Update()
 	}
 }
 
@@ -136,7 +167,7 @@ func (t *ipTransport) notifyListener(a *accessory.Accessory, c *characteristic.C
 		if conn == except {
 			continue
 		}
-		resp, err := event.New(a, c)
+		resp, err := netio.New(a, c)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -146,7 +177,7 @@ func (t *ipTransport) notifyListener(a *accessory.Accessory, c *characteristic.C
 		var buffer = new(bytes.Buffer)
 		resp.Write(buffer)
 		bytes, err := ioutil.ReadAll(buffer)
-		bytes = event.FixProtocolSpecifier(bytes)
+		bytes = netio.FixProtocolSpecifier(bytes)
 		log.Printf("[VERB] %s <- %s", conn.RemoteAddr(), string(bytes))
 		conn.Write(bytes)
 	}
@@ -165,4 +196,18 @@ func transportUUIDInStorage(storage util.Storage) string {
 		}
 	}
 	return string(uuid)
+}
+
+// Handles event which are sent when pairing with a device is added or removed
+func (t *ipTransport) Handle(ev interface{}) {
+	switch ev.(type) {
+	case event.DevicePaired:
+		log.Printf("[INFO] Event: paired with device")
+		t.updateMDNSReachability()
+	case event.DeviceUnpaired:
+		log.Printf("[INFO] Event: unpaired with device")
+		t.updateMDNSReachability()
+	default:
+		break
+	}
 }

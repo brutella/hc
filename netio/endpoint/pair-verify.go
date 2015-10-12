@@ -5,6 +5,7 @@ import (
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/netio"
 	"github.com/brutella/hc/netio/pair"
+	"github.com/brutella/hc/util"
 	"github.com/brutella/log"
 
 	"io"
@@ -22,47 +23,55 @@ type PairVerify struct {
 	database db.Database
 }
 
-// NewPairVerify returns a new handler for pair verify endpoint
+// NewPairVerify returns a new endpoint for pair verify endpoint
 func NewPairVerify(context netio.HAPContext, database db.Database) *PairVerify {
-	handler := PairVerify{
+	endpoint := PairVerify{
 		context:  context,
 		database: database,
 	}
 
-	return &handler
+	return &endpoint
 }
 
-func (handler *PairVerify) ServeHTTP(response http.ResponseWriter, request *http.Request) {
+func (endpoint *PairVerify) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	log.Printf("[VERB] %v POST /pair-verify", request.RemoteAddr)
 	response.Header().Set("Content-Type", netio.HTTPContentTypePairingTLV8)
 
-	key := handler.context.GetConnectionKey(request)
-	session := handler.context.Get(key).(netio.Session)
-	controller := session.PairVerifyHandler()
-	if controller == nil {
+	key := endpoint.context.GetConnectionKey(request)
+	session := endpoint.context.Get(key).(netio.Session)
+	ctlr := session.PairVerifyHandler()
+	if ctlr == nil {
 		log.Println("[VERB] Create new pair verify controller")
-		controller = pair.NewVerifyServerController(handler.database, handler.context)
-		session.SetPairVerifyHandler(controller)
+		ctlr = pair.NewVerifyServerController(endpoint.database, endpoint.context)
+		session.SetPairVerifyHandler(ctlr)
 	}
 
-	res, err := pair.HandleReaderForHandler(request.Body, controller)
+	var err error
+	var in util.Container
+	var out util.Container
+	var secSession crypto.Cryptographer
+
+	if in, err = util.NewTLV8ContainerFromReader(request.Body); err == nil {
+		out, err = ctlr.Handle(in)
+	}
 
 	if err != nil {
 		log.Println(err)
 		response.WriteHeader(http.StatusInternalServerError)
 	} else {
-		io.Copy(response, res)
-		// Setup secure session
-		if controller.KeyVerified() == true {
-			// Verification is done
-			// Switch to secure session
-			secureSession, err := crypto.NewSecureSessionFromSharedKey(controller.SharedKey())
-			if err != nil {
-				log.Println("[ERRO] Could not setup secure session.", err)
-			} else {
+		io.Copy(response, out.BytesBuffer())
+
+		// When key verification is done, switch to a secure session
+		// based on the negotiated shared session key
+		b := out.GetByte(pair.TagSequence)
+		switch pair.VerifyStepType(b) {
+		case pair.VerifyStepFinishResponse:
+			if secSession, err = crypto.NewSecureSessionFromSharedKey(ctlr.SharedKey()); err == nil {
 				log.Println("[VERB] Setup secure session")
+				session.SetCryptographer(secSession)
+			} else {
+				log.Println("[ERRO] Could not setup secure session.", err)
 			}
-			session.SetCryptographer(secureSession)
 		}
 	}
 }

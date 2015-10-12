@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/brutella/hc/db"
+	"github.com/brutella/hc/event"
 	"github.com/brutella/hc/model/container"
 	"github.com/brutella/hc/netio"
 	"github.com/brutella/hc/netio/controller"
@@ -38,10 +39,12 @@ type hkServer struct {
 	port        string
 	listener    *net.TCPListener
 	hapListener *netio.HAPTCPListener
+
+	emitter event.Emitter
 }
 
 // NewServer returns a server
-func NewServer(ctx netio.HAPContext, d db.Database, c *container.Container, device netio.SecuredDevice, mutex *sync.Mutex) Server {
+func NewServer(ctx netio.HAPContext, d db.Database, c *container.Container, device netio.SecuredDevice, mutex *sync.Mutex, emitter event.Emitter) Server {
 	// os gives us a free Port when Port is ""
 	ln, err := net.Listen("tcp", "")
 	if err != nil {
@@ -59,6 +62,7 @@ func NewServer(ctx netio.HAPContext, d db.Database, c *container.Container, devi
 		mutex:     mutex,
 		listener:  ln.(*net.TCPListener),
 		port:      port,
+		emitter:   emitter,
 	}
 
 	s.setupEndpoints()
@@ -101,10 +105,10 @@ func (s *hkServer) setupEndpoints() {
 	characteristicsController := controller.NewCharacteristicController(s.container)
 	pairingController := pair.NewPairingController(s.database)
 
-	s.mux.Handle("/pair-setup", endpoint.NewPairSetup(s.context, s.device, s.database))
+	s.mux.Handle("/pair-setup", endpoint.NewPairSetup(s.context, s.device, s.database, s.emitter))
 	s.mux.Handle("/pair-verify", endpoint.NewPairVerify(s.context, s.database))
 	s.mux.Handle("/accessories", endpoint.NewAccessories(containerController, s.mutex))
 	s.mux.Handle("/characteristics", endpoint.NewCharacteristics(s.context, characteristicsController, s.mutex))
-	s.mux.Handle("/pairings", endpoint.NewPairing(pairingController))
+	s.mux.Handle("/pairings", endpoint.NewPairing(pairingController, s.emitter))
 	s.mux.Handle("/identify", endpoint.NewIdentify(containerController))
 }

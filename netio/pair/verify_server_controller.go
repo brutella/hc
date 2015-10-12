@@ -41,17 +41,12 @@ func (verify *VerifyServerController) SharedKey() [32]byte {
 	return verify.session.SharedKey
 }
 
-// KeyVerified returns true when key was successfully verified.
-func (verify *VerifyServerController) KeyVerified() bool {
-	return verify.step == VerifyStepFinishResponse
-}
-
 // Handle processes a container to verify if a client is paired correctly.
 func (verify *VerifyServerController) Handle(in util.Container) (util.Container, error) {
 	var out util.Container
 	var err error
 
-	method := pairMethodType(in.GetByte(TagPairingMethod))
+	method := PairMethodType(in.GetByte(TagPairingMethod))
 
 	// It is valid that method is not sent
 	// If method is sent then it must be 0x00

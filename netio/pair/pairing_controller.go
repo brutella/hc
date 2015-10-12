@@ -34,7 +34,7 @@ func NewPairingController(database db.Database) *PairingController {
 
 // Handle processes a container to pair with a new client without going through the pairing process.
 func (c *PairingController) Handle(cont util.Container) (util.Container, error) {
-	method := pairMethodType(cont.GetByte(TagPairingMethod))
+	method := PairMethodType(cont.GetByte(TagPairingMethod))
 	username := cont.GetString(TagUsername)
 	publicKey := cont.GetBytes(TagPublicKey)
 
