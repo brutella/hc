@@ -2,13 +2,16 @@ package accessory
 
 import (
 	"github.com/brutella/hc/model"
+	"github.com/brutella/hc/model/characteristic"
 	"github.com/brutella/hc/model/service"
+	"net"
 )
 
 type thermostat struct {
 	*Accessory
 
-	thermostat *service.Thermostat
+	thermostat         *service.Thermostat
+	OnTargetTempChange func(float64)
 }
 
 // NewThermostat returns a thermostat which implements model.Thermostat.
@@ -18,7 +21,15 @@ func NewThermostat(info model.Info, temp, min, max, steps float64) *thermostat {
 
 	accessory.AddService(t.Service)
 
-	return &thermostat{accessory, t}
+	ts := thermostat{accessory, t, nil}
+
+	t.TargetTemp.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
+		if ts.OnTargetTempChange != nil {
+			ts.OnTargetTempChange(t.TargetTemp.Temperature())
+		}
+	})
+
+	return &ts
 }
 
 func (t *thermostat) Temperature() float64 {
