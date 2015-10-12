@@ -2,6 +2,7 @@ package util
 
 import (
 	"bytes"
+	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -73,6 +74,20 @@ func (f *fileStorage) Get(key string) ([]byte, error) {
 // Delete removes the file for the corresponding key.
 func (f *fileStorage) Delete(key string) error {
 	return os.Remove(f.filePathToFile(key))
+}
+
+func (f *fileStorage) KeysWithSuffix(suffix string) (keys []string, err error) {
+	var infos []os.FileInfo
+
+	if infos, err = ioutil.ReadDir(f.dir()); err == nil {
+		for _, info := range infos {
+			if info.IsDir() == false && strings.HasSuffix(info.Name(), suffix) == true {
+				keys = append(keys, info.Name())
+			}
+		}
+	}
+
+	return
 }
 
 // Private
