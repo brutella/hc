@@ -16,6 +16,9 @@ type Database interface {
 
 	// DeleteEntity deletes a entity from the database
 	DeleteEntity(entity Entity)
+
+	// Entities returns all entities
+	Entities() ([]Entity, error)
 }
 
 type database struct {
@@ -49,13 +52,7 @@ func NewDatabaseWithStorage(storage util.Storage) Database {
 // The method tries to load the ltpk from disk and returns initialized client object.
 // The method returns nil when no file for this client could be found.
 func (db *database) EntityWithName(name string) (e Entity, err error) {
-	var b []byte
-
-	if b, err = db.storage.Get(toKey(name)); err == nil {
-		err = json.Unmarshal(b, &e)
-	}
-
-	return
+	return db.entityForKey(toEntityKey(name))
 }
 
 // SaveEntity stores the long-term public key of the entity as {entity-name}.ltpk to disk.
@@ -66,13 +63,39 @@ func (db *database) SaveEntity(e Entity) error {
 		return err
 	}
 
-	return db.storage.Set(toKey(e.Name), b)
+	return db.storage.Set(toEntityKey(e.Name), b)
 }
 
 func (db *database) DeleteEntity(e Entity) {
-	db.storage.Delete(toKey(e.Name))
+	db.storage.Delete(toEntityKey(e.Name))
 }
 
-func toKey(s string) string {
-	return hex.EncodeToString([]byte(s))
+func (db *database) Entities() (es []Entity, err error) {
+	var e Entity
+	var ks []string
+
+	if ks, err = db.storage.KeysWithSuffix(".entity"); err == nil {
+		for _, k := range ks {
+			if e, err = db.entityForKey(k); err != nil {
+				return nil, err
+			}
+			es = append(es, e)
+		}
+	}
+
+	return
+}
+
+func (db *database) entityForKey(key string) (e Entity, err error) {
+	var b []byte
+
+	if b, err = db.storage.Get(key); err == nil {
+		err = json.Unmarshal(b, &e)
+	}
+
+	return
+}
+
+func toEntityKey(s string) string {
+	return hex.EncodeToString([]byte(s)) + ".entity"
 }

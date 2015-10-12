@@ -2,7 +2,7 @@ package pair
 
 // These constants are used to access values in a TLV8 container.
 const (
-	// TagPairingMethod is the paring method tag. The value is of type pairMethodType.
+	// TagPairingMethod is the paring method tag. The value is of type PairMethodType.
 	TagPairingMethod = 0x00
 
 	// TagUsername is the username tag. The value is of type string.
@@ -20,7 +20,7 @@ const (
 	// TagEncryptedData is the encrypted data tag. The value includes the encrypted message and auth tag.
 	TagEncryptedData = 0x05
 
-	// TagSequence is the sequence tag. The value is of type pairStepType or VerifyStepType - depending on the context.
+	// TagSequence is the sequence tag. The value is of type PairStepType or VerifyStepType - depending on the context.
 	TagSequence = 0x06
 
 	// TagErrCode is the error tag. The value is of type ErrCode.

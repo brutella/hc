@@ -82,3 +82,24 @@ func TestGetUndefined(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestKeysWithSuffix(t *testing.T) {
+	var err error
+	var keys []string
+	storage, err := NewTempFileStorage()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	storage.Set("test1.txt", []byte("ASDF"))
+	storage.Set("test2.txt", []byte("ASDF"))
+	storage.Set("test3.dat", []byte("ASDF"))
+
+	if keys, err = storage.KeysWithSuffix(".txt"); err != nil {
+		t.Fatal(err)
+	}
+
+	if is, want := keys, []string{"test1.txt", "test2.txt"}; reflect.DeepEqual(is, want) == false {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+}

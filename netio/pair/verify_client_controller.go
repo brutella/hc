@@ -40,7 +40,7 @@ func (verify *VerifyClientController) Handle(in util.Container) (util.Container,
 	var out util.Container
 	var err error
 
-	method := pairMethodType(in.GetByte(TagPairingMethod))
+	method := PairMethodType(in.GetByte(TagPairingMethod))
 
 	// It is valid that method is not sent
 	// If method is sent then it must be 0x00

@@ -2,38 +2,38 @@ package pair
 
 import "fmt"
 
-// pairStepType defines the type of pairing steps.
-type pairStepType byte
+// PairStepType defines the type of pairing steps.
+type PairStepType byte
 
 const (
 	// PairStepWaiting is the step when waiting server waits for pairing request from a client.
-	PairStepWaiting pairStepType = 0x00
+	PairStepWaiting PairStepType = 0x00
 
 	// PairStepStartRequest sent from the client to the accessory to start pairing.
-	PairStepStartRequest pairStepType = 0x01
+	PairStepStartRequest PairStepType = 0x01
 
 	// PairStepStartResponse sent from the accessory to the client alongside the server's salt and public key
-	PairStepStartResponse pairStepType = 0x02
+	PairStepStartResponse PairStepType = 0x02
 
 	// PairStepVerifyRequest sent from the client to the accessory alongside the client public key and proof.
-	PairStepVerifyRequest pairStepType = 0x03
+	PairStepVerifyRequest PairStepType = 0x03
 
 	// PairStepVerifyResponse sent from the accessory to the client alongside the server's proof.
-	PairStepVerifyResponse pairStepType = 0x04
+	PairStepVerifyResponse PairStepType = 0x04
 
 	// PairStepKeyExchangeRequest sent from the client to the accessory alongside the client encrypted username and public key
-	PairStepKeyExchangeRequest pairStepType = 0x05
+	PairStepKeyExchangeRequest PairStepType = 0x05
 
 	// PairStepKeyExchangeResponse sent from the accessory to the client alongside the accessory encrypted username and public key
-	PairStepKeyExchangeResponse pairStepType = 0x06
+	PairStepKeyExchangeResponse PairStepType = 0x06
 )
 
 // Byte returns the raw byte value.
-func (t pairStepType) Byte() byte {
+func (t PairStepType) Byte() byte {
 	return byte(t)
 }
 
-func (t pairStepType) String() string {
+func (t PairStepType) String() string {
 	switch t {
 	case PairStepWaiting:
 		return "Waiting"

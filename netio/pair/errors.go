@@ -7,15 +7,15 @@ import (
 
 var errInvalidClientKeyLength = errors.New("Invalid client public key size")
 
-var errInvalidPairMethod = func(m pairMethodType) error {
+var errInvalidPairMethod = func(m PairMethodType) error {
 	return fmt.Errorf("Invalid pairing method %v\n", m)
 }
 
-var errInvalidPairStep = func(t pairStepType) error {
+var errInvalidPairStep = func(t PairStepType) error {
 	return fmt.Errorf("Invalid pairing step %v\n", t)
 }
 
-var errInvalidInternalPairStep = func(t pairStepType) error {
+var errInvalidInternalPairStep = func(t PairStepType) error {
 	return fmt.Errorf("Invalid internal pairing step %v\n", t)
 }
 
