@@ -37,4 +37,12 @@ type Thermostat interface {
 
 	// TargetMode returns the target mode
 	TargetMode() HeatCoolModeType
+
+	// OnTargetTempChange calls the argument function when the thermostat's
+	// target temperature is changed
+	OnTargetTempChange(func(float64))
+
+	// OnTargetModeChange calls the argument function when the thermostat's
+	// target mode is changed
+	OnTargetModeChange(func(HeatCoolModeType))
 }

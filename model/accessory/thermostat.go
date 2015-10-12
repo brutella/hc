@@ -11,7 +11,8 @@ type thermostat struct {
 	*Accessory
 
 	thermostat         *service.Thermostat
-	OnTargetTempChange func(float64)
+	onTargetTempChange func(float64)
+	onTargetModeChange func(model.HeatCoolModeType)
 }
 
 // NewThermostat returns a thermostat which implements model.Thermostat.
@@ -21,11 +22,17 @@ func NewThermostat(info model.Info, temp, min, max, steps float64) *thermostat {
 
 	accessory.AddService(t.Service)
 
-	ts := thermostat{accessory, t, nil}
+	ts := thermostat{accessory, t, nil, nil}
 
 	t.TargetTemp.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
-		if ts.OnTargetTempChange != nil {
-			ts.OnTargetTempChange(t.TargetTemp.Temperature())
+		if ts.onTargetTempChange != nil {
+			ts.onTargetTempChange(t.TargetTemp.Temperature())
+		}
+	})
+
+	t.TargetMode.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
+		if ts.onTargetModeChange != nil {
+			ts.onTargetModeChange(t.TargetMode.HeatingCoolingMode())
 		}
 	})
 
@@ -68,4 +75,12 @@ func (t *thermostat) SetTargetMode(value model.HeatCoolModeType) {
 
 func (t *thermostat) TargetMode() model.HeatCoolModeType {
 	return t.thermostat.TargetMode.HeatingCoolingMode()
+}
+
+func (t *thermostat) OnTargetTempChange(fn func(float64)) {
+	t.onTargetTempChange = fn
+}
+
+func (t *thermostat) OnTargetModeChange(fn func(model.HeatCoolModeType)) {
+	t.onTargetModeChange = fn
 }
