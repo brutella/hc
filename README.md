@@ -1,5 +1,7 @@
 # HomeControl
 
+[![Build Status](https://travis-ci.org/brutella/hc.svg)](https://travis-ci.org/brutella/hc)
+
 [HomeControl][homecontrol] is an implementation of the [HomeKit][homekit] Accessory Protocol (HAP) to create your own HomeKit accessory and bridges. HomeKit bridges make non-HomeKit accessories available to HomeKit by acting as a middleman.
 
 ## Overview
