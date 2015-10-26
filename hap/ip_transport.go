@@ -46,7 +46,7 @@ type ipTransport struct {
 // appears as a new one to clients.
 func NewIPTransport(pin string, pth string, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
 	// Find transport name which is visible in mDNS
-	name := path.Join(pth, a.Name())
+	name := a.Name()
 	if len(name) == 0 {
 		log.Fatal("Invalid empty name for first accessory")
 	}
@@ -56,7 +56,7 @@ func NewIPTransport(pin string, pth string, a *accessory.Accessory, as ...*acces
 		return nil, err
 	}
 
-	storage, err := util.NewFileStorage(name)
+	storage, err := util.NewFileStorage(path.Join(pth, name))
 	if err != nil {
 		return nil, err
 	}
