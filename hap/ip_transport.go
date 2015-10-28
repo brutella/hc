@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net"
+        "path"
 	"sync"
 
 	"github.com/brutella/hc/db"
@@ -32,9 +33,21 @@ type ipTransport struct {
 	container *container.Container
 
 	emitter event.Emitter
+
+        config *HAPConfig
+}
+type HAPConfig struct {
+        PIN string
+        StoragePath string
 }
 
-// NewIPTransport creates a transport to provide accessories over IP.
+// NewIPTransport is a Compatibility wrapper for any code that depends on the simple implementation
+func NewIPTransport(pin string, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
+        config := &HAPConfig{PIN: pin}
+        return NewHAPTransport(config, a, as...)
+}
+
+// NewHAPTransport creates a transport to provide accessories over IP.
 // The pairing is secured using a 8-numbers pin.
 // If more than one accessory is provided, the first becomes a bridge in HomeKit.
 // It's fine when the bridge has no explicit services.
@@ -43,19 +56,22 @@ type ipTransport struct {
 // So changing the order of the accessories or renaming the first accessory makes the stored
 // data inaccessible to the tranport. In this case new crypto keys are created and the accessory
 // appears as a new one to clients.
-func NewIPTransport(pin string, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
+func NewHAPTransport(config *HAPConfig, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
 	// Find transport name which is visible in mDNS
 	name := a.Name()
-	if len(name) == 0 {
-		log.Fatal("Invalid empty name for first accessory")
+	if len(name) == 0 || len(config.PIN) == 0 {
+		log.Fatal("Invalid empty name for first accessory or invalid pin")
 	}
 
-	hapPin, err := NewPin(pin)
+	hapPin, err := NewPin(config.PIN)
 	if err != nil {
 		return nil, err
 	}
-
-	storage, err := util.NewFileStorage(name)
+        location := name
+        if len(config.StoragePath) > 0 {
+                location = path.Join(config.StoragePath, name)
+        }
+	storage, err := util.NewFileStorage(location)
 	if err != nil {
 		return nil, err
 	}
@@ -74,6 +90,7 @@ func NewIPTransport(pin string, a *accessory.Accessory, as ...*accessory.Accesso
 		mutex:     &sync.Mutex{},
 		context:   netio.NewContextForSecuredDevice(device),
 		emitter:   event.NewEmitter(),
+                config:    config,
 	}
 
 	t.addAccessory(a)
