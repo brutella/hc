@@ -24,3 +24,11 @@ func NewTemperatureSensor(info model.Info, temp, min, max, steps float64) *therm
 func (t *thermometer) Temperature() float64 {
 	return t.temperatureSensor.Temp.Temperature()
 }
+
+func (t *thermometer) SetTemperature(value float64) {
+	t.temperatureSensor.Temp.SetTemperature(value)
+}
+
+func (t *thermometer) Unit() model.TempUnit {
+	return t.temperatureSensor.Unit.Unit()
+}
