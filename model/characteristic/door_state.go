@@ -16,11 +16,11 @@ func NewDoorState(current model.DoorStateType, CharacteristicType Characteristic
 }
 
 func NewCurrentDoorState(current model.DoorStateType) *DoorState {
-	return NewHeatingCoolingMode(current, TypeCurrentDoorState, PermsRead())
+	return NewDoorState(current, TypeCurrentDoorState, PermsRead())
 }
 
 func NewTargetDoorState(current model.DoorStateType) *DoorState {
-	return NewHeatingCoolingMode(current, TypeTargetDoorState, PermsAll())
+	return NewDoorState(current, TypeTargetDoorState, PermsAll())
 }
 
 func (c *DoorState) SetDoorState(mode model.DoorStateType) {
@@ -28,5 +28,5 @@ func (c *DoorState) SetDoorState(mode model.DoorStateType) {
 }
 
 func (c *DoorState) DoorState() model.DoorStateType {
-	return model.HeatCoolModeType(c.Byte())
+	return model.DoorStateType(c.Byte())
 }

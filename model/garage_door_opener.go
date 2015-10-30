@@ -29,9 +29,9 @@ type GarageDoorOpener interface {
 	// TargetState returns the target state
 	TargetState() DoorStateType
 
-    // SetObstruction sets the obstruction detection
-    SetObstruction(bool)
+    // SetObstructionDetected sets the obstruction detection
+    SetObstructionDetected(bool)
 
-    // Obstruction returns the obstruction detection
-    Obstruction() bool
+    // ObstructionDetected returns the obstruction detection
+    ObstructionDetected() bool
 }
