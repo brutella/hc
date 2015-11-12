@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net"
+	"path"
 	"sync"
 
 	"github.com/brutella/hc/db"
@@ -43,7 +44,7 @@ type ipTransport struct {
 // So changing the order of the accessories or renaming the first accessory makes the stored
 // data inaccessible to the tranport. In this case new crypto keys are created and the accessory
 // appears as a new one to clients.
-func NewIPTransport(pin string, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
+func NewIPTransport(pin string, pth string, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
 	// Find transport name which is visible in mDNS
 	name := a.Name()
 	if len(name) == 0 {
@@ -55,7 +56,7 @@ func NewIPTransport(pin string, a *accessory.Accessory, as ...*accessory.Accesso
 		return nil, err
 	}
 
-	storage, err := util.NewFileStorage(name)
+	storage, err := util.NewFileStorage(path.Join(pth, name))
 	if err != nil {
 		return nil, err
 	}
