@@ -10,9 +10,6 @@ import (
 type outlet struct {
 	*Accessory
 	outlet *service.Outlet
-
-	onChanged    func(bool)
-	inUseChanged func(bool)
 }
 
 // NewOutlet returns an outlet which implements model.Outlet.
@@ -22,19 +19,7 @@ func NewOutlet(info model.Info) *outlet {
 
 	accessory.AddService(s.Service)
 
-	sw := outlet{accessory, s, nil, nil}
-
-	s.On.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
-		if sw.onChanged != nil {
-			sw.onChanged(s.On.On())
-		}
-	})
-
-	s.InUse.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
-		if sw.inUseChanged != nil {
-			sw.inUseChanged(s.InUse.InUse())
-		}
-	})
+	sw := outlet{accessory, s}
 
 	return &sw
 }
@@ -56,9 +41,13 @@ func (o *outlet) IsInUse() bool {
 }
 
 func (o *outlet) OnStateChanged(fn func(bool)) {
-	o.onChanged = fn
+	o.outlet.On.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
+		fn(new.(bool))
+	})
 }
 
 func (o *outlet) InUseStateChanged(fn func(bool)) {
-	o.inUseChanged = fn
+	o.outlet.InUse.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
+		fn(new.(bool))
+	})
 }

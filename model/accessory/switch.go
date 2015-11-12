@@ -10,8 +10,6 @@ import (
 type switcher struct {
 	*Accessory
 	switcher *service.Switch
-
-	onChanged func(bool)
 }
 
 // NewSwitch returns a switch which implements model.Switch.
@@ -21,13 +19,7 @@ func NewSwitch(info model.Info) *switcher {
 
 	accessory.AddService(s.Service)
 
-	sw := switcher{accessory, s, nil}
-
-	s.On.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
-		if sw.onChanged != nil {
-			sw.onChanged(s.On.On())
-		}
-	})
+	sw := switcher{accessory, s}
 
 	return &sw
 }
@@ -41,5 +33,7 @@ func (s *switcher) IsOn() bool {
 }
 
 func (s *switcher) OnStateChanged(fn func(bool)) {
-	s.onChanged = fn
+	s.switcher.On.OnConnChange(func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
+		fn(new.(bool))
+	})
 }
