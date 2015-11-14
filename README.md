@@ -63,7 +63,7 @@ func main() {
 	}
 	sw := accessory.NewSwitch(info)
     
-	t, err := hap.NewIPTransport("00102003", sw.Accessory)
+        t, err := hap.NewHAPTransport(&hap.HAPConfig{PIN: "00102003"}, sw.Accessory)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -86,6 +86,14 @@ info := model.Info{
     Model: "AB",
     Firmware: "1.0.1",
 }
+```
+
+By default, all key and pairing material is stored in the current working directory in a directory named the same as the first accessory. You can add a prefix by adding it to HAPConfig. It works with both relative and absolute paths.
+
+```go
+
+t, err := hap.NewHAPTransport(&hap.HAPConfig{PIN: "00102003", StoragePath: "hap_tmp"}, sw.Accessory)
+
 ```
 
 ### Callbacks
