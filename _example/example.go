@@ -14,7 +14,9 @@ func main() {
 		Name: "Lamp",
 	}
 	sw := accessory.NewSwitch(switchInfo)
-	t, err := hap.NewIPTransport("00102003", sw.Accessory)
+    
+    config := hap.Config{Pin: "12344321", Port:":12345", DatabaseDir: "db"}
+	t, err := hap.NewIPTransport(config, sw.Accessory)
 
 	if err != nil {
 		log.Fatal(err)

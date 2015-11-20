@@ -18,7 +18,23 @@ import (
 	"github.com/gosexy/to"
 )
 
+// Config provides basic configuration for an IP transport
+type Config struct {
+	// Path to the database
+	// When empty, the tranport stores the data inside a folder named exactly like the accessory
+	DatabaseDir string
+
+	// Port at which transport is reachable e.g. :12345
+	// When empty, the transport uses a random port
+	Port string
+
+	// Pin with has to be entered on iOS client to pair with the accessory
+	// When empty, the pin 00102003 is used
+	Pin string
+}
+
 type ipTransport struct {
+	config  Config
 	context netio.HAPContext
 	server  server.Server
 	mutex   *sync.Mutex
@@ -31,31 +47,51 @@ type ipTransport struct {
 	device    netio.SecuredDevice
 	container *container.Container
 
+	// Used to communicate between different parts of the program (e.g. successful pairing with HomeKit)
 	emitter event.Emitter
 }
 
 // NewIPTransport creates a transport to provide accessories over IP.
-// The pairing is secured using a 8-numbers pin.
-// If more than one accessory is provided, the first becomes a bridge in HomeKit.
-// It's fine when the bridge has no explicit services.
 //
-// All accessory specific data (crypto keys, ids) is stored in a folder named after the first accessory.
-// So changing the order of the accessories or renaming the first accessory makes the stored
-// data inaccessible to the tranport. In this case new crypto keys are created and the accessory
-// appears as a new one to clients.
-func NewIPTransport(pin string, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
+// The IP transports stores the crypto keys inside a database, which
+// is by default inside a folder at the current working directory.
+// The folder is named exactly as the accessory name.
+//
+// The transports can contain more than one accessory. If this is the
+// case, the first accessory acts as the HomeKit bridge.
+//
+// *Important:* Changing the name of the accessory, or letting multiple
+// transports store the data inside the same database lead to
+// unexpected behavior – don't do that.
+//
+// The transport is secured with an 8-digit pin, which must be entered
+// by an iOS client to successfully pair with the accessory.
+func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
 	// Find transport name which is visible in mDNS
 	name := a.Name()
 	if len(name) == 0 {
 		log.Fatal("Invalid empty name for first accessory")
 	}
 
-	hapPin, err := NewPin(pin)
-	if err != nil {
-		return nil, err
+	default_config := Config{
+		DatabaseDir: name,
+		Pin:         "00102003",
+		Port:        "",
 	}
 
-	storage, err := util.NewFileStorage(name)
+	if dir := config.DatabaseDir; len(dir) > 0 {
+		default_config.DatabaseDir = dir
+	}
+
+	if pin := config.Pin; len(pin) > 0 {
+		default_config.Pin = pin
+	}
+
+	if port := config.Port; len(port) > 0 {
+		default_config.Port = port
+	}
+
+	storage, err := util.NewFileStorage(default_config.DatabaseDir)
 	if err != nil {
 		return nil, err
 	}
@@ -64,12 +100,19 @@ func NewIPTransport(pin string, a *accessory.Accessory, as ...*accessory.Accesso
 	// must be unique and stay the same over time
 	uuid := transportUUIDInStorage(storage)
 	database := db.NewDatabaseWithStorage(storage)
-	device, err := netio.NewSecuredDevice(uuid, hapPin, database)
+
+	hap_pin, err := NewPin(default_config.Pin)
+	if err != nil {
+		return nil, err
+	}
+
+	device, err := netio.NewSecuredDevice(uuid, hap_pin, database)
 
 	t := &ipTransport{
 		database:  database,
 		name:      name,
 		device:    device,
+		config:    default_config,
 		container: container.NewContainer(),
 		mutex:     &sync.Mutex{},
 		context:   netio.NewContextForSecuredDevice(device),
@@ -87,15 +130,25 @@ func NewIPTransport(pin string, a *accessory.Accessory, as ...*accessory.Accesso
 }
 
 func (t *ipTransport) Start() {
-	s := server.NewServer(t.context, t.database, t.container, t.device, t.mutex, t.emitter)
+	config := server.Config{
+		Port:      t.config.Port,
+		Context:   t.context,
+		Database:  t.database,
+		Container: t.container,
+		Device:    t.device,
+		Mutex:     t.mutex,
+		Emitter:   t.emitter,
+	}
+
+	s := server.NewServer(config)
 	t.server = s
 	port := to.Int64(s.Port())
 
 	mdns := NewMDNSService(t.name, t.device.Name(), int(port))
 	t.mdns = mdns
 
+	// Paired accessories must not be reachable for other clients since iOS 9
 	if t.isPaired() {
-		// Paired accessories must not be reachable for other clients since iOS 9
 		mdns.SetReachable(false)
 	}
 
