@@ -24,7 +24,7 @@ type Config struct {
 	// When empty, the tranport stores the data inside a folder named exactly like the accessory
 	StoragePath string
 
-	// Port at which transport is reachable e.g. :12345
+	// Port at which transport is reachable e.g. 12345
 	// When empty, the transport uses a random port
 	Port string
 
@@ -89,7 +89,7 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 	}
 
 	if port := config.Port; len(port) > 0 {
-		default_config.Port = port
+		default_config.Port = ":" + port
 	}
 
 	storage, err := util.NewFileStorage(default_config.StoragePath)
