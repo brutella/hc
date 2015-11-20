@@ -20,9 +20,9 @@ import (
 
 // Config provides basic configuration for an IP transport
 type Config struct {
-	// Path to the database
+	// Path to the storage
 	// When empty, the tranport stores the data inside a folder named exactly like the accessory
-	DatabaseDir string
+	StoragePath string
 
 	// Port at which transport is reachable e.g. :12345
 	// When empty, the transport uses a random port
@@ -74,13 +74,13 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 	}
 
 	default_config := Config{
-		DatabaseDir: name,
+		StoragePath: name,
 		Pin:         "00102003",
 		Port:        "",
 	}
 
-	if dir := config.DatabaseDir; len(dir) > 0 {
-		default_config.DatabaseDir = dir
+	if dir := config.StoragePath; len(dir) > 0 {
+		default_config.StoragePath = dir
 	}
 
 	if pin := config.Pin; len(pin) > 0 {
@@ -91,7 +91,7 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 		default_config.Port = port
 	}
 
-	storage, err := util.NewFileStorage(default_config.DatabaseDir)
+	storage, err := util.NewFileStorage(default_config.StoragePath)
 	if err != nil {
 		return nil, err
 	}
