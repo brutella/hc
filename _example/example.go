@@ -15,7 +15,7 @@ func main() {
 	}
 	sw := accessory.NewSwitch(switchInfo)
 
-	config := hap.Config{Pin: "12344321", Port: "12345", StoragePath: "db"}
+	config := hap.Config{Pin: "12344321", Port: "12345", StoragePath: "./db"}
 	t, err := hap.NewIPTransport(config, sw.Accessory)
 
 	if err != nil {
