@@ -27,6 +27,16 @@ type Server interface {
 	Stop()
 }
 
+type Config struct {
+	Port      string
+	Context   netio.HAPContext
+	Database  db.Database
+	Container *container.Container
+	Device    netio.SecuredDevice
+	Mutex     *sync.Mutex
+	Emitter   event.Emitter
+}
+
 type hkServer struct {
 	context  netio.HAPContext
 	database db.Database
@@ -44,9 +54,10 @@ type hkServer struct {
 }
 
 // NewServer returns a server
-func NewServer(ctx netio.HAPContext, d db.Database, c *container.Container, device netio.SecuredDevice, mutex *sync.Mutex, emitter event.Emitter) Server {
+func NewServer(c Config) Server {
+
 	// os gives us a free Port when Port is ""
-	ln, err := net.Listen("tcp", "")
+	ln, err := net.Listen("tcp", c.Port)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,15 +65,15 @@ func NewServer(ctx netio.HAPContext, d db.Database, c *container.Container, devi
 	_, port, _ := net.SplitHostPort(ln.Addr().String())
 
 	s := hkServer{
-		context:   ctx,
-		database:  d,
-		container: c,
-		device:    device,
+		context:   c.Context,
+		database:  c.Database,
+		container: c.Container,
+		device:    c.Device,
 		mux:       http.NewServeMux(),
-		mutex:     mutex,
+		mutex:     c.Mutex,
 		listener:  ln.(*net.TCPListener),
 		port:      port,
-		emitter:   emitter,
+		emitter:   c.Emitter,
 	}
 
 	s.setupEndpoints()

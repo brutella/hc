@@ -63,7 +63,8 @@ func main() {
 	}
 	sw := accessory.NewSwitch(info)
     
-	t, err := hap.NewIPTransport("00102003", sw.Accessory)
+    config := hap.Config{Pin: "00102003"}
+	t, err := hap.NewIPTransport(config, sw.Accessory)
 	if err != nil {
 		log.Fatal(err)
 	}
