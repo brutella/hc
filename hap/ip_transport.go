@@ -65,7 +65,7 @@ type ipTransport struct {
 // unexpected behavior – don't do that.
 //
 // The transport is secured with an 8-digit pin, which must be entered
-// by an iOS client to successfully pair with the accessory. If the 
+// by an iOS client to successfully pair with the accessory. If the
 // provided transport config does not specify any pin, 00102003 is used.
 func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
 	// Find transport name which is visible in mDNS
