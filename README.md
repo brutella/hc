@@ -17,8 +17,8 @@ I've made an app for iPhone, iPad and Apple Watch called [Home][home] to control
 
 ## Features
 
-- Full implementation of the HomeKit Accessory Protocol in pure Go
-    - Support for switch, outlet, light bulb, thermostat accessory
+- Full implementation of the HomeKit Accessory Protocol in Go
+    - Support for switch, outlet, light bulb, thermometer, and thermostat accessory
 - Built-in service announcement via mDNS using [bonjour](http://github.com/oleksandr/bonjour)
 - Optional logging with https://github.com/brutella/log
 - Runs on multiple platforms (already in use on Linux and OS X)
