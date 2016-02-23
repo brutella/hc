@@ -14,12 +14,11 @@ import (
 // Every accessory has the "accessory info" service by default which consists
 // of characteristics to identify the accessory: name, model, manufacturer,...
 type Accessory struct {
-	ID       int64              `json:"aid"`
-	Services []*service.Service `json:"services"`
+	ID       int64                  `json:"aid"`
+	Services []*service.Service     `json:"services"`
+	Info     *service.AccessoryInfo `json:"-"`
 
-	Info    *service.AccessoryInfo `json:"-"`
-	idCount int64
-
+	idCount    int64
 	onIdentify func()
 }
 

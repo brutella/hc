@@ -42,7 +42,7 @@ func TestOutletOnChanged(t *testing.T) {
 		newValue = value
 	})
 
-	o.outlet.On.SetValueFromConnection(true, characteristic.TestConn)
+	o.Outlet.On.SetValueFromConnection(true, characteristic.TestConn)
 
 	if is, want := o.IsOn(), true; is != want {
 		t.Fatalf("is=%v want=%v", is, want)

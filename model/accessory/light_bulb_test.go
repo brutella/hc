@@ -52,9 +52,9 @@ func TestLightBulbCallbacks(t *testing.T) {
 		newSaturation = value
 	})
 
-	light.bulb.Brightness.SetValueFromConnection(80, characteristic.TestConn)
-	light.bulb.Hue.SetValueFromConnection(15.5, characteristic.TestConn)
-	light.bulb.Saturation.SetValueFromConnection(22.4, characteristic.TestConn)
+	light.LightBulb.Brightness.SetValueFromConnection(80, characteristic.TestConn)
+	light.LightBulb.Hue.SetValueFromConnection(15.5, characteristic.TestConn)
+	light.LightBulb.Saturation.SetValueFromConnection(22.4, characteristic.TestConn)
 
 	if is, want := newBrightness, 80; is != want {
 		t.Fatalf("is=%v want=%v", is, want)

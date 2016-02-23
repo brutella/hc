@@ -5,30 +5,30 @@ import (
 	"github.com/brutella/hc/model/service"
 )
 
-type thermometer struct {
+type Thermometer struct {
 	*Accessory
 
-	temperatureSensor *service.TemperatureSensor
+	TempSensor *service.TemperatureSensor
 }
 
-// NewTemperatureSensor returns a thermometer  which implements model.Thermometer.
-func NewTemperatureSensor(info model.Info, temp, min, max, steps float64) *thermometer {
+// NewTemperatureSensor returns a Thermometer which implements model.Thermometer.
+func NewTemperatureSensor(info model.Info, temp, min, max, steps float64) *Thermometer {
 	accessory := New(info)
 	t := service.NewTemperatureSensor(info.Name, temp, min, max, steps)
 
 	accessory.AddService(t.Service)
 
-	return &thermometer{accessory, t}
+	return &Thermometer{accessory, t}
 }
 
-func (t *thermometer) Temperature() float64 {
-	return t.temperatureSensor.Temp.Temperature()
+func (t *Thermometer) Temperature() float64 {
+	return t.TempSensor.Temp.Temperature()
 }
 
-func (t *thermometer) SetTemperature(value float64) {
-	t.temperatureSensor.Temp.SetTemperature(value)
+func (t *Thermometer) SetTemperature(value float64) {
+	t.TempSensor.Temp.SetTemperature(value)
 }
 
-func (t *thermometer) Unit() model.TempUnit {
-	return t.temperatureSensor.Unit.Unit()
+func (t *Thermometer) Unit() model.TempUnit {
+	return t.TempSensor.Unit.Unit()
 }

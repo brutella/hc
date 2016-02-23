@@ -35,7 +35,7 @@ func TestSwitchOnChanged(t *testing.T) {
 		newValue = value
 	})
 
-	s.switcher.On.SetValueFromConnection(true, characteristic.TestConn)
+	s.Switch.On.SetValueFromConnection(true, characteristic.TestConn)
 
 	if is, want := s.IsOn(), true; is != want {
 		t.Fatalf("is=%v want=%v", is, want)

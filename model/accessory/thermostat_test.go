@@ -49,7 +49,7 @@ func TestTargetTempCallback(t *testing.T) {
 		newValue = value
 	})
 
-	ts.thermostat.TargetTemp.SetValueFromConnection(25.2, characteristic.TestConn)
+	ts.Thermostat.TargetTemp.SetValueFromConnection(25.2, characteristic.TestConn)
 
 	if is, want := ts.TargetTemperature(), 25.2; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
@@ -65,7 +65,7 @@ func TestTargetModeCallback(t *testing.T) {
 		newValue = value
 	})
 
-	ts.thermostat.TargetMode.SetValueFromConnection(model.HeatCoolModeCool, characteristic.TestConn)
+	ts.Thermostat.TargetMode.SetValueFromConnection(model.HeatCoolModeCool, characteristic.TestConn)
 
 	if is, want := ts.TargetMode(), model.HeatCoolModeCool; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
