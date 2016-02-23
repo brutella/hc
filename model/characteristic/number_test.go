@@ -6,10 +6,10 @@ import (
 
 func TestNumber(t *testing.T) {
 	number := NewNumber(20.2, 0, 100, 0.1, FormatFloat, PermsAll())
+
 	if x := number.Format; x != FormatFloat {
 		t.Fatal(x)
 	}
-
 	if is, want := number.GetValue(), 20.2; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
@@ -23,7 +23,7 @@ func TestNumber(t *testing.T) {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 
-	number.SetValue(17)
+	number.SetNumber(17)
 	number.SetMinValue(0.3)
 	number.SetMaxValue(200)
 	number.SetMinStepValue(0.3)

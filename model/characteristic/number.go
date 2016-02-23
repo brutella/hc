@@ -29,10 +29,6 @@ func (n *Number) SetMinStepValue(value interface{}) {
 	n.MinStep = value
 }
 
-func (n *Number) GetValue() interface{} {
-	return n.Value
-}
-
 func (n *Number) GetMinValue() interface{} {
 	return n.MinValue
 }

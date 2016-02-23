@@ -146,10 +146,17 @@ func (c *Characteristic) hasWritePermissions() bool {
 // When permissions are write only, this methods does not set the Value field.
 func (c *Characteristic) setValue(value interface{}, conn net.Conn) {
 	if c.Value != nil {
-		converted, err := to.Convert(value, reflect.TypeOf(c.Value).Kind())
-		if err == nil {
+		if converted, err := to.Convert(value, reflect.TypeOf(c.Value).Kind()); err == nil {
 			value = converted
 		}
+	}
+
+	// Value must be within min and max
+	switch c.Format {
+	case FormatFloat:
+		value = c.boundFloat64Value(value.(float64))
+	case FormatInt:
+		value = c.boundIntValue(value.(int))
 	}
 
 	// Ignore when new value is same
@@ -186,4 +193,28 @@ func (c *Characteristic) onConnChange(funcs []ConnChangeFunc, conn net.Conn, new
 	for _, fn := range funcs {
 		fn(conn, c, newValue, oldValue)
 	}
+}
+
+func (c *Characteristic) boundFloat64Value(value float64) interface{} {
+	min, minOK := c.MinValue.(float64)
+	max, maxOK := c.MaxValue.(float64)
+	if maxOK == true && value > max {
+		value = max
+	} else if minOK == true && value < min {
+		value = min
+	}
+
+	return value
+}
+
+func (c *Characteristic) boundIntValue(value int) interface{} {
+	min, minOK := c.MinValue.(int)
+	max, maxOK := c.MaxValue.(int)
+	if maxOK == true && value > max {
+		value = max
+	} else if minOK == true && value < min {
+		value = min
+	}
+
+	return value
 }

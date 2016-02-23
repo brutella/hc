@@ -17,3 +17,17 @@ func TestFloat(t *testing.T) {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 }
+
+func TestNumberFloatOutOfBounds(t *testing.T) {
+	number := NewFloatMinMaxSteps(20.2, 0, 100, 0.1, PermsAll())
+
+	number.SetFloat(120)
+	if is, want := number.FloatValue(), 100.0; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	number.SetFloat(-40)
+	if is, want := number.FloatValue(), 0.0; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+}
