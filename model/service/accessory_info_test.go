@@ -15,7 +15,7 @@ func TestAccessoryInfo(t *testing.T) {
 
 	i := NewInfo(info)
 
-	if is, want := i.Type, typeAccessoryInfo; is != want {
+	if is, want := i.Type, TypeAccessoryInfo; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 	if x := i.Identify.GetValue(); x != nil {

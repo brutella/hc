@@ -15,7 +15,7 @@ func NewOutlet(name string, on, inUse bool) *Outlet {
 	inUseChar := characteristic.NewInUse(inUse)
 
 	sw := NewSwitch(name, on)
-	sw.Type = typeOutlet
+	sw.Type = TypeOutlet
 	sw.AddCharacteristic(inUseChar.Characteristic)
 
 	return &Outlet{sw, inUseChar}

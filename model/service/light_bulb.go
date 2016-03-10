@@ -23,7 +23,7 @@ func NewLightBulb(name string, on bool) *LightBulb {
 	hue := characteristic.NewHue(0.0)
 
 	svc := New()
-	svc.Type = typeLightbulb
+	svc.Type = TypeLightbulb
 	svc.AddCharacteristic(onChar.Characteristic)
 	svc.AddCharacteristic(nameChar.Characteristic)
 	svc.AddCharacteristic(brightness.Characteristic)

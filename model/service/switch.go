@@ -17,7 +17,7 @@ func NewSwitch(name string, on bool) *Switch {
 	nameChar := characteristic.NewName(name)
 
 	svc := New()
-	svc.Type = typeSwitch
+	svc.Type = TypeSwitch
 	svc.AddCharacteristic(onChar.Characteristic)
 	svc.AddCharacteristic(nameChar.Characteristic)
 

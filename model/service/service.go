@@ -8,7 +8,7 @@ import (
 // Service is an HomeKit service consisting of characteristics.
 type Service struct {
 	ID              int64                            `json:"iid"`
-	Type            serviceType                      `json:"type"`
+	Type            ServiceType                      `json:"type"`
 	Characteristics []*characteristic.Characteristic `json:"characteristics"`
 }
 

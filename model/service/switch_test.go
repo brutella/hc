@@ -9,7 +9,7 @@ import (
 func TestSwitch(t *testing.T) {
 	sw := NewSwitch("My Switch", true)
 
-	if is, want := sw.Type, typeSwitch; is != want {
+	if is, want := sw.Type, TypeSwitch; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 	if is, want := sw.Name.GetValue(), "My Switch"; is != want {

@@ -49,7 +49,7 @@ func NewAccessoryInfo(accessoryName, serialNumber, manufacturerName, modelName, 
 	name := characteristic.NewName(accessoryName)
 
 	svc := New()
-	svc.Type = typeAccessoryInfo
+	svc.Type = TypeAccessoryInfo
 	svc.AddCharacteristic(name.Characteristic)
 	svc.AddCharacteristic(manufacturer.Characteristic)
 	svc.AddCharacteristic(model.Characteristic)

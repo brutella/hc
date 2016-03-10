@@ -26,7 +26,7 @@ func NewThermostat(name string, temperature, min, max, steps float64) *Thermosta
 	mode := characteristic.NewCurrentHeatingCoolingMode(model.HeatCoolModeOff)
 	targetMode := characteristic.NewTargetHeatingCoolingMode(model.HeatCoolModeOff)
 
-	svc.Type = typeThermostat
+	svc.Type = TypeThermostat
 	svc.AddCharacteristic(mode.Characteristic)
 	svc.AddCharacteristic(targetMode.Characteristic)
 	svc.AddCharacteristic(targetTemp.Characteristic)

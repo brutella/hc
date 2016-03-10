@@ -21,7 +21,7 @@ func NewTemperatureSensor(name string, temperature, min, max, steps float64) *Te
 	temp := characteristic.NewCurrentTemperatureCharacteristic(temperature, min, max, steps, string(tempUnit))
 
 	svc := New()
-	svc.Type = typeTemperatureSensor
+	svc.Type = TypeTemperatureSensor
 	svc.AddCharacteristic(temp.Characteristic)
 	svc.AddCharacteristic(nameChar.Characteristic)
 	svc.AddCharacteristic(unitChar.Characteristic)

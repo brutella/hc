@@ -8,7 +8,7 @@ import (
 func TestThermostat(t *testing.T) {
 	thermostat := NewThermostat("Testthermostat", 10.5, -10, 100, 1)
 
-	if is, want := thermostat.Type, typeThermostat; is != want {
+	if is, want := thermostat.Type, TypeThermostat; is != want {
 		t.Fatalf("type: is=%v want=%v", is, want)
 	}
 	if is, want := thermostat.Name.GetValue(), "Testthermostat"; is != want {
