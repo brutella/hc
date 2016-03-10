@@ -14,13 +14,14 @@ var info = model.Info{
 }
 
 func TestContainer(t *testing.T) {
-	acc1 := accessory.New(info)
+	acc1 := accessory.New(info, accessory.TypeOther)
 	info.Name = "Accessory2"
-	acc2 := accessory.New(info)
+	acc2 := accessory.New(info, accessory.TypeOther)
 
 	if is, want := acc1.GetID(), model.InvalidID; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
+
 	if is, want := acc2.GetID(), model.InvalidID; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
@@ -50,7 +51,7 @@ func TestContainer(t *testing.T) {
 }
 
 func TestAccessoryCount(t *testing.T) {
-	accessory := accessory.New(info)
+	accessory := accessory.New(info, accessory.TypeOther)
 	c := NewContainer()
 	c.AddAccessory(accessory)
 
@@ -61,6 +62,24 @@ func TestAccessoryCount(t *testing.T) {
 	c.RemoveAccessory(accessory)
 
 	if is, want := len(c.Accessories), 0; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+}
+
+func TestAccessoryType(t *testing.T) {
+	a1 := accessory.New(info, accessory.TypeLightBulb)
+	a2 := accessory.New(info, accessory.TypeSwitch)
+
+	c := NewContainer()
+	c.AddAccessory(a1)
+
+	if is, want := c.AccessoryType(), accessory.TypeLightBulb; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	c.AddAccessory(a2)
+
+	if is, want := c.AccessoryType(), accessory.TypeBridge; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 }

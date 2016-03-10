@@ -19,7 +19,7 @@ func TestGetAccessories(t *testing.T) {
 		Model:        "Accessory",
 	}
 
-	a := accessory.New(info)
+	a := accessory.New(info, accessory.TypeOther)
 
 	m := container.NewContainer()
 	m.AddAccessory(a)

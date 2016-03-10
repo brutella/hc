@@ -14,7 +14,8 @@ type LightBulb struct {
 
 // NewLightBulb returns a light bulb which implements model.LightBulb.
 func NewLightBulb(info model.Info) *LightBulb {
-	accessory := New(info)
+	accessory := New(info, TypeLightBulb)
+
 	bulb := service.NewLightBulb(info.Name, false) // off
 
 	accessory.AddService(bulb.Service)

@@ -13,7 +13,7 @@ type Thermometer struct {
 
 // NewTemperatureSensor returns a Thermometer which implements model.Thermometer.
 func NewTemperatureSensor(info model.Info, temp, min, max, steps float64) *Thermometer {
-	accessory := New(info)
+	accessory := New(info, TypeThermostat)
 	t := service.NewTemperatureSensor(info.Name, temp, min, max, steps)
 
 	accessory.AddService(t.Service)

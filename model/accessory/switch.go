@@ -14,7 +14,7 @@ type Switch struct {
 
 // NewSwitch returns a switch which implements model.Switch.
 func NewSwitch(info model.Info) *Switch {
-	accessory := New(info)
+	accessory := New(info, TypeOutlet)
 	s := service.NewSwitch(info.Name, false) // off
 
 	accessory.AddService(s.Service)

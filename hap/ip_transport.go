@@ -145,7 +145,7 @@ func (t *ipTransport) Start() {
 	t.server = s
 	port := to.Int64(s.Port())
 
-	mdns := NewMDNSService(t.name, t.device.Name(), int(port))
+	mdns := NewMDNSService(t.name, t.device.Name(), int(port), int64(t.container.AccessoryType()))
 	t.mdns = mdns
 
 	// Paired accessories must not be reachable for other clients since iOS 9

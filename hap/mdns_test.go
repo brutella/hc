@@ -6,7 +6,7 @@ import (
 )
 
 func TestMDNS(t *testing.T) {
-	mdns := NewMDNSService("My MDNS Service", "1234", 5010)
+	mdns := NewMDNSService("My MDNS Service", "1234", 5010, 1)
 	expect := []string{
 		"pv=1.0",
 		"id=1234",
@@ -23,7 +23,7 @@ func TestMDNS(t *testing.T) {
 }
 
 func TestReachable(t *testing.T) {
-	mdns := NewMDNSService("My MDNS Service", "1234", 5010)
+	mdns := NewMDNSService("My MDNS Service", "1234", 5010, 1)
 	expect := []string{
 		"pv=1.0",
 		"id=1234",

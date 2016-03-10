@@ -22,13 +22,13 @@ type MDNSService struct {
 	state              int64 // s#
 	mfiCompliant       bool  // ff
 	reachable          bool  // sf
-	categoryIdentifier int64 // ci; default 1 (Other)
+	categoryIdentifier int64 // ci (see AccessoryType)
 
 	server *bonjour.Server
 }
 
 // NewMDNSService returns a new service based for the bridge name, id and port.
-func NewMDNSService(name, id string, port int) *MDNSService {
+func NewMDNSService(name, id string, port int, category int64) *MDNSService {
 	return &MDNSService{
 		name:               name,
 		port:               port,
@@ -38,7 +38,7 @@ func NewMDNSService(name, id string, port int) *MDNSService {
 		state:              1,
 		mfiCompliant:       false,
 		reachable:          true,
-		categoryIdentifier: 1,
+		categoryIdentifier: category,
 	}
 }
 

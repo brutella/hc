@@ -19,7 +19,7 @@ var info = model.Info{
 }
 
 func TestCharacteristicNotification(t *testing.T) {
-	a := accessory.New(info)
+	a := accessory.New(info, accessory.TypeOther)
 	c := container.NewContainer()
 	c.AddAccessory(a)
 
@@ -39,7 +39,7 @@ func TestCharacteristicNotification(t *testing.T) {
 }
 
 func TestCharacteristicNotificationResponse(t *testing.T) {
-	a := accessory.New(info)
+	a := accessory.New(info, accessory.TypeOther)
 	resp, err := New(a, a.Info.Name.Characteristic)
 
 	if err != nil {

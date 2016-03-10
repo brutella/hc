@@ -7,7 +7,7 @@ import (
 )
 
 func TestAccessoryIdentifyChanged(t *testing.T) {
-	a := New(info)
+	a := New(info, TypeOther)
 
 	var identifyCalled = 0
 	a.OnIdentify(func() {
@@ -37,7 +37,7 @@ func TestAccessoryInfo(t *testing.T) {
 		Software:     "2.1",
 	}
 
-	a := New(accessoryInfo)
+	a := New(accessoryInfo, TypeOther)
 
 	if is, want := a.Name(), "My Accessory"; is != want {
 		t.Fatalf("name is=%v want=%v", is, want)

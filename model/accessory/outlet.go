@@ -14,7 +14,7 @@ type Outlet struct {
 
 // NewOutlet returns an Outlet which implements model.Outlet.
 func NewOutlet(info model.Info) *Outlet {
-	accessory := New(info)
+	accessory := New(info, TypeOutlet)
 	s := service.NewOutlet(info.Name, false, true) // off
 
 	accessory.AddService(s.Service)

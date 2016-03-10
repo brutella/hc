@@ -31,7 +31,7 @@ func TestGetCharacteristic(t *testing.T) {
 		Model:        "Bridge",
 	}
 
-	a := accessory.New(info)
+	a := accessory.New(info, accessory.TypeBridge)
 
 	m := container.NewContainer()
 	m.AddAccessory(a)

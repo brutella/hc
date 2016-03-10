@@ -53,3 +53,16 @@ func (m *Container) Equal(other interface{}) bool {
 
 	return false
 }
+
+// AccessoryType returns the accessory type identifier for the accessories inside the container.
+func (m *Container) AccessoryType() accessory.AccessoryType {
+	if as := m.Accessories; len(as) > 0 {
+		if len(as) > 1 {
+			return accessory.TypeBridge
+		}
+
+		return as[0].Type
+	}
+
+	return accessory.TypeOther
+}
