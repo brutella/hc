@@ -3,7 +3,6 @@ package endpoint
 import (
 	"github.com/brutella/hc/netio"
 	"github.com/brutella/log"
-
 	"io"
 	"io/ioutil"
 	"net/http"

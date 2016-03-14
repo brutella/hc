@@ -3,8 +3,10 @@ package controller
 import (
 	"github.com/brutella/hc/model/characteristic"
 	"github.com/brutella/hc/model/container"
+	"github.com/brutella/hc/netio"
 	"github.com/brutella/hc/netio/data"
 	"github.com/brutella/log"
+	"github.com/gosexy/to"
 
 	"bytes"
 	"encoding/json"
@@ -13,6 +15,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/url"
+	"strings"
 )
 
 // CharacteristicController implements the CharacteristicsHandler interface and provides
@@ -26,21 +29,28 @@ func NewCharacteristicController(m *container.Container) *CharacteristicControll
 	return &CharacteristicController{container: m}
 }
 
-// HandleGetCharacteristics handles a get characteristic request.
+// HandleGetCharacteristics handles a get characteristic request like `/characteristics?id=1.4,1.5`
 func (ctr *CharacteristicController) HandleGetCharacteristics(form url.Values) (io.Reader, error) {
 	var b bytes.Buffer
-	aid, cid, err := ParseAccessoryAndCharacterID(form.Get("id"))
-	containerChar := ctr.GetCharacteristic(aid, cid)
-	if containerChar == nil {
-		log.Printf("[WARN] No characteristic found with aid %d and iid %d\n", aid, cid)
-		return &b, nil
+	var chs []data.Characteristic
+
+	// id=1.4,1.5
+	paths := strings.Split(form.Get("id"), ",")
+	for _, p := range paths {
+		if ids := strings.Split(p, "."); len(ids) == 2 {
+			aid := to.Int64(ids[0]) // accessory id
+			iid := to.Int64(ids[1]) // instance id (= characteristic id)
+			c := data.Characteristic{AccessoryID: aid, CharacteristicID: iid}
+			if ch := ctr.GetCharacteristic(aid, iid); ch != nil {
+				c.Value = ch.GetValue()
+			} else {
+				c.Status = netio.StatusServiceCommunicationFailure
+			}
+			chs = append(chs, c)
+		}
 	}
 
-	chars := data.NewCharacteristics()
-	char := data.Characteristic{AccessoryID: aid, ID: cid, Value: containerChar.GetValue(), Events: containerChar.EventsEnabled()}
-	chars.AddCharacteristic(char)
-
-	result, err := json.Marshal(chars)
+	result, err := json.Marshal(&data.Characteristics{chs})
 	if err != nil {
 		log.Println("[ERRO]", err)
 	}
@@ -66,9 +76,9 @@ func (ctr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader, co
 	log.Println("[VERB]", string(b))
 
 	for _, c := range chars.Characteristics {
-		characteristic := ctr.GetCharacteristic(c.AccessoryID, c.ID)
+		characteristic := ctr.GetCharacteristic(c.AccessoryID, c.CharacteristicID)
 		if characteristic == nil {
-			log.Printf("[ERRO] Could not find characteristic with aid %d and iid %d\n", c.AccessoryID, c.ID)
+			log.Printf("[ERRO] Could not find characteristic with aid %d and iid %d\n", c.AccessoryID, c.CharacteristicID)
 			continue
 		}
 
@@ -84,13 +94,13 @@ func (ctr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader, co
 	return err
 }
 
-// GetCharacteristic returns the characteristic with the specified accessory and characteristic id.
-func (ctr *CharacteristicController) GetCharacteristic(accessoryID int64, characteristicID int64) *characteristic.Characteristic {
+// GetCharacteristic returns the characteristic identified by the accessory id aid and characteristic id iid
+func (ctr *CharacteristicController) GetCharacteristic(aid int64, iid int64) *characteristic.Characteristic {
 	for _, a := range ctr.container.Accessories {
-		if a.GetID() == accessoryID {
+		if a.GetID() == aid {
 			for _, s := range a.GetServices() {
 				for _, c := range s.GetCharacteristics() {
-					if c.GetID() == characteristicID {
+					if c.GetID() == iid {
 						return c
 					}
 				}

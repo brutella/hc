@@ -47,10 +47,9 @@ func FixProtocolSpecifier(b []byte) []byte {
 
 // Body returns the json body for an notification response as bytes.
 func Body(a *accessory.Accessory, c *characteristic.Characteristic) (*bytes.Buffer, error) {
-	chars := data.NewCharacteristics()
-	char := data.Characteristic{AccessoryID: a.GetID(), ID: c.GetID(), Value: c.GetValue()}
-	chars.AddCharacteristic(char)
 
+	ch := data.Characteristic{AccessoryID: a.GetID(), CharacteristicID: c.GetID(), Value: c.GetValue()}
+	chars := data.Characteristics{[]data.Characteristic{ch}}
 	result, err := json.Marshal(chars)
 	if err != nil {
 		return nil, err

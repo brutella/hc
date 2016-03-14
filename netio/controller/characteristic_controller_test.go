@@ -99,7 +99,7 @@ func TestPutCharacteristic(t *testing.T) {
 		t.Fatal("characteristic not found")
 	}
 
-	char := data.Characteristic{AccessoryID: 1, ID: cid, Value: true}
+	char := data.Characteristic{AccessoryID: 1, CharacteristicID: cid, Value: true}
 	var slice []data.Characteristic
 	slice = append(slice, char)
 
