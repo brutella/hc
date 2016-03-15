@@ -63,7 +63,14 @@ func (s *MDNSService) Publish() error {
 	hostname, _ := os.Hostname()
 	host := fmt.Sprintf("%s.", strings.Trim(hostname, "."))
 	text := s.txtRecords()
-	server, err := bonjour.RegisterProxy(s.name, "_hap._tcp.", "", s.port, host, ip.String(), text, nil)
+
+	// 2016-03-14(brutella): Remove whitespaces from service name to fix
+	// invalid http host header field value produces by iOS.
+	//
+	// [Radar] http://openradar.appspot.com/radar?id=4931940373233664
+	stripped := strings.Replace(s.name, " ", "", -1)
+
+	server, err := bonjour.RegisterProxy(stripped, "_hap._tcp.", "", s.port, host, ip.String(), text, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
