@@ -30,7 +30,7 @@ type Config struct {
 	Port string
 
 	// IP on which clients can connect.
-	IP net.IP
+	IP string
 
 	// Pin with has to be entered on iOS client to pair with the accessory
 	// When empty, the pin 00102003 is used
@@ -87,7 +87,7 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 		StoragePath: name,
 		Pin:         "00102003",
 		Port:        "",
-		IP:          ip,
+		IP:          ip.String(),
 	}
 
 	if dir := config.StoragePath; len(dir) > 0 {
@@ -161,7 +161,7 @@ func (t *ipTransport) Start() {
 	t.server = s
 
 	// Publish accessory ip
-	host := t.config.IP.String()
+	host := t.config.IP
 
 	// Publish server port which might be different then `t.config.Port`
 	portInt64 := to.Int64(s.Port())
