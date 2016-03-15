@@ -5,9 +5,7 @@ import (
 	"github.com/gosexy/to"
 	"github.com/oleksandr/bonjour"
 
-	"errors"
 	"fmt"
-	"net"
 	"os"
 	"strings"
 )
@@ -15,6 +13,7 @@ import (
 // MDNSService represents a mDNS service.
 type MDNSService struct {
 	name               string
+	ip                 string
 	port               int
 	protocol           string // Protocol version (pv) (Default 1.0)
 	id                 string
@@ -28,9 +27,10 @@ type MDNSService struct {
 }
 
 // NewMDNSService returns a new service based for the bridge name, id and port.
-func NewMDNSService(name, id string, port int, category int64) *MDNSService {
+func NewMDNSService(name string, id string, ip string, port int, category int64) *MDNSService {
 	return &MDNSService{
 		name:               name,
+		ip:                 ip,
 		port:               port,
 		protocol:           "1.0",
 		id:                 id,
@@ -53,12 +53,6 @@ func (s *MDNSService) SetReachable(r bool) {
 
 // Publish announces the service for the machine's ip address on a random port using mDNS.
 func (s *MDNSService) Publish() error {
-	ip, err := GetFirstLocalIPAddress()
-	if err != nil {
-		return err
-	}
-	log.Println("[INFO] Accessory IP is", ip)
-
 	// Host should end with '.'
 	hostname, _ := os.Hostname()
 	host := fmt.Sprintf("%s.", strings.Trim(hostname, "."))
@@ -70,7 +64,7 @@ func (s *MDNSService) Publish() error {
 	// [Radar] http://openradar.appspot.com/radar?id=4931940373233664
 	stripped := strings.Replace(s.name, " ", "", -1)
 
-	server, err := bonjour.RegisterProxy(stripped, "_hap._tcp.", "", s.port, host, ip.String(), text, nil)
+	server, err := bonjour.RegisterProxy(stripped, "_hap._tcp.", "", s.port, host, s.ip, text, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -91,25 +85,6 @@ func (s *MDNSService) Update() {
 func (s *MDNSService) Stop() {
 	s.server.Shutdown()
 	s.server = nil
-}
-
-// GetFirstLocalIPAddress returns the first available IP address of the local machine
-// This is a fix for Beaglebone Black where net.LookupIP(hostname) return no IP address.
-func GetFirstLocalIPAddress() (net.IP, error) {
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		return nil, err
-	}
-
-	for _, a := range addrs {
-		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-			if ipnet.IP.To4() != nil {
-				return ipnet.IP, nil
-			}
-		}
-	}
-
-	return nil, errors.New("Could not determine ip address")
 }
 
 func (s *MDNSService) txtRecords() []string {
