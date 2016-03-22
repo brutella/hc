@@ -65,7 +65,7 @@ func (s *MDNSService) Publish() error {
 	text := s.txtRecords()
 
 	// 2016-03-14(brutella): Replace whitespaces (" ") from service name 
-    // with underscores ("–")to fix invalid http host header field value
+    // with underscores ("_")to fix invalid http host header field value
     // produces by iOS.
 	//
 	// [Radar] http://openradar.appspot.com/radar?id=4931940373233664
