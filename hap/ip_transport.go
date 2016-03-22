@@ -161,12 +161,13 @@ func (t *ipTransport) Start() {
 	t.server = s
 
 	// Publish accessory ip
-	host := t.config.IP
+	ip := t.config.IP
+	log.Println("[INFO] Accessory IP is", ip)
 
 	// Publish server port which might be different then `t.config.Port`
 	portInt64 := to.Int64(s.Port())
 
-	mdns := NewMDNSService(t.name, t.device.Name(), host, int(portInt64), int64(t.container.AccessoryType()))
+	mdns := NewMDNSService(t.name, t.device.Name(), ip, int(portInt64), int64(t.container.AccessoryType()))
 	t.mdns = mdns
 
 	// Paired accessories must not be reachable for other clients since iOS 9
