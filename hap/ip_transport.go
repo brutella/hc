@@ -2,6 +2,7 @@ package hap
 
 import (
 	"bytes"
+	"errors"
 	"io/ioutil"
 	"net"
 	"sync"
@@ -24,9 +25,12 @@ type Config struct {
 	// When empty, the tranport stores the data inside a folder named exactly like the accessory
 	StoragePath string
 
-	// Port at which transport is reachable e.g. 12345
+	// Port on which transport is reachable e.g. 12345
 	// When empty, the transport uses a random port
 	Port string
+
+	// IP on which clients can connect.
+	IP string
 
 	// Pin with has to be entered on iOS client to pair with the accessory
 	// When empty, the pin 00102003 is used
@@ -74,10 +78,16 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 		log.Fatal("Invalid empty name for first accessory")
 	}
 
+	ip, err := getFirstLocalIPAddr()
+	if err != nil {
+		return nil, err
+	}
+
 	default_config := Config{
 		StoragePath: name,
 		Pin:         "00102003",
 		Port:        "",
+		IP:          ip.String(),
 	}
 
 	if dir := config.StoragePath; len(dir) > 0 {
@@ -90,6 +100,10 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 
 	if port := config.Port; len(port) > 0 {
 		default_config.Port = ":" + port
+	}
+
+	if ip := config.IP; len(ip) > 0 {
+		default_config.IP = ip
 	}
 
 	storage, err := util.NewFileStorage(default_config.StoragePath)
@@ -131,6 +145,8 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 }
 
 func (t *ipTransport) Start() {
+
+	// Create server which handles incoming tcp connections
 	config := server.Config{
 		Port:      t.config.Port,
 		Context:   t.context,
@@ -143,9 +159,15 @@ func (t *ipTransport) Start() {
 
 	s := server.NewServer(config)
 	t.server = s
-	port := to.Int64(s.Port())
 
-	mdns := NewMDNSService(t.name, t.device.Name(), int(port), int64(t.container.AccessoryType()))
+	// Publish accessory ip
+	ip := t.config.IP
+	log.Println("[INFO] Accessory IP is", ip)
+
+	// Publish server port which might be different then `t.config.Port`
+	portInt64 := to.Int64(s.Port())
+
+	mdns := NewMDNSService(t.name, t.device.Name(), ip, int(portInt64), int64(t.container.AccessoryType()))
 	t.mdns = mdns
 
 	// Paired accessories must not be reachable for other clients since iOS 9
@@ -264,4 +286,33 @@ func (t *ipTransport) Handle(ev interface{}) {
 	default:
 		break
 	}
+}
+
+// GetFirstLocalIPAddress returns the first available IP address of the local machine
+// This is a fix for Beaglebone Black where net.LookupIP(hostname) return no IP address.
+func getFirstLocalIPAddr() (net.IP, error) {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, addr := range addrs {
+		var ip net.IP
+		switch v := addr.(type) {
+		case *net.IPNet:
+			ip = v.IP
+		case *net.IPAddr:
+			ip = v.IP
+		}
+		if ip == nil || ip.IsLoopback() {
+			continue
+		}
+		ip = ip.To4()
+		if ip == nil {
+			continue // not an ipv4 address
+		}
+		return ip, nil
+	}
+
+	return nil, errors.New("Could not determine ip address")
 }
