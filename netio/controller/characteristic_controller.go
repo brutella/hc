@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"github.com/brutella/hc/model/characteristic"
-	"github.com/brutella/hc/model/container"
+	"github.com/brutella/hc/accessory"
+	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/netio"
 	"github.com/brutella/hc/netio/data"
 	"github.com/brutella/log"
@@ -21,11 +21,11 @@ import (
 // CharacteristicController implements the CharacteristicsHandler interface and provides
 // read (GET) and write (POST) interfaces to the managed characteristics.
 type CharacteristicController struct {
-	container *container.Container
+	container *accessory.Container
 }
 
 // NewCharacteristicController returns a new characteristic controller.
-func NewCharacteristicController(m *container.Container) *CharacteristicController {
+func NewCharacteristicController(m *accessory.Container) *CharacteristicController {
 	return &CharacteristicController{container: m}
 }
 
@@ -42,7 +42,7 @@ func (ctr *CharacteristicController) HandleGetCharacteristics(form url.Values) (
 			iid := to.Int64(ids[1]) // instance id (= characteristic id)
 			c := data.Characteristic{AccessoryID: aid, CharacteristicID: iid}
 			if ch := ctr.GetCharacteristic(aid, iid); ch != nil {
-				c.Value = ch.GetValue()
+				c.Value = ch.Value
 			} else {
 				c.Status = netio.StatusServiceCommunicationFailure
 			}
@@ -83,7 +83,7 @@ func (ctr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader, co
 		}
 
 		if c.Value != nil {
-			characteristic.SetValueFromConnection(c.Value, conn)
+			characteristic.UpdateValueFromConnection(c.Value, conn)
 		}
 
 		if events, ok := c.Events.(bool); ok == true {

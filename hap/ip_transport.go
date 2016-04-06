@@ -7,11 +7,10 @@ import (
 	"net"
 	"sync"
 
+	"github.com/brutella/hc/accessory"
+	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/event"
-	"github.com/brutella/hc/model/accessory"
-	"github.com/brutella/hc/model/characteristic"
-	"github.com/brutella/hc/model/container"
 	"github.com/brutella/hc/netio"
 	"github.com/brutella/hc/server"
 	"github.com/brutella/hc/util"
@@ -49,7 +48,7 @@ type ipTransport struct {
 
 	name      string
 	device    netio.SecuredDevice
-	container *container.Container
+	container *accessory.Container
 
 	// Used to communicate between different parts of the program (e.g. successful pairing with HomeKit)
 	emitter event.Emitter
@@ -73,7 +72,7 @@ type ipTransport struct {
 // provided transport config does not specify any pin, 00102003 is used.
 func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
 	// Find transport name which is visible in mDNS
-	name := a.Name()
+	name := a.Info.Name.GetValue()
 	if len(name) == 0 {
 		log.Fatal("Invalid empty name for first accessory")
 	}
@@ -128,7 +127,7 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 		name:      name,
 		device:    device,
 		config:    default_config,
-		container: container.NewContainer(),
+		container: accessory.NewContainer(),
 		mutex:     &sync.Mutex{},
 		context:   netio.NewContextForSecuredDevice(device),
 		emitter:   event.NewEmitter(),
@@ -225,14 +224,14 @@ func (t *ipTransport) addAccessory(a *accessory.Accessory) {
 					t.notifyListener(a, c, conn)
 				}
 			}
-			c.OnConnChange(onConnChange)
+			c.OnValueUpdateFromConn(onConnChange)
 
 			onChange := func(c *characteristic.Characteristic, new, old interface{}) {
 				if c.Events == true {
 					t.notifyListener(a, c, nil)
 				}
 			}
-			c.OnChange(onChange)
+			c.OnValueUpdate(onChange)
 		}
 	}
 }

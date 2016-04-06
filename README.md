@@ -2,25 +2,27 @@
 
 [![Build Status](https://travis-ci.org/brutella/hc.svg)](https://travis-ci.org/brutella/hc)
 
-[HomeControl][homecontrol] is an implementation of the [HomeKit][homekit] Accessory Protocol (HAP) to create your own HomeKit accessory and bridges. HomeKit bridges make non-HomeKit accessories available to HomeKit by acting as a middleman.
+[HomeControl][homecontrol] is an implementation of the [HomeKit][homekit] Accessory Protocol (HAP) to create your own HomeKit accessory in [Go](https://golang.org). [HomeKit][homekit] is a set of protocols and libraries to access devices for Home Automation. The actual protocol documentation is only available to MFi members.
 
-## Overview
+You can use this library to make existing Home Automation devices HomeKit compatible. I've already developed the following HomeKit bridges with in:
 
-[HomeKit][homekit] is a set of protocols and libraries to access accessories for Home Automation. Unfortunately the protocol is not open source and the official documentation is only available to MFi members. HomeControl is a complete implementation of the protocol in Go and does not depend on any OS.
+- [LIFX](https://github.com/brutella/hklifx/)
+- [UVR1611](https://github.com/brutella/hkuvr1611)
 
-## HomeKit Client
+## HomeKit on iOS
 
-I've made an app for iPhone, iPad and Apple Watch called [Home][home] to control any HomeKit accessory. If you purchase Home on the [App Store][home-appstore], you not only support my work but also get an awesome iOS app. Thank you.
+HomeKit is fully integrated since iOS 8. Developers can use the HomeKit framework to communicate with HomeKit using high-level APIs.
+I've developed the [Home][home] app (for iPhone, iPad, Apple Watch) to control HomeKit accessories. If you [purchase Home][home-appstore] on the App Store, you not only support my work but also get an awesome iOS app. Thank you.
+
+Once you've setup HomeKit, you can use Siri to interact with your accessories using voice command (*Hey Siri, turn off the lights in the living room*).
 
 [home]: http://selfcoded.com/home/
 [home-appstore]: http://itunes.apple.com/app/id995994352
 
 ## Features
 
-- Full implementation of the HomeKit Accessory Protocol in Go
-    - Support for switch, outlet, light bulb, thermometer, and thermostat accessory
+- Full implementation of the HAP in Go
 - Built-in service announcement via mDNS using [bonjour](http://github.com/oleksandr/bonjour)
-- Optional logging with https://github.com/brutella/log
 - Runs on multiple platforms (already in use on Linux and OS X)
 - Documentation: http://godoc.org/github.com/brutella/hc
 
@@ -45,7 +47,7 @@ I've made an app for iPhone, iPad and Apple Watch called [Home][home] to control
 
 ## API Example
 
-Create a simple on/off switch which is accessible via IP and secured using the pin *00102003*.
+Create a simple on/off switch, which is accessible via IP and secured using the pin *00102003*.
 
 ```go
 package main
@@ -53,18 +55,17 @@ package main
 import (
     "log"
     "github.com/brutella/hc/hap"
-    "github.com/brutella/hc/model"
-    "github.com/brutella/hc/model/accessory"
+    "github.com/brutella/hc/accessory"
 )
 
 func main() {
-	info := model.Info{
+	info := accessory.Info{
 		Name: "Lamp",
 	}
-	sw := accessory.NewSwitch(info)
+	acc := accessory.NewSwitch(info)
     
     config := hap.Config{Pin: "00102003"}
-	t, err := hap.NewIPTransport(config, sw.Accessory)
+	t, err := hap.NewIPTransport(config, acc.Accessory)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -80,7 +81,7 @@ func main() {
 You should change some default values for your own needs
 
 ```go
-info := model.Info{
+info := accessory.Info{
     Name: "Lamp",
     SerialNumber: "051AC-23AAM1",
 	Manufacturer: "Apple",
@@ -94,7 +95,7 @@ info := model.Info{
 You get a callback when the power state of a switch changed by a client.
 
 ```go
-sw.OnStateChanged(func(on bool) {
+acc.Switch.On.OnValueRemoteUpdate(func(on bool) {
 	if on == true {
 		log.Println("Client changed switch to on")
 	} else {
@@ -105,9 +106,29 @@ sw.OnStateChanged(func(on bool) {
 
 When the switch is turned on "the analog way", you should set the state of the accessory.
 
-	sw.SetOn(true)
+	acc.Switch.On.SetValue(true)
 
 A complete example is available in `_example/example.go`.
+
+## Model
+
+The HomeKit model hierarchy looks like this:
+
+    Accessory
+    |-- Accessory Info Service
+    |   |-- Identify Characteristic
+    |   |-- Manufacturer Characteristic
+    |   |-- Model Characteristic
+    |   |-- Name Characteristic
+    |   |-- Serial Characteristic
+    |   
+    |-- * Service
+    |   |-- * Characteristic
+
+HomeKit accessories are container for services. Every accessory must provide the `Accessory Information Service`. Every service provides one or more characteristics (a characteristic might be the power state of an outlet). HomeKit has predefined service and characteristic types, which are supported by iOS. You can define your own service and characteristic types, but it's recommended to use predefined ones.
+
+This library provides all HomeKit characteristics (see `characteristic` package) and services (see `service` package).
+You can also find common accessory types like lightbulbs, outlets, thermostats in the `accessory` package.
 
 ## Dependencies
 
@@ -119,37 +140,6 @@ HomeControl depends on the following libraries
 - `github.com/agl/ed25519` for *ed25519* signature
 - `github.com/gosexy/to` for type conversion
 - `github.com/oleksandr/bonjour` for mDNS
-
-## HomeKit Accessories
-
-HomeControl currently supports the following accessory types
-
-- Switch
-- Outlet
-- Light Bulb
-- Thermostat
-- Thermometer (same as the Thermostat accessory which just readonly services)
-
-The metdata dump in iOS 8.3 (found by [@KhaosT](https://twitter.com/khaost/status/567621750494474241)) includes a list of required and optional characteristics.
-
-<table>
-    <tr><th>Service</th><th>Required</th><th>Optional</th><tr>
-    <tr><td>Accessory Information</td><td>name, manufacturer, model, serial-number, identify</td><td>firmware.revision, hardware.revision, software.revision</td><tr>
-    <tr><td>Switch</td><td>on</td><td>name</td><tr>
-    <tr><td>Outlet</td><td>on, outlet-in-use</td><td>name</td><tr>
-    <tr><td>Fan</td><td>on</td><td>name, rotation.direction, rotation.speed</td><tr>
-    <tr><td>Thermostat</td><td>heating-cooling.current, heating-cooling.target, temperature.current, temperature.target, temperature.units</td><td>name, relative-humidity.current, relative-humidity.target, temperature.cooling-threshold, temperature.heating-threshold</td><tr>
-    <tr><td>Garage Door Opener</td><td>door-state.current, door-state.target, obstruction-detected</td><td>lock-mechanism.current-state, lock-mechanism.target-state, name</td><tr>
-    <tr><td>Light Bulb</td><td>on</td><td>name, brightness, hue, saturation</td><tr>
-    <tr><td>Lock Management</td><td>version, lock-management.control-point</td><td>administrator-only-access, audio-feedback, door-state.current, lock-management.auto-secure-timeout, lock-mechanism.last-known-action, logs, motion-detected</td><tr>
-    <tr><td>Lock Mechanism</td><td>lock-mechanism.current-state, lock-mechanism.target-state</td><td>name</td><tr>
-</table>
-
-The HomeKit framework on iOS uses the same order as in the json. I assume that clients displays them in the same order to the user.
-
-### iOS 9
-
-iOS 9 supports new type of accessories and includes new service and characteristic types. The new types are already available in *model/service/constants.go* and *model/characteristic/constants.go*.
 
 # Contact
 

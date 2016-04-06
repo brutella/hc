@@ -1,9 +1,7 @@
 package netio
 
 import (
-	"github.com/brutella/hc/model"
-	"github.com/brutella/hc/model/accessory"
-	"github.com/brutella/hc/model/container"
+	"github.com/brutella/hc/accessory"
 
 	"bytes"
 	"io/ioutil"
@@ -11,7 +9,7 @@ import (
 	"testing"
 )
 
-var info = model.Info{
+var info = accessory.Info{
 	Name:         "My Bridge",
 	SerialNumber: "001",
 	Manufacturer: "Google",
@@ -20,7 +18,7 @@ var info = model.Info{
 
 func TestCharacteristicNotification(t *testing.T) {
 	a := accessory.New(info, accessory.TypeOther)
-	c := container.NewContainer()
+	c := accessory.NewContainer()
 	c.AddAccessory(a)
 
 	buffer, err := Body(a, a.Info.Name.Characteristic)
@@ -33,7 +31,7 @@ func TestCharacteristicNotification(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if is, want := string(bytes), `{"characteristics":[{"aid":1,"iid":2,"value":"My Bridge"}]}`; is != want {
+	if is, want := string(bytes), `{"characteristics":[{"aid":1,"iid":5,"value":"My Bridge"}]}`; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 }

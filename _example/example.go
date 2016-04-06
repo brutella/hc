@@ -2,28 +2,27 @@ package main
 
 import (
 	"github.com/brutella/hc/hap"
-	"github.com/brutella/hc/model"
-	"github.com/brutella/hc/model/accessory"
+	"github.com/brutella/hc/accessory"
 
 	"log"
 	"time"
 )
 
 func main() {
-	switchInfo := model.Info{
+	switchInfo := accessory.Info{
 		Name: "Lamp",
 	}
-	sw := accessory.NewSwitch(switchInfo)
+	acc := accessory.NewSwitch(switchInfo)
 
 	config := hap.Config{Pin: "12344321", Port: "12345", StoragePath: "./db"}
-	t, err := hap.NewIPTransport(config, sw.Accessory)
+	t, err := hap.NewIPTransport(config, acc.Accessory)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Log to console when client (e.g. iOS app) changes the value of the on characteristic
-	sw.OnStateChanged(func(on bool) {
+	acc.Switch.On.OnValueRemoteUpdate(func(on bool) {
 		if on == true {
 			log.Println("[INFO] Client changed switch to on")
 		} else {
@@ -34,13 +33,13 @@ func main() {
 	// Periodically toggle the switch's on characteristic
 	go func() {
 		for {
-			on := !sw.IsOn()
+			on := !acc.Switch.On.GetValue()
 			if on == true {
-				log.Println("[INFO] Switch on")
+				log.Println("[INFO] Switch is on")
 			} else {
-				log.Println("[INFO] Switch off")
+				log.Println("[INFO] Switch is off")
 			}
-			sw.SetOn(on)
+			acc.Switch.On.SetValue(on)
 			time.Sleep(5 * time.Second)
 		}
 	}()

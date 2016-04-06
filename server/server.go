@@ -1,9 +1,9 @@
 package server
 
 import (
+	"github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/event"
-	"github.com/brutella/hc/model/container"
 	"github.com/brutella/hc/netio"
 	"github.com/brutella/hc/netio/controller"
 	"github.com/brutella/hc/netio/endpoint"
@@ -31,7 +31,7 @@ type Config struct {
 	Port      string
 	Context   netio.HAPContext
 	Database  db.Database
-	Container *container.Container
+	Container *accessory.Container
 	Device    netio.SecuredDevice
 	Mutex     *sync.Mutex
 	Emitter   event.Emitter
@@ -44,7 +44,7 @@ type hkServer struct {
 	mux      *http.ServeMux
 
 	mutex     *sync.Mutex
-	container *container.Container
+	container *accessory.Container
 
 	port        string
 	listener    *net.TCPListener

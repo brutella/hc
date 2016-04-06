@@ -1,12 +1,10 @@
 package controller
 
 import (
-	"github.com/brutella/hc/model"
-	"github.com/brutella/hc/model/accessory"
-	"github.com/brutella/hc/model/characteristic"
-	"github.com/brutella/hc/model/container"
-	"github.com/brutella/hc/model/service"
+	"github.com/brutella/hc/accessory"
+	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/netio/data"
+	"github.com/brutella/hc/service"
 
 	"bytes"
 	"encoding/json"
@@ -24,7 +22,7 @@ func idsString(accessoryID, characteristicID int64) url.Values {
 }
 
 func TestGetCharacteristic(t *testing.T) {
-	info := model.Info{
+	info := accessory.Info{
 		Name:         "My Bridge",
 		SerialNumber: "001",
 		Manufacturer: "Google",
@@ -33,7 +31,7 @@ func TestGetCharacteristic(t *testing.T) {
 
 	a := accessory.New(info, accessory.TypeBridge)
 
-	m := container.NewContainer()
+	m := accessory.NewContainer()
 	m.AddAccessory(a)
 
 	aid := a.GetID()
@@ -72,7 +70,7 @@ func toSwitchService(obj interface{}) *service.Switch {
 }
 
 func TestPutCharacteristic(t *testing.T) {
-	info := model.Info{
+	info := accessory.Info{
 		Name:         "My Switch",
 		SerialNumber: "001",
 		Manufacturer: "Google",
@@ -80,16 +78,16 @@ func TestPutCharacteristic(t *testing.T) {
 	}
 
 	a := accessory.NewSwitch(info)
-	a.SetOn(false)
+	a.Switch.On.SetValue(false)
 
-	m := container.NewContainer()
+	m := accessory.NewContainer()
 	m.AddAccessory(a.Accessory)
 
-	// find on characteristic with type TypePowerState
+	// find on characteristic with type TypeOn
 	var cid int64
 	for _, s := range a.Accessory.Services {
 		for _, c := range s.Characteristics {
-			if c.Type == characteristic.TypePowerState {
+			if c.Type == characteristic.TypeOn {
 				cid = c.ID
 			}
 		}
@@ -120,7 +118,7 @@ func TestPutCharacteristic(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if is, want := a.IsOn(), true; is != want {
+	if is, want := a.Switch.On.GetValue(), true; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 }

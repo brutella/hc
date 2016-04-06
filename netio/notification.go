@@ -3,8 +3,8 @@ package netio
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/brutella/hc/model/accessory"
-	"github.com/brutella/hc/model/characteristic"
+	"github.com/brutella/hc/accessory"
+	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/netio/data"
 	"io/ioutil"
 	"net/http"
@@ -48,7 +48,7 @@ func FixProtocolSpecifier(b []byte) []byte {
 // Body returns the json body for an notification response as bytes.
 func Body(a *accessory.Accessory, c *characteristic.Characteristic) (*bytes.Buffer, error) {
 
-	ch := data.Characteristic{AccessoryID: a.GetID(), CharacteristicID: c.GetID(), Value: c.GetValue()}
+	ch := data.Characteristic{AccessoryID: a.GetID(), CharacteristicID: c.GetID(), Value: c.Value}
 	chars := data.Characteristics{[]data.Characteristic{ch}}
 	result, err := json.Marshal(chars)
 	if err != nil {
