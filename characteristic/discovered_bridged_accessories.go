@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeDiscoveredBridgedAccessories = "0000009F-0000-1000-8000-0026BB765291"
+const TypeDiscoveredBridgedAccessories = "9F"
 
 type DiscoveredBridgedAccessories struct {
 	*Int

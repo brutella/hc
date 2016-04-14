@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeOutlet = "00000047-0000-1000-8000-0026BB765291"
+const TypeOutlet = "47"
 
 type Outlet struct {
 	*Service

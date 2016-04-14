@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeSaturation = "0000002F-0000-1000-8000-0026BB765291"
+const TypeSaturation = "2F"
 
 type Saturation struct {
 	*Float

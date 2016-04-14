@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeLockManagementAutoSecurityTimeout = "0000001A-0000-1000-8000-0026BB765291"
+const TypeLockManagementAutoSecurityTimeout = "1A"
 
 type LockManagementAutoSecurityTimeout struct {
 	*Int

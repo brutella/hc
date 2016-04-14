@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeAudioFeedback = "00000005-0000-1000-8000-0026BB765291"
+const TypeAudioFeedback = "5"
 
 type AudioFeedback struct {
 	*Bool

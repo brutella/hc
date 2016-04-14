@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeSecuritySystem = "0000007E-0000-1000-8000-0026BB765291"
+const TypeSecuritySystem = "7E"
 
 type SecuritySystem struct {
 	*Service

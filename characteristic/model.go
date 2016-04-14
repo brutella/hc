@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeModel = "00000021-0000-1000-8000-0026BB765291"
+const TypeModel = "21"
 
 type Model struct {
 	*String

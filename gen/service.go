@@ -58,7 +58,7 @@ func ServiceGoCode(svc *ServiceMetadata, chars []*CharacteristicMetadata) ([]byt
 		StructName: camelCased(svc.Name),
 		FileName:   ServiceFileName(svc),
 		TypeName:   serviceTypeName(svc),
-		TypeValue:  svc.UUID,
+		TypeValue:  minifyUUID(svc.UUID),
 		Chars:      requiredCharacteristics(svc, chars),
 	}
 

@@ -6,7 +6,7 @@ const (
 	TemperatureDisplayUnitsFahrenheit int = 1
 )
 
-const TypeTemperatureDisplayUnits = "00000036-0000-1000-8000-0026BB765291"
+const TypeTemperatureDisplayUnits = "36"
 
 type TemperatureDisplayUnits struct {
 	*Int

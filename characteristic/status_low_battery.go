@@ -6,7 +6,7 @@ const (
 	StatusLowBatteryBatteryLevelLow    int = 1
 )
 
-const TypeStatusLowBattery = "00000079-0000-1000-8000-0026BB765291"
+const TypeStatusLowBattery = "79"
 
 type StatusLowBattery struct {
 	*Int

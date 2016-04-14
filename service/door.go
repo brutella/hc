@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeDoor = "00000081-0000-1000-8000-0026BB765291"
+const TypeDoor = "81"
 
 type Door struct {
 	*Service

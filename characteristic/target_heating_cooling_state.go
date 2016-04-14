@@ -8,7 +8,7 @@ const (
 	TargetHeatingCoolingStateAuto int = 3
 )
 
-const TypeTargetHeatingCoolingState = "00000033-0000-1000-8000-0026BB765291"
+const TypeTargetHeatingCoolingState = "33"
 
 type TargetHeatingCoolingState struct {
 	*Int

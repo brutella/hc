@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeWindowCovering = "0000008C-0000-1000-8000-0026BB765291"
+const TypeWindowCovering = "8C"
 
 type WindowCovering struct {
 	*Service

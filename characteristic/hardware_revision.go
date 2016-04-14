@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeHardwareRevision = "00000053-0000-1000-8000-0026BB765291"
+const TypeHardwareRevision = "53"
 
 type HardwareRevision struct {
 	*String

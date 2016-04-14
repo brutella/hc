@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeOccupancySensor = "00000086-0000-1000-8000-0026BB765291"
+const TypeOccupancySensor = "86"
 
 type OccupancySensor struct {
 	*Service

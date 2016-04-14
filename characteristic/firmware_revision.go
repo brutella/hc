@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeFirmwareRevision = "00000052-0000-1000-8000-0026BB765291"
+const TypeFirmwareRevision = "52"
 
 type FirmwareRevision struct {
 	*String

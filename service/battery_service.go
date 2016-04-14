@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeBatteryService = "00000096-0000-1000-8000-0026BB765291"
+const TypeBatteryService = "96"
 
 type BatteryService struct {
 	*Service

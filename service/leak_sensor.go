@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeLeakSensor = "00000083-0000-1000-8000-0026BB765291"
+const TypeLeakSensor = "83"
 
 type LeakSensor struct {
 	*Service

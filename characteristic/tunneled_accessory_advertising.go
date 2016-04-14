@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeTunneledAccessoryAdvertising = "00000060-0000-1000-8000-0026BB765291"
+const TypeTunneledAccessoryAdvertising = "60"
 
 type TunneledAccessoryAdvertising struct {
 	*Bool

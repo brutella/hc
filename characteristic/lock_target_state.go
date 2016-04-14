@@ -6,7 +6,7 @@ const (
 	LockTargetStateSecured   int = 1
 )
 
-const TypeLockTargetState = "0000001E-0000-1000-8000-0026BB765291"
+const TypeLockTargetState = "1E"
 
 type LockTargetState struct {
 	*Int

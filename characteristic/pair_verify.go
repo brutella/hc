@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypePairVerify = "0000004E-0000-1000-8000-0026BB765291"
+const TypePairVerify = "4E"
 
 type PairVerify struct {
 	*Bytes

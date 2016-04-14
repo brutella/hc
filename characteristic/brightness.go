@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeBrightness = "00000008-0000-1000-8000-0026BB765291"
+const TypeBrightness = "8"
 
 type Brightness struct {
 	*Int

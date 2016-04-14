@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeAccessoryInformation = "0000003E-0000-1000-8000-0026BB765291"
+const TypeAccessoryInformation = "3E"
 
 type AccessoryInformation struct {
 	*Service

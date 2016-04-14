@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeTunneledBTLEAccessoryService = "00000056-0000-1000-8000-0026BB765291"
+const TypeTunneledBTLEAccessoryService = "56"
 
 type TunneledBTLEAccessoryService struct {
 	*Service

@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeTunneledAccessoryStateNumber = "00000058-0000-1000-8000-0026BB765291"
+const TypeTunneledAccessoryStateNumber = "58"
 
 type TunneledAccessoryStateNumber struct {
 	*Float

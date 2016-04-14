@@ -6,7 +6,7 @@ const (
 	LeakDetectedLeakDetected    int = 1
 )
 
-const TypeLeakDetected = "00000070-0000-1000-8000-0026BB765291"
+const TypeLeakDetected = "70"
 
 type LeakDetected struct {
 	*Int

@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeHeatingThresholdTemperature = "00000012-0000-1000-8000-0026BB765291"
+const TypeHeatingThresholdTemperature = "12"
 
 type HeatingThresholdTemperature struct {
 	*Float

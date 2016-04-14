@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypePairSetup = "0000004C-0000-1000-8000-0026BB765291"
+const TypePairSetup = "4C"
 
 type PairSetup struct {
 	*Bytes

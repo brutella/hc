@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeWindow = "0000008B-0000-1000-8000-0026BB765291"
+const TypeWindow = "8B"
 
 type Window struct {
 	*Service

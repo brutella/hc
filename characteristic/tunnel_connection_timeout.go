@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeTunnelConnectionTimeout = "00000061-0000-1000-8000-0026BB765291"
+const TypeTunnelConnectionTimeout = "61"
 
 type TunnelConnectionTimeout struct {
 	*Int

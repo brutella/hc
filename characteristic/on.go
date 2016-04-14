@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeOn = "00000025-0000-1000-8000-0026BB765291"
+const TypeOn = "25"
 
 type On struct {
 	*Bool

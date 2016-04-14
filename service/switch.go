@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeSwitch = "00000049-0000-1000-8000-0026BB765291"
+const TypeSwitch = "49"
 
 type Switch struct {
 	*Service

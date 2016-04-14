@@ -6,7 +6,7 @@ const (
 	ChargingStateCharging    int = 1
 )
 
-const TypeChargingState = "0000008F-0000-1000-8000-0026BB765291"
+const TypeChargingState = "8F"
 
 type ChargingState struct {
 	*Int

@@ -6,7 +6,7 @@ const (
 	TargetDoorStateClosed int = 1
 )
 
-const TypeTargetDoorState = "00000032-0000-1000-8000-0026BB765291"
+const TypeTargetDoorState = "32"
 
 type TargetDoorState struct {
 	*Int

@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeDayOfTheWeek = "00000098-0000-1000-8000-0026BB765291"
+const TypeDayOfTheWeek = "98"
 
 type DayOfTheWeek struct {
 	*Int

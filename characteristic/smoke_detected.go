@@ -6,7 +6,7 @@ const (
 	SmokeDetectedSmokeDetected    int = 1
 )
 
-const TypeSmokeDetected = "00000076-0000-1000-8000-0026BB765291"
+const TypeSmokeDetected = "76"
 
 type SmokeDetected struct {
 	*Int

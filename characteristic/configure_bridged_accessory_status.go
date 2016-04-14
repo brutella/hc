@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeConfigureBridgedAccessoryStatus = "0000009D-0000-1000-8000-0026BB765291"
+const TypeConfigureBridgedAccessoryStatus = "9D"
 
 type ConfigureBridgedAccessoryStatus struct {
 	*Bytes

@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeThermostat = "0000004A-0000-1000-8000-0026BB765291"
+const TypeThermostat = "4A"
 
 type Thermostat struct {
 	*Service

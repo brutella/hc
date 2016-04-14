@@ -10,7 +10,7 @@ const (
 	AirQualityPoor      int = 5
 )
 
-const TypeAirQuality = "00000095-0000-1000-8000-0026BB765291"
+const TypeAirQuality = "95"
 
 type AirQuality struct {
 	*Int

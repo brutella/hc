@@ -6,7 +6,7 @@ const (
 	StatusJammedJammed    int = 1
 )
 
-const TypeStatusJammed = "00000078-0000-1000-8000-0026BB765291"
+const TypeStatusJammed = "78"
 
 type StatusJammed struct {
 	*Int

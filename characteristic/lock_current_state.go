@@ -8,7 +8,7 @@ const (
 	LockCurrentStateUnknown   int = 3
 )
 
-const TypeLockCurrentState = "0000001D-0000-1000-8000-0026BB765291"
+const TypeLockCurrentState = "1D"
 
 type LockCurrentState struct {
 	*Int

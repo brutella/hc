@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeCategory = "000000A3-0000-1000-8000-0026BB765291"
+const TypeCategory = "A3"
 
 type Category struct {
 	*Int

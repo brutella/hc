@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeLockMechanism = "00000045-0000-1000-8000-0026BB765291"
+const TypeLockMechanism = "45"
 
 type LockMechanism struct {
 	*Service

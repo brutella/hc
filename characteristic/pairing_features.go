@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypePairingFeatures = "0000004F-0000-1000-8000-0026BB765291"
+const TypePairingFeatures = "4F"
 
 type PairingFeatures struct {
 	*Int

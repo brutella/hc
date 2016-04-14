@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeVersion = "00000037-0000-1000-8000-0026BB765291"
+const TypeVersion = "37"
 
 type Version struct {
 	*String

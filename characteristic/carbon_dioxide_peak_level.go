@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeCarbonDioxidePeakLevel = "00000094-0000-1000-8000-0026BB765291"
+const TypeCarbonDioxidePeakLevel = "94"
 
 type CarbonDioxidePeakLevel struct {
 	*Float

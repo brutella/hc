@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeTemperatureSensor = "0000008A-0000-1000-8000-0026BB765291"
+const TypeTemperatureSensor = "8A"
 
 type TemperatureSensor struct {
 	*Service

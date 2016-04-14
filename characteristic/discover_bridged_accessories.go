@@ -6,7 +6,7 @@ const (
 	DiscoverBridgedAccessoriesStopDiscovery  int = 1
 )
 
-const TypeDiscoverBridgedAccessories = "0000009E-0000-1000-8000-0026BB765291"
+const TypeDiscoverBridgedAccessories = "9E"
 
 type DiscoverBridgedAccessories struct {
 	*Int

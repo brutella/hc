@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeHue = "00000013-0000-1000-8000-0026BB765291"
+const TypeHue = "13"
 
 type Hue struct {
 	*Float

@@ -7,7 +7,7 @@ const (
 	PositionStateStopped    int = 2
 )
 
-const TypePositionState = "00000072-0000-1000-8000-0026BB765291"
+const TypePositionState = "72"
 
 type PositionState struct {
 	*Int

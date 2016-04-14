@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeStatusFault = "00000077-0000-1000-8000-0026BB765291"
+const TypeStatusFault = "77"
 
 type StatusFault struct {
 	*Int

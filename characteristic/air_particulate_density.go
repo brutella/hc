@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeAirParticulateDensity = "00000064-0000-1000-8000-0026BB765291"
+const TypeAirParticulateDensity = "64"
 
 type AirParticulateDensity struct {
 	*Float

@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeGarageDoorOpener = "00000041-0000-1000-8000-0026BB765291"
+const TypeGarageDoorOpener = "41"
 
 type GarageDoorOpener struct {
 	*Service

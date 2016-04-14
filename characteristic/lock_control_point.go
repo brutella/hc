@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeLockControlPoint = "00000019-0000-1000-8000-0026BB765291"
+const TypeLockControlPoint = "19"
 
 type LockControlPoint struct {
 	*Bytes

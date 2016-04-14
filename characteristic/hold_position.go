@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeHoldPosition = "0000006F-0000-1000-8000-0026BB765291"
+const TypeHoldPosition = "6F"
 
 type HoldPosition struct {
 	*Bool

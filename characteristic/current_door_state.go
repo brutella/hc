@@ -9,7 +9,7 @@ const (
 	CurrentDoorStateStopped int = 4
 )
 
-const TypeCurrentDoorState = "0000000E-0000-1000-8000-0026BB765291"
+const TypeCurrentDoorState = "E"
 
 type CurrentDoorState struct {
 	*Int

@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeStatelessProgrammableSwitch = "00000089-0000-1000-8000-0026BB765291"
+const TypeStatelessProgrammableSwitch = "89"
 
 type StatelessProgrammableSwitch struct {
 	*Service

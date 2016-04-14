@@ -13,7 +13,7 @@ const (
 	LockLastKnownActionSecuredByAutoSecureTimeout  int = 8
 )
 
-const TypeLockLastKnownAction = "0000001C-0000-1000-8000-0026BB765291"
+const TypeLockLastKnownAction = "1C"
 
 type LockLastKnownAction struct {
 	*Int

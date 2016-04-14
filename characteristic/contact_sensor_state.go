@@ -6,7 +6,7 @@ const (
 	ContactSensorStateContactNotDetected int = 1
 )
 
-const TypeContactSensorState = "0000006A-0000-1000-8000-0026BB765291"
+const TypeContactSensorState = "6A"
 
 type ContactSensorState struct {
 	*Int

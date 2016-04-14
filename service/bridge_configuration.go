@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeBridgeConfiguration = "000000A1-0000-1000-8000-0026BB765291"
+const TypeBridgeConfiguration = "A1"
 
 type BridgeConfiguration struct {
 	*Service

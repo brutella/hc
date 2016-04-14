@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeTimeUpdate = "0000009A-0000-1000-8000-0026BB765291"
+const TypeTimeUpdate = "9A"
 
 type TimeUpdate struct {
 	*Bool

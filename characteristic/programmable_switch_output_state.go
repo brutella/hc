@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeProgrammableSwitchOutputState = "00000074-0000-1000-8000-0026BB765291"
+const TypeProgrammableSwitchOutputState = "74"
 
 type ProgrammableSwitchOutputState struct {
 	*Int

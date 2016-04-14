@@ -9,7 +9,7 @@ const (
 	SecuritySystemCurrentStateAlarmTriggered int = 4
 )
 
-const TypeSecuritySystemCurrentState = "00000066-0000-1000-8000-0026BB765291"
+const TypeSecuritySystemCurrentState = "66"
 
 type SecuritySystemCurrentState struct {
 	*Int

@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeLinkQuality = "0000009C-0000-1000-8000-0026BB765291"
+const TypeLinkQuality = "9C"
 
 type LinkQuality struct {
 	*Int

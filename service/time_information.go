@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeTimeInformation = "00000099-0000-1000-8000-0026BB765291"
+const TypeTimeInformation = "99"
 
 type TimeInformation struct {
 	*Service

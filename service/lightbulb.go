@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeLightbulb = "00000043-0000-1000-8000-0026BB765291"
+const TypeLightbulb = "43"
 
 type Lightbulb struct {
 	*Service

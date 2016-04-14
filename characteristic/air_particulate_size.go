@@ -6,7 +6,7 @@ const (
 	AirParticulateSize10Μm  int = 1
 )
 
-const TypeAirParticulateSize = "00000065-0000-1000-8000-0026BB765291"
+const TypeAirParticulateSize = "65"
 
 type AirParticulateSize struct {
 	*Int

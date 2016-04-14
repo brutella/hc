@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeFan = "00000040-0000-1000-8000-0026BB765291"
+const TypeFan = "40"
 
 type Fan struct {
 	*Service

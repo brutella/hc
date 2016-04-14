@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeLogs = "0000001F-0000-1000-8000-0026BB765291"
+const TypeLogs = "1F"
 
 type Logs struct {
 	*Bytes

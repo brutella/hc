@@ -7,7 +7,7 @@ const (
 	CurrentHeatingCoolingStateCool int = 2
 )
 
-const TypeCurrentHeatingCoolingState = "0000000F-0000-1000-8000-0026BB765291"
+const TypeCurrentHeatingCoolingState = "F"
 
 type CurrentHeatingCoolingState struct {
 	*Int

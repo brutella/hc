@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeObstructionDetected = "00000024-0000-1000-8000-0026BB765291"
+const TypeObstructionDetected = "24"
 
 type ObstructionDetected struct {
 	*Bool

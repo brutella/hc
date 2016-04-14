@@ -8,7 +8,7 @@ const (
 	SecuritySystemTargetStateDisarm   int = 3
 )
 
-const TypeSecuritySystemTargetState = "00000067-0000-1000-8000-0026BB765291"
+const TypeSecuritySystemTargetState = "67"
 
 type SecuritySystemTargetState struct {
 	*Int

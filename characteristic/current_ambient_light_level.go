@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeCurrentAmbientLightLevel = "0000006B-0000-1000-8000-0026BB765291"
+const TypeCurrentAmbientLightLevel = "6B"
 
 type CurrentAmbientLightLevel struct {
 	*Float

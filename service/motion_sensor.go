@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeMotionSensor = "00000085-0000-1000-8000-0026BB765291"
+const TypeMotionSensor = "85"
 
 type MotionSensor struct {
 	*Service

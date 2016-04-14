@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeProgrammableSwitchEvent = "00000073-0000-1000-8000-0026BB765291"
+const TypeProgrammableSwitchEvent = "73"
 
 type ProgrammableSwitchEvent struct {
 	*Int

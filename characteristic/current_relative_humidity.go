@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeCurrentRelativeHumidity = "00000010-0000-1000-8000-0026BB765291"
+const TypeCurrentRelativeHumidity = "10"
 
 type CurrentRelativeHumidity struct {
 	*Float

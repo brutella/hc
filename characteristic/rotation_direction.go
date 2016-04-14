@@ -6,7 +6,7 @@ const (
 	RotationDirectionCounterclockwise int = 1
 )
 
-const TypeRotationDirection = "00000028-0000-1000-8000-0026BB765291"
+const TypeRotationDirection = "28"
 
 type RotationDirection struct {
 	*Int

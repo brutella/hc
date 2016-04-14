@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeSecuritySystemAlarmType = "0000008E-0000-1000-8000-0026BB765291"
+const TypeSecuritySystemAlarmType = "8E"
 
 type SecuritySystemAlarmType struct {
 	*Int

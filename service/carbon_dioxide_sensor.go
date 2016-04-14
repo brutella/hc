@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeCarbonDioxideSensor = "00000097-0000-1000-8000-0026BB765291"
+const TypeCarbonDioxideSensor = "97"
 
 type CarbonDioxideSensor struct {
 	*Service

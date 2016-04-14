@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeRotationSpeed = "00000029-0000-1000-8000-0026BB765291"
+const TypeRotationSpeed = "29"
 
 type RotationSpeed struct {
 	*Float

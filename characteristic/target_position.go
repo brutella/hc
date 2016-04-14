@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeTargetPosition = "0000007C-0000-1000-8000-0026BB765291"
+const TypeTargetPosition = "7C"
 
 type TargetPosition struct {
 	*Int

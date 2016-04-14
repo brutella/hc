@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeReachable = "00000063-0000-1000-8000-0026BB765291"
+const TypeReachable = "63"
 
 type Reachable struct {
 	*Bool

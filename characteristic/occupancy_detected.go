@@ -6,7 +6,7 @@ const (
 	OccupancyDetectedOccupancyDetected    int = 1
 )
 
-const TypeOccupancyDetected = "00000071-0000-1000-8000-0026BB765291"
+const TypeOccupancyDetected = "71"
 
 type OccupancyDetected struct {
 	*Int

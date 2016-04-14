@@ -6,7 +6,7 @@ const (
 	CarbonMonoxideDetectedCOLevelsAbnormal int = 1
 )
 
-const TypeCarbonMonoxideDetected = "00000069-0000-1000-8000-0026BB765291"
+const TypeCarbonMonoxideDetected = "69"
 
 type CarbonMonoxideDetected struct {
 	*Int

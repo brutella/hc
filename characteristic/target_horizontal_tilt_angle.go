@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeTargetHorizontalTiltAngle = "0000007B-0000-1000-8000-0026BB765291"
+const TypeTargetHorizontalTiltAngle = "7B"
 
 type TargetHorizontalTiltAngle struct {
 	*Int

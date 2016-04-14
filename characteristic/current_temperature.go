@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeCurrentTemperature = "00000011-0000-1000-8000-0026BB765291"
+const TypeCurrentTemperature = "11"
 
 type CurrentTemperature struct {
 	*Float

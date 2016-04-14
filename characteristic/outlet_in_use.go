@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeOutletInUse = "00000026-0000-1000-8000-0026BB765291"
+const TypeOutletInUse = "26"
 
 type OutletInUse struct {
 	*Bool

@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeBridgingState = "00000062-0000-1000-8000-0026BB765291"
+const TypeBridgingState = "62"
 
 type BridgingState struct {
 	*Service

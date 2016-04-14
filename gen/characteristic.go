@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"regexp"
 	"sort"
 	"strings"
 	"text/template"
@@ -66,7 +67,7 @@ func NewCharacteristic(char *CharacteristicMetadata) *Characteristic {
 		FileName:           FileName(char),
 		PermsDecl:          permissionDecl(char),
 		TypeName:           typeName(char),
-		TypeValue:          char.UUID,
+		TypeValue:          minifyUUID(char.UUID),
 		DefaultValue:       defaultValue(char),
 		MinValue:           minValue(char),
 		MaxValue:           maxValue(char),
@@ -228,6 +229,18 @@ func defaultValue(char *CharacteristicMetadata) interface{} {
 	}
 
 	return nil
+}
+
+// minifyUUID returns a minified version of s by removing unneeded characters.
+// For example the UUID "0000008C-0000-1000-8000-0026BB765291" the Window Covering
+// service will be minified to "8C".
+func minifyUUID(s string) string {
+	authRegexp := regexp.MustCompile(`^([0-9a-fA-F]*)`)
+	if str := authRegexp.FindString(s); len(str) > 0 {
+		return strings.TrimLeft(str, "0")
+	}
+
+	return s
 }
 
 // Return the name of the characteristic type name

@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeBatteryLevel = "00000068-0000-1000-8000-0026BB765291"
+const TypeBatteryLevel = "68"
 
 type BatteryLevel struct {
 	*Int
