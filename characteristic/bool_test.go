@@ -21,7 +21,7 @@ func TestBool(t *testing.T) {
 
 func TestValueUpdate(t *testing.T) {
 	b := NewBool(TypeOn)
-	b.Perms = PermsWrite()
+	b.Perms = PermsAll()
 
 	var newValue bool
 	b.OnValueRemoteUpdate(func(value bool) {

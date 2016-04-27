@@ -16,11 +16,6 @@ func PermsRead() []string {
 	return []string{PermRead, PermEvents}
 }
 
-// PermsWrite returns write and event permissions
-func PermsWrite() []string {
-	return []string{PermWrite, PermEvents}
-}
-
 // PermsReadOnly returns read permission
 func PermsReadOnly() []string {
 	return []string{PermRead}
