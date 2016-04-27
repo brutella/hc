@@ -171,7 +171,7 @@ func (t *ipTransport) Start() {
 
 	// Paired accessories must not be reachable for other clients since iOS 9
 	if t.isPaired() {
-		mdns.SetReachable(false)
+		mdns.SetDiscoverable(false)
 	}
 
 	mdns.Publish()
@@ -206,7 +206,7 @@ func (t *ipTransport) isPaired() bool {
 
 func (t *ipTransport) updateMDNSReachability() {
 	if mdns := t.mdns; mdns != nil {
-		mdns.SetReachable(t.isPaired() == false)
+		mdns.SetDiscoverable(t.isPaired() == false)
 		mdns.Update()
 	}
 }

@@ -34,7 +34,7 @@ func TestReachable(t *testing.T) {
 		"md=My MDNS Service",
 		"ci=1",
 	}
-	mdns.SetReachable(false)
+	mdns.SetDiscoverable(false)
 
 	if x := mdns.txtRecords(); reflect.DeepEqual(x, expect) == false {
 		t.Fatal(expect)

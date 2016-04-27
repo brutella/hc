@@ -20,7 +20,7 @@ type MDNSService struct {
 	configuration      int64 // c#
 	state              int64 // s#
 	mfiCompliant       bool  // ff
-	reachable          bool  // sf
+	discoverable       bool  // sf
 	categoryIdentifier int64 // ci (see AccessoryType)
 
 	server *bonjour.Server
@@ -37,7 +37,7 @@ func NewMDNSService(name string, id string, ip string, port int, category int64)
 		configuration:      1,
 		state:              1,
 		mfiCompliant:       false,
-		reachable:          true,
+		discoverable:       true,
 		categoryIdentifier: category,
 	}
 }
@@ -47,8 +47,8 @@ func (s *MDNSService) IsPublished() bool {
 	return s.server != nil
 }
 
-func (s *MDNSService) SetReachable(r bool) {
-	s.reachable = r
+func (s *MDNSService) SetDiscoverable(val bool) {
+	s.discoverable = val
 }
 
 // Publish announces the service for the machine's ip address on a random port using mDNS.
@@ -94,7 +94,7 @@ func (s *MDNSService) txtRecords() []string {
 		fmt.Sprintf("id=%s", s.id),
 		fmt.Sprintf("c#=%d", s.configuration),
 		fmt.Sprintf("s#=%d", s.state),
-		fmt.Sprintf("sf=%d", to.Int64(s.reachable)),
+		fmt.Sprintf("sf=%d", to.Int64(s.discoverable)),
 		fmt.Sprintf("ff=%d", to.Int64(s.mfiCompliant)),
 		fmt.Sprintf("md=%s", s.name),
 		fmt.Sprintf("ci=%d", s.categoryIdentifier),
