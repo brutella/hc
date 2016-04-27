@@ -9,7 +9,10 @@ type String struct {
 }
 
 func NewString(typ string) *String {
-	return &String{NewCharacteristic(typ)}
+	char := NewCharacteristic(typ)
+	char.Format = FormatString
+
+	return &String{char}
 }
 
 // SetValue sets a value

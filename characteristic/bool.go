@@ -10,6 +10,8 @@ type Bool struct {
 
 func NewBool(typ string) *Bool {
 	number := NewCharacteristic(typ)
+	number.Format = FormatBool
+
 	return &Bool{number}
 }
 
