@@ -11,8 +11,7 @@ func TestBytesEncoding(t *testing.T) {
 	b := NewBytes(TypeLogs)
 	b.SetValue(val)
 
-	tlv8 := []byte{0x00, 0x02, 0xFA, 0xAA}
-	expect := base64.StdEncoding.EncodeToString(tlv8)
+	expect := base64.StdEncoding.EncodeToString(val)
 
 	if x := b.Value; reflect.DeepEqual(x, expect) == false {
 		t.Fatal(x)
