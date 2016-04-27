@@ -1,7 +1,10 @@
 package accessory
 
 import (
+	"reflect"
 	"testing"
+
+	"github.com/brutella/hc/service"
 )
 
 var info = Info{
@@ -71,5 +74,27 @@ func TestAccessoryType(t *testing.T) {
 
 	if is, want := c.AccessoryType(), TypeBridge; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
+	}
+}
+
+func TestContentHash(t *testing.T) {
+	acc := New(info, TypeLightbulb)
+	c := NewContainer()
+	c.AddAccessory(acc)
+
+	hash := c.ContentHash()
+
+	acc.Info.Name.SetValue("Test Value")
+
+	// Hash ignores the value field and should therefore be the same
+	if is, want := c.ContentHash(), hash; reflect.DeepEqual(is, want) == false {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	acc.AddService(service.New(service.TypeLightbulb))
+
+	// Hash changes when accessories/services/characteristics are added
+	if is, want := c.ContentHash(), hash; reflect.DeepEqual(is, want) == true {
+		t.Fatalf("%v should not be %v", is, want)
 	}
 }

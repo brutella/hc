@@ -1,5 +1,11 @@
 package accessory
 
+import (
+	"crypto/md5"
+	"encoding/json"
+	"log"
+)
+
 // Container manages a list of accessories.
 type Container struct {
 	Accessories []*Accessory `json:"accessories"`
@@ -61,4 +67,57 @@ func (m *Container) AccessoryType() AccessoryType {
 	}
 
 	return TypeOther
+}
+
+// ContentHash returns a hash of the content (ignoring the value field).
+func (m *Container) ContentHash() []byte {
+	var b []byte
+	var err error
+
+	if b, err = json.Marshal(m); err != nil {
+		log.Fatal(err)
+	}
+
+	val := map[string]interface{}{}
+	if err := json.Unmarshal(b, &val); err != nil {
+		log.Fatal(err)
+	}
+
+	deleteFieldFromDict(&val, "value")
+
+	if b, err = json.Marshal(val); err != nil {
+		log.Fatal(err)
+	}
+
+	h := md5.New()
+	h.Write(b)
+	return h.Sum(nil)
+}
+
+func deleteFieldFromDict(val *map[string]interface{}, field string) {
+	for k, v := range *val {
+		if k == field {
+			delete(*val, k)
+		} else {
+			deleteFieldFromInterface(&v, field)
+		}
+	}
+}
+
+func deleteFieldFromArray(val *[]interface{}, field string) {
+	for _, v := range *val {
+		deleteFieldFromInterface(&v, field)
+	}
+}
+
+func deleteFieldFromInterface(val *interface{}, field string) {
+	v := *val
+
+	if dict, ok := v.(map[string]interface{}); ok == true {
+		deleteFieldFromDict(&dict, field)
+	}
+
+	if array, ok := v.([]interface{}); ok == true {
+		deleteFieldFromArray(&array, field)
+	}
 }

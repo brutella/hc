@@ -2,7 +2,6 @@ package hap
 
 import (
 	"bytes"
-	"errors"
 	"io/ioutil"
 	"net"
 	"sync"
@@ -18,26 +17,8 @@ import (
 	"github.com/gosexy/to"
 )
 
-// Config provides basic configuration for an IP transport
-type Config struct {
-	// Path to the storage
-	// When empty, the tranport stores the data inside a folder named exactly like the accessory
-	StoragePath string
-
-	// Port on which transport is reachable e.g. 12345
-	// When empty, the transport uses a random port
-	Port string
-
-	// IP on which clients can connect.
-	IP string
-
-	// Pin with has to be entered on iOS client to pair with the accessory
-	// When empty, the pin 00102003 is used
-	Pin string
-}
-
 type ipTransport struct {
-	config  Config
+	config  *Config
 	context netio.HAPContext
 	server  server.Server
 	mutex   *sync.Mutex
@@ -46,7 +27,6 @@ type ipTransport struct {
 	storage  util.Storage
 	database db.Database
 
-	name      string
 	device    netio.SecuredDevice
 	container *accessory.Container
 
@@ -77,56 +57,30 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 		log.Fatal("Invalid empty name for first accessory")
 	}
 
-	ip, err := getFirstLocalIPAddr()
+	cfg := defaultConfig(name)
+	cfg.merge(config)
+
+	storage, err := util.NewFileStorage(cfg.StoragePath)
 	if err != nil {
 		return nil, err
 	}
 
-	default_config := Config{
-		StoragePath: name,
-		Pin:         "00102003",
-		Port:        "",
-		IP:          ip.String(),
-	}
-
-	if dir := config.StoragePath; len(dir) > 0 {
-		default_config.StoragePath = dir
-	}
-
-	if pin := config.Pin; len(pin) > 0 {
-		default_config.Pin = pin
-	}
-
-	if port := config.Port; len(port) > 0 {
-		default_config.Port = ":" + port
-	}
-
-	if ip := config.IP; len(ip) > 0 {
-		default_config.IP = ip
-	}
-
-	storage, err := util.NewFileStorage(default_config.StoragePath)
-	if err != nil {
-		return nil, err
-	}
-
-	// Find transport uuid which appears as "id" txt record in mDNS and
-	// must be unique and stay the same over time
-	uuid := transportUUIDInStorage(storage)
 	database := db.NewDatabaseWithStorage(storage)
 
-	hap_pin, err := NewPin(default_config.Pin)
+	hap_pin, err := NewPin(cfg.Pin)
 	if err != nil {
 		return nil, err
 	}
 
-	device, err := netio.NewSecuredDevice(uuid, hap_pin, database)
+	cfg.load(storage)
+
+	device, err := netio.NewSecuredDevice(cfg.id, hap_pin, database)
 
 	t := &ipTransport{
+		storage:   storage,
 		database:  database,
-		name:      name,
 		device:    device,
-		config:    default_config,
+		config:    cfg,
 		container: accessory.NewContainer(),
 		mutex:     &sync.Mutex{},
 		context:   netio.NewContextForSecuredDevice(device),
@@ -138,6 +92,16 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 		t.addAccessory(a)
 	}
 
+	// Users can only pair discoverable accessories
+	if t.isPaired() {
+		cfg.discoverable = false
+	}
+
+	cfg.categoryId = int(t.container.AccessoryType())
+	cfg.updateConfigHash(t.container.ContentHash())
+	cfg.save(storage)
+
+	// Listen for events to update mDNS txt records
 	t.emitter.AddListener(t)
 
 	return t, err
@@ -159,22 +123,16 @@ func (t *ipTransport) Start() {
 	s := server.NewServer(config)
 	t.server = s
 
-	// Publish accessory ip
-	ip := t.config.IP
-	log.Println("[INFO] Accessory IP is", ip)
-
 	// Publish server port which might be different then `t.config.Port`
-	portInt64 := to.Int64(s.Port())
+	t.config.servePort = int(to.Int64(s.Port()))
 
-	mdns := NewMDNSService(t.name, t.device.Name(), ip, int(portInt64), int64(t.container.AccessoryType()))
+	mdns := NewMDNSService(t.config)
 	t.mdns = mdns
 
-	// Paired accessories must not be reachable for other clients since iOS 9
-	if t.isPaired() {
-		mdns.SetDiscoverable(false)
-	}
-
 	mdns.Publish()
+
+	// Publish accessory ip
+	log.Println("[INFO] Accessory IP is", t.config.IP)
 
 	// Listen until server.Stop() is called
 	s.ListenAndServe()
@@ -206,7 +164,7 @@ func (t *ipTransport) isPaired() bool {
 
 func (t *ipTransport) updateMDNSReachability() {
 	if mdns := t.mdns; mdns != nil {
-		mdns.SetDiscoverable(t.isPaired() == false)
+		t.config.discoverable = t.isPaired() == false
 		mdns.Update()
 	}
 }
@@ -258,21 +216,6 @@ func (t *ipTransport) notifyListener(a *accessory.Accessory, c *characteristic.C
 	}
 }
 
-// transportUUIDInStorage returns the uuid stored in storage or
-// creates a new random uuid and stores it.
-func transportUUIDInStorage(storage util.Storage) string {
-	uuid, err := storage.Get("uuid")
-	if len(uuid) == 0 || err != nil {
-		str := util.RandomHexString()
-		uuid = []byte(netio.MAC48Address(str))
-		err := storage.Set("uuid", uuid)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-	return string(uuid)
-}
-
 // Handles event which are sent when pairing with a device is added or removed
 func (t *ipTransport) Handle(ev interface{}) {
 	switch ev.(type) {
@@ -285,33 +228,4 @@ func (t *ipTransport) Handle(ev interface{}) {
 	default:
 		break
 	}
-}
-
-// GetFirstLocalIPAddress returns the first available IP address of the local machine
-// This is a fix for Beaglebone Black where net.LookupIP(hostname) return no IP address.
-func getFirstLocalIPAddr() (net.IP, error) {
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		return nil, err
-	}
-
-	for _, addr := range addrs {
-		var ip net.IP
-		switch v := addr.(type) {
-		case *net.IPNet:
-			ip = v.IP
-		case *net.IPAddr:
-			ip = v.IP
-		}
-		if ip == nil || ip.IsLoopback() {
-			continue
-		}
-		ip = ip.To4()
-		if ip == nil {
-			continue // not an ipv4 address
-		}
-		return ip, nil
-	}
-
-	return nil, errors.New("Could not determine ip address")
 }
