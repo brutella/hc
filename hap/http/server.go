@@ -1,4 +1,4 @@
-package server
+package http
 
 import (
 	"github.com/brutella/hc/accessory"
@@ -37,7 +37,7 @@ type Config struct {
 	Emitter   event.Emitter
 }
 
-type hkServer struct {
+type server struct {
 	context  netio.HAPContext
 	database db.Database
 	device   netio.SecuredDevice
@@ -64,7 +64,7 @@ func NewServer(c Config) Server {
 
 	_, port, _ := net.SplitHostPort(ln.Addr().String())
 
-	s := hkServer{
+	s := server{
 		context:   c.Context,
 		database:  c.Database,
 		container: c.Container,
@@ -81,11 +81,11 @@ func NewServer(c Config) Server {
 	return &s
 }
 
-func (s *hkServer) ListenAndServe() error {
+func (s *server) ListenAndServe() error {
 	return s.listenAndServe(s.addrString(), s.mux, s.context)
 }
 
-func (s *hkServer) Stop() {
+func (s *server) Stop() {
 	for _, c := range s.context.ActiveConnections() {
 		c.Close()
 	}
@@ -93,12 +93,12 @@ func (s *hkServer) Stop() {
 	s.hapListener.Close()
 }
 
-func (s *hkServer) Port() string {
+func (s *server) Port() string {
 	return s.port
 }
 
 // listenAndServe returns a http.Server to listen on a specific address
-func (s *hkServer) listenAndServe(addr string, handler http.Handler, context netio.HAPContext) error {
+func (s *server) listenAndServe(addr string, handler http.Handler, context netio.HAPContext) error {
 	server := http.Server{Addr: addr, Handler: handler}
 	// Use a HAPTCPListener
 	listener := netio.NewHAPTCPListener(s.listener, context)
@@ -106,12 +106,12 @@ func (s *hkServer) listenAndServe(addr string, handler http.Handler, context net
 	return server.Serve(listener)
 }
 
-func (s *hkServer) addrString() string {
+func (s *server) addrString() string {
 	return ":" + s.port
 }
 
 // setupEndpoints creates controller objects to handle HAP endpoints
-func (s *hkServer) setupEndpoints() {
+func (s *server) setupEndpoints() {
 	containerController := controller.NewContainerController(s.container)
 	characteristicsController := controller.NewCharacteristicController(s.container)
 	pairingController := pair.NewPairingController(s.database)

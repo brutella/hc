@@ -10,8 +10,8 @@ import (
 	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/event"
+	"github.com/brutella/hc/hap/http"
 	"github.com/brutella/hc/netio"
-	"github.com/brutella/hc/server"
 	"github.com/brutella/hc/util"
 	"github.com/brutella/log"
 	"github.com/gosexy/to"
@@ -20,7 +20,7 @@ import (
 type ipTransport struct {
 	config  *Config
 	context netio.HAPContext
-	server  server.Server
+	server  http.Server
 	mutex   *sync.Mutex
 	mdns    *MDNSService
 
@@ -110,7 +110,7 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 func (t *ipTransport) Start() {
 
 	// Create server which handles incoming tcp connections
-	config := server.Config{
+	config := http.Config{
 		Port:      t.config.Port,
 		Context:   t.context,
 		Database:  t.database,
@@ -120,7 +120,7 @@ func (t *ipTransport) Start() {
 		Emitter:   t.emitter,
 	}
 
-	s := server.NewServer(config)
+	s := http.NewServer(config)
 	t.server = s
 
 	// Publish server port which might be different then `t.config.Port`

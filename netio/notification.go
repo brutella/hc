@@ -27,8 +27,6 @@ func New(a *accessory.Accessory, c *characteristic.Characteristic) (*http.Respon
 	resp.ContentLength = int64(body.Len())
 	resp.Header = map[string][]string{}
 	resp.Header.Set("Content-Type", HTTPContentTypeHAPJson)
-	// (brutella) Not sure if Date header must be set
-	// resp.Header.Set("Date", netio.CurrentRFC1123Date())
 
 	// Will be ignored unfortunately and won't be fixed https://github.com/golang/go/issues/9304
 	// Make sure to call FixProtocolSpecifier() instead
