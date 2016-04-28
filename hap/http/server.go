@@ -4,10 +4,10 @@ import (
 	"github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/event"
-	"github.com/brutella/hc/netio"
-	"github.com/brutella/hc/netio/controller"
-	"github.com/brutella/hc/netio/endpoint"
-	"github.com/brutella/hc/netio/pair"
+	"github.com/brutella/hc/hap"
+	"github.com/brutella/hc/hap/controller"
+	"github.com/brutella/hc/hap/endpoint"
+	"github.com/brutella/hc/hap/pair"
 
 	"log"
 	"net"
@@ -29,18 +29,18 @@ type Server interface {
 
 type Config struct {
 	Port      string
-	Context   netio.HAPContext
+	Context   hap.Context
 	Database  db.Database
 	Container *accessory.Container
-	Device    netio.SecuredDevice
+	Device    hap.SecuredDevice
 	Mutex     *sync.Mutex
 	Emitter   event.Emitter
 }
 
 type server struct {
-	context  netio.HAPContext
+	context  hap.Context
 	database db.Database
-	device   netio.SecuredDevice
+	device   hap.SecuredDevice
 	mux      *http.ServeMux
 
 	mutex     *sync.Mutex
@@ -48,7 +48,7 @@ type server struct {
 
 	port        string
 	listener    *net.TCPListener
-	hapListener *netio.HAPTCPListener
+	hapListener *hap.TCPListener
 
 	emitter event.Emitter
 }
@@ -98,10 +98,10 @@ func (s *server) Port() string {
 }
 
 // listenAndServe returns a http.Server to listen on a specific address
-func (s *server) listenAndServe(addr string, handler http.Handler, context netio.HAPContext) error {
+func (s *server) listenAndServe(addr string, handler http.Handler, context hap.Context) error {
 	server := http.Server{Addr: addr, Handler: handler}
-	// Use a HAPTCPListener
-	listener := netio.NewHAPTCPListener(s.listener, context)
+	// Use a TCPListener
+	listener := hap.NewTCPListener(s.listener, context)
 	s.hapListener = listener
 	return server.Serve(listener)
 }

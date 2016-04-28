@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/brutella/hc/hap"
+	"github.com/brutella/hc"
 	"github.com/brutella/hc/accessory"
 
 	"log"
@@ -14,8 +14,8 @@ func main() {
 	}
 	acc := accessory.NewSwitch(switchInfo)
 
-	config := hap.Config{Pin: "12344321", Port: "12345", StoragePath: "./db"}
-	t, err := hap.NewIPTransport(config, acc.Accessory)
+	config := hc.Config{Pin: "12344321", Port: "12345", StoragePath: "./db"}
+	t, err := hc.NewIPTransport(config, acc.Accessory)
 
 	if err != nil {
 		log.Fatal(err)
@@ -44,7 +44,7 @@ func main() {
 		}
 	}()
 
-	hap.OnTermination(func() {
+	hc.OnTermination(func() {
 		t.Stop()
 	})
 

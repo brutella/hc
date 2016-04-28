@@ -64,13 +64,13 @@ func main() {
 	}
 	acc := accessory.NewSwitch(info)
     
-    config := hap.Config{Pin: "00102003"}
-	t, err := hap.NewIPTransport(config, acc.Accessory)
+    config := hc.Config{Pin: "00102003"}
+	t, err := hc.NewIPTransport(config, acc.Accessory)
 	if err != nil {
 		log.Fatal(err)
 	}
     
-    hap.OnTermination(func(){
+    hc.OnTermination(func(){
         t.Stop()
     })
     

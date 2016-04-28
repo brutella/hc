@@ -18,4 +18,5 @@ const (
 	TypeWindow             AccessoryType = 13
 	TypeWindowCovering     AccessoryType = 14
 	TypeProgrammableSwitch AccessoryType = 15
+	TypeRangeExtender      AccessoryType = 16
 )
