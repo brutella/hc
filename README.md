@@ -54,7 +54,7 @@ package main
 
 import (
     "log"
-    "github.com/brutella/hc/hap"
+    "github.com/brutella/hc"
     "github.com/brutella/hc/accessory"
 )
 
