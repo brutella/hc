@@ -1,4 +1,4 @@
-package gen
+package golang
 
 import (
 	"bytes"
@@ -9,6 +9,8 @@ import (
 	"sort"
 	"strings"
 	"text/template"
+
+	"github.com/brutella/hc/gen"
 )
 
 // CharStructTemplate is template for a characteristic struct.
@@ -59,7 +61,7 @@ type Characteristic struct {
 	Consts []ConstDecl
 }
 
-func NewCharacteristic(char *CharacteristicMetadata) *Characteristic {
+func NewCharacteristic(char *gen.CharacteristicMetadata) *Characteristic {
 	data := Characteristic{
 		EmbeddedStructName: embeddedStructNames[char.Format],
 		FormatTypeName:     formatConstants[char.Format],
@@ -137,12 +139,12 @@ func (v ByValue) Swap(i, j int) {
 }
 
 // FileName returns the filename for a characteristic
-func FileName(char *CharacteristicMetadata) string {
+func FileName(char *gen.CharacteristicMetadata) string {
 	return fmt.Sprintf("%s.go", underscored(char.Name))
 }
 
 // CharacteristicGoCode returns the o code for a characteristic file
-func CharacteristicGoCode(char *CharacteristicMetadata) ([]byte, error) {
+func CharacteristicGoCode(char *gen.CharacteristicMetadata) ([]byte, error) {
 	var err error
 	var buf bytes.Buffer
 
@@ -192,7 +194,7 @@ var embeddedStructNames = map[string]string{
 }
 
 // isReadable returns true the characteristic contains the readable property
-func isReadable(char *CharacteristicMetadata) bool {
+func isReadable(char *gen.CharacteristicMetadata) bool {
 	for _, perm := range char.Properties {
 		if perm == "read" {
 			return true
@@ -203,7 +205,7 @@ func isReadable(char *CharacteristicMetadata) bool {
 }
 
 // defaultValue returns the default value of a characteristic, based on the characteristic format and properties (readable)
-func defaultValue(char *CharacteristicMetadata) interface{} {
+func defaultValue(char *gen.CharacteristicMetadata) interface{} {
 	if isReadable(char) == false {
 		return nil
 	}
@@ -241,11 +243,11 @@ func minifyUUID(s string) string {
 }
 
 // Return the name of the characteristic type name
-func typeName(char *CharacteristicMetadata) string {
+func typeName(char *gen.CharacteristicMetadata) string {
 	return "Type" + camelCased(char.Name)
 }
 
-func structName(char *CharacteristicMetadata) string {
+func structName(char *gen.CharacteristicMetadata) string {
 	return camelCased(char.Name)
 }
 
@@ -267,7 +269,7 @@ func camelCased(s string) string {
 	return strings.Replace(lowered, " ", "", -1)
 }
 
-func permissionDecl(char *CharacteristicMetadata) string {
+func permissionDecl(char *gen.CharacteristicMetadata) string {
 	var perms []string
 	for _, perm := range char.Properties {
 		switch perm {
@@ -288,7 +290,7 @@ func permissionDecl(char *CharacteristicMetadata) string {
 	return "[]string{" + strings.Join(perms, ",") + "}"
 }
 
-func unitName(char *CharacteristicMetadata) string {
+func unitName(char *gen.CharacteristicMetadata) string {
 	switch char.Unit {
 	case "percentage":
 		return "UnitPercentage"
@@ -301,7 +303,7 @@ func unitName(char *CharacteristicMetadata) string {
 	}
 }
 
-func constraints(char *CharacteristicMetadata) map[string]interface{} {
+func constraints(char *gen.CharacteristicMetadata) map[string]interface{} {
 	if char.Constraints != nil {
 		if constraints, ok := char.Constraints.(map[string]interface{}); ok == true {
 			return constraints
@@ -310,14 +312,14 @@ func constraints(char *CharacteristicMetadata) map[string]interface{} {
 	return nil
 }
 
-func constraintWithKey(char *CharacteristicMetadata, key string) interface{} {
+func constraintWithKey(char *gen.CharacteristicMetadata, key string) interface{} {
 	if constr := constraints(char); constr != nil {
 		return constr[key]
 	}
 	return nil
 }
 
-func constrainedValues(char *CharacteristicMetadata) map[string]interface{} {
+func constrainedValues(char *gen.CharacteristicMetadata) map[string]interface{} {
 	if values := constraintWithKey(char, "ValidValues"); values != nil {
 		return values.(map[string]interface{})
 	}
@@ -325,19 +327,19 @@ func constrainedValues(char *CharacteristicMetadata) map[string]interface{} {
 	return nil
 }
 
-func minValue(char *CharacteristicMetadata) interface{} {
+func minValue(char *gen.CharacteristicMetadata) interface{} {
 	return constraintWithKey(char, "MinimumValue")
 }
 
-func maxValue(char *CharacteristicMetadata) interface{} {
+func maxValue(char *gen.CharacteristicMetadata) interface{} {
 	return constraintWithKey(char, "MaximumValue")
 }
 
-func stepValue(char *CharacteristicMetadata) interface{} {
+func stepValue(char *gen.CharacteristicMetadata) interface{} {
 	return constraintWithKey(char, "StepValue")
 }
 
-func constDecls(char *CharacteristicMetadata) []ConstDecl {
+func constDecls(char *gen.CharacteristicMetadata) []ConstDecl {
 	if values := constrainedValues(char); values != nil {
 		name := camelCased(char.Name)
 		typ := constTypes[char.Format]

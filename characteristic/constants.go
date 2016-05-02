@@ -43,5 +43,6 @@ const (
 	FormatUInt32 = "uint32"
 	FormatInt32  = "int32"
 	FormatUInt64 = "uint64"
+	FormatData   = "data"
 	FormatTLV8   = "tlv8"
 )

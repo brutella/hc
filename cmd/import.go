@@ -1,3 +1,5 @@
+// +build ignore
+
 // Imports HomeKit metadata from a file and creates files for every characteristic and service.
 // It finishes by running `go fmt` in the characterist and service packages.
 //
@@ -9,6 +11,7 @@ package main
 import (
 	"encoding/json"
 	"github.com/brutella/hc/gen"
+	"github.com/brutella/hc/gen/golang"
 	"io/ioutil"
 	"log"
 	"os"
@@ -48,10 +51,10 @@ func main() {
 	// Create characteristic files
 	for _, char := range metadata.Characteristics {
 		log.Printf("Processing %s Characteristic", char.Name)
-		if b, err := gen.CharacteristicGoCode(char); err != nil {
+		if b, err := golang.CharacteristicGoCode(char); err != nil {
 			log.Println(err)
 		} else {
-			filePath := filepath.Join(CharPkgPath, gen.FileName(char))
+			filePath := filepath.Join(CharPkgPath, golang.FileName(char))
 			log.Println("Creating file", filePath)
 			if f, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666); err != nil {
 				log.Fatal(err)
@@ -66,10 +69,10 @@ func main() {
 	// Create service files
 	for _, svc := range metadata.Services {
 		log.Printf("Processing %s Service", svc.Name)
-		if b, err := gen.ServiceGoCode(svc, metadata.Characteristics); err != nil {
+		if b, err := golang.ServiceGoCode(svc, metadata.Characteristics); err != nil {
 			log.Println(err)
 		} else {
-			filePath := filepath.Join(SvcPkgPath, gen.ServiceFileName(svc))
+			filePath := filepath.Join(SvcPkgPath, golang.ServiceFileName(svc))
 			log.Println("Creating file", filePath)
 			if f, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666); err != nil {
 				log.Fatal(err)

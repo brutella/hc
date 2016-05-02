@@ -1,9 +1,11 @@
-package gen
+package golang
 
 import (
 	"bytes"
 	"fmt"
 	"text/template"
+
+	"github.com/brutella/hc/gen"
 )
 
 // ServiceStructTemplate is template for a service struct.
@@ -45,12 +47,12 @@ type Service struct {
 }
 
 // FileName returns the filename for a characteristic
-func ServiceFileName(svc *ServiceMetadata) string {
+func ServiceFileName(svc *gen.ServiceMetadata) string {
 	return fmt.Sprintf("%s.go", underscored(svc.Name))
 }
 
 // ServiceGoCode returns the o code for a characteristic file
-func ServiceGoCode(svc *ServiceMetadata, chars []*CharacteristicMetadata) ([]byte, error) {
+func ServiceGoCode(svc *gen.ServiceMetadata, chars []*gen.CharacteristicMetadata) ([]byte, error) {
 	var err error
 	var buf bytes.Buffer
 
@@ -71,11 +73,11 @@ func ServiceGoCode(svc *ServiceMetadata, chars []*CharacteristicMetadata) ([]byt
 }
 
 // Return the name of the characteristic type name
-func serviceTypeName(svc *ServiceMetadata) string {
+func serviceTypeName(svc *gen.ServiceMetadata) string {
 	return "Type" + camelCased(svc.Name)
 }
 
-func requiredCharacteristics(svc *ServiceMetadata, chars []*CharacteristicMetadata) []*Characteristic {
+func requiredCharacteristics(svc *gen.ServiceMetadata, chars []*gen.CharacteristicMetadata) []*Characteristic {
 	var required = []*Characteristic{}
 	for _, uuid := range svc.RequiredCharacteristics {
 		char := charWithUUID(uuid, chars)
@@ -86,7 +88,7 @@ func requiredCharacteristics(svc *ServiceMetadata, chars []*CharacteristicMetada
 	return required
 }
 
-func charWithUUID(uuid string, chars []*CharacteristicMetadata) *CharacteristicMetadata {
+func charWithUUID(uuid string, chars []*gen.CharacteristicMetadata) *gen.CharacteristicMetadata {
 	for _, char := range chars {
 		if char.UUID == uuid {
 			return char
