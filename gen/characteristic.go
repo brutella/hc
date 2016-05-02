@@ -165,7 +165,6 @@ var formatConstants = map[string]string{
 	"uint32": "FormatUInt32",
 	"int32":  "FormatInt32",
 	"uint64": "FormatUInt64",
-	"int64":  "FormatInt64",
 	"tlv8":   "FormatTLV8",
 }
 
@@ -178,7 +177,6 @@ var constTypes = map[string]string{
 	"uint32": "int",
 	"int32":  "int",
 	"uint64": "int",
-	"int64":  "int",
 	"tlv8":   "[]byte",
 }
 
@@ -190,7 +188,6 @@ var embeddedStructNames = map[string]string{
 	"uint16": "Int",
 	"uint32": "Int",
 	"int32":  "Int",
-	"int64":  "Int",
 	"tlv8":   "Bytes",
 }
 
@@ -216,7 +213,7 @@ func defaultValue(char *CharacteristicMetadata) interface{} {
 		return `""`
 	case "bool":
 		return "false"
-	case "int", "float", "uint8", "uint16", "uint32", "int32", "uint64", "int64":
+	case "int", "float", "uint8", "uint16", "uint32", "int32", "uint64":
 		if min := minValue(char); min != nil {
 			return min
 		}

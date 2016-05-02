@@ -138,7 +138,7 @@ func (c *Characteristic) updateValue(value interface{}, conn net.Conn) {
 	switch c.Format {
 	case FormatFloat:
 		value = c.boundFloat64Value(value.(float64))
-	case FormatUInt8, FormatUInt16, FormatUInt32, FormatUInt64, FormatInt32, FormatInt64:
+	case FormatUInt8, FormatUInt16, FormatUInt32, FormatUInt64, FormatInt32:
 		value = c.boundIntValue(value.(int))
 	}
 
