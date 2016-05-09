@@ -7,7 +7,7 @@
 You can use this library to make existing Home Automation devices HomeKit compatible. I've already developed the following HomeKit bridges with in:
 
 - [LIFX](https://github.com/brutella/hklifx/)
-- [UVR1611](https://github.com/brutella/hkuvr1611)
+- [UVR1611](https://github.com/brutella/hkuvr)
 - [Fronius Symo](https://github.com/brutella/hksymo)
 
 ## HomeKit on iOS
