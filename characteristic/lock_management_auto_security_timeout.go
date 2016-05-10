@@ -15,6 +15,7 @@ func NewLockManagementAutoSecurityTimeout() *LockManagementAutoSecurityTimeout {
 	char.SetMaxValue(86400)
 	char.SetStepValue(1)
 	char.SetValue(0)
+	char.Unit = UnitSeconds
 
 	return &LockManagementAutoSecurityTimeout{char}
 }

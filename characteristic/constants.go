@@ -31,6 +31,8 @@ const (
 	UnitPercentage = "percentage"
 	UnitArcDegrees = "arcdegrees"
 	UnitCelsius    = "celsius"
+	UnitLux        = "lux"
+	UnitSeconds    = "seconds"
 )
 
 // HAP characterisitic formats

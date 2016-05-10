@@ -10,6 +10,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/gen"
 )
 
@@ -291,16 +292,26 @@ func permissionDecl(char *gen.CharacteristicMetadata) string {
 }
 
 func unitName(char *gen.CharacteristicMetadata) string {
-	switch char.Unit {
-	case "percentage":
-		return "UnitPercentage"
-	case "arcdegrees":
-		return "UnitArcDegrees"
-	case "celsius":
-		return "UnitCelsius"
-	default:
+	if len(char.Unit) == 0 {
 		return ""
 	}
+
+	switch char.Unit {
+	case characteristic.UnitPercentage:
+		return "UnitPercentage"
+	case characteristic.UnitArcDegrees:
+		return "UnitArcDegrees"
+	case characteristic.UnitCelsius:
+		return "UnitCelsius"
+	case characteristic.UnitLux:
+		return "UnitLux"
+	case characteristic.UnitSeconds:
+		return "UnitSeconds"
+	default:
+		log.Fatalf("Could not find unit name for %s\n", char.Unit)
+	}
+
+	return ""
 }
 
 func constraints(char *gen.CharacteristicMetadata) map[string]interface{} {

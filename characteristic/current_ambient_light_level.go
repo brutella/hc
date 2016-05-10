@@ -15,6 +15,7 @@ func NewCurrentAmbientLightLevel() *CurrentAmbientLightLevel {
 	char.SetMaxValue(100000)
 	char.SetStepValue(0.0001)
 	char.SetValue(0.0001)
+	char.Unit = UnitLux
 
 	return &CurrentAmbientLightLevel{char}
 }
