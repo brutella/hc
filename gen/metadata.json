@@ -1,12 +1,89 @@
 {
+  "Categories" : [
+    {
+      "Name" : "Unknown",
+      "Category" : 0
+    },
+    {
+      "Name" : "Other",
+      "Category" : 1
+    },
+    {
+      "Name" : "Bridge",
+      "Category" : 2
+    },
+    {
+      "Name" : "Fan",
+      "Category" : 3
+    },
+    {
+      "Name" : "Garage Door Opener",
+      "Category" : 4
+    },
+    {
+      "Name" : "Lightbulb",
+      "Category" : 5
+    },
+    {
+      "Name" : "Door Lock",
+      "Category" : 6
+    },
+    {
+      "Name" : "Outlet",
+      "Category" : 7
+    },
+    {
+      "Name" : "Switch",
+      "Category" : 8
+    },
+    {
+      "Name" : "Thermostat",
+      "Category" : 9
+    },
+    {
+      "Name" : "Sensor",
+      "Category" : 10
+    },
+    {
+      "Name" : "Security System",
+      "Category" : 11
+    },
+    {
+      "Name" : "Door",
+      "Category" : 12
+    },
+    {
+      "Name" : "Window",
+      "Category" : 13
+    },
+    {
+      "Name" : "Window Covering",
+      "Category" : 14
+    },
+    {
+      "Name" : "Programmable Switch",
+      "Category" : 15
+    },
+    {
+      "Name" : "IP Camera",
+      "Category" : 17
+    }
+  ],
   "Characteristics" : [
     {
-      "Name" : "Accessory Identifier",
-      "UUID" : "00000057-0000-1000-8000-0026BB765291",
+      "Constraints" : {
+        "ValidBits" : {
+          "0" : "Additional Setup Required"
+        }
+      },
+      "Name" : "Accessory Flags",
+      "UUID" : "000000A6-0000-1000-8000-0026BB765291",
       "Properties" : [
-        "read"
+        "read",
+        "cnotify",
+        "uncnotify"
       ],
-      "Format" : "string",
+      "Format" : "uint32",
       "Permissions" : [
         "securedRead"
       ]
@@ -243,23 +320,6 @@
     },
     {
       "Constraints" : {
-        "StepValue" : 1,
-        "MaximumValue" : 16,
-        "MinimumValue" : 1
-      },
-      "Name" : "Category",
-      "UUID" : "000000A3-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "cnotify"
-      ],
-      "Format" : "uint16",
-      "Permissions" : [
-        "securedRead"
-      ]
-    },
-    {
-      "Constraints" : {
         "ValidValues" : {
           "0" : "Not Charging",
           "1" : "Charging"
@@ -272,29 +332,6 @@
         "cnotify"
       ],
       "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
-      ]
-    },
-    {
-      "Name" : "Configure Bridged Accessory",
-      "UUID" : "000000A0-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "write"
-      ],
-      "Format" : "tlv8",
-      "Permissions" : [
-        "securedWrite"
-      ]
-    },
-    {
-      "Name" : "Configure Bridged Accessory Status",
-      "UUID" : "0000009D-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "cnotify"
-      ],
-      "Format" : "tlv8",
       "Permissions" : [
         "securedRead"
       ]
@@ -471,19 +508,6 @@
       }
     },
     {
-      "Name" : "Current Time",
-      "UUID" : "0000009B-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "write"
-      ],
-      "Format" : "string",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
-      ]
-    },
-    {
       "Format" : "int32",
       "UUID" : "0000006E-0000-1000-8000-0026BB765291",
       "Properties" : [
@@ -502,53 +526,17 @@
       }
     },
     {
-      "Constraints" : {
-        "StepValue" : 1,
-        "MaximumValue" : 7,
-        "MinimumValue" : 1
-      },
-      "Name" : "Day of the Week",
-      "UUID" : "00000098-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "write"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
-      ]
-    },
-    {
-      "Constraints" : {
-        "ValidValues" : {
-          "0" : "Start Discovery",
-          "1" : "Stop Discovery"
-        }
-      },
-      "Name" : "Discover Bridged Accessories",
-      "UUID" : "0000009E-0000-1000-8000-0026BB765291",
+      "Name" : "Digital Zoom",
+      "UUID" : "0000011D-0000-1000-8000-0026BB765291",
       "Properties" : [
         "read",
         "write",
         "cnotify"
       ],
-      "Format" : "uint8",
+      "Format" : "float",
       "Permissions" : [
         "securedRead",
         "securedWrite"
-      ]
-    },
-    {
-      "Name" : "Discovered Bridged Accessories",
-      "UUID" : "0000009F-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "cnotify"
-      ],
-      "Format" : "uint16",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
@@ -636,6 +624,39 @@
       ]
     },
     {
+      "Name" : "Image Mirroring",
+      "UUID" : "0000011F-0000-1000-8000-0026BB765291",
+      "Properties" : [
+        "read",
+        "write",
+        "cnotify"
+      ],
+      "Format" : "bool",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ]
+    },
+    {
+      "Constraints" : {
+        "StepValue" : 90,
+        "MaximumValue" : 270,
+        "MinimumValue" : 0
+      },
+      "Name" : "Image Rotation",
+      "UUID" : "0000011E-0000-1000-8000-0026BB765291",
+      "Properties" : [
+        "read",
+        "write",
+        "cnotify"
+      ],
+      "Format" : "float",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ]
+    },
+    {
       "Constraints" : {
         "ValidValues" : {
           "0" : "Leak Not Detected",
@@ -648,23 +669,6 @@
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
-      ]
-    },
-    {
-      "Constraints" : {
-        "StepValue" : 1,
-        "MaximumValue" : 4,
-        "MinimumValue" : 1
-      },
-      "Name" : "Link Quality",
-      "UUID" : "0000009C-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "cnotify"
       ],
       "Format" : "uint8",
       "Permissions" : [
@@ -760,7 +764,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Format" : "uint8",
       "Permissions" : [
@@ -803,6 +808,20 @@
       ]
     },
     {
+      "Name" : "Mute",
+      "UUID" : "0000011A-0000-1000-8000-0026BB765291",
+      "Properties" : [
+        "read",
+        "write",
+        "cnotify"
+      ],
+      "Format" : "bool",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ]
+    },
+    {
       "Name" : "Motion Detected",
       "UUID" : "00000022-0000-1000-8000-0026BB765291",
       "Properties" : [
@@ -824,6 +843,20 @@
       "Format" : "string",
       "Permissions" : [
         "securedRead"
+      ]
+    },
+    {
+      "Name" : "Night Vision",
+      "UUID" : "0000011B-0000-1000-8000-0026BB765291",
+      "Properties" : [
+        "read",
+        "write",
+        "cnotify"
+      ],
+      "Format" : "bool",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
       ]
     },
     {
@@ -867,6 +900,20 @@
         "cnotify"
       ],
       "Format" : "bool",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ]
+    },
+    {
+      "Name" : "Optical Zoom",
+      "UUID" : "0000011C-0000-1000-8000-0026BB765291",
+      "Properties" : [
+        "read",
+        "write",
+        "cnotify"
+      ],
+      "Format" : "float",
       "Permissions" : [
         "securedRead",
         "securedWrite"
@@ -987,18 +1034,6 @@
       "Permissions" : [
         "securedRead",
         "securedWrite"
-      ]
-    },
-    {
-      "Name" : "Reachable",
-      "UUID" : "00000063-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "cnotify"
-      ],
-      "Format" : "bool",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
@@ -1123,6 +1158,19 @@
       ]
     },
     {
+      "Name" : "Selected Stream Configuration",
+      "UUID" : "00000117-0000-1000-8000-0026BB765291",
+      "Properties" : [
+        "read",
+        "write"
+      ],
+      "Format" : "tlv8",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ]
+    },
+    {
       "Name" : "Serial Number",
       "UUID" : "00000030-0000-1000-8000-0026BB765291",
       "Properties" : [
@@ -1131,6 +1179,20 @@
       "Format" : "string",
       "Permissions" : [
         "securedRead"
+      ]
+    },
+    {
+      "Name" : "Setup Endpoints",
+      "UUID" : "00000118-0000-1000-8000-0026BB765291",
+      "Properties" : [
+        "read",
+        "write",
+        "cnotify"
+      ],
+      "Format" : "tlv8",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
       ]
     },
     {
@@ -1176,6 +1238,12 @@
       ]
     },
     {
+      "Constraints" : {
+        "ValidValues" : {
+          "0" : "No Fault",
+          "1" : "General Fault"
+        }
+      },
       "Name" : "Status Fault",
       "UUID" : "00000077-0000-1000-8000-0026BB765291",
       "Properties" : [
@@ -1241,6 +1309,53 @@
         "uncnotify"
       ],
       "Format" : "uint8",
+      "Permissions" : [
+        "securedRead"
+      ]
+    },
+    {
+      "Name" : "Streaming Status",
+      "UUID" : "00000120-0000-1000-8000-0026BB765291",
+      "Properties" : [
+        "read",
+        "write",
+        "cnotify"
+      ],
+      "Format" : "tlv8",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ]
+    },
+    {
+      "Name" : "Supported Audio Stream Configuration",
+      "UUID" : "00000115-0000-1000-8000-0026BB765291",
+      "Properties" : [
+        "read"
+      ],
+      "Format" : "tlv8",
+      "Permissions" : [
+        "securedRead"
+      ]
+    },
+    {
+      "Name" : "Supported RTP Configuration",
+      "UUID" : "00000116-0000-1000-8000-0026BB765291",
+      "Properties" : [
+        "read"
+      ],
+      "Format" : "tlv8",
+      "Permissions" : [
+        "securedRead"
+      ]
+    },
+    {
+      "Name" : "Supported Video Stream Configuration",
+      "UUID" : "00000114-0000-1000-8000-0026BB765291",
+      "Properties" : [
+        "read"
+      ],
+      "Format" : "tlv8",
       "Permissions" : [
         "securedRead"
       ]
@@ -1408,73 +1523,6 @@
       ]
     },
     {
-      "Name" : "Time Update",
-      "UUID" : "0000009A-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "cnotify"
-      ],
-      "Format" : "bool",
-      "Permissions" : [
-        "securedRead"
-      ]
-    },
-    {
-      "Name" : "Tunnel Connection Timeout ",
-      "UUID" : "00000061-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "write",
-        "read",
-        "cnotify"
-      ],
-      "Format" : "uint32",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
-      ]
-    },
-    {
-      "Name" : "Tunneled Accessory Advertising",
-      "UUID" : "00000060-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "write",
-        "read",
-        "cnotify"
-      ],
-      "Format" : "bool",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
-      ]
-    },
-    {
-      "Name" : "Tunneled Accessory Connected",
-      "UUID" : "00000059-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "write",
-        "read",
-        "cnotify"
-      ],
-      "Format" : "bool",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
-      ]
-    },
-    {
-      "Name" : "Tunneled Accessory State Number",
-      "UUID" : "00000058-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "cnotify"
-      ],
-      "Format" : "float",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
-      ]
-    },
-    {
       "Name" : "Version",
       "UUID" : "00000037-0000-1000-8000-0026BB765291",
       "Properties" : [
@@ -1485,6 +1533,26 @@
       "Permissions" : [
         "securedRead"
       ]
+    },
+    {
+      "Format" : "float",
+      "UUID" : "00000119-0000-1000-8000-0026BB765291",
+      "Properties" : [
+        "read",
+        "write",
+        "cnotify"
+      ],
+      "Name" : "Volume",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
+      "Unit" : "percentage",
+      "Constraints" : {
+        "StepValue" : 1,
+        "MaximumValue" : 100,
+        "MinimumValue" : 0
+      }
     }
   ],
   "Version" : "1.0",
@@ -1495,7 +1563,8 @@
         "00000020-0000-1000-8000-0026BB765291",
         "00000021-0000-1000-8000-0026BB765291",
         "00000023-0000-1000-8000-0026BB765291",
-        "00000030-0000-1000-8000-0026BB765291"
+        "00000030-0000-1000-8000-0026BB765291",
+        "000000A6-0000-1000-8000-0026BB765291"
       ],
       "OptionalCharacteristics" : [
         "00000052-0000-1000-8000-0026BB765291",
@@ -1535,29 +1604,37 @@
     },
     {
       "RequiredCharacteristics" : [
-        "0000009D-0000-1000-8000-0026BB765291",
-        "0000009E-0000-1000-8000-0026BB765291",
-        "0000009F-0000-1000-8000-0026BB765291",
-        "000000A0-0000-1000-8000-0026BB765291"
+        "00000025-0000-1000-8000-0026BB765291"
       ],
       "OptionalCharacteristics" : [
-
+        "0000006C-0000-1000-8000-0026BB765291",
+        "0000006E-0000-1000-8000-0026BB765291",
+        "0000007B-0000-1000-8000-0026BB765291",
+        "0000007D-0000-1000-8000-0026BB765291",
+        "0000011B-0000-1000-8000-0026BB765291",
+        "0000011C-0000-1000-8000-0026BB765291",
+        "0000011D-0000-1000-8000-0026BB765291",
+        "0000011E-0000-1000-8000-0026BB765291",
+        "0000011F-0000-1000-8000-0026BB765291",
+        "00000023-0000-1000-8000-0026BB765291"
       ],
-      "Name" : "Bridge Configuration",
-      "UUID" : "000000A1-0000-1000-8000-0026BB765291"
+      "Name" : "Camera Control",
+      "UUID" : "00000111-0000-1000-8000-0026BB765291"
     },
     {
       "RequiredCharacteristics" : [
-        "00000063-0000-1000-8000-0026BB765291",
-        "0000009C-0000-1000-8000-0026BB765291",
-        "00000057-0000-1000-8000-0026BB765291",
-        "000000A3-0000-1000-8000-0026BB765291"
+        "00000114-0000-1000-8000-0026BB765291",
+        "00000115-0000-1000-8000-0026BB765291",
+        "00000116-0000-1000-8000-0026BB765291",
+        "00000117-0000-1000-8000-0026BB765291",
+        "00000120-0000-1000-8000-0026BB765291",
+        "00000118-0000-1000-8000-0026BB765291"
       ],
       "OptionalCharacteristics" : [
         "00000023-0000-1000-8000-0026BB765291"
       ],
-      "Name" : "Bridging State",
-      "UUID" : "00000062-0000-1000-8000-0026BB765291"
+      "Name" : "Camera RTP Stream Management",
+      "UUID" : "00000110-0000-1000-8000-0026BB765291"
     },
     {
       "RequiredCharacteristics" : [
@@ -1618,6 +1695,18 @@
       ],
       "Name" : "Door",
       "UUID" : "00000081-0000-1000-8000-0026BB765291"
+    },
+    {
+      "RequiredCharacteristics" : [
+        "00000073-0000-1000-8000-0026BB765291"
+      ],
+      "OptionalCharacteristics" : [
+        "00000008-0000-1000-8000-0026BB765291",
+        "00000119-0000-1000-8000-0026BB765291",
+        "00000023-0000-1000-8000-0026BB765291"
+      ],
+      "Name" : "Doorbell",
+      "UUID" : "00000121-0000-1000-8000-0026BB765291"
     },
     {
       "RequiredCharacteristics" : [
@@ -1727,10 +1816,18 @@
         "00000023-0000-1000-8000-0026BB765291"
       ],
       "Name" : "Lock Mechanism",
-      "UUID" : "00000045-0000-1000-8000-0026BB765291",
-      "IncludedServices" : [
-        "00000044-0000-1000-8000-0026BB765291"
-      ]
+      "UUID" : "00000045-0000-1000-8000-0026BB765291"
+    },
+    {
+      "RequiredCharacteristics" : [
+        "0000011A-0000-1000-8000-0026BB765291"
+      ],
+      "OptionalCharacteristics" : [
+        "00000119-0000-1000-8000-0026BB765291",
+        "00000023-0000-1000-8000-0026BB765291"
+      ],
+      "Name" : "Microphone",
+      "UUID" : "00000112-0000-1000-8000-0026BB765291"
     },
     {
       "RequiredCharacteristics" : [
@@ -1801,6 +1898,17 @@
     },
     {
       "RequiredCharacteristics" : [
+        "0000011A-0000-1000-8000-0026BB765291"
+      ],
+      "OptionalCharacteristics" : [
+        "00000119-0000-1000-8000-0026BB765291",
+        "00000023-0000-1000-8000-0026BB765291"
+      ],
+      "Name" : "Speaker",
+      "UUID" : "00000113-0000-1000-8000-0026BB765291"
+    },
+    {
+      "RequiredCharacteristics" : [
         "00000073-0000-1000-8000-0026BB765291",
         "00000074-0000-1000-8000-0026BB765291"
       ],
@@ -1861,33 +1969,6 @@
       ],
       "Name" : "Thermostat",
       "UUID" : "0000004A-0000-1000-8000-0026BB765291"
-    },
-    {
-      "RequiredCharacteristics" : [
-        "0000009B-0000-1000-8000-0026BB765291",
-        "00000098-0000-1000-8000-0026BB765291",
-        "0000009A-0000-1000-8000-0026BB765291"
-      ],
-      "OptionalCharacteristics" : [
-
-      ],
-      "Name" : "Time Information",
-      "UUID" : "00000099-0000-1000-8000-0026BB765291"
-    },
-    {
-      "RequiredCharacteristics" : [
-        "00000023-0000-1000-8000-0026BB765291",
-        "00000057-0000-1000-8000-0026BB765291",
-        "00000058-0000-1000-8000-0026BB765291",
-        "00000059-0000-1000-8000-0026BB765291",
-        "00000060-0000-1000-8000-0026BB765291",
-        "00000061-0000-1000-8000-0026BB765291"
-      ],
-      "OptionalCharacteristics" : [
-
-      ],
-      "Name" : "Tunneled BTLE Accessory Service",
-      "UUID" : "00000056-0000-1000-8000-0026BB765291"
     },
     {
       "RequiredCharacteristics" : [

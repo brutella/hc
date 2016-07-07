@@ -1,6 +1,11 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
+const (
+	StatusFaultNoFault      int = 0
+	StatusFaultGeneralFault int = 1
+)
+
 const TypeStatusFault = "77"
 
 type StatusFault struct {

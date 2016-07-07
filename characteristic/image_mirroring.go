@@ -1,18 +1,18 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeMute = "11A"
+const TypeImageMirroring = "11F"
 
-type Mute struct {
+type ImageMirroring struct {
 	*Bool
 }
 
-func NewMute() *Mute {
-	char := NewBool(TypeMute)
+func NewImageMirroring() *ImageMirroring {
+	char := NewBool(TypeImageMirroring)
 	char.Format = FormatBool
 	char.Perms = []string{PermRead, PermWrite, PermEvents}
 
 	char.SetValue(false)
 
-	return &Mute{char}
+	return &ImageMirroring{char}
 }

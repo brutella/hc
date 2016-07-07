@@ -1,18 +1,18 @@
 // THIS FILE IS AUTO-GENERATED
 package characteristic
 
-const TypeMute = "11A"
+const TypeNightVision = "11B"
 
-type Mute struct {
+type NightVision struct {
 	*Bool
 }
 
-func NewMute() *Mute {
-	char := NewBool(TypeMute)
+func NewNightVision() *NightVision {
+	char := NewBool(TypeNightVision)
 	char.Format = FormatBool
 	char.Perms = []string{PermRead, PermWrite, PermEvents}
 
 	char.SetValue(false)
 
-	return &Mute{char}
+	return &NightVision{char}
 }

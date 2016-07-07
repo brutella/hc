@@ -3,6 +3,7 @@ package accessory
 type AccessoryType int
 
 const (
+	TypeUnknown            AccessoryType = 0
 	TypeOther              AccessoryType = 1
 	TypeBridge             AccessoryType = 2
 	TypeFan                AccessoryType = 3
@@ -18,5 +19,5 @@ const (
 	TypeWindow             AccessoryType = 13
 	TypeWindowCovering     AccessoryType = 14
 	TypeProgrammableSwitch AccessoryType = 15
-	TypeRangeExtender      AccessoryType = 16
+	TypeIPCamera           AccessoryType = 17
 )
