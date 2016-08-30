@@ -10,12 +10,11 @@ const TypeAccessoryInformation = "3E"
 type AccessoryInformation struct {
 	*Service
 
-	Identify       *characteristic.Identify
-	Manufacturer   *characteristic.Manufacturer
-	Model          *characteristic.Model
-	Name           *characteristic.Name
-	SerialNumber   *characteristic.SerialNumber
-	AccessoryFlags *characteristic.AccessoryFlags
+	Identify     *characteristic.Identify
+	Manufacturer *characteristic.Manufacturer
+	Model        *characteristic.Model
+	Name         *characteristic.Name
+	SerialNumber *characteristic.SerialNumber
 }
 
 func NewAccessoryInformation() *AccessoryInformation {
@@ -36,9 +35,6 @@ func NewAccessoryInformation() *AccessoryInformation {
 
 	svc.SerialNumber = characteristic.NewSerialNumber()
 	svc.AddCharacteristic(svc.SerialNumber.Characteristic)
-
-	svc.AccessoryFlags = characteristic.NewAccessoryFlags()
-	svc.AddCharacteristic(svc.AccessoryFlags.Characteristic)
 
 	return &svc
 }

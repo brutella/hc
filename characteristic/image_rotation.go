@@ -15,6 +15,7 @@ func NewImageRotation() *ImageRotation {
 	char.SetMaxValue(270)
 	char.SetStepValue(90)
 	char.SetValue(0)
+	char.Unit = UnitArcDegrees
 
 	return &ImageRotation{char}
 }

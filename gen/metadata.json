@@ -639,23 +639,24 @@
       ]
     },
     {
-      "Constraints" : {
-        "StepValue" : 90,
-        "MaximumValue" : 270,
-        "MinimumValue" : 0
-      },
-      "Name" : "Image Rotation",
+      "Format" : "float",
       "UUID" : "0000011E-0000-1000-8000-0026BB765291",
       "Properties" : [
         "read",
         "write",
         "cnotify"
       ],
-      "Format" : "float",
+      "Name" : "Image Rotation",
       "Permissions" : [
         "securedRead",
         "securedWrite"
-      ]
+      ],
+      "Unit" : "arcdegrees",
+      "Constraints" : {
+        "StepValue" : 90,
+        "MaximumValue" : 270,
+        "MinimumValue" : 0
+      }
     },
     {
       "Constraints" : {
