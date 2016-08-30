@@ -1,31 +1,12 @@
 package chacha20poly1305
 
 import (
-	"encoding/binary"
 	"encoding/hex"
-	"github.com/codahale/chacha20"
 	"reflect"
 	"testing"
+
+	"github.com/codahale/chacha20"
 )
-
-func TestAddBytesMod8(t *testing.T) {
-	b := []byte{}
-	add := []byte{0xFF}
-
-	if x := AddBytes(b, add, 8); reflect.DeepEqual(x, []byte{0xFF, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}) == false {
-		t.Fatal(x)
-	}
-}
-
-func TestAddBytesMod8FromUint64(t *testing.T) {
-	b := []byte{}
-	add := make([]byte, 8)
-	binary.LittleEndian.PutUint64(add, uint64(1)) // [0x1 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0]
-
-	if x := AddBytes(b, add, 8); reflect.DeepEqual(x, []byte{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}) == false {
-		t.Fatal(x)
-	}
-}
 
 // Test how and if de-/encoding works with chacha20 - surprise it works
 func TestChacha20(t *testing.T) {
