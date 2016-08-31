@@ -142,7 +142,7 @@ func getFirstLocalIPAddr() (net.IP, error) {
 		case *net.IPAddr:
 			ip = v.IP
 		}
-		if ip == nil || ip.IsLoopback() {
+		if ip == nil || ip.IsLoopback() || ip.IsUnspecified() {
 			continue
 		}
 		ip = ip.To4()
