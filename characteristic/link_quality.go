@@ -4,11 +4,11 @@ package characteristic
 const TypeLinkQuality = "9C"
 
 type LinkQuality struct {
-	*Int
+	*UInt8
 }
 
 func NewLinkQuality() *LinkQuality {
-	char := NewInt(TypeLinkQuality)
+	char := NewUInt8(TypeLinkQuality)
 	char.Format = FormatUInt8
 	char.Perms = []string{PermRead, PermEvents}
 	char.SetMinValue(1)

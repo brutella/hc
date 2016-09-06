@@ -31,6 +31,8 @@ type Characteristic struct {
 
 	connValueUpdateFuncs []ConnChangeFunc
 	valueChangeFuncs     []ChangeFunc
+	
+	AccessoryID	int64 `json:"-"`	// 'parent'
 }
 
 // writeOnlyPerms returns true when permissions only include write permission
@@ -49,6 +51,16 @@ func noWritePerms(permissions []string) bool {
 		}
 	}
 	return true
+}
+
+// hasEvents returns true when permissions include events
+func hasEvents(permissions []string) bool {
+	for _, value := range permissions {
+		if value == PermEvents {
+			return true
+		}
+	}
+	return false
 }
 
 // NewCharacteristic returns a characteristic
@@ -81,6 +93,12 @@ func (c *Characteristic) EventsEnabled() bool {
 	return c.Events
 }
 
+
+// Activate events for this characteristic if it contains events
+func (c *Characteristic) ActivateEvents() {
+	c.Events = hasEvents(c.Perms)
+}
+
 func (c *Characteristic) OnValueUpdate(fn ChangeFunc) {
 	c.valueChangeFuncs = append(c.valueChangeFuncs, fn)
 }
@@ -108,8 +126,61 @@ func (c *Characteristic) SetID(id int64) {
 	c.ID = id
 }
 
+// Set parent accessory ID
+func (c *Characteristic) SetAccessoryID(id int64) {
+	c.AccessoryID = id
+}
+
+// Set characteristic permissions
+func (c *Characteristic) SetPerms(perms []string) {
+	c.Perms = perms
+}
+
+// Set characteristic description
+func (c *Characteristic) SetDescription(description string) {
+	c.Description = description
+}
+
+// Set characteristic format
+func (c *Characteristic) SetFormat(format string) {
+	c.Format = format
+}
+
+// Set characteristic units
+func (c *Characteristic) SetUnit(unit string) {
+	if unit != "" {
+		c.Unit = unit
+	}
+}
+
+// Set characteristic minimum value
+func (c *Characteristic) SetMinValue(minValue interface{}) {
+	if minValue != nil {
+		c.MinValue = minValue
+	}
+}
+
+// Set characteristic maximum value
+func (c *Characteristic) SetMaxValue(maxValue interface{}) {
+	if maxValue != nil {
+		c.MaxValue = maxValue
+	}
+}
+
+// Set characteristic step value
+func (c *Characteristic) SetStepValue(stepValue interface{}) {
+	if stepValue != nil {
+		c.StepValue = stepValue
+	}
+}
+
 func (c *Characteristic) GetID() int64 {
 	return c.ID
+}
+
+// Return the ID of the parent accessory
+func (c *Characteristic) GetAccessoryID() int64 {
+	return c.AccessoryID
 }
 
 // Private
@@ -134,13 +205,20 @@ func (c *Characteristic) updateValue(value interface{}, conn net.Conn) {
 		}
 	}
 
+	// TODO: All the int/uint's must be split into their 'true' data-types. Cannot gurantee that a UInt64 can fit into
+	// an 'int' on all platforms
 	// Value must be within min and max
 	switch c.Format {
 	case FormatFloat:
 		value = c.boundFloat64Value(value.(float64))
-	case FormatUInt8, FormatUInt16, FormatUInt32, FormatUInt64, FormatInt32:
+	case FormatUInt8:
+		value = c.boundUInt8Value(value.(uint8))
+	case FormatUInt16:
+		value = c.boundUInt16Value(value.(uint16))
+	case FormatUInt32, FormatUInt64, FormatInt32:
 		value = c.boundIntValue(value.(int))
 	}
+
 
 	// Ignore when new value is same
 	if c.Value == value {
@@ -181,6 +259,30 @@ func (c *Characteristic) onValueUpdateFromConn(funcs []ConnChangeFunc, conn net.
 func (c *Characteristic) boundFloat64Value(value float64) interface{} {
 	min, minOK := c.MinValue.(float64)
 	max, maxOK := c.MaxValue.(float64)
+	if maxOK == true && value > max {
+		value = max
+	} else if minOK == true && value < min {
+		value = min
+	}
+
+	return value
+}
+
+func (c *Characteristic) boundUInt8Value(value uint8) interface{} {
+	min, minOK := c.MinValue.(uint8)
+	max, maxOK := c.MaxValue.(uint8)
+	if maxOK == true && value > max {
+		value = max
+	} else if minOK == true && value < min {
+		value = min
+	}
+
+	return value
+}
+
+func (c *Characteristic) boundUInt16Value(value uint16) interface{} {
+	min, minOK := c.MinValue.(uint16)
+	max, maxOK := c.MaxValue.(uint16)
 	if maxOK == true && value > max {
 		value = max
 	} else if minOK == true && value < min {

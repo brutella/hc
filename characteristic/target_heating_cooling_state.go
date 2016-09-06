@@ -11,11 +11,11 @@ const (
 const TypeTargetHeatingCoolingState = "33"
 
 type TargetHeatingCoolingState struct {
-	*Int
+	*UInt8
 }
 
 func NewTargetHeatingCoolingState() *TargetHeatingCoolingState {
-	char := NewInt(TypeTargetHeatingCoolingState)
+	char := NewUInt8(TypeTargetHeatingCoolingState)
 	char.Format = FormatUInt8
 	char.Perms = []string{PermRead, PermWrite, PermEvents}
 

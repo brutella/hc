@@ -2,6 +2,7 @@ package accessory
 
 import (
 	"github.com/brutella/hc/service"
+	"github.com/brutella/hc/characteristic"
 )
 
 type Info struct {
@@ -71,6 +72,25 @@ func New(info Info, typ AccessoryType) *Accessory {
 	return acc
 }
 
+// NewEx returns an accessory that contains a default AccessoryInformation.
+func NewEx(typ AccessoryType) *Accessory {
+	svc := service.NewAccessoryInformation()
+
+	acc := &Accessory{
+		idCount: 1,
+		Info:    svc,
+		Type:    typ,
+	}
+
+	acc.AddService(acc.Info.Service)
+
+	svc.Identify.OnValueRemoteUpdate(func(value bool) {
+		acc.Identify()
+	})
+
+	return acc	
+}
+
 func (a *Accessory) SetID(id int64) {
 	a.ID = id
 }
@@ -108,6 +128,43 @@ func (a *Accessory) AddService(s *service.Service) {
 	}
 
 	a.Services = append(a.Services, s)
+}
+
+// Add a service to the accessory. IDs are not updated
+func (a *Accessory) AddServiceEx(s *service.Service) {
+	if s.Type == service.TypeAccessoryInformation {
+		for _, char := range s.Characteristics {
+			if char.Type == characteristic.TypeManufacturer {
+				if val := char.Value.(string); len(val) > 0 {
+					a.Info.Manufacturer.SetValue(val)
+				} else {
+					a.Info.Manufacturer.SetValue("undefined")
+				}
+			} else if char.Type == characteristic.TypeModel {
+				if val := char.Value.(string); len(val) > 0 {
+					a.Info.Model.SetValue(val)
+				} else {
+					a.Info.Model.SetValue("undefined")
+				}
+			} else if char.Type == characteristic.TypeName {
+				if val := char.Value.(string); len(val) > 0 {
+					a.Info.Name.SetValue(val)
+				} else {
+					a.Info.Name.SetValue("undefined")
+				}
+			} else if char.Type == characteristic.TypeSerialNumber {
+				if val := char.Value.(string); len(val) > 0 {
+					a.Info.SerialNumber.SetValue(val)
+				} else {
+					a.Info.SerialNumber.SetValue("undefined")
+				}
+			} else if char.Type == characteristic.TypeIdentify {
+				// @mikejac: since this is a "remote" accessory, identify has no meaning here
+			}
+		}
+	} else {
+		a.Services = append(a.Services, s)
+	}
 }
 
 // Equal returns true when receiver has the same services and id as the argument.

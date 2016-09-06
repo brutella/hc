@@ -94,6 +94,16 @@ func (ctr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader, co
 	return err
 }
 
+// GetCharacteristic returns the accessory identified by the accessory id aid
+func (ctr *CharacteristicController) GetAccessory(aid int64) *accessory.Accessory {
+	for _, a := range ctr.container.Accessories {
+		if a.GetID() == aid {
+			return a
+		}
+	}
+	return nil
+}
+
 // GetCharacteristic returns the characteristic identified by the accessory id aid and characteristic id iid
 func (ctr *CharacteristicController) GetCharacteristic(aid int64, iid int64) *characteristic.Characteristic {
 	for _, a := range ctr.container.Accessories {

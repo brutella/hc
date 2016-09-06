@@ -4,11 +4,11 @@ package characteristic
 const TypeCategory = "A3"
 
 type Category struct {
-	*Int
+	*UInt16
 }
 
 func NewCategory() *Category {
-	char := NewInt(TypeCategory)
+	char := NewUInt16(TypeCategory)
 	char.Format = FormatUInt16
 	char.Perms = []string{PermRead, PermEvents}
 	char.SetMinValue(1)

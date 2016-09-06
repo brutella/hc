@@ -3,6 +3,7 @@ package hc
 import (
 	"errors"
 	"bytes"
+	"os"
 	"io/ioutil"
 	"net"
 	"sync"
@@ -18,7 +19,7 @@ import (
 	"github.com/gosexy/to"
 )
 
-type ipTransport struct {
+type ipTransportAlt struct {
 	config  *Config
 	context hap.Context
 	server  http.Server
@@ -35,7 +36,7 @@ type ipTransport struct {
 	emitter event.Emitter
 }
 
-// NewIPTransport creates a transport to provide accessories over IP.
+// NewIPTransportAlt creates a transport to provide accessories over IP.
 //
 // The IP transports stores the crypto keys inside a database, which
 // is by default inside a folder at the current working directory.
@@ -51,15 +52,23 @@ type ipTransport struct {
 // The transport is secured with an 8-digit pin, which must be entered
 // by an iOS client to successfully pair with the accessory. If the
 // provided transport config does not specify any pin, 00102003 is used.
-func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
+func NewIPTransportAlt(config Config, nodename string, a *accessory.Accessory) (Transport, error) {
 	// Find transport name which is visible in mDNS
 	name := a.Info.Name.GetValue()
 	if len(name) == 0 {
-		log.Fatal("Invalid empty name for first accessory")
+		return nil, errors.New("invalid empty name for first accessory")
 	}
 
 	cfg := defaultConfig(name)
 	cfg.merge(config)
+	cfg.StoragePath = cfg.StoragePath  + "/" + nodename
+
+	// Create a directory for this node
+    if _, err := os.Stat(cfg.StoragePath); os.IsNotExist(err) {
+		if err = os.MkdirAll(cfg.StoragePath, 0777); err != nil {
+			return nil, err
+		}
+    }
 
 	storage, err := util.NewFileStorage(cfg.StoragePath)
 	if err != nil {
@@ -77,7 +86,7 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 
 	device, err := hap.NewSecuredDevice(cfg.id, hap_pin, database)
 
-	t := &ipTransport{
+	t := &ipTransportAlt{
 		storage:   storage,
 		database:  database,
 		device:    device,
@@ -89,43 +98,39 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 	}
 
 	t.addAccessory(a)
-	for _, a := range as {
-		t.addAccessory(a)
-	}
-
-	// Users can only pair discoverable accessories
-	if t.isPaired() {
-		cfg.discoverable = false
-	}
-
-	cfg.categoryId = int(t.container.AccessoryType())
-	cfg.updateConfigHash(t.container.ContentHash())
-	cfg.save(storage)
-
-	// Listen for events to update mDNS txt records
-	t.emitter.AddListener(t)
 
 	return t, err
 }
 
-// Add an accessory to the transport - not valid for this transport
-func (t *ipTransport) AddAccessory(a *accessory.Accessory) error {
-	// not permited - do nothing
-	return errors.New("not permitted for this type of transport")
+// Add an accessory to the transport - must be done before the transport is started
+func (t *ipTransportAlt) AddAccessory(a *accessory.Accessory) error {
+	t.addAccessory(a)
 	
+	return nil
 }
 
 // Returns accessory that have the specified id
-func (t *ipTransport) GetAccessoryByID(aid int64) (a *accessory.Accessory) {
+func (t *ipTransportAlt) GetAccessoryByID(aid int64) (a *accessory.Accessory) {
 	return t.container.GetAccessoryByID(aid)
 }
 
 // Get the container holding all the accessories
-func (t *ipTransport) GetContainer() (container *accessory.Container) {
+func (t *ipTransportAlt) GetContainer() (container *accessory.Container) {
 	return t.container
 }
 
-func (t *ipTransport) Start() {
+func (t *ipTransportAlt) Start() {
+	// Users can only pair discoverable accessories
+	if t.isPaired() {
+		t.config.discoverable = false
+	}
+
+	t.config.categoryId = int(t.container.AccessoryType())
+	t.config.updateConfigHash(t.container.ContentHash())
+	t.config.save(t.storage)
+
+	// Listen for events to update mDNS txt records
+	t.emitter.AddListener(t)
 
 	// Create server which handles incoming tcp connections
 	config := http.Config{
@@ -150,30 +155,32 @@ func (t *ipTransport) Start() {
 	mdns.Publish()
 
 	// Publish accessory ip
-	log.Println("[INFO] Accessory IP is", t.config.IP)
+	log.Printf("[INFO] Accessory IP is %s:%d", t.config.IP, t.config.servePort)
 
 	// Listen until server.Stop() is called
 	s.ListenAndServe()
 }
 
 // Stop stops the ip transport by unpublishing the mDNS service.
-func (t *ipTransport) Stop() {
+func (t *ipTransportAlt) Stop() {
 	if t.mdns != nil {
+		log.Printf("[INFO] Stop mDNS")
 		t.mdns.Stop()
 	}
 
 	if t.server != nil {
+		log.Printf("[INFO] Stop server. Accessory IP is %s:%d", t.config.IP, t.config.servePort)
 		t.server.Stop()
 	}
 }
 
 // Delete data related to this transport from disk
-func (t *ipTransport) RemoveFromDisk() error {
+func (t *ipTransportAlt) RemoveFromDisk() error {
 	return nil
 }
 
 // isPaired returns true when the transport is already paired
-func (t *ipTransport) isPaired() bool {
+func (t *ipTransportAlt) isPaired() bool {
 
 	// If more than one entity is stored in the database, we are paired with a device.
 	// The transport itself is a device and is stored in the database, therefore
@@ -185,22 +192,23 @@ func (t *ipTransport) isPaired() bool {
 	return false
 }
 
-func (t *ipTransport) updateMDNSReachability() {
+func (t *ipTransportAlt) updateMDNSReachability() {
 	if mdns := t.mdns; mdns != nil {
 		t.config.discoverable = t.isPaired() == false
 		mdns.Update()
 	}
 }
 
-func (t *ipTransport) addAccessory(a *accessory.Accessory) {
+func (t *ipTransportAlt) addAccessory(a *accessory.Accessory) {
 	t.container.AddAccessory(a)
-
+	
 	for _, s := range a.Services {
 		for _, c := range s.Characteristics {
 			// When a characteristic value changes and events are enabled for this characteristic
 			// all listeners are notified. Since we don't track which client is interested in
 			// which characteristic change event, we send them to all active connections.
 			onConnChange := func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
+				log.Printf("[VERB] onConnChange")
 				if c.Events == true {
 					t.notifyListener(a, c, conn)
 				}
@@ -208,7 +216,9 @@ func (t *ipTransport) addAccessory(a *accessory.Accessory) {
 			c.OnValueUpdateFromConn(onConnChange)
 
 			onChange := func(c *characteristic.Characteristic, new, old interface{}) {
+				log.Printf("[VERB] onChange")
 				if c.Events == true {
+					log.Printf("[VERB] onChange; c.Events == true")
 					t.notifyListener(a, c, nil)
 				}
 			}
@@ -217,7 +227,7 @@ func (t *ipTransport) addAccessory(a *accessory.Accessory) {
 	}
 }
 
-func (t *ipTransport) notifyListener(a *accessory.Accessory, c *characteristic.Characteristic, except net.Conn) {
+func (t *ipTransportAlt) notifyListener(a *accessory.Accessory, c *characteristic.Characteristic, except net.Conn) {
 	conns := t.context.ActiveConnections()
 	for _, conn := range conns {
 		if conn == except {
@@ -240,7 +250,7 @@ func (t *ipTransport) notifyListener(a *accessory.Accessory, c *characteristic.C
 }
 
 // Handles event which are sent when pairing with a device is added or removed
-func (t *ipTransport) Handle(ev interface{}) {
+func (t *ipTransportAlt) Handle(ev interface{}) {
 	switch ev.(type) {
 	case event.DevicePaired:
 		log.Printf("[INFO] Event: paired with device")

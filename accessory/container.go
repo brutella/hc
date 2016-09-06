@@ -24,9 +24,27 @@ func NewContainer() *Container {
 // AddAccessory adds an accessory to the container.
 // This method ensures that the accessory ids are valid and unique withing the container.
 func (m *Container) AddAccessory(a *Accessory) {
+	// set aid for all 'child' characteristics
+	for _, s := range a.GetServices() {
+		for _, c := range s.GetCharacteristics() {
+			c.SetAccessoryID(m.idCount)
+		}
+	}
+	
 	a.SetID(m.idCount)
 	m.idCount++
 	m.Accessories = append(m.Accessories, a)
+}
+
+// Returns accessory that have the specified id
+func (m *Container) GetAccessoryByID(aid int64) (*Accessory) {
+	for _, accessory := range m.Accessories {
+		if accessory.GetID() == aid {
+			return accessory
+		}
+	}
+	
+	return nil
 }
 
 // RemoveAccessory removes an accessory from the container.
