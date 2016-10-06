@@ -11,13 +11,18 @@ import (
 	"strings"
 )
 
-// NewNotification returns an notification response for a characteristic from an accessory.
-func NewNotification(a *accessory.Accessory, c *characteristic.Characteristic) (*http.Response, error) {
+// NewCharacteristicNotification returns an notification response for a characteristic from an accessory.
+func NewCharacteristicNotification(a *accessory.Accessory, c *characteristic.Characteristic) (*http.Response, error) {
 	body, err := Body(a, c)
 	if err != nil {
 		return nil, err
 	}
 
+	return NewNotification(body), nil
+}
+
+// NewNotification returns a notification response with a specific body content.
+func NewNotification(body *bytes.Buffer) *http.Response {
 	resp := new(http.Response)
 	resp.Status = "200 OK"
 	resp.StatusCode = http.StatusOK
@@ -32,7 +37,7 @@ func NewNotification(a *accessory.Accessory, c *characteristic.Characteristic) (
 	// Make sure to call FixProtocolSpecifier() instead
 	resp.Proto = "EVENT/1.0"
 
-	return resp, nil
+	return resp
 }
 
 // FixProtocolSpecifier returns bytes where the http protocol specifier "HTTP/1.0" is replaced by "EVENT/1.0" in the argument bytes.

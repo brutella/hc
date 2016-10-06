@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net"
 	"sync"
+	"time"
 
 	"github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/characteristic"
@@ -18,11 +19,12 @@ import (
 )
 
 type ipTransport struct {
-	config  *Config
-	context hap.Context
-	server  http.Server
-	mutex   *sync.Mutex
-	mdns    *MDNSService
+	config    *Config
+	context   hap.Context
+	server    http.Server
+	keepAlive *hap.KeepAlive
+	mutex     *sync.Mutex
+	mdns      *MDNSService
 
 	storage  util.Storage
 	database db.Database
@@ -134,12 +136,21 @@ func (t *ipTransport) Start() {
 	// Publish accessory ip
 	log.Println("[INFO] Accessory IP is", t.config.IP)
 
+	// Send keep alive notifications to all connected clients every 10 minutes
+	t.keepAlive = hap.NewKeepAlive(10*time.Minute, t.context)
+	go t.keepAlive.Start()
+
 	// Listen until server.Stop() is called
 	s.ListenAndServe()
 }
 
 // Stop stops the ip transport by unpublishing the mDNS service.
 func (t *ipTransport) Stop() {
+
+	if t.keepAlive != nil {
+		t.keepAlive.Stop()
+	}
+
 	if t.mdns != nil {
 		t.mdns.Stop()
 	}
@@ -200,7 +211,7 @@ func (t *ipTransport) notifyListener(a *accessory.Accessory, c *characteristic.C
 		if conn == except {
 			continue
 		}
-		resp, err := hap.NewNotification(a, c)
+		resp, err := hap.NewCharacteristicNotification(a, c)
 		if err != nil {
 			log.Fatal(err)
 		}

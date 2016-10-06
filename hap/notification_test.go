@@ -38,7 +38,7 @@ func TestCharacteristicNotification(t *testing.T) {
 
 func TestCharacteristicNotificationResponse(t *testing.T) {
 	a := accessory.New(info, accessory.TypeOther)
-	resp, err := NewNotification(a, a.Info.Name.Characteristic)
+	resp, err := NewCharacteristicNotification(a, a.Info.Name.Characteristic)
 
 	if err != nil {
 		t.Fatal(err)
