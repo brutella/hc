@@ -284,7 +284,7 @@ func permissionDecl(char *gen.CharacteristicMetadata) string {
 			// TODO(mah)
 			break
 		default:
-			log.Fatal(fmt.Sprintf("Undefined characteristic permission %s", perm))
+			log.Panic(fmt.Sprintf("Undefined characteristic permission %s", perm))
 		}
 	}
 

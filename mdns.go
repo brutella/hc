@@ -1,7 +1,7 @@
 package hc
 
 import (
-	"github.com/brutella/log"
+	"github.com/brutella/hc/log"
 	"github.com/oleksandr/bonjour"
 
 	"fmt"
@@ -43,7 +43,7 @@ func (s *MDNSService) Publish() error {
 
 	server, err := bonjour.RegisterProxy(stripped, "_hap._tcp.", "", s.config.servePort, host, s.config.IP, text, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Info.Panic(err)
 	}
 
 	s.server = server
@@ -55,7 +55,7 @@ func (s *MDNSService) Update() {
 	if s.server != nil {
 		txt := s.config.txtRecords()
 		s.server.SetText(txt)
-		log.Println("[INFO]", txt)
+		log.Debug.Println(txt)
 	}
 }
 

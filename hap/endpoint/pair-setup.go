@@ -5,8 +5,8 @@ import (
 	"github.com/brutella/hc/event"
 	"github.com/brutella/hc/hap"
 	"github.com/brutella/hc/hap/pair"
+	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/util"
-	"github.com/brutella/log"
 
 	"io"
 	"net/http"
@@ -41,7 +41,7 @@ func NewPairSetup(context hap.Context, device hap.SecuredDevice, database db.Dat
 }
 
 func (endpoint *PairSetup) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	log.Printf("[VERB] %v POST /pair-setup", request.RemoteAddr)
+	log.Debug.Printf("%v POST /pair-setup", request.RemoteAddr)
 	response.Header().Set("Content-Type", hap.HTTPContentTypePairingTLV8)
 
 	var err error
@@ -52,10 +52,10 @@ func (endpoint *PairSetup) ServeHTTP(response http.ResponseWriter, request *http
 	session := endpoint.context.Get(key).(hap.Session)
 	ctrl := session.PairSetupHandler()
 	if ctrl == nil {
-		log.Println("[VERB] Create new pair setup controller")
+		log.Debug.Println("Create new pair setup controller")
 
 		if ctrl, err = pair.NewSetupServerController(endpoint.device, endpoint.database); err != nil {
-			log.Println(err)
+			log.Info.Panic(err)
 		}
 
 		session.SetPairSetupHandler(ctrl)
@@ -66,7 +66,7 @@ func (endpoint *PairSetup) ServeHTTP(response http.ResponseWriter, request *http
 	}
 
 	if err != nil {
-		log.Println("[ERRO]", err)
+		log.Info.Println(err)
 		response.WriteHeader(http.StatusInternalServerError)
 	} else {
 		io.Copy(response, out.BytesBuffer())

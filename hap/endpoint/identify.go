@@ -2,7 +2,7 @@ package endpoint
 
 import (
 	"github.com/brutella/hc/hap"
-	"github.com/brutella/log"
+	"github.com/brutella/hc/log"
 	"net/http"
 )
 
@@ -18,7 +18,7 @@ func NewIdentify(h hap.IdentifyHandler) *Identify {
 }
 
 func (i *Identify) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	log.Printf("[VERB] %v POST /identify", request.RemoteAddr)
+	log.Debug.Printf("%v POST /identify", request.RemoteAddr)
 	i.handler.IdentifyAccessory()
 	response.WriteHeader(http.StatusNoContent)
 }

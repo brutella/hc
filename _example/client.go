@@ -35,37 +35,37 @@ func main() {
 
 	pairStartResponse, err := pairSetup(pairStartRequest)
 	if err != nil {
-		log.Fatal(err)
+		log.Info.Panic(err)
 	}
 
 	// 2) S -> C
 	pairVerifyRequest, err := pair.HandleReaderForHandler(pairStartResponse, client)
 	if err != nil {
-		log.Fatal(err)
+		log.Info.Panic(err)
 	}
 
 	// 3) C -> S
 	pairVerifyResponse, err := pairSetup(pairVerifyRequest)
 	if err != nil {
-		log.Fatal(err)
+		log.Info.Panic(err)
 	}
 
 	// 4) S -> C
 	pairKeyRequest, err := pair.HandleReaderForHandler(pairVerifyResponse, client)
 	if err != nil {
-		log.Fatal(err)
+		log.Info.Panic(err)
 	}
 
 	// 5) C -> S
 	pairKeyRespond, err := pairSetup(pairKeyRequest)
 	if err != nil {
-		log.Fatal(err)
+		log.Info.Panic(err)
 	}
 
 	// 6) S -> C
 	request, err := pair.HandleReaderForHandler(pairKeyRespond, client)
 	if err != nil {
-		log.Fatal(err)
+		log.Info.Panic(err)
 	}
 
 	if request != nil {
@@ -80,25 +80,25 @@ func main() {
 	// 1) C -> S
 	verifyStartResponse, err := pairVerify(verifyStartRequest)
 	if err != nil {
-		log.Fatal(err)
+		log.Info.Panic(err)
 	}
 
 	// 2) S -> C
 	verifyFinishRequest, err := pair.HandleReaderForHandler(verifyStartResponse, verify)
 	if err != nil {
-		log.Fatal(err)
+		log.Info.Panic(err)
 	}
 
 	// 3) C -> S
 	verifyFinishResponse, err := pairVerify(verifyFinishRequest)
 	if err != nil {
-		log.Fatal(err)
+		log.Info.Panic(err)
 	}
 
 	// 4) S -> C
 	last_request, err := pair.HandleReaderForHandler(verifyFinishResponse, verify)
 	if err != nil {
-		log.Fatal(err)
+		log.Info.Panic(err)
 	}
 
 	if last_request != nil {

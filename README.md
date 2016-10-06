@@ -68,7 +68,7 @@ func main() {
     config := hc.Config{Pin: "00102003"}
 	t, err := hc.NewIPTransport(config, acc.Accessory)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
     
     hc.OnTermination(func(){

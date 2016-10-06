@@ -5,7 +5,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/hap"
 	"github.com/brutella/hc/hap/data"
-	"github.com/brutella/log"
+	"github.com/brutella/hc/log"
 	"github.com/gosexy/to"
 
 	"bytes"
@@ -52,7 +52,7 @@ func (ctr *CharacteristicController) HandleGetCharacteristics(form url.Values) (
 
 	result, err := json.Marshal(&data.Characteristics{chs})
 	if err != nil {
-		log.Println("[ERRO]", err)
+		log.Info.Panic(err)
 	}
 
 	b.Write(result)
@@ -73,12 +73,12 @@ func (ctr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader, co
 		return err
 	}
 
-	log.Println("[VERB]", string(b))
+	log.Debug.Println(string(b))
 
 	for _, c := range chars.Characteristics {
 		characteristic := ctr.GetCharacteristic(c.AccessoryID, c.CharacteristicID)
 		if characteristic == nil {
-			log.Printf("[ERRO] Could not find characteristic with aid %d and iid %d\n", c.AccessoryID, c.CharacteristicID)
+			log.Info.Printf("Could not find characteristic with aid %d and iid %d\n", c.AccessoryID, c.CharacteristicID)
 			continue
 		}
 

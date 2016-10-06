@@ -6,8 +6,8 @@ import (
 	"github.com/brutella/hc/crypto/hkdf"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/hap"
+	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/util"
-	"github.com/brutella/log"
 
 	"bytes"
 	"encoding/hex"
@@ -103,8 +103,8 @@ func (setup *SetupServerController) handlePairStart(in util.Container) (util.Con
 	out.SetBytes(TagPublicKey, setup.session.PublicKey)
 	out.SetBytes(TagSalt, setup.session.Salt)
 
-	log.Println("[VERB] <-     B:", hex.EncodeToString(out.GetBytes(TagPublicKey)))
-	log.Println("[VERB] <-     s:", hex.EncodeToString(out.GetBytes(TagSalt)))
+	log.Debug.Println("<-     B:", hex.EncodeToString(out.GetBytes(TagPublicKey)))
+	log.Debug.Println("<-     s:", hex.EncodeToString(out.GetBytes(TagSalt)))
 
 	return out, nil
 }
@@ -123,7 +123,7 @@ func (setup *SetupServerController) handlePairVerify(in util.Container) (util.Co
 	out.SetByte(TagSequence, setup.step.Byte())
 
 	clientPublicKey := in.GetBytes(TagPublicKey)
-	log.Println("[VERB] ->     A:", hex.EncodeToString(clientPublicKey))
+	log.Debug.Println("->     A:", hex.EncodeToString(clientPublicKey))
 
 	err := setup.session.SetupPrivateKeyFromClientPublicKey(clientPublicKey)
 	if err != nil {
@@ -131,15 +131,15 @@ func (setup *SetupServerController) handlePairVerify(in util.Container) (util.Co
 	}
 
 	clientProof := in.GetBytes(TagProof)
-	log.Println("[VERB] ->     M1:", hex.EncodeToString(clientProof))
+	log.Debug.Println("->     M1:", hex.EncodeToString(clientProof))
 
 	proof, err := setup.session.ProofFromClientProof(clientProof)
 	if err != nil || len(proof) == 0 { // proof `M1` is wrong
-		log.Println("[WARN] Proof M1 is wrong")
+		log.Debug.Println("Proof M1 is wrong")
 		setup.reset()
 		out.SetByte(TagErrCode, ErrCodeAuthenticationFailed.Byte()) // return error 2
 	} else {
-		log.Println("[INFO] Proof M1 is valid")
+		log.Debug.Println("Proof M1 is valid")
 		err := setup.session.SetupEncryptionKey([]byte("Pair-Setup-Encrypt-Salt"), []byte("Pair-Setup-Encrypt-Info"))
 		if err != nil {
 			return nil, err
@@ -149,9 +149,9 @@ func (setup *SetupServerController) handlePairVerify(in util.Container) (util.Co
 		out.SetBytes(TagProof, proof)
 	}
 
-	log.Println("[VERB] <-     M2:", hex.EncodeToString(out.GetBytes(TagProof)))
-	log.Println("[VERB]         S:", hex.EncodeToString(setup.session.PrivateKey))
-	log.Println("[VERB]         K:", hex.EncodeToString(setup.session.EncryptionKey[:]))
+	log.Debug.Println("<-     M2:", hex.EncodeToString(out.GetBytes(TagProof)))
+	log.Debug.Println("        S:", hex.EncodeToString(setup.session.PrivateKey))
+	log.Debug.Println("        K:", hex.EncodeToString(setup.session.EncryptionKey[:]))
 
 	return out, nil
 }
@@ -177,14 +177,14 @@ func (setup *SetupServerController) handleKeyExchange(in util.Container) (util.C
 	message := data[:(len(data) - 16)]
 	var mac [16]byte
 	copy(mac[:], data[len(message):]) // 16 byte (MAC)
-	log.Println("[VERB] ->     Message:", hex.EncodeToString(message))
-	log.Println("[VERB] ->     MAC:", hex.EncodeToString(mac[:]))
+	log.Debug.Println("->     Message:", hex.EncodeToString(message))
+	log.Debug.Println("->     MAC:", hex.EncodeToString(mac[:]))
 
 	decrypted, err := chacha20poly1305.DecryptAndVerify(setup.session.EncryptionKey[:], []byte("PS-Msg05"), message, mac, nil)
 
 	if err != nil {
 		setup.reset()
-		log.Println("[ERRO]", err)
+		log.Info.Panic(err)
 		out.SetByte(TagErrCode, ErrCodeUnknown.Byte()) // return error 1
 	} else {
 		decryptedBuf := bytes.NewBuffer(decrypted)
@@ -196,9 +196,9 @@ func (setup *SetupServerController) handleKeyExchange(in util.Container) (util.C
 		username := in.GetString(TagUsername)
 		clientltpk := in.GetBytes(TagPublicKey)
 		signature := in.GetBytes(TagSignature)
-		log.Println("[VERB] ->     Username:", username)
-		log.Println("[VERB] ->     ltpk:", hex.EncodeToString(clientltpk))
-		log.Println("[VERB] ->     Signature:", hex.EncodeToString(signature))
+		log.Debug.Println("->     Username:", username)
+		log.Debug.Println("->     ltpk:", hex.EncodeToString(clientltpk))
+		log.Debug.Println("->     Signature:", hex.EncodeToString(signature))
 
 		// Calculate hash `H`
 		hash, _ := hkdf.Sha512(setup.session.PrivateKey, []byte("Pair-Setup-Controller-Sign-Salt"), []byte("Pair-Setup-Controller-Sign-Info"))
@@ -208,15 +208,15 @@ func (setup *SetupServerController) handleKeyExchange(in util.Container) (util.C
 		material = append(material, clientltpk...)
 
 		if crypto.ValidateED25519Signature(clientltpk, material, signature) == false {
-			log.Println("[WARN] ed25519 signature is invalid")
+			log.Debug.Println("ed25519 signature is invalid")
 			setup.reset()
 			out.SetByte(TagErrCode, ErrCodeAuthenticationFailed.Byte()) // return error 2
 		} else {
-			log.Println("[VERB] ed25519 signature is valid")
+			log.Debug.Println("ed25519 signature is valid")
 			// Store entity ltpk and name
 			entity := db.NewEntity(username, clientltpk, nil)
 			setup.database.SaveEntity(entity)
-			log.Printf("[INFO] Stored ltpk '%s' for entity '%s'\n", hex.EncodeToString(clientltpk), username)
+			log.Debug.Printf("Stored ltpk '%s' for entity '%s'\n", hex.EncodeToString(clientltpk), username)
 
 			ltpk := setup.device.PublicKey()
 			ltsk := setup.device.PrivateKey()
@@ -230,7 +230,7 @@ func (setup *SetupServerController) handleKeyExchange(in util.Container) (util.C
 
 			signature, err := crypto.ED25519Signature(ltsk, material)
 			if err != nil {
-				log.Fatal(err)
+				log.Info.Panic(err)
 				return nil, err
 			}
 
@@ -239,9 +239,9 @@ func (setup *SetupServerController) handleKeyExchange(in util.Container) (util.C
 			tlvPairKeyExchange.SetBytes(TagPublicKey, ltpk)
 			tlvPairKeyExchange.SetBytes(TagSignature, []byte(signature))
 
-			log.Println("[VERB] <-     Username:", tlvPairKeyExchange.GetString(TagUsername))
-			log.Println("[VERB] <-     ltpk:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TagPublicKey)))
-			log.Println("[VERB] <-     Signature:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TagSignature)))
+			log.Debug.Println("<-     Username:", tlvPairKeyExchange.GetString(TagUsername))
+			log.Debug.Println("<-     ltpk:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TagPublicKey)))
+			log.Debug.Println("<-     Signature:", hex.EncodeToString(tlvPairKeyExchange.GetBytes(TagSignature)))
 
 			encrypted, mac, _ := chacha20poly1305.EncryptAndSeal(setup.session.EncryptionKey[:], []byte("PS-Msg06"), tlvPairKeyExchange.BytesBuffer().Bytes(), nil)
 			out.SetByte(TagSequence, PairStepKeyExchangeRequest.Byte())

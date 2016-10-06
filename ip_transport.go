@@ -13,8 +13,8 @@ import (
 	"github.com/brutella/hc/event"
 	"github.com/brutella/hc/hap"
 	"github.com/brutella/hc/hap/http"
+	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/util"
-	"github.com/brutella/log"
 	"github.com/gosexy/to"
 )
 
@@ -56,7 +56,7 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 	// Find transport name which is visible in mDNS
 	name := a.Info.Name.GetValue()
 	if len(name) == 0 {
-		log.Fatal("Invalid empty name for first accessory")
+		log.Info.Panic("Invalid empty name for first accessory")
 	}
 
 	cfg := defaultConfig(name)
@@ -134,7 +134,7 @@ func (t *ipTransport) Start() {
 	mdns.Publish()
 
 	// Publish accessory ip
-	log.Println("[INFO] Accessory IP is", t.config.IP)
+	log.Info.Println("Accessory IP is", t.config.IP)
 
 	// Send keep alive notifications to all connected clients every 10 minutes
 	t.keepAlive = hap.NewKeepAlive(10*time.Minute, t.context)
@@ -213,7 +213,7 @@ func (t *ipTransport) notifyListener(a *accessory.Accessory, c *characteristic.C
 		}
 		resp, err := hap.NewCharacteristicNotification(a, c)
 		if err != nil {
-			log.Fatal(err)
+			log.Info.Panic(err)
 		}
 
 		// Write response into buffer to replace HTTP protocol
@@ -222,7 +222,7 @@ func (t *ipTransport) notifyListener(a *accessory.Accessory, c *characteristic.C
 		resp.Write(buffer)
 		bytes, err := ioutil.ReadAll(buffer)
 		bytes = hap.FixProtocolSpecifier(bytes)
-		log.Printf("[VERB] %s <- %s", conn.RemoteAddr(), string(bytes))
+		log.Debug.Printf("%s <- %s", conn.RemoteAddr(), string(bytes))
 		conn.Write(bytes)
 	}
 }
@@ -231,10 +231,10 @@ func (t *ipTransport) notifyListener(a *accessory.Accessory, c *characteristic.C
 func (t *ipTransport) Handle(ev interface{}) {
 	switch ev.(type) {
 	case event.DevicePaired:
-		log.Printf("[INFO] Event: paired with device")
+		log.Debug.Printf("Event: paired with device")
 		t.updateMDNSReachability()
 	case event.DeviceUnpaired:
-		log.Printf("[INFO] Event: unpaired with device")
+		log.Debug.Printf("Event: unpaired with device")
 		t.updateMDNSReachability()
 	default:
 		break

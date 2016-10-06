@@ -3,7 +3,7 @@ package hap
 import (
 	"bytes"
 	"github.com/brutella/hc/crypto"
-	"github.com/brutella/log"
+	"github.com/brutella/hc/log"
 	"net"
 	"time"
 
@@ -49,7 +49,7 @@ func (con *Connection) EncryptedWrite(b []byte) (int, error) {
 	encrypted, err := con.getEncrypter().Encrypt(&buffer)
 
 	if err != nil {
-		log.Println("[ERRO] Encryption failed:", err)
+		log.Info.Panic("Encryption failed:", err)
 		err = con.connection.Close()
 		return 0, err
 	}
@@ -67,7 +67,7 @@ func (con *Connection) DecryptedRead(b []byte) (int, error) {
 		buffered := bufio.NewReader(con.connection)
 		decrypted, err := con.getDecrypter().Decrypt(buffered)
 		if err != nil {
-			log.Println("[ERRO] Decryption failed:", err)
+			log.Debug.Println("Decryption failed:", err)
 			err = con.connection.Close()
 			return 0, err
 		}
@@ -105,7 +105,7 @@ func (con *Connection) Read(b []byte) (int, error) {
 
 // Close closes the connection and deletes the related session from the context.
 func (con *Connection) Close() error {
-	log.Println("[INFO] Close connection and remove session")
+	log.Debug.Println("Close connection and remove session")
 
 	// Remove session from the context
 	con.context.DeleteSessionForConnection(con.connection)

@@ -3,8 +3,8 @@ package pair
 import (
 	"fmt"
 	"github.com/brutella/hc/db"
+	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/util"
-	"github.com/brutella/log"
 )
 
 // Pairing implements pairing json of format
@@ -38,20 +38,20 @@ func (c *PairingController) Handle(cont util.Container) (util.Container, error) 
 	username := cont.GetString(TagUsername)
 	publicKey := cont.GetBytes(TagPublicKey)
 
-	log.Println("[VERB] ->   Method:", method)
-	log.Println("[VERB] -> Username:", username)
-	log.Println("[VERB] ->     LTPK:", publicKey)
+	log.Debug.Println("->   Method:", method)
+	log.Debug.Println("-> Username:", username)
+	log.Debug.Println("->     LTPK:", publicKey)
 
 	entity := db.NewEntity(username, publicKey, nil)
 
 	switch method {
 	case PairingMethodDelete:
-		log.Printf("[INFO] Remove LTPK for client '%s'\n", username)
+		log.Debug.Printf("Remove LTPK for client '%s'\n", username)
 		c.database.DeleteEntity(entity)
 	case PairingMethodAdd:
 		err := c.database.SaveEntity(entity)
 		if err != nil {
-			log.Println("[ERRO]", err)
+			log.Info.Panic(err)
 			return nil, err
 		}
 	default:

@@ -6,8 +6,8 @@ import (
 	"github.com/brutella/hc/crypto/hkdf"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/hap"
+	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/util"
-	"github.com/brutella/log"
 
 	"bytes"
 	"encoding/hex"
@@ -55,7 +55,7 @@ func (setup *SetupClientController) Handle(in util.Container) (util.Container, e
 
 	code := errCode(in.GetByte(TagErrCode))
 	if code != ErrCodeNo {
-		log.Println("[ERRO]", code)
+		log.Info.Panic(code)
 		return nil, code.Error()
 	}
 
@@ -218,7 +218,7 @@ func (setup *SetupClientController) handleKeyExchange(in util.Container) (util.C
 		entity := db.NewEntity(username, ltpk, nil)
 		err = setup.database.SaveEntity(entity)
 		if err != nil {
-			fmt.Println("[ERRO]", err)
+            log.Info.Panic(err)
 		}
 	}
 

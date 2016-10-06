@@ -2,8 +2,8 @@ package pair
 
 import (
 	"github.com/brutella/hc/hap"
+	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/util"
-	"github.com/brutella/log"
 
 	"io"
 )
@@ -15,19 +15,19 @@ func HandleReaderForHandler(r io.Reader, h hap.ContainerHandler) (rOut io.Reader
 		return nil, err
 	}
 
-	log.Println("[VERB] ->     Seq:", in.GetByte(TagSequence))
+	log.Debug.Println("->     Seq:", in.GetByte(TagSequence))
 
 	out, err := h.Handle(in)
 
 	if err != nil {
-		log.Println("[ERRO]", err)
+		log.Info.Println(err)
 	} else {
 		if out != nil {
-			log.Println("[VERB] <-     Seq:", out.GetByte(TagSequence))
+			log.Debug.Println("<-     Seq:", out.GetByte(TagSequence))
 			rOut = out.BytesBuffer()
 		}
 	}
-	log.Println("[VERB] --------------------------")
+	log.Debug.Println("--------------------------")
 
 	return rOut, err
 }

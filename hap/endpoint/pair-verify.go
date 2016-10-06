@@ -5,8 +5,8 @@ import (
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/hap"
 	"github.com/brutella/hc/hap/pair"
+	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/util"
-	"github.com/brutella/log"
 
 	"io"
 	"net/http"
@@ -34,14 +34,14 @@ func NewPairVerify(context hap.Context, database db.Database) *PairVerify {
 }
 
 func (endpoint *PairVerify) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	log.Printf("[VERB] %v POST /pair-verify", request.RemoteAddr)
+	log.Debug.Printf("%v POST /pair-verify", request.RemoteAddr)
 	response.Header().Set("Content-Type", hap.HTTPContentTypePairingTLV8)
 
 	key := endpoint.context.GetConnectionKey(request)
 	session := endpoint.context.Get(key).(hap.Session)
 	ctlr := session.PairVerifyHandler()
 	if ctlr == nil {
-		log.Println("[VERB] Create new pair verify controller")
+		log.Debug.Println("Create new pair verify controller")
 		ctlr = pair.NewVerifyServerController(endpoint.database, endpoint.context)
 		session.SetPairVerifyHandler(ctlr)
 	}
@@ -56,7 +56,7 @@ func (endpoint *PairVerify) ServeHTTP(response http.ResponseWriter, request *htt
 	}
 
 	if err != nil {
-		log.Println(err)
+		log.Info.Println(err)
 		response.WriteHeader(http.StatusInternalServerError)
 	} else {
 		io.Copy(response, out.BytesBuffer())
@@ -67,10 +67,10 @@ func (endpoint *PairVerify) ServeHTTP(response http.ResponseWriter, request *htt
 		switch pair.VerifyStepType(b) {
 		case pair.VerifyStepFinishResponse:
 			if secSession, err = crypto.NewSecureSessionFromSharedKey(ctlr.SharedKey()); err == nil {
-				log.Println("[VERB] Setup secure session")
+				log.Debug.Println("Setup secure session")
 				session.SetCryptographer(secSession)
 			} else {
-				log.Println("[ERRO] Could not setup secure session.", err)
+				log.Info.Panic("Could not setup secure session.", err)
 			}
 		}
 	}

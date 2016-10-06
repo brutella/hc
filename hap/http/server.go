@@ -8,8 +8,8 @@ import (
 	"github.com/brutella/hc/hap/controller"
 	"github.com/brutella/hc/hap/endpoint"
 	"github.com/brutella/hc/hap/pair"
+	"github.com/brutella/hc/log"
 
-	"log"
 	"net"
 	"net/http"
 	"sync"
@@ -59,7 +59,7 @@ func NewServer(c Config) Server {
 	// os gives us a free Port when Port is ""
 	ln, err := net.Listen("tcp", c.Port)
 	if err != nil {
-		log.Fatal(err)
+		log.Info.Panic(err)
 	}
 
 	_, port, _ := net.SplitHostPort(ln.Addr().String())

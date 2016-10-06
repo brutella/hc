@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/brutella/hc"
+    "github.com/brutella/hc/log"
 	"github.com/brutella/hc/accessory"
 
-	"log"
 	"time"
 )
 
@@ -18,15 +18,15 @@ func main() {
 	t, err := hc.NewIPTransport(config, acc.Accessory)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Info.Panic(err)
 	}
 
 	// Log to console when client (e.g. iOS app) changes the value of the on characteristic
 	acc.Switch.On.OnValueRemoteUpdate(func(on bool) {
 		if on == true {
-			log.Println("[INFO] Client changed switch to on")
+			log.Debug.Println("Client changed switch to on")
 		} else {
-			log.Println("[INFO] Client changed switch to off")
+			log.Debug.Println("Client changed switch to off")
 		}
 	})
 
@@ -35,9 +35,9 @@ func main() {
 		for {
 			on := !acc.Switch.On.GetValue()
 			if on == true {
-				log.Println("[INFO] Switch is on")
+				log.Debug.Println("Switch is on")
 			} else {
-				log.Println("[INFO] Switch is off")
+				log.Debug.Println("Switch is off")
 			}
 			acc.Switch.On.SetValue(on)
 			time.Sleep(5 * time.Second)

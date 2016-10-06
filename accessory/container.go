@@ -3,7 +3,7 @@ package accessory
 import (
 	"crypto/md5"
 	"encoding/json"
-	"log"
+	"github.com/brutella/hc/log"
 )
 
 // Container manages a list of accessories.
@@ -75,18 +75,18 @@ func (m *Container) ContentHash() []byte {
 	var err error
 
 	if b, err = json.Marshal(m); err != nil {
-		log.Fatal(err)
+		log.Info.Panic(err)
 	}
 
 	val := map[string]interface{}{}
 	if err := json.Unmarshal(b, &val); err != nil {
-		log.Fatal(err)
+		log.Info.Panic(err)
 	}
 
 	deleteFieldFromDict(&val, "value")
 
 	if b, err = json.Marshal(val); err != nil {
-		log.Fatal(err)
+		log.Info.Panic(err)
 	}
 
 	h := md5.New()

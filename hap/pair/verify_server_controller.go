@@ -8,8 +8,8 @@ import (
 	"github.com/brutella/hc/crypto/chacha20poly1305"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/hap"
+	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/util"
-	"github.com/brutella/log"
 )
 
 // VerifyServerController verifies the stored client public key and negotiates a shared secret
@@ -90,7 +90,7 @@ func (verify *VerifyServerController) handlePairVerifyStart(in util.Container) (
 	verify.step = VerifyStepStartResponse
 
 	clientPublicKey := in.GetBytes(TagPublicKey)
-	log.Println("[VERB] ->     A:", hex.EncodeToString(clientPublicKey))
+	log.Debug.Println("->     A:", hex.EncodeToString(clientPublicKey))
 	if len(clientPublicKey) != 32 {
 		return nil, errInvalidClientKeyLength
 	}
@@ -108,7 +108,7 @@ func (verify *VerifyServerController) handlePairVerifyStart(in util.Container) (
 	material = append(material, clientPublicKey...)
 	signature, err := crypto.ED25519Signature(device.PrivateKey(), material)
 	if err != nil {
-		log.Fatal(err)
+		log.Info.Println(err)
 		return nil, err
 	}
 
@@ -124,12 +124,12 @@ func (verify *VerifyServerController) handlePairVerifyStart(in util.Container) (
 	out.SetBytes(TagPublicKey, verify.session.PublicKey[:])
 	out.SetBytes(TagEncryptedData, append(encryptedBytes, mac[:]...))
 
-	log.Println("[VERB]        K:", hex.EncodeToString(verify.session.EncryptionKey[:]))
-	log.Println("[VERB]        B:", hex.EncodeToString(verify.session.PublicKey[:]))
-	log.Println("[VERB]        S:", hex.EncodeToString(verify.session.PrivateKey[:]))
-	log.Println("[VERB]   Shared:", hex.EncodeToString(verify.session.SharedKey[:]))
+	log.Debug.Println("       K:", hex.EncodeToString(verify.session.EncryptionKey[:]))
+	log.Debug.Println("       B:", hex.EncodeToString(verify.session.PublicKey[:]))
+	log.Debug.Println("       S:", hex.EncodeToString(verify.session.PrivateKey[:]))
+	log.Debug.Println("  Shared:", hex.EncodeToString(verify.session.SharedKey[:]))
 
-	log.Println("[VERB] <-     B:", hex.EncodeToString(out.GetBytes(TagPublicKey)))
+	log.Debug.Println("<-     B:", hex.EncodeToString(out.GetBytes(TagPublicKey)))
 
 	return out, nil
 }
@@ -149,8 +149,8 @@ func (verify *VerifyServerController) handlePairVerifyFinish(in util.Container) 
 	message := data[:(len(data) - 16)]
 	var mac [16]byte
 	copy(mac[:], data[len(message):]) // 16 byte (MAC)
-	log.Println("[VERB] ->     Message:", hex.EncodeToString(message))
-	log.Println("[VERB] ->     MAC:", hex.EncodeToString(mac[:]))
+	log.Debug.Println("->     Message:", hex.EncodeToString(message))
+	log.Debug.Println("->     MAC:", hex.EncodeToString(mac[:]))
 
 	decryptedBytes, err := chacha20poly1305.DecryptAndVerify(verify.session.EncryptionKey[:], []byte("PV-Msg03"), message, mac, nil)
 
@@ -159,7 +159,7 @@ func (verify *VerifyServerController) handlePairVerifyFinish(in util.Container) 
 
 	if err != nil {
 		verify.reset()
-		log.Println("[ERRO]", err)
+		log.Info.Panic(err)
 		out.SetByte(TagErrCode, ErrCodeAuthenticationFailed.Byte()) // return error 2
 	} else {
 		in, err := util.NewTLV8ContainerFromReader(bytes.NewBuffer(decryptedBytes))
@@ -169,8 +169,8 @@ func (verify *VerifyServerController) handlePairVerifyFinish(in util.Container) 
 
 		username := in.GetString(TagUsername)
 		signature := in.GetBytes(TagSignature)
-		log.Println("[VERB]     client:", username)
-		log.Println("[VERB]  signature:", hex.EncodeToString(signature))
+		log.Debug.Println("    client:", username)
+		log.Debug.Println(" signature:", hex.EncodeToString(signature))
 
 		entity, err := verify.database.EntityWithName(username)
 		if err != nil {
@@ -187,11 +187,11 @@ func (verify *VerifyServerController) handlePairVerifyFinish(in util.Container) 
 		material = append(material, verify.session.PublicKey[:]...)
 
 		if crypto.ValidateED25519Signature(entity.PublicKey, material, signature) == false {
-			log.Println("[WARN] signature is invalid")
+			log.Debug.Println("signature is invalid")
 			verify.reset()
 			out.SetByte(TagErrCode, ErrCodeUnknownPeer.Byte()) // return error 4
 		} else {
-			log.Println("[VERB] signature is valid")
+			log.Debug.Println("signature is valid")
 		}
 	}
 

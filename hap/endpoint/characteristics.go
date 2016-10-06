@@ -2,7 +2,7 @@ package endpoint
 
 import (
 	"github.com/brutella/hc/hap"
-	"github.com/brutella/log"
+	"github.com/brutella/hc/log"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -39,21 +39,21 @@ func (handler *Characteristics) ServeHTTP(response http.ResponseWriter, request 
 	handler.mutex.Lock()
 	switch request.Method {
 	case hap.MethodGET:
-		log.Printf("[VERB] %v GET /characteristics", request.RemoteAddr)
+		log.Debug.Printf("%v GET /characteristics", request.RemoteAddr)
 		request.ParseForm()
 		res, err = handler.controller.HandleGetCharacteristics(request.Form)
 	case hap.MethodPUT:
-		log.Printf("[VERB] %v PUT /characteristics", request.RemoteAddr)
+		log.Debug.Printf("%v PUT /characteristics", request.RemoteAddr)
 		session := handler.context.GetSessionForRequest(request)
 		conn := session.Connection()
 		err = handler.controller.HandleUpdateCharacteristics(request.Body, conn)
 	default:
-		log.Println("[WARN] Cannot handle HTTP method", request.Method)
+		log.Debug.Println("Cannot handle HTTP method", request.Method)
 	}
 	handler.mutex.Unlock()
 
 	if err != nil {
-		log.Println("[ERRO]", err)
+		log.Info.Panic(err)
 		response.WriteHeader(http.StatusInternalServerError)
 	} else {
 		if res != nil {

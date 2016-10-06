@@ -4,8 +4,8 @@ import (
 	"github.com/brutella/hc/event"
 	"github.com/brutella/hc/hap"
 	"github.com/brutella/hc/hap/pair"
+	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/util"
-	"github.com/brutella/log"
 	"io"
 	"net/http"
 )
@@ -31,7 +31,7 @@ func NewPairing(controller *pair.PairingController, emitter event.Emitter) *Pair
 }
 
 func (endpoint *Pairing) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	log.Printf("[VERB] %v POST /pairings", request.RemoteAddr)
+	log.Debug.Printf("%v POST /pairings", request.RemoteAddr)
 	response.Header().Set("Content-Type", hap.HTTPContentTypePairingTLV8)
 
 	var err error
@@ -43,7 +43,7 @@ func (endpoint *Pairing) ServeHTTP(response http.ResponseWriter, request *http.R
 	}
 
 	if err != nil {
-		log.Println(err)
+		log.Info.Println(err)
 		response.WriteHeader(http.StatusInternalServerError)
 	} else {
 		io.Copy(response, out.BytesBuffer())

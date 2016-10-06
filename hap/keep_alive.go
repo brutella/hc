@@ -2,8 +2,8 @@ package hap
 
 import (
 	"bytes"
+	"github.com/brutella/hc/log"
 	"io/ioutil"
-	"log"
 	"time"
 )
 
@@ -54,7 +54,7 @@ func (k *KeepAlive) sendKeepAlive() {
 		resp.Write(buffer)
 		bytes, _ := ioutil.ReadAll(buffer)
 		bytes = FixProtocolSpecifier(bytes)
-		log.Printf("[VERB] Keep alive %s <- %s", conn.RemoteAddr(), string(bytes))
+		log.Debug.Printf("Keep alive %s <- %s", conn.RemoteAddr(), string(bytes))
 		conn.Write(bytes)
 	}
 }
