@@ -38,9 +38,6 @@ Once you've setup HomeKit, you can use Siri to interact with your accessories us
         # Clone project
         git clone https://github.com/brutella/hklight && cd hklight
         
-        # Install dependencies
-        go get
-        
         # Run the project
         go run hklightd.go
 
