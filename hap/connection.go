@@ -67,8 +67,12 @@ func (con *Connection) DecryptedRead(b []byte) (int, error) {
 		buffered := bufio.NewReader(con.connection)
 		decrypted, err := con.getDecrypter().Decrypt(buffered)
 		if err != nil {
-			log.Debug.Println("Decryption failed:", err)
-			err = con.connection.Close()
+			if neterr, ok := err.(net.Error); ok && neterr.Timeout() {
+				// Ignore timeout error #77
+			} else {
+				log.Debug.Println("Decryption failed:", err)
+				err = con.connection.Close()
+			}
 			return 0, err
 		}
 
