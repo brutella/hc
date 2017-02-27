@@ -129,7 +129,7 @@ func (con *Connection) RemoteAddr() net.Addr {
 
 // SetDeadline calls SetDeadline() of the underlying connection
 func (con *Connection) SetDeadline(t time.Time) error {
-	return con.connection.SetReadDeadline(t)
+	return con.connection.SetDeadline(t)
 }
 
 // SetReadDeadline calls SetReadDeadline() of the underlying connection
