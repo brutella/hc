@@ -133,7 +133,6 @@ You can also find common accessory types like lightbulbs, outlets, thermostats i
 HomeControl uses vendor directories (`vendor/`) to integrate the following libraries
 
 - `github.com/tadglines/go-pkgs/crypto/srp` for *SRP* algorithm
-- `github.com/codahale/chacha20` for *chacha20 poly1305* algorithm
 - `github.com/agl/ed25519` for *ed25519* signature
 - `github.com/gosexy/to` for type conversion
 - `github.com/oleksandr/bonjour` for mDNS
