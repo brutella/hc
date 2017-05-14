@@ -89,9 +89,11 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 		emitter:   event.NewEmitter(),
 	}
 
-	t.addAccessory(a)
-	for _, a := range as {
+	if a != nil {
 		t.addAccessory(a)
+		for _, a := range as {
+			t.addAccessory(a)
+		}
 	}
 
 	// Users can only pair discoverable accessories
