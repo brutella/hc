@@ -1,6 +1,8 @@
 package hc
 
-import ()
+import (
+       "github.com/brutella/hc/accessory"
+)
 
 // Transport provides accessories over a network.
 type Transport interface {
@@ -9,4 +11,7 @@ type Transport interface {
 
 	// Stop stops the transport
 	Stop()
+
+	// Add accessory to transport
+	addAccessory(a *accessory.Accessory)
 }
