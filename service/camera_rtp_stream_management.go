@@ -13,7 +13,7 @@ type CameraRTPStreamManagement struct {
 	SupportedVideoStreamConfiguration *characteristic.SupportedVideoStreamConfiguration
 	SupportedAudioStreamConfiguration *characteristic.SupportedAudioStreamConfiguration
 	SupportedRTPConfiguration         *characteristic.SupportedRTPConfiguration
-	SelectedStreamConfiguration       *characteristic.SelectedStreamConfiguration
+	SelectedRTPStreamConfiguration    *characteristic.SelectedRTPStreamConfiguration
 	StreamingStatus                   *characteristic.StreamingStatus
 	SetupEndpoints                    *characteristic.SetupEndpoints
 }
@@ -31,8 +31,8 @@ func NewCameraRTPStreamManagement() *CameraRTPStreamManagement {
 	svc.SupportedRTPConfiguration = characteristic.NewSupportedRTPConfiguration()
 	svc.AddCharacteristic(svc.SupportedRTPConfiguration.Characteristic)
 
-	svc.SelectedStreamConfiguration = characteristic.NewSelectedStreamConfiguration()
-	svc.AddCharacteristic(svc.SelectedStreamConfiguration.Characteristic)
+	svc.SelectedRTPStreamConfiguration = characteristic.NewSelectedRTPStreamConfiguration()
+	svc.AddCharacteristic(svc.SelectedRTPStreamConfiguration.Characteristic)
 
 	svc.StreamingStatus = characteristic.NewStreamingStatus()
 	svc.AddCharacteristic(svc.StreamingStatus.Characteristic)

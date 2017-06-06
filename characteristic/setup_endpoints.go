@@ -10,7 +10,7 @@ type SetupEndpoints struct {
 func NewSetupEndpoints() *SetupEndpoints {
 	char := NewBytes(TypeSetupEndpoints)
 	char.Format = FormatTLV8
-	char.Perms = []string{PermRead, PermWrite, PermEvents}
+	char.Perms = []string{PermRead, PermWrite}
 
 	char.SetValue([]byte{})
 

@@ -13,7 +13,7 @@ func NewCarbonMonoxideLevel() *CarbonMonoxideLevel {
 	char.Perms = []string{PermRead, PermEvents}
 	char.SetMinValue(0)
 	char.SetMaxValue(100)
-	char.SetStepValue(0.1)
+
 	char.SetValue(0)
 
 	return &CarbonMonoxideLevel{char}

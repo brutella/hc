@@ -95,93 +95,96 @@
   ],
   "Characteristics" : [
     {
+      "UUID" : "000000A6-0000-1000-8000-0026BB765291",
+      "Name" : "Accessory Flags",
+      "Format" : "uint32",
       "Constraints" : {
         "ValidBits" : {
-          "0" : "Additional Setup Required"
+          "0" : "Requires Additional Setup"
         }
       },
-      "Name" : "Accessory Flags",
-      "UUID" : "000000A6-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint32",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "000000B0-0000-1000-8000-0026BB765291",
+      "Name" : "Active",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Inactive",
           "1" : "Active"
         }
       },
-      "Name" : "Active",
-      "UUID" : "000000B0-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
       "Name" : "Administrator Only Access",
-      "UUID" : "00000001-0000-1000-8000-0026BB765291",
+      "Format" : "bool",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
       ],
-      "Format" : "bool",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
-      ]
+      "UUID" : "00000001-0000-1000-8000-0026BB765291"
     },
     {
+      "UUID" : "00000064-0000-1000-8000-0026BB765291",
+      "Name" : "Air Particulate Density",
+      "Format" : "float",
       "Constraints" : {
         "StepValue" : 1,
         "MaximumValue" : 1000,
         "MinimumValue" : 0
       },
-      "Name" : "Air Particulate Density",
-      "UUID" : "00000064-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "float",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "00000065-0000-1000-8000-0026BB765291",
+      "Name" : "Air Particulate Size",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "2.5 μm",
           "1" : "10 μm"
         }
       },
-      "Name" : "Air Particulate Size",
-      "UUID" : "00000065-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "00000095-0000-1000-8000-0026BB765291",
+      "Name" : "Air Quality",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "3" : "Fair",
@@ -192,42 +195,28 @@
           "5" : "Poor"
         }
       },
-      "Name" : "Air Quality",
-      "UUID" : "00000095-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
-      ]
-    },
-    {
-      "Name" : "App Matching Identifier",
-      "UUID" : "000000A4-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read"
-      ],
-      "Format" : "tlv8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
       "Name" : "Audio Feedback",
-      "UUID" : "00000005-0000-1000-8000-0026BB765291",
+      "Format" : "bool",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
       ],
-      "Format" : "bool",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
-      ]
+      "UUID" : "00000005-0000-1000-8000-0026BB765291"
     },
     {
       "Format" : "uint8",
@@ -268,112 +257,111 @@
       }
     },
     {
+      "UUID" : "00000092-0000-1000-8000-0026BB765291",
+      "Name" : "Carbon Dioxide Detected",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "CO2 Levels Normal",
           "1" : "CO2 Levels Abnormal"
         }
       },
-      "Name" : "Carbon Dioxide Detected",
-      "UUID" : "00000092-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
-      "Constraints" : {
-        "StepValue" : 100,
-        "MaximumValue" : 100000,
-        "MinimumValue" : 0
-      },
-      "Name" : "Carbon Dioxide Level",
       "UUID" : "00000093-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "cnotify"
-      ],
+      "Name" : "Carbon Dioxide Level",
       "Format" : "float",
-      "Permissions" : [
-        "securedRead"
-      ]
-    },
-    {
       "Constraints" : {
-        "StepValue" : 100,
         "MaximumValue" : 100000,
         "MinimumValue" : 0
       },
-      "Name" : "Carbon Dioxide Peak Level",
-      "UUID" : "00000094-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "float",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "00000094-0000-1000-8000-0026BB765291",
+      "Name" : "Carbon Dioxide Peak Level",
+      "Format" : "float",
+      "Constraints" : {
+        "MaximumValue" : 100000,
+        "MinimumValue" : 0
+      },
+      "Permissions" : [
+        "securedRead"
+      ],
+      "Properties" : [
+        "read",
+        "cnotify"
+      ]
+    },
+    {
+      "UUID" : "00000069-0000-1000-8000-0026BB765291",
+      "Name" : "Carbon Monoxide Detected",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "CO Levels Normal",
           "1" : "CO Levels Abnormal"
         }
       },
-      "Name" : "Carbon Monoxide Detected",
-      "UUID" : "00000069-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
-      "Constraints" : {
-        "StepValue" : 0.1,
-        "MaximumValue" : 100,
-        "MinimumValue" : 0
-      },
-      "Name" : "Carbon Monoxide Level",
       "UUID" : "00000090-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "cnotify"
-      ],
+      "Name" : "Carbon Monoxide Level",
       "Format" : "float",
-      "Permissions" : [
-        "securedRead"
-      ]
-    },
-    {
       "Constraints" : {
-        "StepValue" : 0.1,
         "MaximumValue" : 100,
         "MinimumValue" : 0
       },
-      "Name" : "Carbon Monoxide Peak Level",
-      "UUID" : "00000091-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "float",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "00000091-0000-1000-8000-0026BB765291",
+      "Name" : "Carbon Monoxide Peak Level",
+      "Format" : "float",
+      "Constraints" : {
+        "MaximumValue" : 100,
+        "MinimumValue" : 0
+      },
+      "Permissions" : [
+        "securedRead"
+      ],
+      "Properties" : [
+        "read",
+        "cnotify"
+      ]
+    },
+    {
+      "UUID" : "0000008F-0000-1000-8000-0026BB765291",
+      "Name" : "Charging State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Not Charging",
@@ -381,34 +369,50 @@
           "2" : "Not Chargeable"
         }
       },
-      "Name" : "Charging State",
-      "UUID" : "0000008F-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "000000CE-0000-1000-8000-0026BB765291",
+      "Name" : "Color Temperature",
+      "Format" : "uint32",
+      "Constraints" : {
+        "StepValue" : 1,
+        "MaximumValue" : 500,
+        "MinimumValue" : 140
+      },
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
+      "Properties" : [
+        "read",
+        "write",
+        "cnotify"
+      ]
+    },
+    {
+      "UUID" : "0000006A-0000-1000-8000-0026BB765291",
+      "Name" : "Contact Sensor State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Contact Detected",
           "1" : "Contact Not Detected"
         }
       },
-      "Name" : "Contact Sensor State",
-      "UUID" : "0000006A-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
@@ -432,6 +436,9 @@
       }
     },
     {
+      "UUID" : "000000A9-0000-1000-8000-0026BB765291",
+      "Name" : "Current Air Purifier State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Inactive",
@@ -439,15 +446,12 @@
           "2" : "Purifying Air"
         }
       },
-      "Name" : "Current Air Purifier State",
-      "UUID" : "000000A9-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
@@ -463,12 +467,14 @@
       ],
       "Unit" : "lux",
       "Constraints" : {
-        "StepValue" : 0.0001,
         "MaximumValue" : 100000,
         "MinimumValue" : 0.0001
       }
     },
     {
+      "UUID" : "0000000E-0000-1000-8000-0026BB765291",
+      "Name" : "Current Door State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "3" : "Closing",
@@ -478,19 +484,19 @@
           "0" : "Open"
         }
       },
-      "Name" : "Current Door State",
-      "UUID" : "0000000E-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "000000AF-0000-1000-8000-0026BB765291",
+      "Name" : "Current Fan State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Inactive",
@@ -498,18 +504,18 @@
           "2" : "Blowing Air"
         }
       },
-      "Name" : "Current Fan State",
-      "UUID" : "000000AF-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "000000B1-0000-1000-8000-0026BB765291",
+      "Name" : "Current Heater Cooler State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "3" : "Cooling",
@@ -518,18 +524,18 @@
           "0" : "Inactive"
         }
       },
-      "Name" : "Current Heater Cooler State",
-      "UUID" : "000000B1-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "0000000F-0000-1000-8000-0026BB765291",
+      "Name" : "Current Heating Cooling State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Off",
@@ -537,16 +543,13 @@
           "2" : "Cool"
         }
       },
-      "Name" : "Current Heating Cooling State",
-      "UUID" : "0000000F-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
@@ -568,6 +571,9 @@
       }
     },
     {
+      "UUID" : "000000B3-0000-1000-8000-0026BB765291",
+      "Name" : "Current Humidifier Dehumidifier State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "3" : "Dehumidifying",
@@ -576,15 +582,12 @@
           "0" : "Inactive"
         }
       },
-      "Name" : "Current Humidifier Dehumidifier State",
-      "UUID" : "000000B3-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
@@ -624,6 +627,9 @@
       }
     },
     {
+      "UUID" : "000000AA-0000-1000-8000-0026BB765291",
+      "Name" : "Current Slat State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Fixed",
@@ -631,15 +637,12 @@
           "2" : "Swinging"
         }
       },
-      "Name" : "Current Slat State",
-      "UUID" : "000000AA-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
@@ -698,73 +701,74 @@
     },
     {
       "Name" : "Digital Zoom",
-      "UUID" : "0000011D-0000-1000-8000-0026BB765291",
+      "Format" : "float",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
       ],
-      "Format" : "float",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
-      ]
+      "UUID" : "0000011D-0000-1000-8000-0026BB765291"
     },
     {
+      "UUID" : "000000AC-0000-1000-8000-0026BB765291",
+      "Name" : "Filter Change Indication",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Filter OK",
           "1" : "Change Filter"
         }
       },
-      "Name" : "Filter Change Indication",
-      "UUID" : "000000AC-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "000000AB-0000-1000-8000-0026BB765291",
+      "Name" : "Filter Life Level",
+      "Format" : "float",
       "Constraints" : {
+        "stepValue" : 1,
         "MaximumValue" : 100,
         "MinimumValue" : 0
       },
-      "Name" : "Filter Life Level",
-      "UUID" : "000000AB-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "float",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
       "Name" : "Firmware Revision",
-      "UUID" : "00000052-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read"
-      ],
       "Format" : "string",
       "Permissions" : [
         "securedRead"
-      ]
+      ],
+      "Properties" : [
+        "read"
+      ],
+      "UUID" : "00000052-0000-1000-8000-0026BB765291"
     },
     {
       "Name" : "Hardware Revision",
-      "UUID" : "00000053-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read"
-      ],
       "Format" : "string",
       "Permissions" : [
         "securedRead"
-      ]
+      ],
+      "Properties" : [
+        "read"
+      ],
+      "UUID" : "00000053-0000-1000-8000-0026BB765291"
     },
     {
       "Format" : "float",
@@ -788,14 +792,14 @@
     },
     {
       "Name" : "Hold Position",
-      "UUID" : "0000006F-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "write"
-      ],
       "Format" : "bool",
       "Permissions" : [
         "securedWrite"
-      ]
+      ],
+      "Properties" : [
+        "write"
+      ],
+      "UUID" : "0000006F-0000-1000-8000-0026BB765291"
     },
     {
       "Format" : "float",
@@ -819,28 +823,28 @@
     },
     {
       "Name" : "Identify",
-      "UUID" : "00000014-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "write"
-      ],
       "Format" : "bool",
       "Permissions" : [
         "securedWrite"
-      ]
+      ],
+      "Properties" : [
+        "write"
+      ],
+      "UUID" : "00000014-0000-1000-8000-0026BB765291"
     },
     {
       "Name" : "Image Mirroring",
-      "UUID" : "0000011F-0000-1000-8000-0026BB765291",
+      "Format" : "bool",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
       ],
-      "Format" : "bool",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
-      ]
+      "UUID" : "0000011F-0000-1000-8000-0026BB765291"
     },
     {
       "Format" : "float",
@@ -863,36 +867,39 @@
       }
     },
     {
+      "UUID" : "00000070-0000-1000-8000-0026BB765291",
+      "Name" : "Leak Detected",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Leak Not Detected",
           "1" : "Leak Detected"
         }
       },
-      "Name" : "Leak Detected",
-      "UUID" : "00000070-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
       "Name" : "Lock Control Point",
-      "UUID" : "00000019-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "write"
-      ],
       "Format" : "tlv8",
       "Permissions" : [
         "securedWrite"
-      ]
+      ],
+      "Properties" : [
+        "write"
+      ],
+      "UUID" : "00000019-0000-1000-8000-0026BB765291"
     },
     {
+      "UUID" : "0000001D-0000-1000-8000-0026BB765291",
+      "Name" : "Lock Current State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "3" : "Unknown",
@@ -901,19 +908,19 @@
           "0" : "Unsecured"
         }
       },
-      "Name" : "Lock Current State",
-      "UUID" : "0000001D-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "0000001C-0000-1000-8000-0026BB765291",
+      "Name" : "Lock Last Known Action",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "7" : "Unsecured Remotely",
@@ -927,359 +934,354 @@
           "2" : "Secured Physically, Exterior"
         }
       },
-      "Name" : "Lock Last Known Action",
-      "UUID" : "0000001C-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "Unit" : "seconds",
+      "Name" : "Lock Management Auto Security Timeout",
       "Format" : "uint32",
-      "UUID" : "0000001A-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
       ],
-      "Name" : "Lock Management Auto Security Timeout",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
-      ],
-      "Unit" : "seconds",
-      "Constraints" : {
-        "StepValue" : 1,
-        "MaximumValue" : 86400,
-        "MinimumValue" : 0
-      }
+      "UUID" : "0000001A-0000-1000-8000-0026BB765291"
     },
     {
+      "UUID" : "000000A7-0000-1000-8000-0026BB765291",
+      "Name" : "Lock Physical Controls",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Control Lock Disabled",
           "1" : "Control Lock Enabled"
         }
       },
-      "Name" : "Lock Physical Controls",
-      "UUID" : "000000A7-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
+      "UUID" : "0000001E-0000-1000-8000-0026BB765291",
+      "Name" : "Lock Target State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Unsecured",
           "1" : "Secured"
         }
       },
-      "Name" : "Lock Target State",
-      "UUID" : "0000001E-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
       "Name" : "Logs",
-      "UUID" : "0000001F-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "cnotify"
-      ],
       "Format" : "tlv8",
       "Permissions" : [
         "securedRead"
-      ]
+      ],
+      "Properties" : [
+        "read",
+        "cnotify"
+      ],
+      "UUID" : "0000001F-0000-1000-8000-0026BB765291"
     },
     {
       "Name" : "Manufacturer",
-      "UUID" : "00000020-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read"
-      ],
       "Format" : "string",
       "Permissions" : [
         "securedRead"
-      ]
+      ],
+      "Properties" : [
+        "read"
+      ],
+      "UUID" : "00000020-0000-1000-8000-0026BB765291"
     },
     {
       "Name" : "Model",
-      "UUID" : "00000021-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read"
-      ],
       "Format" : "string",
       "Permissions" : [
         "securedRead"
-      ]
-    },
-    {
-      "Name" : "Mute",
-      "UUID" : "0000011A-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "write",
-        "cnotify"
       ],
-      "Format" : "bool",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
-      ]
+      "Properties" : [
+        "read"
+      ],
+      "UUID" : "00000021-0000-1000-8000-0026BB765291"
     },
     {
       "Name" : "Motion Detected",
-      "UUID" : "00000022-0000-1000-8000-0026BB765291",
+      "Format" : "bool",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
       ],
+      "UUID" : "00000022-0000-1000-8000-0026BB765291"
+    },
+    {
+      "Name" : "Mute",
       "Format" : "bool",
       "Permissions" : [
-        "securedRead"
-      ]
-    },
-    {
-      "Name" : "Name",
-      "UUID" : "00000023-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read"
+        "securedRead",
+        "securedWrite"
       ],
-      "Format" : "string",
-      "Permissions" : [
-        "securedRead"
-      ]
-    },
-    {
-      "Name" : "Night Vision",
-      "UUID" : "0000011B-0000-1000-8000-0026BB765291",
       "Properties" : [
         "read",
         "write",
         "cnotify"
       ],
+      "UUID" : "0000011A-0000-1000-8000-0026BB765291"
+    },
+    {
+      "Name" : "Name",
+      "Format" : "string",
+      "Permissions" : [
+        "securedRead"
+      ],
+      "Properties" : [
+        "read"
+      ],
+      "UUID" : "00000023-0000-1000-8000-0026BB765291"
+    },
+    {
+      "Name" : "Night Vision",
       "Format" : "bool",
       "Permissions" : [
         "securedRead",
         "securedWrite"
-      ]
+      ],
+      "Properties" : [
+        "read",
+        "write",
+        "cnotify"
+      ],
+      "UUID" : "0000011B-0000-1000-8000-0026BB765291"
     },
     {
+      "UUID" : "000000C4-0000-1000-8000-0026BB765291",
+      "Name" : "Nitrogen Dioxide Density",
+      "Format" : "float",
       "Constraints" : {
         "StepValue" : 1,
         "MaximumValue" : 1000,
         "MinimumValue" : 0
       },
-      "Name" : "Nitrogen Dioxide Density",
-      "UUID" : "000000C4-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "float",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
       "Name" : "Obstruction Detected",
-      "UUID" : "00000024-0000-1000-8000-0026BB765291",
+      "Format" : "bool",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
       ],
-      "Format" : "bool",
-      "Permissions" : [
-        "securedRead"
-      ]
+      "UUID" : "00000024-0000-1000-8000-0026BB765291"
     },
     {
+      "UUID" : "00000071-0000-1000-8000-0026BB765291",
+      "Name" : "Occupancy Detected",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Occupancy Not Detected",
           "1" : "Occupancy Detected"
         }
       },
-      "Name" : "Occupancy Detected",
-      "UUID" : "00000071-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
       "Name" : "On",
-      "UUID" : "00000025-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "write",
-        "cnotify"
-      ],
       "Format" : "bool",
       "Permissions" : [
         "securedRead",
         "securedWrite"
-      ]
-    },
-    {
-      "Name" : "Optical Zoom",
-      "UUID" : "0000011C-0000-1000-8000-0026BB765291",
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
       ],
+      "UUID" : "00000025-0000-1000-8000-0026BB765291"
+    },
+    {
+      "Name" : "Optical Zoom",
       "Format" : "float",
       "Permissions" : [
         "securedRead",
         "securedWrite"
-      ]
+      ],
+      "Properties" : [
+        "read",
+        "write",
+        "cnotify"
+      ],
+      "UUID" : "0000011C-0000-1000-8000-0026BB765291"
     },
     {
       "Name" : "Outlet In Use",
-      "UUID" : "00000026-0000-1000-8000-0026BB765291",
+      "Format" : "bool",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
       ],
-      "Format" : "bool",
-      "Permissions" : [
-        "securedRead"
-      ]
+      "UUID" : "00000026-0000-1000-8000-0026BB765291"
     },
     {
+      "UUID" : "000000C3-0000-1000-8000-0026BB765291",
+      "Name" : "Ozone Density",
+      "Format" : "float",
       "Constraints" : {
         "StepValue" : 1,
         "MaximumValue" : 1000,
         "MinimumValue" : 0
       },
-      "Name" : "Ozone Density",
-      "UUID" : "000000C3-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "float",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
       "Name" : "Pair Setup",
-      "UUID" : "0000004C-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "write"
-      ],
       "Format" : "tlv8",
       "Permissions" : [
         "read",
         "write"
-      ]
+      ],
+      "Properties" : [
+        "read",
+        "write"
+      ],
+      "UUID" : "0000004C-0000-1000-8000-0026BB765291"
     },
     {
       "Name" : "Pair Verify",
-      "UUID" : "0000004E-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "write"
-      ],
       "Format" : "tlv8",
       "Permissions" : [
         "read",
         "write"
-      ]
-    },
-    {
-      "Name" : "Pairing Features",
-      "UUID" : "0000004F-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read"
       ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "read"
-      ]
-    },
-    {
-      "Name" : "Pairing Pairings",
-      "UUID" : "00000050-0000-1000-8000-0026BB765291",
       "Properties" : [
         "read",
         "write"
       ],
+      "UUID" : "0000004E-0000-1000-8000-0026BB765291"
+    },
+    {
+      "Name" : "Pairing Features",
+      "Format" : "uint8",
+      "Permissions" : [
+        "read"
+      ],
+      "Properties" : [
+        "read"
+      ],
+      "UUID" : "0000004F-0000-1000-8000-0026BB765291"
+    },
+    {
+      "Name" : "Pairing Pairings",
       "Format" : "tlv8",
       "Permissions" : [
         "securedRead",
         "securedWrite"
-      ]
+      ],
+      "Properties" : [
+        "read",
+        "write"
+      ],
+      "UUID" : "00000050-0000-1000-8000-0026BB765291"
     },
     {
-      "Constraints" : {
-        "StepValue" : 1,
-        "MaximumValue" : 1000,
-        "MinimumValue" : 0
-      },
-      "Name" : "PM10 Density",
       "UUID" : "000000C7-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "cnotify",
-        "uncnotify"
-      ],
+      "Name" : "PM10 Density",
       "Format" : "float",
-      "Permissions" : [
-        "securedRead"
-      ]
-    },
-    {
       "Constraints" : {
         "StepValue" : 1,
         "MaximumValue" : 1000,
         "MinimumValue" : 0
       },
-      "Name" : "PM2.5 Density",
-      "UUID" : "000000C6-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "float",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "000000C6-0000-1000-8000-0026BB765291",
+      "Name" : "PM2.5 Density",
+      "Format" : "float",
+      "Constraints" : {
+        "StepValue" : 1,
+        "MaximumValue" : 1000,
+        "MinimumValue" : 0
+      },
+      "Permissions" : [
+        "securedRead"
+      ],
+      "Properties" : [
+        "read",
+        "cnotify",
+        "uncnotify"
+      ]
+    },
+    {
+      "UUID" : "00000072-0000-1000-8000-0026BB765291",
+      "Name" : "Position State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Decreasing",
@@ -1287,125 +1289,105 @@
           "2" : "Stopped"
         }
       },
-      "Name" : "Position State",
-      "UUID" : "00000072-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
-      "Constraints" : {
-        "StepValue" : 1,
-        "MaximumValue" : 1,
-        "MinimumValue" : 0
-      },
-      "Name" : "Programmable Switch Event",
       "UUID" : "00000073-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "cnotify"
-      ],
+      "Name" : "Programmable Switch Event",
       "Format" : "uint8",
+      "Constraints" : {
+        "ValidValues" : {
+          "0" : "Single Press",
+          "1" : "Double Press",
+          "2" : "Long Press"
+        }
+      },
       "Permissions" : [
         "securedRead"
-      ]
-    },
-    {
-      "Constraints" : {
-        "StepValue" : 1,
-        "MaximumValue" : 1,
-        "MinimumValue" : 0
-      },
-      "Name" : "Programmable Switch Output State",
-      "UUID" : "00000074-0000-1000-8000-0026BB765291",
+      ],
       "Properties" : [
         "read",
-        "write",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
-      "Constraints" : {
-        "StepValue" : 1,
-        "MaximumValue" : 100,
-        "MinimumValue" : 0
-      },
-      "Name" : "Relative Humidity Dehumidifier Threshold",
       "UUID" : "000000C9-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "write",
-        "cnotify"
-      ],
+      "Name" : "Relative Humidity Dehumidifier Threshold",
       "Format" : "float",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
-      ]
-    },
-    {
       "Constraints" : {
         "StepValue" : 1,
         "MaximumValue" : 100,
         "MinimumValue" : 0
       },
-      "Name" : "Relative Humidity Humidifier Threshold",
-      "UUID" : "000000CA-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
-      ],
-      "Format" : "float",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
+      "UUID" : "000000CA-0000-1000-8000-0026BB765291",
+      "Name" : "Relative Humidity Humidifier Threshold",
+      "Format" : "float",
+      "Constraints" : {
+        "StepValue" : 1,
+        "MaximumValue" : 100,
+        "MinimumValue" : 0
+      },
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
+      "Properties" : [
+        "read",
+        "write",
+        "cnotify"
+      ]
+    },
+    {
+      "UUID" : "000000AD-0000-1000-8000-0026BB765291",
+      "Name" : "Reset Filter Indication",
+      "Format" : "uint8",
       "Constraints" : {
         "StepValue" : 1,
         "MaximumValue" : 1,
         "MinimumValue" : 1
       },
-      "Name" : "Reset Filter Indication",
-      "UUID" : "000000AD-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "write"
-      ],
-      "Format" : "uint8",
       "Permissions" : [
         "securedWrite"
+      ],
+      "Properties" : [
+        "write"
       ]
     },
     {
+      "UUID" : "00000028-0000-1000-8000-0026BB765291",
+      "Name" : "Rotation Direction",
+      "Format" : "int32",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Clockwise",
           "1" : "Counter-clockwise"
         }
       },
-      "Name" : "Rotation Direction",
-      "UUID" : "00000028-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
-      ],
-      "Format" : "int32",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
@@ -1449,23 +1431,26 @@
       }
     },
     {
+      "UUID" : "0000008E-0000-1000-8000-0026BB765291",
+      "Name" : "Security System Alarm Type",
+      "Format" : "uint8",
       "Constraints" : {
         "StepValue" : 1,
         "MaximumValue" : 1,
         "MinimumValue" : 0
       },
-      "Name" : "Security System Alarm Type",
-      "UUID" : "0000008E-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "00000066-0000-1000-8000-0026BB765291",
+      "Name" : "Security System Current State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "3" : "Disarmed",
@@ -1475,19 +1460,19 @@
           "0" : "Stay Arm"
         }
       },
-      "Name" : "Security System Current State",
-      "UUID" : "00000066-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "00000067-0000-1000-8000-0026BB765291",
+      "Name" : "Security System Target State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "3" : "Disarm",
@@ -1496,299 +1481,320 @@
           "0" : "Stay Arm"
         }
       },
-      "Name" : "Security System Target State",
-      "UUID" : "00000067-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
-      "Name" : "Selected Stream Configuration",
-      "UUID" : "00000117-0000-1000-8000-0026BB765291",
+      "Name" : "Selected RTP Stream Configuration",
+      "Format" : "tlv8",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write"
       ],
-      "Format" : "tlv8",
+      "UUID" : "00000117-0000-1000-8000-0026BB765291"
+    },
+    {
+      "UUID" : "00000030-0000-1000-8000-0026BB765291",
+      "Name" : "Serial Number",
+      "Format" : "string",
+      "Constraints" : {
+        "MaximumLength" : 64
+      },
       "Permissions" : [
-        "securedRead",
-        "securedWrite"
+        "securedRead"
+      ],
+      "Properties" : [
+        "read"
       ]
     },
     {
-      "Name" : "Serial Number",
-      "UUID" : "00000030-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read"
-      ],
-      "Format" : "string",
+      "UUID" : "000000CB-0000-1000-8000-0026BB765291",
+      "Name" : "Service Label Index",
+      "Format" : "uint8",
+      "Constraints" : {
+        "StepValue" : 1,
+        "MaximumValue" : 255,
+        "MinimumValue" : 1
+      },
       "Permissions" : [
         "securedRead"
+      ],
+      "Properties" : [
+        "read"
+      ]
+    },
+    {
+      "UUID" : "000000CD-0000-1000-8000-0026BB765291",
+      "Name" : "Service Label Namespace",
+      "Format" : "uint8",
+      "Constraints" : {
+        "ValidValues" : {
+          "0" : "Dots",
+          "1" : "Arabic Numerals"
+        }
+      },
+      "Permissions" : [
+        "securedRead"
+      ],
+      "Properties" : [
+        "read"
       ]
     },
     {
       "Name" : "Setup Endpoints",
-      "UUID" : "00000118-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "write",
-        "cnotify"
-      ],
       "Format" : "tlv8",
       "Permissions" : [
         "securedRead",
         "securedWrite"
-      ]
+      ],
+      "Properties" : [
+        "read",
+        "write"
+      ],
+      "UUID" : "00000118-0000-1000-8000-0026BB765291"
     },
     {
+      "UUID" : "000000C0-0000-1000-8000-0026BB765291",
+      "Name" : "Slat Type",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Horizontal",
           "1" : "Vertical"
         }
       },
-      "Name" : "Slat Type",
-      "UUID" : "000000C0-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "cnotify"
-      ],
-      "Format" : "uint8",
       "Permissions" : [
         "securedRead"
+      ],
+      "Properties" : [
+        "read"
       ]
     },
     {
+      "UUID" : "00000076-0000-1000-8000-0026BB765291",
+      "Name" : "Smoke Detected",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Smoke Not Detected",
           "1" : "Smoke Detected"
         }
       },
-      "Name" : "Smoke Detected",
-      "UUID" : "00000076-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
-      ]
-    },
-    {
-      "Name" : "Software Revision",
-      "UUID" : "00000054-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read"
-      ],
-      "Format" : "string",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
       "Name" : "Status Active",
-      "UUID" : "00000075-0000-1000-8000-0026BB765291",
+      "Format" : "bool",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
       ],
-      "Format" : "bool",
-      "Permissions" : [
-        "securedRead"
-      ]
+      "UUID" : "00000075-0000-1000-8000-0026BB765291"
     },
     {
+      "UUID" : "00000077-0000-1000-8000-0026BB765291",
+      "Name" : "Status Fault",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "No Fault",
           "1" : "General Fault"
         }
       },
-      "Name" : "Status Fault",
-      "UUID" : "00000077-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "00000078-0000-1000-8000-0026BB765291",
+      "Name" : "Status Jammed",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Not Jammed",
           "1" : "Jammed"
         }
       },
-      "Name" : "Status Jammed",
-      "UUID" : "00000078-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "00000079-0000-1000-8000-0026BB765291",
+      "Name" : "Status Low Battery",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Battery Level Normal",
           "1" : "Battery Level Low"
         }
       },
-      "Name" : "Status Low Battery",
-      "UUID" : "00000079-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "0000007A-0000-1000-8000-0026BB765291",
+      "Name" : "Status Tampered",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Not Tampered",
           "1" : "Tampered"
         }
       },
-      "Name" : "Status Tampered",
-      "UUID" : "0000007A-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
       "Name" : "Streaming Status",
-      "UUID" : "00000120-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read",
-        "write",
-        "cnotify"
-      ],
       "Format" : "tlv8",
       "Permissions" : [
-        "securedRead",
-        "securedWrite"
-      ]
+        "securedRead"
+      ],
+      "Properties" : [
+        "read",
+        "cnotify"
+      ],
+      "UUID" : "00000120-0000-1000-8000-0026BB765291"
     },
     {
+      "UUID" : "000000C5-0000-1000-8000-0026BB765291",
+      "Name" : "Sulphur Dioxide Density",
+      "Format" : "float",
       "Constraints" : {
         "StepValue" : 1,
         "MaximumValue" : 1000,
         "MinimumValue" : 0
       },
-      "Name" : "Sulphur Dioxide Density",
-      "UUID" : "000000C5-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "float",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
       "Name" : "Supported Audio Stream Configuration",
-      "UUID" : "00000115-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read"
-      ],
       "Format" : "tlv8",
       "Permissions" : [
         "securedRead"
-      ]
+      ],
+      "Properties" : [
+        "read"
+      ],
+      "UUID" : "00000115-0000-1000-8000-0026BB765291"
     },
     {
       "Name" : "Supported RTP Configuration",
-      "UUID" : "00000116-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read"
-      ],
       "Format" : "tlv8",
       "Permissions" : [
         "securedRead"
-      ]
+      ],
+      "Properties" : [
+        "read"
+      ],
+      "UUID" : "00000116-0000-1000-8000-0026BB765291"
     },
     {
       "Name" : "Supported Video Stream Configuration",
-      "UUID" : "00000114-0000-1000-8000-0026BB765291",
-      "Properties" : [
-        "read"
-      ],
       "Format" : "tlv8",
       "Permissions" : [
         "securedRead"
-      ]
+      ],
+      "Properties" : [
+        "read"
+      ],
+      "UUID" : "00000114-0000-1000-8000-0026BB765291"
     },
     {
+      "UUID" : "000000B6-0000-1000-8000-0026BB765291",
+      "Name" : "Swing Mode",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
-          "0" : "Swing disabled",
-          "1" : "Swing enabled"
+          "0" : "Swing Disabled",
+          "1" : "Swing Enabled"
         }
       },
-      "Name" : "Swing Mode",
-      "UUID" : "000000B6-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
+      "UUID" : "000000A8-0000-1000-8000-0026BB765291",
+      "Name" : "Target Air Purifier State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Manual",
           "1" : "Auto"
         }
       },
-      "Name" : "Target Air Purifier State",
-      "UUID" : "000000A8-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
+      "UUID" : "000000AE-0000-1000-8000-0026BB765291",
+      "Name" : "Target Air Quality",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Excellent",
@@ -1796,60 +1802,60 @@
           "2" : "Fair"
         }
       },
-      "Name" : "Target Air Quality",
-      "UUID" : "000000AE-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
+      "UUID" : "00000032-0000-1000-8000-0026BB765291",
+      "Name" : "Target Door State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Open",
           "1" : "Closed"
         }
       },
-      "Name" : "Target Door State",
-      "UUID" : "00000032-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
+      "UUID" : "000000BF-0000-1000-8000-0026BB765291",
+      "Name" : "Target Fan State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Manual",
           "1" : "Auto"
         }
       },
-      "Name" : "Target Fan State",
-      "UUID" : "000000BF-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
+      "UUID" : "000000B2-0000-1000-8000-0026BB765291",
+      "Name" : "Target Heater Cooler State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Auto",
@@ -1857,20 +1863,20 @@
           "2" : "Cool"
         }
       },
-      "Name" : "Target Heater Cooler State",
-      "UUID" : "000000B2-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
+      "UUID" : "00000033-0000-1000-8000-0026BB765291",
+      "Name" : "Target Heating Cooling State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "3" : "Auto",
@@ -1879,17 +1885,14 @@
           "0" : "Off"
         }
       },
-      "Name" : "Target Heating Cooling State",
-      "UUID" : "00000033-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
@@ -1913,24 +1916,24 @@
       }
     },
     {
+      "UUID" : "000000B4-0000-1000-8000-0026BB765291",
+      "Name" : "Target Humidifier Dehumidifier State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
-          "0" : "Auto",
+          "0" : "Humidifier or Dehumidifier",
           "1" : "Humidifier",
           "2" : "Dehumidifier"
         }
       },
-      "Name" : "Target Humidifier Dehumidifier State",
-      "UUID" : "000000B4-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
@@ -1974,23 +1977,23 @@
       }
     },
     {
+      "UUID" : "000000BE-0000-1000-8000-0026BB765291",
+      "Name" : "Target Slat State",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Manual",
           "1" : "Auto"
         }
       },
-      "Name" : "Target Slat State",
-      "UUID" : "000000BE-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
@@ -2054,57 +2057,60 @@
       }
     },
     {
+      "UUID" : "00000036-0000-1000-8000-0026BB765291",
+      "Name" : "Temperature Display Units",
+      "Format" : "uint8",
       "Constraints" : {
         "ValidValues" : {
           "0" : "Celsius",
           "1" : "Fahrenheit"
         }
       },
-      "Name" : "Temperature Display Units",
-      "UUID" : "00000036-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
       "Properties" : [
         "read",
         "write",
         "cnotify"
-      ],
-      "Format" : "uint8",
-      "Permissions" : [
-        "securedRead",
-        "securedWrite"
       ]
     },
     {
-      "Name" : "Version",
       "UUID" : "00000037-0000-1000-8000-0026BB765291",
+      "Name" : "Version",
+      "Format" : "string",
+      "Constraints" : {
+        "MaximumLength" : 64
+      },
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "string",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
+      "UUID" : "000000C8-0000-1000-8000-0026BB765291",
+      "Name" : "VOC Density",
+      "Format" : "float",
       "Constraints" : {
         "StepValue" : 1,
         "MaximumValue" : 1000,
         "MinimumValue" : 0
       },
-      "Name" : "VOC Density",
-      "UUID" : "000000C8-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify",
         "uncnotify"
-      ],
-      "Format" : "float",
-      "Permissions" : [
-        "securedRead"
       ]
     },
     {
-      "Format" : "float",
+      "Format" : "uint8",
       "UUID" : "00000119-0000-1000-8000-0026BB765291",
       "Properties" : [
         "read",
@@ -2124,19 +2130,19 @@
       }
     },
     {
+      "UUID" : "000000B5-0000-1000-8000-0026BB765291",
+      "Name" : "Water Level",
+      "Format" : "float",
       "Constraints" : {
         "MaximumValue" : 100,
         "MinimumValue" : 0
       },
-      "Name" : "Water Level",
-      "UUID" : "000000B5-0000-1000-8000-0026BB765291",
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
         "cnotify"
-      ],
-      "Format" : "float",
-      "Permissions" : [
-        "securedRead"
       ]
     }
   ],
@@ -2148,14 +2154,12 @@
         "00000020-0000-1000-8000-0026BB765291",
         "00000021-0000-1000-8000-0026BB765291",
         "00000023-0000-1000-8000-0026BB765291",
-        "00000030-0000-1000-8000-0026BB765291"
+        "00000030-0000-1000-8000-0026BB765291",
+        "00000052-0000-1000-8000-0026BB765291"
       ],
       "OptionalCharacteristics" : [
-        "00000052-0000-1000-8000-0026BB765291",
         "00000053-0000-1000-8000-0026BB765291",
-        "00000054-0000-1000-8000-0026BB765291",
-        "000000A6-0000-1000-8000-0026BB765291",
-        "000000A4-0000-1000-8000-0026BB765291"
+        "000000A6-0000-1000-8000-0026BB765291"
       ],
       "Name" : "Accessory Information",
       "UUID" : "0000003E-0000-1000-8000-0026BB765291"
@@ -2208,25 +2212,6 @@
       ],
       "Name" : "Battery Service",
       "UUID" : "00000096-0000-1000-8000-0026BB765291"
-    },
-    {
-      "RequiredCharacteristics" : [
-        "00000025-0000-1000-8000-0026BB765291"
-      ],
-      "OptionalCharacteristics" : [
-        "0000006C-0000-1000-8000-0026BB765291",
-        "0000006E-0000-1000-8000-0026BB765291",
-        "0000007B-0000-1000-8000-0026BB765291",
-        "0000007D-0000-1000-8000-0026BB765291",
-        "0000011B-0000-1000-8000-0026BB765291",
-        "0000011C-0000-1000-8000-0026BB765291",
-        "0000011D-0000-1000-8000-0026BB765291",
-        "0000011E-0000-1000-8000-0026BB765291",
-        "0000011F-0000-1000-8000-0026BB765291",
-        "00000023-0000-1000-8000-0026BB765291"
-      ],
-      "Name" : "Camera Control",
-      "UUID" : "00000111-0000-1000-8000-0026BB765291"
     },
     {
       "RequiredCharacteristics" : [
@@ -2557,6 +2542,16 @@
     },
     {
       "RequiredCharacteristics" : [
+        "000000CD-0000-1000-8000-0026BB765291"
+      ],
+      "OptionalCharacteristics" : [
+        "00000023-0000-1000-8000-0026BB765291"
+      ],
+      "Name" : "Service Label",
+      "UUID" : "000000CC-0000-1000-8000-0026BB765291"
+    },
+    {
+      "RequiredCharacteristics" : [
         "000000C0-0000-1000-8000-0026BB765291",
         "000000AA-0000-1000-8000-0026BB765291"
       ],
@@ -2596,21 +2591,11 @@
     },
     {
       "RequiredCharacteristics" : [
-        "00000073-0000-1000-8000-0026BB765291",
-        "00000074-0000-1000-8000-0026BB765291"
-      ],
-      "OptionalCharacteristics" : [
-        "00000023-0000-1000-8000-0026BB765291"
-      ],
-      "Name" : "Stateful Programmable Switch",
-      "UUID" : "00000088-0000-1000-8000-0026BB765291"
-    },
-    {
-      "RequiredCharacteristics" : [
         "00000073-0000-1000-8000-0026BB765291"
       ],
       "OptionalCharacteristics" : [
-        "00000023-0000-1000-8000-0026BB765291"
+        "00000023-0000-1000-8000-0026BB765291",
+        "000000CB-0000-1000-8000-0026BB765291"
       ],
       "Name" : "Stateless Programmable Switch",
       "UUID" : "00000089-0000-1000-8000-0026BB765291"

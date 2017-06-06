@@ -10,7 +10,7 @@ type StreamingStatus struct {
 func NewStreamingStatus() *StreamingStatus {
 	char := NewBytes(TypeStreamingStatus)
 	char.Format = FormatTLV8
-	char.Perms = []string{PermRead, PermWrite, PermEvents}
+	char.Perms = []string{PermRead, PermEvents}
 
 	char.SetValue([]byte{})
 

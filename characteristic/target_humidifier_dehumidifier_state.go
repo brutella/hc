@@ -2,9 +2,9 @@
 package characteristic
 
 const (
-	TargetHumidifierDehumidifierStateAuto         int = 0
-	TargetHumidifierDehumidifierStateHumidifier   int = 1
-	TargetHumidifierDehumidifierStateDehumidifier int = 2
+	TargetHumidifierDehumidifierStateHumidifierOrDehumidifier int = 0
+	TargetHumidifierDehumidifierStateHumidifier               int = 1
+	TargetHumidifierDehumidifierStateDehumidifier             int = 2
 )
 
 const TypeTargetHumidifierDehumidifierState = "B4"

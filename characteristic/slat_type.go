@@ -15,7 +15,7 @@ type SlatType struct {
 func NewSlatType() *SlatType {
 	char := NewInt(TypeSlatType)
 	char.Format = FormatUInt8
-	char.Perms = []string{PermRead, PermEvents}
+	char.Perms = []string{PermRead}
 
 	char.SetValue(0)
 

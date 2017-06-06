@@ -4,12 +4,12 @@ package characteristic
 const TypeVolume = "119"
 
 type Volume struct {
-	*Float
+	*Int
 }
 
 func NewVolume() *Volume {
-	char := NewFloat(TypeVolume)
-	char.Format = FormatFloat
+	char := NewInt(TypeVolume)
+	char.Format = FormatUInt8
 	char.Perms = []string{PermRead, PermWrite, PermEvents}
 	char.SetMinValue(0)
 	char.SetMaxValue(100)
