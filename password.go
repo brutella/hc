@@ -3,13 +3,18 @@ package hc
 import (
 	"bytes"
 	"errors"
+	"fmt"
 )
+
+var invalidPins = []string{"12345678", "87654321", "00000000", "11111111", "22222222", "33333333", "44444444", "55555555", "66666666", "77777777", "88888888", "99999999"}
 
 // NewPin returns a HomeKit compatible pin string from a 8-numbers strings e.g. '01020304'.
 func NewPin(pin string) (string, error) {
 	var fmtPin string
-	if pin == "12345678" {
-		return fmtPin, errors.New("Pin must not be 12345678")
+	for _, invalidPin := range invalidPins {
+		if pin == invalidPin {
+			return fmtPin, fmt.Errorf("Pin must not be %s", pin)
+		}
 	}
 
 	if len(pin) != 8 {

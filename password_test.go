@@ -32,8 +32,20 @@ func TestNonNumberPin(t *testing.T) {
 	}
 }
 
-func TestInvalidPin(t *testing.T) {
+func TestInvalidPins(t *testing.T) {
 	if _, err := NewPin("12345678"); err == nil {
+		t.Fatal("expected error")
+	}
+
+	if _, err := NewPin("87654321"); err == nil {
+		t.Fatal("expected error")
+	}
+
+	if _, err := NewPin("11111111"); err == nil {
+		t.Fatal("expected error")
+	}
+
+	if _, err := NewPin("99999999"); err == nil {
 		t.Fatal("expected error")
 	}
 }
