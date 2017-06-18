@@ -22,6 +22,7 @@ import (
 var LibPath = os.ExpandEnv("$GOPATH/src/github.com/brutella/hc")
 var GenPath = filepath.Join(LibPath, "gen")
 var SvcPkgPath = filepath.Join(LibPath, "service")
+var AccPkgPath = filepath.Join(LibPath, "accessory")
 var CharPkgPath = filepath.Join(LibPath, "characteristic")
 var MetadataPath = filepath.Join(GenPath, "metadata.json")
 
@@ -84,6 +85,21 @@ func main() {
 		}
 	}
 
+	// Create an accessory categories file
+	if b, err := golang.CategoriesGoCode(metadata.Categories); err != nil {
+		log.Println(err)
+	} else {
+		filePath := filepath.Join(AccPkgPath, "constant.go")
+		log.Println("Creating file", filePath)
+		if f, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666); err != nil {
+			log.Fatal(err)
+		} else {
+			if _, err := f.Write(b); err != nil {
+				log.Fatal()
+			}
+		}
+	}
+
 	log.Println("Running go fmt")
 
 	charCmd := exec.Command("go", "fmt")
@@ -95,6 +111,12 @@ func main() {
 	svcCmd := exec.Command("go", "fmt")
 	svcCmd.Dir = os.ExpandEnv(SvcPkgPath)
 	if err := svcCmd.Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	accCmd := exec.Command("go", "fmt")
+	accCmd.Dir = os.ExpandEnv(AccPkgPath)
+	if err := accCmd.Run(); err != nil {
 		log.Fatal(err)
 	}
 }

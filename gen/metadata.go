@@ -2,11 +2,12 @@ package gen
 
 // Metadata represents the data in a HomeKit metadata file
 type Metadata struct {
-	Characteristics []*CharacteristicMetadata `json:Characteristics`
-	Services        []*ServiceMetadata        `json:Services`
+	Categories      []*CategoryMetadata
+	Characteristics []*CharacteristicMetadata
+	Services        []*ServiceMetadata
 }
 
-// Characteristic represents a characteristic metadata entry
+// CharacteristicMetadata represents a characteristic metadata entry
 type CharacteristicMetadata struct {
 	Constraints interface{} `json:Constraints,omitempty`
 	Format      string
@@ -17,10 +18,16 @@ type CharacteristicMetadata struct {
 	Unit        string `json:Unit,omitempty`
 }
 
-// Service represents a service metadata entry
+// ServiceMetadata represents a service metadata entry
 type ServiceMetadata struct {
 	RequiredCharacteristics []string
 	OptionalCharacteristics []string
 	Name                    string
 	UUID                    string
+}
+
+// CategoryMetadata represents an accessory category metadata entry
+type CategoryMetadata struct {
+	Name     string
+	Category int
 }
