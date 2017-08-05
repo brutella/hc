@@ -2,7 +2,7 @@ package hc
 
 import (
 	"github.com/brutella/hc/log"
-	"github.com/oleksandr/bonjour"
+	"github.com/grandcat/zeroconf"
 
 	"fmt"
 	"os"
@@ -12,7 +12,7 @@ import (
 // MDNSService represents a mDNS service.
 type MDNSService struct {
 	config *Config
-	server *bonjour.Server
+	server *zeroconf.Server
 }
 
 // NewMDNSService returns a new service based for the bridge name, id and port.
@@ -41,7 +41,7 @@ func (s *MDNSService) Publish() error {
 	// [Radar] http://openradar.appspot.com/radar?id=4931940373233664
 	stripped := strings.Replace(s.config.name, " ", "_", -1)
 
-	server, err := bonjour.RegisterProxy(stripped, "_hap._tcp.", "", s.config.servePort, host, s.config.IP, text, nil)
+	server, err := zeroconf.RegisterProxy(stripped, "_hap._tcp.", "", s.config.servePort, host, []string{s.config.IP}, text, nil)
 	if err != nil {
 		log.Info.Panic(err)
 	}
