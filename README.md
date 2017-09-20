@@ -1,7 +1,6 @@
 # DNS-SD
 
-This library implements [Multicast DNS](mDNS) and [DNS-Based Service Discovery](dnssd) to provide zero-configuration operations. It lets you announce and find services in a specific domain.
-
+This library implements [Multicast DNS](mDNS) and [DNS-Based Service Discovery](dnssd) to provide zero-configuration operations. It lets you announce and find services in a specific mDNS domain.
 
 [mdns]: https://tools.ietf.org/html/rfc6762
 [dnssd]: https://tools.ietf.org/html/rfc6763
@@ -9,7 +8,10 @@ This library implements [Multicast DNS](mDNS) and [DNS-Based Service Discovery](
 TODO
 
 - Support negative responses (RFC6762 6.1)
-- 
+- Handle txt records case insensitive
+- Remove outdated services from cache regularly
+- Implement lexicographically later algorithm
+- Make sure that hostnames are FQDNs
 
 ## Multicast DNS
 
