@@ -19,9 +19,9 @@ func NewCache() *Cache {
 
 // UpdateFrom updates the cache from resource records in msg.
 // TODO consider the cache-flush bit to make records as to be deleted in one second
-func (c *Cache) UpdateFrom(msg *dns.Msg) (adds []Service, rmvs []Service) {
+func (c *Cache) UpdateFrom(msg *dns.Msg) (adds []*Service, rmvs []*Service) {
 	answers := allRecords(msg)
-	sort.Sort(ByType(answers))
+	sort.Sort(byType(answers))
 
 loop:
 	for _, answer := range answers {
@@ -36,7 +36,7 @@ loop:
 					break
 				}
 				entry = newService(rr.Ptr)
-				adds = append(adds, *entry)
+				adds = append(adds, entry)
 				c.services[entry.ServiceInstanceName()] = entry
 			} else {
 				entry = e
@@ -54,7 +54,7 @@ loop:
 					break
 				}
 				entry = newService(rr.Hdr.Name)
-				adds = append(adds, *entry)
+				adds = append(adds, entry)
 				c.services[entry.ServiceInstanceName()] = entry
 			} else {
 				entry = e
@@ -68,12 +68,12 @@ loop:
 		case *dns.A:
 			for _, entry := range c.services {
 				if entry.Hostname() == rr.Hdr.Name {
+
 					for _, ip := range entry.IPs {
 						if ip.Equal(rr.A) {
 							continue loop
 						}
 					}
-
 					entry.IPs = append(entry.IPs, rr.A)
 				}
 			}
@@ -129,12 +129,12 @@ loop:
 	return
 }
 
-func (c *Cache) removeExpired() []Service {
-	var outdated []Service
+func (c *Cache) removeExpired() []*Service {
+	var outdated []*Service
 	var services = c.services
 	for key, srv := range services {
 		if time.Now().After(srv.expiration) {
-			outdated = append(outdated, *srv)
+			outdated = append(outdated, srv)
 			delete(c.services, key)
 		}
 	}
@@ -142,24 +142,19 @@ func (c *Cache) removeExpired() []Service {
 	return outdated
 }
 
-type ByType []dns.RR
+type byType []dns.RR
 
-func (a ByType) Len() int      { return len(a) }
-func (a ByType) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-func (a ByType) Less(i, j int) bool {
+func (a byType) Len() int      { return len(a) }
+func (a byType) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a byType) Less(i, j int) bool {
+	// Sort in the following order
+	// 1. SRV or PTR
+	// 2. Anything else
 	switch a[i].(type) {
 	case *dns.SRV:
 		return true
 	case *dns.PTR:
 		return true
-	case *dns.TXT:
-		return false
-	case *dns.A:
-		return false
-	case *dns.AAAA:
-		return false
-	case *dns.NSEC:
-		return false
 	}
 
 	return false

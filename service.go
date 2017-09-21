@@ -85,6 +85,7 @@ func newService(instance string) *Service {
 		Domain: domain,
 		Host:   "",
 		Text:   make(map[string]string),
+		IPs:    []net.IP{},
 	}
 }
 

@@ -7,29 +7,33 @@ import (
 
 // LookupInstance resolves a service by its service instance name.
 func LookupInstance(ctx context.Context, instance string) (srv Service, err error) {
-	var conn *mdnsConn
+	var conn MDNSConn
 	var cache = NewCache()
 
-	conn, err = newMDNSConn()
+	conn, err = NewMDNSConn()
 
 	if err != nil {
 		return
 	}
 
-	defer conn.close()
+	defer conn.Close()
 
 	m := new(dns.Msg)
-	m.Question = []dns.Question{
-		dns.Question{instance, dns.TypeSRV, dns.ClassINET},
-		dns.Question{instance, dns.TypeTXT, dns.ClassINET},
-	}
+
+	srvQ := dns.Question{instance, dns.TypeSRV, dns.ClassINET}
+	txtQ := dns.Question{instance, dns.TypeTXT, dns.ClassINET}
+	setQuestionUnicast(&srvQ)
+	setQuestionUnicast(&txtQ)
+
+	m.Question = []dns.Question{srvQ, txtQ}
 
 	readCtx, readCancel := context.WithCancel(ctx)
 	defer readCancel()
 
-	ch := conn.read(readCtx)
+	ch := conn.Read(readCtx)
 
-	conn.sendQuery(m)
+	q := &Query{msg: m}
+	conn.SendQuery(q)
 
 	for {
 		select {

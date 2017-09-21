@@ -10,6 +10,24 @@ import (
 	"net"
 )
 
+var (
+	IPv4LinkLocalMulticast = net.ParseIP("224.0.0.251")
+	IPv6LinkLocalMulticast = net.ParseIP("ff02::fb")
+
+	AddrIPv4LinkLocalMulticast = &net.UDPAddr{
+		IP:   IPv4LinkLocalMulticast,
+		Port: 5353,
+	}
+
+	AddrIPv6LinkLocalMulticast = &net.UDPAddr{
+		IP:   IPv6LinkLocalMulticast,
+		Port: 5353,
+	}
+
+	TtlDefault  uint32 = 75 * 60 // Default ttl for mDNS resource records
+	TtlHostname uint32 = 120     // TTL for mDNS resource records containing the host name
+)
+
 // Query is a mDNS query
 type Query struct {
 	msg *dns.Msg // The query message
@@ -78,14 +96,14 @@ func newMDNSConn() (*mdnsConn, error) {
 	var connIPv4 *ipv4.PacketConn
 	var connIPv6 *ipv6.PacketConn
 
-	if conn, err := net.ListenUDP("udp4", AddrIPv4); err != nil {
+	if conn, err := net.ListenUDP("udp4", AddrIPv4LinkLocalMulticast); err != nil {
 		errs = append(errs, err)
 	} else {
 		connIPv4 = ipv4.NewPacketConn(conn)
 		connIPv4.SetControlMessage(ipv4.FlagInterface, true)
 	}
 
-	if conn, err := net.ListenUDP("udp6", AddrIPv6); err != nil {
+	if conn, err := net.ListenUDP("udp6", AddrIPv6LinkLocalMulticast); err != nil {
 		errs = append(errs, err)
 	} else {
 		connIPv6 = ipv6.NewPacketConn(conn)
@@ -215,11 +233,11 @@ func (c *mdnsConn) sendResponseTo(m *dns.Msg, addr *net.UDPAddr) error {
 func (c *mdnsConn) writeMsg(m *dns.Msg) error {
 	var err error
 	if c.ipv4 != nil {
-		err = c.writeMsgTo(m, AddrIPv4)
+		err = c.writeMsgTo(m, AddrIPv4LinkLocalMulticast)
 	}
 
 	if c.ipv6 != nil {
-		err = c.writeMsgTo(m, AddrIPv6)
+		err = c.writeMsgTo(m, AddrIPv6LinkLocalMulticast)
 	}
 
 	return err
@@ -330,4 +348,32 @@ func first(errs ...error) error {
 	}
 
 	return nil
+}
+
+// Sets the Top Bit of rrclass for all answer records to trigger a cache flush in the receivers.
+func setAnswerCacheFlushBit(msg *dns.Msg) {
+	// From RFC6762
+	//    The most significant bit of the rrclass for a record in the Answer
+	//    Section of a response message is the Multicast DNS cache-flush bit
+	//    and is discussed in more detail below in Section 10.2, "Announcements
+	//    to Flush Outdated Cache Entries".
+	for _, a := range msg.Answer {
+		a.Header().Class |= (1 << 15)
+	}
+}
+
+// Sets the Top Bit of class to indicate the unicast responses are preferred for this question.
+func setQuestionUnicast(q *dns.Question) {
+	q.Qclass |= (1 << 15)
+}
+
+// Returns true if q requires unicast responses.
+func isUnicastQuestion(q dns.Question) bool {
+	// From RFC6762
+	// 18.12.  Repurposing of Top Bit of qclass in Question Section
+	//
+	//    In the Question Section of a Multicast DNS query, the top bit of the
+	//    qclass field is used to indicate that unicast responses are preferred
+	//    for this particular question.  (See Section 5.4.)
+	return q.Qclass&(1<<15) != 0
 }

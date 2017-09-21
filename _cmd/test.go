@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/brutella/dnssd"
-	"github.com/brutella/dnssd/log"
 	"net"
 	"os"
 	"os/signal"

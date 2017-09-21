@@ -13,7 +13,7 @@ func PTR(srv Service) *dns.PTR {
 			Name:   srv.ServiceName(),
 			Rrtype: dns.TypePTR,
 			Class:  dns.ClassINET,
-			Ttl:    ttlDefault,
+			Ttl:    TtlDefault,
 		},
 		Ptr: srv.ServiceInstanceName(),
 	}
@@ -25,7 +25,7 @@ func DNSSDServicesPTR(srv Service) *dns.PTR {
 			Name:   srv.ServicesMetaQueryName(),
 			Rrtype: dns.TypePTR,
 			Class:  dns.ClassINET,
-			Ttl:    ttlDefault,
+			Ttl:    TtlDefault,
 		},
 		Ptr: srv.ServiceName(),
 	}
@@ -37,7 +37,7 @@ func SRV(srv Service) *dns.SRV {
 			Name:   srv.ServiceInstanceName(),
 			Rrtype: dns.TypeSRV,
 			Class:  dns.ClassINET,
-			Ttl:    ttlHostname,
+			Ttl:    TtlHostname,
 		},
 		Priority: 0,
 		Weight:   0,
@@ -57,7 +57,7 @@ func TXT(srv Service) *dns.TXT {
 			Name:   srv.ServiceInstanceName(),
 			Rrtype: dns.TypeTXT,
 			Class:  dns.ClassINET,
-			Ttl:    ttlDefault,
+			Ttl:    TtlDefault,
 		},
 		Txt: txts,
 	}
@@ -71,7 +71,7 @@ func NSEC(rr dns.RR, srv Service, iface *net.Interface) *dns.NSEC {
 				Name:   r.Ptr,
 				Rrtype: dns.TypeNSEC,
 				Class:  dns.ClassINET,
-				Ttl:    ttlDefault,
+				Ttl:    TtlDefault,
 			},
 			NextDomain: r.Ptr,
 			TypeBitMap: []uint16{dns.TypeTXT, dns.TypeSRV},
@@ -99,7 +99,7 @@ func NSEC(rr dns.RR, srv Service, iface *net.Interface) *dns.NSEC {
 					Name:   r.Target,
 					Rrtype: dns.TypeNSEC,
 					Class:  dns.ClassINET,
-					Ttl:    ttlDefault,
+					Ttl:    TtlDefault,
 				},
 				NextDomain: r.Target,
 				TypeBitMap: types,
@@ -130,7 +130,7 @@ func A(srv Service, iface *net.Interface) []*dns.A {
 					Name:   srv.Hostname(),
 					Rrtype: dns.TypeA,
 					Class:  dns.ClassINET,
-					Ttl:    ttlHostname,
+					Ttl:    TtlHostname,
 				},
 				A: ip,
 			}
@@ -159,7 +159,7 @@ func AAAA(srv Service, iface *net.Interface) []*dns.AAAA {
 					Name:   srv.Hostname(),
 					Rrtype: dns.TypeAAAA,
 					Class:  dns.ClassINET,
-					Ttl:    ttlHostname,
+					Ttl:    TtlHostname,
 				},
 				AAAA: ip,
 			}
@@ -168,34 +168,6 @@ func AAAA(srv Service, iface *net.Interface) []*dns.AAAA {
 	}
 
 	return aaaas
-}
-
-// Sets the Top Bit of rrclass for all answer records to trigger a cache flush in the receivers.
-func setAnswerCacheFlushBit(msg *dns.Msg) {
-	// From RFC6762
-	//    The most significant bit of the rrclass for a record in the Answer
-	//    Section of a response message is the Multicast DNS cache-flush bit
-	//    and is discussed in more detail below in Section 10.2, "Announcements
-	//    to Flush Outdated Cache Entries".
-	for _, a := range msg.Answer {
-		a.Header().Class |= (1 << 15)
-	}
-}
-
-// Sets the Top Bit of class to indicate the unicast responses are preferred for this question.
-func setQuestionUnicast(q *dns.Question) {
-	q.Qclass |= (1 << 15)
-}
-
-// Returns true if q requires unicast responses.
-func isUnicastQuestion(q dns.Question) bool {
-	// From RFC6762
-	// 18.12.  Repurposing of Top Bit of qclass in Question Section
-	//
-	//    In the Question Section of a Multicast DNS query, the top bit of the
-	//    qclass field is used to indicate that unicast responses are preferred
-	//    for this particular question.  (See Section 5.4.)
-	return q.Qclass&(1<<15) != 0
 }
 
 // Returns true if ips contains IPv4 addresses.

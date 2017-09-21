@@ -22,8 +22,8 @@ func LookupType(ctx context.Context, service string, add AddServiceFunc, rmv Rmv
 
 	ifaces, _ := net.Interfaces()
 	for _, ifi := range ifaces {
-		conn.ipv4.JoinGroup(&ifi, &net.UDPAddr{IP: IPv4Group})
-		conn.ipv6.JoinGroup(&ifi, &net.UDPAddr{IP: IPv6Group})
+		conn.ipv4.JoinGroup(&ifi, &net.UDPAddr{IP: IPv4LinkLocalMulticast})
+		conn.ipv6.JoinGroup(&ifi, &net.UDPAddr{IP: IPv6LinkLocalMulticast})
 	}
 
 	m := new(dns.Msg)
@@ -39,7 +39,8 @@ func LookupType(ctx context.Context, service string, add AddServiceFunc, rmv Rmv
 
 	ch := conn.read(readCtx)
 
-	conn.sendQuery(m)
+	q := &Query{msg: m}
+	conn.SendQuery(q)
 
 	for {
 		select {
@@ -48,13 +49,13 @@ func LookupType(ctx context.Context, service string, add AddServiceFunc, rmv Rmv
 
 			for _, srv := range adds {
 				if srv.ServiceName() == service {
-					add(srv)
+					add(*srv)
 				}
 			}
 
 			for _, srv := range rmvs {
 				if srv.ServiceName() == service {
-					rmv(srv)
+					rmv(*srv)
 				}
 			}
 		case <-ctx.Done():

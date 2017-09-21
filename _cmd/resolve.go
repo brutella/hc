@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/brutella/dnssd"
+	"github.com/brutella/dnssd/log"
 	"os"
 	"os/signal"
 	"strings"
@@ -12,13 +13,14 @@ import (
 )
 
 var instanceFlag = flag.String("Name", "A", "Service Name")
-var serviceFlag = flag.String("Type", "_hap._tcp.", "Service type")
+var serviceFlag = flag.String("Type", "_http._tcp.", "Service type")
 var domainFlag = flag.String("Domain", "local.", "Browsing domain")
 
 var timeFormat = "15:04:05.000"
 
 func main() {
-	if len(*instanceFlag) == 0 {
+	log.Debug.Enable()
+	if len(*instanceFlag) == 0 || len(*serviceFlag) == 0 || len(*domainFlag) == 0 {
 		flag.Usage()
 		return
 	}
@@ -29,22 +31,14 @@ func main() {
 	fmt.Printf("DATE: –––%s–––\n", time.Now().Format("Mon Jan 2 2006"))
 	fmt.Printf("%s	...STARTING...\n", time.Now().Format(timeFormat))
 
-	resolve := func() {
-		ctx, cancel := dnssd.NewResolveContext()
-		defer cancel()
-
-		if srv, err := dnssd.LookupInstance(ctx, instance); err != nil {
-			fmt.Println("Could not resolve", err)
-		} else {
-			fmt.Printf("%s	%s can be reached at %s:%d\n%v\n", time.Now().Format(timeFormat), srv.ServiceInstanceName(), srv.Hostname, srv.Port, srv.Text)
-		}
-	}
-
 	addFn := func(srv dnssd.Service) {
-		if srv.ServiceInstanceName() != instance {
-			return
+		if srv.ServiceInstanceName() == instance {
+			text := ""
+			for key, value := range srv.Text {
+				text += fmt.Sprintf("%s=%s", key, value)
+			}
+			fmt.Printf("%s	%s can be reached at %s:%d\n	%v\n", time.Now().Format(timeFormat), srv.ServiceInstanceName(), srv.Hostname(), srv.Port, text)
 		}
-		go resolve()
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
