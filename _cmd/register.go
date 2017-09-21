@@ -32,6 +32,7 @@ func main() {
 	fmt.Printf("%s	...STARTING...\n", time.Now().Format(timeFormat))
 
 	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	if resp, err := dnssd.NewResponder(); err != nil {
 		fmt.Println(err)

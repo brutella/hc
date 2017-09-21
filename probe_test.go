@@ -17,7 +17,7 @@ type testConn struct {
 	in  chan *dns.Msg
 	out chan *dns.Msg
 
-	once sync.Once
+	once *sync.Once
 }
 
 func newTestConn() *testConn {
@@ -25,7 +25,7 @@ func newTestConn() *testConn {
 		read: make(chan *Request),
 		in:   make(chan *dns.Msg),
 		out:  make(chan *dns.Msg),
-		once: sync.Once{},
+		once: &sync.Once{},
 	}
 
 	return c
@@ -66,7 +66,7 @@ func (c *testConn) start(ctx context.Context) {
 }
 
 func TestProbing(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	conn := newTestConn()

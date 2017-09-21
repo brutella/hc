@@ -12,6 +12,8 @@ import (
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	if resp, err := dnssd.NewResponder(); err != nil {
 		fmt.Println(err)
 	} else {
