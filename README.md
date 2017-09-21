@@ -34,7 +34,7 @@ When calling `Respond` the responder probes for the service instance name and ho
 
 #### Update TXT records
 
-Once a service is added to a responder, you have to use the `handle` object to change properties.
+Once a service is added to a responder, you have to use the `handle` object to update properties.
 
 ```go
 handle.UpdateText(map[string]string{"key1": "value1", "key2": "value2"}, resp)
@@ -42,7 +42,7 @@ handle.UpdateText(map[string]string{"key1": "value1", "key2": "value2"}, resp)
 
 ## Examples
 
-Take a look at thee examples in the `_cmd` directory to register services, resolve service instances and to browse for service types.
+There are examples in the `_cmd` directory to register services, resolve service instances and to browse for service types.
 
 ## TODO
 
