@@ -8,8 +8,7 @@ import (
 // ServiceHandle serves a middleman between a service and a responder.
 type ServiceHandle interface {
 	UpdateText(text map[string]string, r Responder)
-	Handles(s *Service) bool
-	Service() *Service
+	Service() Service
 }
 
 type serviceHandle struct {
@@ -35,10 +34,6 @@ func (h *serviceHandle) UpdateText(text map[string]string, r Responder) {
 	rr.conn.SendResponse(resp)
 }
 
-func (h *serviceHandle) Handles(s *Service) bool {
-	return h.service == s
-}
-
-func (h *serviceHandle) Service() *Service {
-	return h.service
+func (h *serviceHandle) Service() Service {
+	return *h.service
 }
