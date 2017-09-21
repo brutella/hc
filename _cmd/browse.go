@@ -17,6 +17,8 @@ var domainFlag = flag.String("Domain", "local.", "Browsing domain")
 var timeFormat = "15:04:05.000"
 
 func main() {
+	flag.Parse()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

@@ -5,21 +5,20 @@ import (
 	"flag"
 	"fmt"
 	"github.com/brutella/dnssd"
-	"github.com/brutella/dnssd/log"
 	"os"
 	"os/signal"
 	"strings"
 	"time"
 )
 
-var instanceFlag = flag.String("Name", "A", "Service Name")
+var instanceFlag = flag.String("Name", "My Service", "Service Name")
 var serviceFlag = flag.String("Type", "_http._tcp.", "Service type")
 var domainFlag = flag.String("Domain", "local.", "Browsing domain")
 
 var timeFormat = "15:04:05.000"
 
 func main() {
-	log.Debug.Enable()
+	flag.Parse()
 	if len(*instanceFlag) == 0 || len(*serviceFlag) == 0 || len(*domainFlag) == 0 {
 		flag.Usage()
 		return
