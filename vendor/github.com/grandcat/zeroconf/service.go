@@ -1,8 +1,9 @@
-package bonjour
+package zeroconf
 
 import (
 	"fmt"
 	"net"
+	"sync"
 )
 
 // ServiceRecord contains the basic description of a service, which contains instance name, service type & domain
@@ -12,13 +13,13 @@ type ServiceRecord struct {
 	Domain   string `json:"domain"` // If blank, assumes "local"
 
 	// private variable populated on the first call to ServiceName()/ServiceInstanceName()
-	serviceName         string `json:"-"`
-	serviceInstanceName string `json:"-"`
-	serviceTypeName     string `json:"-"`
+	serviceName         string
+	serviceInstanceName string
+	serviceTypeName     string
 }
 
-// Returns complete service name (e.g. _foobar._tcp.local.), which is composed
-// from a service name (also referred as service type) and a domain.
+// ServiceName returns a complete service name (e.g. _foobar._tcp.local.), which is composed
+// of a service name (also referred as service type) and a domain.
 func (s *ServiceRecord) ServiceName() string {
 	if s.serviceName == "" {
 		s.serviceName = fmt.Sprintf("%s.%s.", trimDot(s.Service), trimDot(s.Domain))
@@ -26,7 +27,7 @@ func (s *ServiceRecord) ServiceName() string {
 	return s.serviceName
 }
 
-// Returns complete service instance name (e.g. MyDemo\ Service._foobar._tcp.local.),
+// ServiceInstanceName returns a complete service instance name (e.g. MyDemo\ Service._foobar._tcp.local.),
 // which is composed from service instance name, service name and a domain.
 func (s *ServiceRecord) ServiceInstanceName() string {
 	// If no instance name provided we cannot compose service instance name
@@ -40,6 +41,7 @@ func (s *ServiceRecord) ServiceInstanceName() string {
 	return s.serviceInstanceName
 }
 
+// ServiceTypeName returns the complete identifier for a DNS-SD query.
 func (s *ServiceRecord) ServiceTypeName() string {
 	// If not cached - compose and cache
 	if s.serviceTypeName == "" {
@@ -52,7 +54,7 @@ func (s *ServiceRecord) ServiceTypeName() string {
 	return s.serviceTypeName
 }
 
-// Constructs a ServiceRecord structure by given arguments
+// NewServiceRecord constructs a ServiceRecord.
 func NewServiceRecord(instance, service, domain string) *ServiceRecord {
 	return &ServiceRecord{instance, service, domain, "", "", ""}
 }
@@ -61,14 +63,29 @@ func NewServiceRecord(instance, service, domain string) *ServiceRecord {
 type LookupParams struct {
 	ServiceRecord
 	Entries chan<- *ServiceEntry // Entries Channel
+
+	stopProbing chan struct{}
+	once        sync.Once
 }
 
-// Constructs a LookupParams structure by given arguments
+// NewLookupParams constructs a LookupParams.
 func NewLookupParams(instance, service, domain string, entries chan<- *ServiceEntry) *LookupParams {
 	return &LookupParams{
-		*NewServiceRecord(instance, service, domain),
-		entries,
+		ServiceRecord: *NewServiceRecord(instance, service, domain),
+		Entries:       entries,
+
+		stopProbing: make(chan struct{}),
 	}
+}
+
+// Notify subscriber that no more entries will arrive. Mostly caused
+// by an expired context.
+func (l *LookupParams) done() {
+	close(l.Entries)
+}
+
+func (l *LookupParams) disableProbing() {
+	l.once.Do(func() { close(l.stopProbing) })
 }
 
 // ServiceEntry represents a browse/lookup result for client API.
@@ -80,19 +97,13 @@ type ServiceEntry struct {
 	Port     int      `json:"port"`     // Service Port
 	Text     []string `json:"text"`     // Service info served as a TXT record
 	TTL      uint32   `json:"ttl"`      // TTL of the service record
-	AddrIPv4 net.IP   `json:"-"`        // Host machine IPv4 address
-	AddrIPv6 net.IP   `json:"-"`        // Host machine IPv6 address
+	AddrIPv4 []net.IP `json:"-"`        // Host machine IPv4 address
+	AddrIPv6 []net.IP `json:"-"`        // Host machine IPv6 address
 }
 
-// Constructs a ServiceEntry structure by given arguments
+// NewServiceEntry constructs a ServiceEntry.
 func NewServiceEntry(instance, service, domain string) *ServiceEntry {
 	return &ServiceEntry{
-		*NewServiceRecord(instance, service, domain),
-		"",
-		0,
-		[]string{},
-		0,
-		nil,
-		nil,
+		ServiceRecord: *NewServiceRecord(instance, service, domain),
 	}
 }

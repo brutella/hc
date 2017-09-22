@@ -1,6 +1,11 @@
 The MIT License (MIT)
-
+ 
+Copyright (c) 2016 Stefan Smarzly
 Copyright (c) 2014 Oleksandr Lobunets
+
+Note: Copyright for portions of project zeroconf.sd are held by Oleksandr 
+      Lobunets, 2014, as part of project bonjour. All other copyright for 
+      project zeroconf.sd are held by Stefan Smarzly, 2016.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

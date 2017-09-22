@@ -1,4 +1,4 @@
-package bonjour
+package zeroconf
 
 import "strings"
 

@@ -23,7 +23,7 @@ Once you've setup HomeKit, you can use Siri to interact with your accessories us
 ## Features
 
 - Full implementation of the HAP in Go
-- Built-in service announcement via mDNS using [bonjour](http://github.com/oleksandr/bonjour)
+- Built-in service announcement via mDNS using [bonjour](https://github.com/grandcat/zeroconf)
 - Runs on multiple platforms (already in use on Linux and OS X)
 - Documentation: http://godoc.org/github.com/brutella/hc
 
@@ -135,7 +135,7 @@ HomeControl uses vendor directories (`vendor/`) to integrate the following libra
 - `github.com/tadglines/go-pkgs/crypto/srp` for *SRP* algorithm
 - `github.com/agl/ed25519` for *ed25519* signature
 - `github.com/gosexy/to` for type conversion
-- `github.com/oleksandr/bonjour` for mDNS
+- `github.com/grandcat/zeroconf` for mDNS
 
 # Contact
 
