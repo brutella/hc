@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/brutella/dnssd/log"
 	"github.com/miekg/dns"
+	"math/rand"
+	"strings"
 	"sync"
 	"time"
 )
@@ -27,8 +29,12 @@ type responder struct {
 	unmanaged []*serviceHandle
 	managed   []*serviceHandle
 
-	mutex *sync.Mutex
+	mutex     *sync.Mutex
+	truncated *Request
+	random    *rand.Rand
 }
+
+var DefaultResponder, _ = NewResponder()
 
 func NewResponder() (Responder, error) {
 	conn, err := newMDNSConn()
@@ -46,6 +52,7 @@ func newResponder(conn MDNSConn) *responder {
 		unmanaged: []*serviceHandle{},
 		managed:   []*serviceHandle{},
 		mutex:     &sync.Mutex{},
+		random:    rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 }
 
@@ -78,6 +85,23 @@ func (r *responder) Add(srv Service) (ServiceHandle, error) {
 	}
 
 	return r.addUnmanaged(srv), nil
+}
+
+func (r *responder) Respond(ctx context.Context) error {
+	r.mutex.Lock()
+	r.isRunning = true
+	for _, h := range r.unmanaged {
+		if srv, err := r.register(ctx, *h.service); err != nil {
+			return err
+		} else {
+			h.service = &srv
+			r.managed = append(r.managed, h)
+		}
+	}
+	r.unmanaged = []*serviceHandle{}
+	r.mutex.Unlock()
+
+	return r.respond(ctx)
 }
 
 // announce sends announcement messages including all services.
@@ -145,23 +169,6 @@ func (r *responder) addUnmanaged(srv Service) ServiceHandle {
 	return h
 }
 
-func (r *responder) Respond(ctx context.Context) error {
-	r.mutex.Lock()
-	r.isRunning = true
-	for _, h := range r.unmanaged {
-		if srv, err := r.register(ctx, *h.service); err != nil {
-			return err
-		} else {
-			h.service = &srv
-			r.managed = append(r.managed, h)
-		}
-	}
-	r.unmanaged = []*serviceHandle{}
-	r.mutex.Unlock()
-
-	return r.respond(ctx)
-}
-
 func (r *responder) respond(ctx context.Context) error {
 	if !r.isRunning {
 		return fmt.Errorf("isRunning should be true before calling respond()")
@@ -175,7 +182,38 @@ func (r *responder) respond(ctx context.Context) error {
 	for {
 		select {
 		case req := <-ch:
-			r.handleRequest(req, services(r.managed))
+			// If messages is truncated, we wait for the next message to come (RFC6762 18.5)
+			if req.msg.Truncated {
+				r.truncated = req
+				log.Debug.Println("Waiting for additional answers...")
+				break
+			}
+
+			// append request
+			if r.truncated != nil && r.truncated.from.IP.Equal(req.from.IP) {
+				log.Debug.Println("Add answers to truncated message")
+				msgs := []*dns.Msg{r.truncated.msg, req.msg}
+				r.truncated = nil
+				req.msg = mergeMsgs(msgs)
+			}
+
+			// Conflicting records remove managed services from
+			// the responder and trigger reprobing
+			conflicts := r.findConflicts(req, r.managed)
+		loop:
+			for _, h := range conflicts {
+				log.Debug.Println("Reprobe for", h.service)
+				go r.reprobe(h)
+				for i, m := range r.managed {
+					if h == m {
+						r.managed = append(r.managed[:i], r.managed[i+1:]...)
+						continue loop
+					}
+				}
+			}
+
+			r.handleQuery(req, services(r.managed))
+
 		case <-ctx.Done():
 			r.unannounce(services(r.managed))
 			r.conn.Close()
@@ -214,17 +252,12 @@ func (r *responder) unannounce(services []*Service) {
 	r.conn.SendResponse(resp)
 }
 
-func (r *responder) handleRequest(req *Request, services []*Service) {
-	if req.msg.Truncated {
-		log.Info.Println("TODO(mah) Wait for additional messages to come if request was unicast (see 18.5)")
-	}
-
+func (r *responder) handleQuery(req *Request, services []*Service) {
 	for _, q := range req.msg.Question {
 		msgs := []*dns.Msg{}
 		for _, srv := range services {
 			log.Debug.Printf("%s tries to give response to question %v\n", srv.ServiceInstanceName(), q)
 			if msg := r.handleQuestion(q, req, *srv); msg != nil {
-				log.Debug.Println("Response", msg)
 				msgs = append(msgs, msg)
 			} else {
 				log.Debug.Println("No response")
@@ -253,11 +286,38 @@ func (r *responder) handleRequest(req *Request, services []*Service) {
 	}
 }
 
+func (r *responder) findConflicts(req *Request, hs []*serviceHandle) []*serviceHandle {
+	var conflicts []*serviceHandle
+	for _, h := range hs {
+		if containsConflictingAnswers(req, h) {
+			log.Debug.Println("Received conflicting record", req.msg)
+			conflicts = append(conflicts, h)
+		}
+	}
+
+	return conflicts
+}
+
+func (r *responder) reprobe(h *serviceHandle) {
+	ctx, cancel := context.WithCancel(context.TODO())
+	defer cancel()
+
+	probed, err := ReprobeService(ctx, *h.service)
+	if err != nil {
+		return
+	}
+
+	h.service = &probed
+	r.managed = append(r.managed, h)
+	log.Debug.Println("Reannouncing services", r.managed)
+	go r.announce(services(r.managed))
+}
+
 func (r *responder) handleQuestion(q dns.Question, req *Request, srv Service) *dns.Msg {
 	resp := new(dns.Msg)
 
-	switch q.Name {
-	case srv.ServiceName():
+	switch strings.ToLower(q.Name) {
+	case strings.ToLower(srv.ServiceName()):
 		ptr := PTR(srv)
 		resp.Answer = []dns.RR{ptr}
 
@@ -274,7 +334,12 @@ func (r *responder) handleQuestion(q dns.Question, req *Request, srv Service) *d
 		extra = append(extra, NSEC(ptr, srv, req.iface))
 		resp.Extra = extra
 
-	case srv.ServiceInstanceName():
+		// Wait 20-125 msec for shared resource responses
+		delay := time.Duration(r.random.Intn(105)+20) * time.Millisecond
+		log.Debug.Println("Shared record response wait", delay)
+		time.Sleep(delay)
+
+	case strings.ToLower(srv.ServiceInstanceName()):
 		resp.Answer = []dns.RR{SRV(srv), TXT(srv), PTR(srv)}
 
 		var extra []dns.RR
@@ -294,7 +359,10 @@ func (r *responder) handleQuestion(q dns.Question, req *Request, srv Service) *d
 
 		resp.Extra = extra
 
-	case srv.Hostname():
+		// Set cache flush bit for non-shared records
+		setAnswerCacheFlushBit(resp)
+
+	case strings.ToLower(srv.Hostname()):
 		var answer []dns.RR
 
 		for _, a := range A(srv, req.iface) {
@@ -312,20 +380,18 @@ func (r *responder) handleQuestion(q dns.Question, req *Request, srv Service) *d
 			resp.Extra = []dns.RR{nsec}
 		}
 
-	case srv.ServicesMetaQueryName():
+		// Set cache flush bit for non-shared records
+		setAnswerCacheFlushBit(resp)
+
+	case strings.ToLower(srv.ServicesMetaQueryName()):
 		resp.Answer = []dns.RR{DNSSDServicesPTR(srv)}
 
 	default:
 		return nil
 	}
 
-	log.Debug.Println("Answers\n", resp.Answer)
-	log.Debug.Println("Extra\n", resp.Extra)
-	log.Debug.Println("Known answers\n", req.msg.Answer)
-
 	// Supress known answers
 	resp.Answer = remove(req.msg.Answer, resp.Answer)
-	log.Debug.Println("Unknown answers\n", resp.Answer)
 
 	resp.SetReply(req.msg)
 	resp.Question = nil
@@ -342,4 +408,44 @@ func services(hs []*serviceHandle) []*Service {
 	}
 
 	return result
+}
+
+func containsConflictingAnswers(req *Request, handle *serviceHandle) bool {
+	answers := allRecords(req.msg)
+
+	as := A(*handle.service, nil)
+	aaaas := AAAA(*handle.service, nil)
+	srv := SRV(*handle.service)
+
+	for _, answer := range answers {
+		switch rr := answer.(type) {
+		case *dns.A:
+			if len(as) == 0 {
+				continue
+			}
+
+			if isLexicographicalLaterA(rr, as[0]) {
+				return true
+			}
+
+		case *dns.AAAA:
+			if len(aaaas) == 0 {
+				continue
+			}
+
+			if isLexicographicalLaterAAAA(rr, aaaas[0]) {
+				return true
+			}
+
+		case *dns.SRV:
+			if isLexicographicalLaterSRV(rr, srv) {
+				return true
+			}
+
+		default:
+			break
+		}
+	}
+
+	return false
 }

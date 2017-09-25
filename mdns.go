@@ -101,6 +101,9 @@ func newMDNSConn() (*mdnsConn, error) {
 	} else {
 		connIPv4 = ipv4.NewPacketConn(conn)
 		connIPv4.SetControlMessage(ipv4.FlagInterface, true)
+
+		// Don't send us our own messages back
+		connIPv4.SetMulticastLoopback(false)
 	}
 
 	if conn, err := net.ListenUDP("udp6", AddrIPv6LinkLocalMulticast); err != nil {
@@ -108,6 +111,9 @@ func newMDNSConn() (*mdnsConn, error) {
 	} else {
 		connIPv6 = ipv6.NewPacketConn(conn)
 		connIPv6.SetControlMessage(ipv6.FlagInterface, true)
+
+		// Don't send us our own messages back
+		connIPv6.SetMulticastLoopback(false)
 	}
 
 	if err := first(errs...); connIPv4 == nil && connIPv6 == nil {
@@ -350,7 +356,7 @@ func first(errs ...error) error {
 	return nil
 }
 
-// Sets the Top Bit of rrclass for all answer records to trigger a cache flush in the receivers.
+// Sets the Top Bit of rrclass for all answer records (except PTR) to trigger a cache flush in the receivers.
 func setAnswerCacheFlushBit(msg *dns.Msg) {
 	// From RFC6762
 	//    The most significant bit of the rrclass for a record in the Answer
@@ -358,7 +364,12 @@ func setAnswerCacheFlushBit(msg *dns.Msg) {
 	//    and is discussed in more detail below in Section 10.2, "Announcements
 	//    to Flush Outdated Cache Entries".
 	for _, a := range msg.Answer {
-		a.Header().Class |= (1 << 15)
+		switch a.(type) {
+		case *dns.PTR:
+			continue
+		default:
+			a.Header().Class |= (1 << 15)
+		}
 	}
 }
 

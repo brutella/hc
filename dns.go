@@ -234,6 +234,7 @@ func mergeMsgs(msgs []*dns.Msg) *dns.Msg {
 	resp.Answer = []dns.RR{}
 	resp.Ns = []dns.RR{}
 	resp.Extra = []dns.RR{}
+	resp.Question = []dns.Question{}
 
 	for _, msg := range msgs {
 		if msg.Answer != nil {
@@ -244,6 +245,10 @@ func mergeMsgs(msgs []*dns.Msg) *dns.Msg {
 		}
 		if msg.Extra != nil {
 			resp.Extra = append(resp.Extra, remove(resp.Extra, msg.Extra)...)
+		}
+
+		if msg.Question != nil {
+			resp.Question = append(resp.Question, msg.Question...)
 		}
 	}
 

@@ -2,6 +2,7 @@ package dnssd
 
 import (
 	"github.com/miekg/dns"
+	"net"
 	"time"
 )
 
@@ -36,4 +37,28 @@ func (h *serviceHandle) UpdateText(text map[string]string, r Responder) {
 
 func (h *serviceHandle) Service() Service {
 	return *h.service
+}
+
+func (h *serviceHandle) IPv4s() []net.IP {
+	var result []net.IP
+
+	for _, ip := range h.service.IPs {
+		if ip.To4() != nil {
+			result = append(result, ip)
+		}
+	}
+
+	return result
+}
+
+func (h *serviceHandle) IPv6s() []net.IP {
+	var result []net.IP
+
+	for _, ip := range h.service.IPs {
+		if ip.To16() != nil {
+			result = append(result, ip)
+		}
+	}
+
+	return result
 }

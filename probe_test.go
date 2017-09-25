@@ -2,11 +2,8 @@ package dnssd
 
 import (
 	"context"
-	//"fmt"
-	//"github.com/brutella/dnssd/log"
 	"github.com/miekg/dns"
 	"net"
-	"sync"
 	"testing"
 	"time"
 )
@@ -16,8 +13,6 @@ type testConn struct {
 
 	in  chan *dns.Msg
 	out chan *dns.Msg
-
-	once *sync.Once
 }
 
 func newTestConn() *testConn {
@@ -25,26 +20,28 @@ func newTestConn() *testConn {
 		read: make(chan *Request),
 		in:   make(chan *dns.Msg),
 		out:  make(chan *dns.Msg),
-		once: &sync.Once{},
 	}
 
 	return c
 }
 
 func (c *testConn) SendQuery(q *Query) error {
-	c.out <- q.msg
+	go func() {
+		c.out <- q.msg
+	}()
 	return nil
 }
 
 func (c *testConn) SendResponse(resp *Response) error {
-	c.out <- resp.msg
+	go func() {
+		c.out <- resp.msg
+	}()
+
 	return nil
 }
 
 func (c *testConn) Read(ctx context.Context) <-chan *Request {
-	c.once.Do(func() {
-		go c.start(ctx)
-	})
+	go c.start(ctx)
 	return c.read
 }
 
@@ -84,7 +81,7 @@ func TestProbing(t *testing.T) {
 		otherResp.respond(ctx)
 	}()
 
-	resolved, err := probeService(ctx, conn, srv, 1*time.Millisecond)
+	resolved, err := probeService(ctx, conn, srv, 1*time.Millisecond, true)
 
 	if x := err; x != nil {
 		t.Fatal(x)
@@ -94,7 +91,37 @@ func TestProbing(t *testing.T) {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 
-	if is, want := resolved.Name, "My Service (2)"; is != want {
+	if is, want := resolved.Name, "My Service-2"; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+}
+
+func TestIsLexicographicLater(t *testing.T) {
+	this := &dns.A{
+		Hdr: dns.RR_Header{
+			Name:   "MyPrinter.local.",
+			Rrtype: dns.TypeA,
+			Class:  dns.ClassINET,
+			Ttl:    TtlHostname,
+		},
+		A: net.ParseIP("169.254.99.200"),
+	}
+
+	that := &dns.A{
+		Hdr: dns.RR_Header{
+			Name:   "MyPrinter.local.",
+			Rrtype: dns.TypeA,
+			Class:  dns.ClassINET,
+			Ttl:    TtlHostname,
+		},
+		A: net.ParseIP("169.254.200.50"),
+	}
+
+	if is, want := compareIP(this.A.To4(), that.A.To4()), -1; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	if is, want := compareIP(that.A.To4(), this.A.To4()), 1; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 }

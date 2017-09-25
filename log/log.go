@@ -9,7 +9,7 @@ import (
 var (
 	// Debug generates debug lines of output with a "DEBUG" prefix.
 	// By default the lines are written to /dev/null.
-	Debug = &Logger{log.New(ioutil.Discard, "DEBUG ", log.LstdFlags)}
+	Debug = &Logger{log.New(ioutil.Discard, "DEBUG ", log.Ldate|log.Ltime|log.Lmicroseconds)}
 
 	// Info generates debug lines of output with a "INFO" prefix.
 	// By default the lines are written to stdout.
