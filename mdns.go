@@ -8,6 +8,7 @@ import (
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
 	"net"
+	"runtime"
 )
 
 var (
@@ -102,8 +103,10 @@ func newMDNSConn() (*mdnsConn, error) {
 		connIPv4 = ipv4.NewPacketConn(conn)
 		connIPv4.SetControlMessage(ipv4.FlagInterface, true)
 
-		// Don't send us our own messages back
-		connIPv4.SetMulticastLoopback(false)
+		if runtime.GOOS == "linux" {
+			// Don't send us our own messages back
+			connIPv4.SetMulticastLoopback(false)
+		}
 	}
 
 	if conn, err := net.ListenUDP("udp6", AddrIPv6LinkLocalMulticast); err != nil {
@@ -112,8 +115,10 @@ func newMDNSConn() (*mdnsConn, error) {
 		connIPv6 = ipv6.NewPacketConn(conn)
 		connIPv6.SetControlMessage(ipv6.FlagInterface, true)
 
-		// Don't send us our own messages back
-		connIPv6.SetMulticastLoopback(false)
+		if runtime.GOOS == "linux" {
+			// Don't send us our own messages back
+			connIPv6.SetMulticastLoopback(false)
+		}
 	}
 
 	if err := first(errs...); connIPv4 == nil && connIPv6 == nil {

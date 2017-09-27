@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/brutella/dnssd"
+	"github.com/brutella/dnssd/log"
 	"net"
 	"os"
 	"os/signal"
@@ -11,6 +12,7 @@ import (
 )
 
 func main() {
+	log.Debug.Enable()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

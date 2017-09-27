@@ -182,6 +182,7 @@ func (r *responder) respond(ctx context.Context) error {
 	for {
 		select {
 		case req := <-ch:
+
 			// If messages is truncated, we wait for the next message to come (RFC6762 18.5)
 			if req.msg.Truncated {
 				r.truncated = req

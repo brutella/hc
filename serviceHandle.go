@@ -1,6 +1,7 @@
 package dnssd
 
 import (
+	"github.com/brutella/dnssd/log"
 	"github.com/miekg/dns"
 	"net"
 	"time"
@@ -33,6 +34,8 @@ func (h *serviceHandle) UpdateText(text map[string]string, r Responder) {
 	rr.conn.SendResponse(resp)
 	time.Sleep(1 * time.Second)
 	rr.conn.SendResponse(resp)
+
+	log.Debug.Println("Reannounce TXT", text)
 }
 
 func (h *serviceHandle) Service() Service {
