@@ -44,6 +44,10 @@ handle.UpdateText(map[string]string{"key1": "value1", "key2": "value2"}, resp)
 
 There are examples in the `_cmd` directory to register services, resolve service instances and to browse for service types.
 
+## Conformance
+
+This library passes the [multicast DNS tests](https://github.com/brutella/dnssd/blob/36a2d8c541aab14895fc5492d5ad8ec447a67c47/_cmd/bct/ConformanceTestResults) of Apple's Bonjour Conformance Test.
+
 ## TODO
 
 - [ ] Support negative responses (RFC6762 6.1)
