@@ -2,11 +2,13 @@ package hc
 
 import (
 	"bytes"
+	"context"
 	"io/ioutil"
 	"net"
 	"sync"
-	"time"
+	_ "time"
 
+	"github.com/brutella/dnssd"
 	"github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/db"
@@ -19,12 +21,11 @@ import (
 )
 
 type ipTransport struct {
-	config    *Config
-	context   hap.Context
-	server    http.Server
-	keepAlive *hap.KeepAlive
-	mutex     *sync.Mutex
-	mdns      *MDNSService
+	config  *Config
+	context hap.Context
+	server  http.Server
+	mutex   *sync.Mutex
+	mdns    *MDNSService
 
 	storage  util.Storage
 	database db.Database
@@ -34,6 +35,12 @@ type ipTransport struct {
 
 	// Used to communicate between different parts of the program (e.g. successful pairing with HomeKit)
 	emitter event.Emitter
+
+	ctx    context.Context
+	cancel context.CancelFunc
+
+	responder dnssd.Responder
+	handle    dnssd.ServiceHandle
 }
 
 // NewIPTransport creates a transport to provide accessories over IP.
@@ -77,6 +84,16 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 	cfg.load(storage)
 
 	device, err := hap.NewSecuredDevice(cfg.id, hap_pin, database)
+	if err != nil {
+		return nil, err
+	}
+
+	responder, err := dnssd.NewResponder()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
 
 	t := &ipTransport{
 		storage:   storage,
@@ -87,6 +104,9 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 		mutex:     &sync.Mutex{},
 		context:   hap.NewContextForSecuredDevice(device),
 		emitter:   event.NewEmitter(),
+		responder: responder,
+		ctx:       ctx,
+		cancel:    cancel,
 	}
 
 	t.addAccessory(a)
@@ -128,32 +148,42 @@ func (t *ipTransport) Start() {
 	// Publish server port which might be different then `t.config.Port`
 	t.config.servePort = int(to.Int64(s.Port()))
 
-	mdns := NewMDNSService(t.config)
-	t.mdns = mdns
+	service := newService(t.config)
+	t.handle, _ = t.responder.Add(service)
 
-	mdns.Publish()
+	mdnsCtx, mdnsCancel := context.WithCancel(t.ctx)
+	defer mdnsCancel()
+
+	mdnsStop := make(chan struct{})
+	go func() {
+		t.responder.Respond(mdnsCtx)
+		log.Debug.Println("mdns responder stopped")
+		mdnsStop <- struct{}{}
+	}()
+
+	// keepAliveCtx, keepAliveCancel := context.WithCancel(t.ctx)
+	// defer keepAliveCancel()
+	//
+	// // Send keep alive notifications to all connected clients every 10 minutes
+	// keepAlive := hap.NewKeepAlive(10*time.Minute, t.context)
+	// go func() {
+	// 	keepAlive.Start(keepAliveCtx)
+	// 	log.Info.Println("Keep alive stopped")
+	// }()
 
 	// Publish accessory ip
 	log.Info.Println("Accessory IP is", t.config.IP)
 
-	// Send keep alive notifications to all connected clients every 10 minutes
-	t.keepAlive = hap.NewKeepAlive(10*time.Minute, t.context)
-	go t.keepAlive.Start()
-
 	// Listen until server.Stop() is called
 	s.ListenAndServe()
+
+	// Wait until mdns responder stopped
+	<-mdnsStop
 }
 
 // Stop stops the ip transport by unpublishing the mDNS service.
 func (t *ipTransport) Stop() {
-
-	if t.keepAlive != nil {
-		t.keepAlive.Stop()
-	}
-
-	if t.mdns != nil {
-		t.mdns.Stop()
-	}
+	t.cancel()
 
 	if t.server != nil {
 		t.server.Stop()
@@ -174,9 +204,9 @@ func (t *ipTransport) isPaired() bool {
 }
 
 func (t *ipTransport) updateMDNSReachability() {
-	if mdns := t.mdns; mdns != nil {
-		t.config.discoverable = t.isPaired() == false
-		mdns.Update()
+	t.config.discoverable = t.isPaired() == false
+	if t.handle != nil {
+		t.handle.UpdateText(t.config.txtRecords(), t.responder)
 	}
 }
 
