@@ -49,7 +49,6 @@ There are examples in the `_cmd` directory to register services, resolve service
 - [ ] Support negative responses (RFC6762 6.1)
 - [ ] Handle txt records case insensitive
 - [ ] Remove outdated services from cache regularly
-- [ ] Implement lexicographically later algorithm
 - [ ] Make sure that hostnames are FQDNs
 
 # Contact
