@@ -41,6 +41,8 @@ type ipTransport struct {
 
 	responder dnssd.Responder
 	handle    dnssd.ServiceHandle
+
+	stopped chan struct{}
 }
 
 // NewIPTransport creates a transport to provide accessories over IP.
@@ -107,6 +109,7 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 		responder: responder,
 		ctx:       ctx,
 		cancel:    cancel,
+		stopped:   make(chan struct{}),
 	}
 
 	t.addAccessory(a)
@@ -172,22 +175,28 @@ func (t *ipTransport) Start() {
 	// }()
 
 	// Publish accessory ip
-	log.Info.Println("Accessory IP is", t.config.IP)
+	log.Info.Printf("Accessory address is %s:%s\n", t.config.IP, s.Port())
 
-	// Listen until server.Stop() is called
-	s.ListenAndServe()
+	serverCtx, serverCancel := context.WithCancel(t.ctx)
+	defer serverCancel()
+	serverStop := make(chan struct{})
+	go func() {
+		s.ListenAndServe(serverCtx)
+		log.Debug.Println("server stopped")
+		serverStop <- struct{}{}
+	}()
 
-	// Wait until mdns responder stopped
+	// Wait until mdns responder and server stopped
 	<-mdnsStop
+	<-serverStop
+	t.stopped <- struct{}{}
 }
 
-// Stop stops the ip transport by unpublishing the mDNS service.
-func (t *ipTransport) Stop() {
+// Stop stops the ip transport by stopping the http server and unpublishing the mDNS service.
+func (t *ipTransport) Stop() <-chan struct{} {
 	t.cancel()
 
-	if t.server != nil {
-		t.server.Stop()
-	}
+	return t.stopped
 }
 
 // isPaired returns true when the transport is already paired
