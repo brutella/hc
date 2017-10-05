@@ -3,12 +3,13 @@ package dnssd
 import (
 	"context"
 	"fmt"
+	"net"
+	"runtime"
+
 	"github.com/brutella/dnssd/log"
 	"github.com/miekg/dns"
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
-	"net"
-	"runtime"
 )
 
 var (
@@ -168,9 +169,12 @@ func (c *mdnsConn) readInto(ctx context.Context, ch chan *Request) {
 					continue
 				}
 
-				iface, err := net.InterfaceByIndex(cm.IfIndex)
-				if err != nil {
-					continue
+				var iface *net.Interface
+				if cm != nil {
+					iface, err = net.InterfaceByIndex(cm.IfIndex)
+					if err != nil {
+						continue
+					}
 				}
 
 				if n > 0 {
@@ -202,9 +206,12 @@ func (c *mdnsConn) readInto(ctx context.Context, ch chan *Request) {
 					continue
 				}
 
-				iface, err := net.InterfaceByIndex(cm.IfIndex)
-				if err != nil {
-					continue
+				var iface *net.Interface
+				if cm != nil {
+					iface, err = net.InterfaceByIndex(cm.IfIndex)
+					if err != nil {
+						continue
+					}
 				}
 
 				if n > 0 {
