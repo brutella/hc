@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/brutella/hc.svg)](https://travis-ci.org/brutella/hc)
 
-[HomeControl][homecontrol] is an implementation of the [HomeKit][homekit] Accessory Protocol (HAP) to create your own HomeKit accessory in [Go](https://golang.org). [HomeKit][homekit] is a set of protocols and libraries to access devices for Home Automation. ~~The actual protocol documentation is only available to MFi members.~~ A non-commercial version of the documentation is now available on the [HomeKit developer website](https://developer.apple.com/homekit/).
+HomeControl is an implementation of the [HomeKit][homekit] Accessory Protocol (HAP) to create your own HomeKit accessory in [Go](https://golang.org). [HomeKit][homekit] is a set of protocols and libraries to access devices for Home Automation. ~~The actual protocol documentation is only available to MFi members.~~ A non-commercial version of the documentation is now available on the [HomeKit developer website](https://developer.apple.com/homekit/).
 
 You can use this library to make existing Home Automation devices HomeKit compatible. I've already developed the following HomeKit bridges with in:
 
@@ -17,7 +17,7 @@ I've developed the [Home][home] app (for iPhone, iPad, Apple Watch) to control H
 
 Once you've setup HomeKit, you can use Siri to interact with your accessories using voice command (*Hey Siri, turn off the lights in the living room*).
 
-[home]: http://selfcoded.com/home/
+[home]: http://hochgatterer.me/home/
 [home-appstore]: http://itunes.apple.com/app/id995994352
 
 ## Features
@@ -141,6 +141,8 @@ HomeControl uses vendor directories (`vendor/`) to integrate the following libra
 
 Matthias Hochgatterer
 
+Website: [http://hochgatterer.me](http://hochgatterer.me)
+
 Github: [https://github.com/brutella](https://github.com/brutella/)
 
 Twitter: [https://twitter.com/brutella](https://twitter.com/brutella)
@@ -148,7 +150,6 @@ Twitter: [https://twitter.com/brutella](https://twitter.com/brutella)
 
 # License
 
-HomeControl is available under a non-commercial license. See the LICENSE file for more info.
+`hc` is available under the Apache License 2.0 license. See the LICENSE file for more info.
 
-[homecontrol]: http://selfcoded.com/homecontrol/
 [homekit]: https://developer.apple.com/homekit/
