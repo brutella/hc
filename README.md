@@ -135,7 +135,6 @@ HomeControl uses vendor directories (`vendor/`) to integrate the following libra
 - `github.com/tadglines/go-pkgs/crypto/srp` for *SRP* algorithm
 - `github.com/agl/ed25519` for *ed25519* signature
 - `github.com/gosexy/to` for type conversion
-- `github.com/oleksandr/bonjour` for mDNS
 
 # Contact
 
