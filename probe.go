@@ -263,7 +263,7 @@ func isLexicographicalLaterAAAA(this *dns.AAAA, that *dns.AAAA) bool {
 }
 
 func isLexicographicalLaterSRV(this *dns.SRV, that *dns.SRV) bool {
-	if strings.EqualFold(this.Hdr.Name, this.Hdr.Name) {
+	if strings.EqualFold(this.Hdr.Name, that.Hdr.Name) {
 		log.Debug.Println("Conflicting SRV")
 
 		if !isValidRR(this) {
