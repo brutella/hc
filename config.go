@@ -62,16 +62,16 @@ func defaultConfig(name string) *Config {
 }
 
 // txtRecords returns the config formatted as mDNS txt records
-func (cfg Config) txtRecords() []string {
-	return []string{
-		fmt.Sprintf("pv=%s", cfg.protocol),
-		fmt.Sprintf("id=%s", cfg.id),
-		fmt.Sprintf("c#=%d", cfg.version),
-		fmt.Sprintf("s#=%d", cfg.state),
-		fmt.Sprintf("sf=%d", to.Int64(cfg.discoverable)),
-		fmt.Sprintf("ff=%d", to.Int64(cfg.mfiCompliant)),
-		fmt.Sprintf("md=%s", cfg.name),
-		fmt.Sprintf("ci=%d", cfg.categoryId),
+func (cfg Config) txtRecords() map[string]string {
+	return map[string]string{
+		"pv": cfg.protocol,
+		"id": cfg.id,
+		"c#": fmt.Sprintf("%d", cfg.version),
+		"s#": fmt.Sprintf("%d", cfg.state),
+		"sf": fmt.Sprintf("%d", to.Int64(cfg.discoverable)),
+		"ff": fmt.Sprintf("%d", to.Int64(cfg.mfiCompliant)),
+		"md": cfg.name,
+		"ci": fmt.Sprintf("c%d", cfg.categoryId),
 	}
 }
 

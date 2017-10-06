@@ -8,5 +8,6 @@ type Transport interface {
 	Start()
 
 	// Stop stops the transport
-	Stop()
+	// Use the returned channel to wait until the transport is fully stopped.
+	Stop() <-chan struct{}
 }

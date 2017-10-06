@@ -10,6 +10,7 @@ import (
 	"github.com/brutella/hc/hap/pair"
 	"github.com/brutella/hc/log"
 
+	"context"
 	"net"
 	"net/http"
 	"sync"
@@ -18,13 +19,10 @@ import (
 // Server provides a similar interfaces as http.Server to start and stop a TCP server.
 type Server interface {
 	// ListenAndServe start the server
-	ListenAndServe() error
+	ListenAndServe(context.Context) error
 
 	// Port returns the port on which the server listens to
 	Port() string
-
-	// Stop stops the server
-	Stop()
 }
 
 type Config struct {
@@ -54,7 +52,7 @@ type server struct {
 }
 
 // NewServer returns a server
-func NewServer(c Config) Server {
+func NewServer(c Config) *server {
 
 	// os gives us a free Port when Port is ""
 	ln, err := net.Listen("tcp", c.Port)
@@ -81,16 +79,16 @@ func NewServer(c Config) Server {
 	return &s
 }
 
-func (s *server) ListenAndServe() error {
+func (s *server) ListenAndServe(ctx context.Context) error {
+	go func() {
+		<-ctx.Done()
+		for _, c := range s.context.ActiveConnections() {
+			c.Close()
+		}
+		// Stop listener
+		s.hapListener.Close()
+	}()
 	return s.listenAndServe(s.addrString(), s.mux, s.context)
-}
-
-func (s *server) Stop() {
-	for _, c := range s.context.ActiveConnections() {
-		c.Close()
-	}
-	// Stop listener
-	s.hapListener.Close()
 }
 
 func (s *server) Port() string {

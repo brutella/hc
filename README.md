@@ -135,7 +135,6 @@ HomeControl uses vendor directories (`vendor/`) to integrate the following libra
 - `github.com/tadglines/go-pkgs/crypto/srp` for *SRP* algorithm
 - `github.com/agl/ed25519` for *ed25519* signature
 - `github.com/gosexy/to` for type conversion
-- `github.com/oleksandr/bonjour` for mDNS
 
 # Contact
 
@@ -150,6 +149,6 @@ Twitter: [https://twitter.com/brutella](https://twitter.com/brutella)
 
 # License
 
-`hc` is available under a non-commercial license. See the LICENSE file for more info.
+`hc` is available under the Apache License 2.0 license. See the LICENSE file for more info.
 
 [homekit]: https://developer.apple.com/homekit/

@@ -1,39 +1,52 @@
 package hc
 
 import (
+	"context"
+	"github.com/brutella/dnssd"
 	"github.com/brutella/hc/log"
-	"github.com/oleksandr/bonjour"
-
-	"fmt"
-	"os"
+	"net"
 	"strings"
 )
 
 // MDNSService represents a mDNS service.
 type MDNSService struct {
-	config *Config
-	server *bonjour.Server
+	config    *Config
+	responder dnssd.Responder
+	handle    dnssd.ServiceHandle
+}
+
+func newService(config *Config) dnssd.Service {
+	// 2016-03-14(brutella): Replace whitespaces (" ") from service name
+	// with underscores ("_")to fix invalid http host header field value
+	// produces by iOS.
+	//
+	// [Radar] http://openradar.appspot.com/radar?id=4931940373233664
+	stripped := strings.Replace(config.name, " ", "_", -1)
+
+	var ips []net.IP
+	if ip := net.ParseIP(config.IP); ip != nil {
+		ips = append(ips, ip)
+	}
+
+	service := dnssd.NewService(stripped, "_hap._tcp.", "local.", "", ips, config.servePort)
+	service.Text = config.txtRecords()
+
+	return service
 }
 
 // NewMDNSService returns a new service based for the bridge name, id and port.
 func NewMDNSService(config *Config) *MDNSService {
+	// TODO handle error
+	responder, _ := dnssd.NewResponder()
+
 	return &MDNSService{
-		config: config,
+		config:    config,
+		responder: responder,
 	}
 }
 
-// IsPublished returns true when the service is published.
-func (s *MDNSService) IsPublished() bool {
-	return s.server != nil
-}
-
 // Publish announces the service for the machine's ip address on a random port using mDNS.
-func (s *MDNSService) Publish() error {
-	// Host should end with '.'
-	hostname, _ := os.Hostname()
-	host := fmt.Sprintf("%s.", strings.Trim(hostname, "."))
-	text := s.config.txtRecords()
-
+func (s *MDNSService) Publish(ctx context.Context) error {
 	// 2016-03-14(brutella): Replace whitespaces (" ") from service name
 	// with underscores ("_")to fix invalid http host header field value
 	// produces by iOS.
@@ -41,26 +54,36 @@ func (s *MDNSService) Publish() error {
 	// [Radar] http://openradar.appspot.com/radar?id=4931940373233664
 	stripped := strings.Replace(s.config.name, " ", "_", -1)
 
-	server, err := bonjour.RegisterProxy(stripped, "_hap._tcp.", "", s.config.servePort, host, s.config.IP, text, nil)
+	var ips []net.IP
+	if ip := net.ParseIP(s.config.IP); ip != nil {
+		ips = append(ips, ip)
+	}
+
+	service := dnssd.NewService(stripped, "_hap._tcp.", "local.", "", ips, s.config.servePort)
+	service.Text = s.config.txtRecords()
+	handle, err := s.responder.Add(service)
 	if err != nil {
 		log.Info.Panic(err)
 	}
 
-	s.server = server
-	return err
+	s.handle = handle
+
+	return s.responder.Respond(ctx)
 }
 
 // Update updates the mDNS txt records.
 func (s *MDNSService) Update() {
-	if s.server != nil {
+	if s.handle != nil {
 		txt := s.config.txtRecords()
-		s.server.SetText(txt)
+		s.handle.UpdateText(txt, s.responder)
 		log.Debug.Println(txt)
 	}
 }
 
 // Stop stops the running mDNS service.
 func (s *MDNSService) Stop() {
-	s.server.Shutdown()
-	s.server = nil
+	if s.handle != nil {
+		s.responder.Remove(s.handle)
+		s.handle = nil
+	}
 }

@@ -2,6 +2,7 @@ package hap
 
 import (
 	"bytes"
+	gocontext "context"
 	"github.com/brutella/hc/log"
 	"io/ioutil"
 	"time"
@@ -11,7 +12,6 @@ import (
 // connected clients. This way we can find abandoned connections and close them.
 // Thise is also done in homebridge: https://github.com/KhaosT/HAP-NodeJS/blob/c3a8f989685b62515968278c81b86b744b968960/lib/HAPServer.js#L107
 type KeepAlive struct {
-	stop    chan struct{}
 	timeout time.Duration
 	context Context
 }
@@ -19,7 +19,6 @@ type KeepAlive struct {
 // NewKeepAlive returns a new keep alive for a specific timeout.
 func NewKeepAlive(timeout time.Duration, context Context) *KeepAlive {
 	k := KeepAlive{
-		stop:    make(chan struct{}),
 		timeout: timeout,
 		context: context,
 	}
@@ -27,21 +26,16 @@ func NewKeepAlive(timeout time.Duration, context Context) *KeepAlive {
 	return &k
 }
 
-// Start starts sending keep alive messages. This method blocks until `Stop()` is called.
-func (k *KeepAlive) Start() {
+// Start starts sending keep alive messages. This method blocks until the context is canceled.
+func (k *KeepAlive) Start(ctx gocontext.Context) {
 	for {
 		select {
-		case <-k.stop:
+		case <-ctx.Done():
 			return
 		case <-time.After(k.timeout):
 			k.sendKeepAlive()
 		}
 	}
-}
-
-// Stop stops sending keep alive messages.
-func (k *KeepAlive) Stop() {
-	k.stop <- struct{}{}
 }
 
 func (k *KeepAlive) sendKeepAlive() {
