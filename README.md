@@ -23,7 +23,7 @@ Once you've setup HomeKit, you can use Siri to interact with your accessories us
 ## Features
 
 - Full implementation of the HAP in Go
-- Built-in service announcement via mDNS using [bonjour](http://github.com/oleksandr/bonjour)
+- Built-in service announcement via DNS-SD using [dnssd](http://github.com/brutella/dnssd)
 - Runs on multiple platforms (already in use on Linux and OS X)
 - Documentation: http://godoc.org/github.com/brutella/hc
 
