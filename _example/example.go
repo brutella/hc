@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	log.Debug.Enable()
 	switchInfo := accessory.Info{
 		Name: "Lamp",
 	}
@@ -45,7 +46,7 @@ func main() {
 	}()
 
 	hc.OnTermination(func() {
-		t.Stop()
+		<-t.Stop()
 	})
 
 	t.Start()
