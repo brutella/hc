@@ -80,11 +80,11 @@ You should change some default values for your own needs
 
 ```go
 info := accessory.Info{
-    Name: "Lamp",
-    SerialNumber: "051AC-23AAM1",
+	Name: "Lamp",
+	SerialNumber: "051AC-23AAM1",
 	Manufacturer: "Apple",
-    Model: "AB",
-    Firmware: "1.0.1",
+	Model: "AB",
+	Firmware: "1.0.1",
 }
 ```
 
