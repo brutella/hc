@@ -3,7 +3,6 @@ package dnssd
 import (
 	"context"
 	"github.com/miekg/dns"
-	"net"
 )
 
 type AddServiceFunc func(Service)
@@ -19,12 +18,6 @@ func LookupType(ctx context.Context, service string, add AddServiceFunc, rmv Rmv
 	}
 
 	defer conn.close()
-
-	ifaces, _ := net.Interfaces()
-	for _, ifi := range ifaces {
-		conn.ipv4.JoinGroup(&ifi, &net.UDPAddr{IP: IPv4LinkLocalMulticast})
-		conn.ipv6.JoinGroup(&ifi, &net.UDPAddr{IP: IPv6LinkLocalMulticast})
-	}
 
 	m := new(dns.Msg)
 	m.Question = []dns.Question{
