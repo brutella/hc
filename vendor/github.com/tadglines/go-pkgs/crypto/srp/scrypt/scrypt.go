@@ -15,7 +15,7 @@
 package scrypt
 
 import (
-	"golang.org/x/crypto/scrypt"
+	"code.google.com/p/go.crypto/scrypt"
 	"errors"
 )
 
@@ -24,7 +24,7 @@ const maxInt = int(^uint(0) >> 1)
 // NewScrypt returns a new key derivation function that uses scrypt to do
 // the derivation. The returned key will be 32 bytes in size.
 // If N, r, or p are invalid nil and an error are returned.
-// Seegolang.org/x/crypto/scrypt#Key for details on proper values for
+// See code.google.com/p/go.crypto/scrypt#Key for details on proper values for
 // N, r, and p.
 func NewScrypt(N, r, p int) (func(salt, password []byte) []byte, error) {
 	// The following two checks where copied directly from the scrypt implementation.
