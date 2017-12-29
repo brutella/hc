@@ -20,7 +20,8 @@ func MAC48Address(input string) string {
 	c = append(c, toHex(result[4]))
 	c = append(c, toHex(result[5]))
 
-	return strings.Join(c, ":")
+	// setup id needs the mac address in upper case
+	return strings.ToUpper(strings.Join(c, ":"))
 }
 
 func toHex(b byte) string {
