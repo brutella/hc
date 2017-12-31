@@ -71,19 +71,22 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 	cfg := defaultConfig(name)
 	cfg.merge(config)
 
-	storage, err := util.NewFileStorage(cfg.StoragePath)
-	if err != nil {
-		return nil, err
+	if cfg.Storage == nil {
+		storage, err := util.NewFileStorage(cfg.StoragePath)
+		if err != nil {
+			return nil, err
+		}
+		cfg.Storage = storage
 	}
 
-	database := db.NewDatabaseWithStorage(storage)
+	database := db.NewDatabaseWithStorage(cfg.Storage)
 
 	hap_pin, err := NewPin(cfg.Pin)
 	if err != nil {
 		return nil, err
 	}
 
-	cfg.load(storage)
+	cfg.load(cfg.Storage)
 
 	device, err := hap.NewSecuredDevice(cfg.id, hap_pin, database)
 	if err != nil {
@@ -98,7 +101,7 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 	ctx, cancel := context.WithCancel(context.Background())
 
 	t := &ipTransport{
-		storage:   storage,
+		storage:   cfg.Storage,
 		database:  database,
 		device:    device,
 		config:    cfg,
@@ -124,7 +127,7 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 
 	cfg.categoryId = int(t.container.AccessoryType())
 	cfg.updateConfigHash(t.container.ContentHash())
-	cfg.save(storage)
+	cfg.save(cfg.Storage)
 
 	// Listen for events to update mDNS txt records
 	t.emitter.AddListener(t)

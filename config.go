@@ -13,6 +13,10 @@ import (
 
 // Config provides  basic cfguration for an IP transport
 type Config struct {
+	// An object that stores persistent data for hc
+	// When nil, the transport will fallback to using file storage with the StoragePath directory
+	Storage util.Storage
+
 	// Path to the storage
 	// When empty, the tranport stores the data inside a folder named exactly like the accessory
 	StoragePath string
@@ -99,6 +103,10 @@ func (cfg *Config) save(storage util.Storage) {
 
 // merge updates the StoragePath, Pin, Port and IP fields of the receiver from other.
 func (cfg *Config) merge(other Config) {
+	if other.Storage != nil {
+		cfg.Storage = other.Storage
+	}
+
 	if dir := other.StoragePath; len(dir) > 0 {
 		cfg.StoragePath = dir
 	}
