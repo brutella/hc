@@ -142,11 +142,6 @@ func (c *Characteristic) updateValue(value interface{}, conn net.Conn) {
 		value = c.boundIntValue(value.(int))
 	}
 
-	// Ignore when new value is same
-	if c.Value == value {
-		return
-	}
-
 	// Ignore new values from remote when permissions don't allow write
 	if c.hasWritePerms() == false && conn != nil {
 		return
