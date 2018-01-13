@@ -38,7 +38,7 @@ func TestGetCharacteristic(t *testing.T) {
 	cid := a.Info.Name.GetID()
 	values := idsString(aid, cid)
 	controller := NewCharacteristicController(m)
-	res, err := controller.HandleGetCharacteristics(values)
+	res, err := controller.HandleGetCharacteristics(values, characteristic.TestConn)
 
 	if err != nil {
 		t.Fatal(err)

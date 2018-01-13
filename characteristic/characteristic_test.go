@@ -5,6 +5,46 @@ import (
 	"testing"
 )
 
+func TestCharacteristicGetValue(t *testing.T) {
+	getCalls := 0
+	updateCalls := 0
+
+	c := NewCharacteristic(TypeOn)
+	c.Value = getCalls
+
+	c.OnValueUpdateFromConn(func(conn net.Conn, c *Characteristic, new, old interface{}) {
+		if conn != TestConn {
+			t.Fatal(conn)
+		}
+		updateCalls++
+	})
+
+	c.OnValueGet(func() interface{} {
+		getCalls++
+		return getCalls
+	})
+
+	if is, want := c.GetValue(), 1; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	if is, want := updateCalls, 0; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	if is, want := c.GetValueFromConnection(TestConn), 2; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	if is, want := c.GetValueFromConnection(TestConn), 3; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	if is, want := updateCalls, 2; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+}
+
 func TestCharacteristicUpdateValuesOfWrongType(t *testing.T) {
 	c := NewCharacteristic(TypeOn)
 	c.Value = 5

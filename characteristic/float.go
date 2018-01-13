@@ -47,6 +47,13 @@ func (c *Float) GetStepValue() float64 {
 	return c.StepValue.(float64)
 }
 
+// OnValueRemoteGet calls fn when the value was read by a client.
+func (c *Float) OnValueRemoteGet(fn func() float64) {
+	c.OnValueGet(func() interface{} {
+		return fn()
+	})
+}
+
 // OnValueRemoteUpdate calls fn when the value was updated by a client.
 func (c *Float) OnValueRemoteUpdate(fn func(float64)) {
 	c.OnValueUpdateFromConn(func(conn net.Conn, c *Characteristic, new, old interface{}) {

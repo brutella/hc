@@ -25,6 +25,13 @@ func (c *Bool) GetValue() bool {
 	return c.Value.(bool)
 }
 
+// OnValueRemoteGet calls fn when the value was read by a client.
+func (c *Bool) OnValueRemoteGet(fn func() bool) {
+	c.OnValueGet(func() interface{} {
+		return fn()
+	})
+}
+
 // OnValueRemoteUpdate calls fn when the value was updated by a client.
 func (c *Bool) OnValueRemoteUpdate(fn func(bool)) {
 	c.OnValueUpdateFromConn(func(conn net.Conn, c *Characteristic, new, old interface{}) {

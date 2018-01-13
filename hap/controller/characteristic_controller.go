@@ -30,7 +30,7 @@ func NewCharacteristicController(m *accessory.Container) *CharacteristicControll
 }
 
 // HandleGetCharacteristics handles a get characteristic request like `/characteristics?id=1.4,1.5`
-func (ctr *CharacteristicController) HandleGetCharacteristics(form url.Values) (io.Reader, error) {
+func (ctr *CharacteristicController) HandleGetCharacteristics(form url.Values, conn net.Conn) (io.Reader, error) {
 	var b bytes.Buffer
 	var chs []data.Characteristic
 
@@ -42,7 +42,7 @@ func (ctr *CharacteristicController) HandleGetCharacteristics(form url.Values) (
 			iid := to.Int64(ids[1]) // instance id (= characteristic id)
 			c := data.Characteristic{AccessoryID: aid, CharacteristicID: iid}
 			if ch := ctr.GetCharacteristic(aid, iid); ch != nil {
-				c.Value = ch.Value
+				c.Value = ch.GetValueFromConnection(conn)
 			} else {
 				c.Status = hap.StatusServiceCommunicationFailure
 			}
