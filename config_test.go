@@ -18,22 +18,22 @@ var config = &Config{
 	mfiCompliant: false,
 }
 
-func TesttxtRecords(t *testing.T) {
-	expect := []string{
-		"pv=1.0",
-		"id=1234",
-		"c#=1",
-		"s#=1",
-		"sf=0",
-		"ff=0",
-		"md=My MDNS Service",
-		"ci=1",
+func TestTxtRecords(t *testing.T) {
+	expect := map[string]string{
+		"pv": "1.0",
+		"id": "1234",
+		"c#": "1",
+		"s#": "1",
+		"sf": "0",
+		"ff": "0",
+		"md": "My MDNS Service",
+		"ci": "1",
 	}
 
 	config.discoverable = false
 
 	if x := config.txtRecords(); reflect.DeepEqual(x, expect) == false {
-		t.Fatal(expect)
+		t.Fatalf("%v != %v", x, expect)
 	}
 }
 

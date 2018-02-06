@@ -71,7 +71,7 @@ func (cfg Config) txtRecords() map[string]string {
 		"sf": fmt.Sprintf("%d", to.Int64(cfg.discoverable)),
 		"ff": fmt.Sprintf("%d", to.Int64(cfg.mfiCompliant)),
 		"md": cfg.name,
-		"ci": fmt.Sprintf("c%d", cfg.categoryId),
+		"ci": fmt.Sprintf("%d", cfg.categoryId),
 	}
 }
 
