@@ -252,11 +252,11 @@ func structName(char *gen.CharacteristicMetadata) string {
 	return camelCased(char.Name)
 }
 
-// strip removes any leading and trailing white spaces, and make the following substitutions: "." => "_", ","|"-" => "" (empty string)
+// strip removes any leading and trailing white spaces, and make the following substitutions: "." => "_", ","|"-"|"("|")" => "" (empty string)
 func strip(s string) string {
 	trimmed := strings.TrimSpace(s)
 
-	r := strings.NewReplacer(".", "_", ",", "", "-", "")
+	r := strings.NewReplacer(".", "_", ",", "", "-", "", "(", "", ")", "")
 	return r.Replace(trimmed)
 }
 

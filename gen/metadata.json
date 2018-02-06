@@ -85,12 +85,24 @@
       "Category" : 21
     },
     {
-      "Name" : "Humidifer",
+      "Name" : "Humidifier",
       "Category" : 22
     },
     {
       "Name" : "Dehumidifier",
       "Category" : 23
+    },
+    {
+      "Name" : "Sprinklers",
+      "Category" : 28
+    },
+    {
+      "Name" : "Faucets",
+      "Category" : 29
+    },
+    {
+      "Name" : "Shower Systems",
+      "Category" : 30
     }
   ],
   "Characteristics" : [
@@ -129,7 +141,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -142,7 +155,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "UUID" : "00000001-0000-1000-8000-0026BB765291"
     },
@@ -160,7 +174,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -178,7 +193,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -214,7 +230,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "UUID" : "00000005-0000-1000-8000-0026BB765291"
     },
@@ -223,7 +240,8 @@
       "UUID" : "00000068-0000-1000-8000-0026BB765291",
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Battery Level",
       "Permissions" : [
@@ -242,7 +260,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Brightness",
       "Permissions" : [
@@ -288,7 +307,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -304,7 +324,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -339,7 +360,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -355,7 +377,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -374,7 +397,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -393,7 +417,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -421,7 +446,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Cooling Threshold Temperature",
       "Permissions" : [
@@ -451,7 +477,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -459,7 +486,8 @@
       "UUID" : "0000006B-0000-1000-8000-0026BB765291",
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Current Ambient Light Level",
       "Permissions" : [
@@ -509,7 +537,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -529,7 +558,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -557,7 +587,8 @@
       "UUID" : "0000006C-0000-1000-8000-0026BB765291",
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Current Horizontal Tilt Angle",
       "Permissions" : [
@@ -587,7 +618,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -595,7 +627,8 @@
       "UUID" : "0000006D-0000-1000-8000-0026BB765291",
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Current Position",
       "Permissions" : [
@@ -613,7 +646,8 @@
       "UUID" : "00000010-0000-1000-8000-0026BB765291",
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Current Relative Humidity",
       "Permissions" : [
@@ -642,7 +676,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -650,7 +685,8 @@
       "UUID" : "00000011-0000-1000-8000-0026BB765291",
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Current Temperature",
       "Permissions" : [
@@ -668,7 +704,8 @@
       "UUID" : "000000C1-0000-1000-8000-0026BB765291",
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Current Tilt Angle",
       "Permissions" : [
@@ -686,7 +723,8 @@
       "UUID" : "0000006E-0000-1000-8000-0026BB765291",
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Current Vertical Tilt Angle",
       "Permissions" : [
@@ -709,7 +747,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "UUID" : "0000011D-0000-1000-8000-0026BB765291"
     },
@@ -728,7 +767,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -745,7 +785,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -776,7 +817,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Heating Threshold Temperature",
       "Permissions" : [
@@ -807,7 +849,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Hue",
       "Permissions" : [
@@ -842,7 +885,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "UUID" : "0000011F-0000-1000-8000-0026BB765291"
     },
@@ -852,7 +896,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Image Rotation",
       "Permissions" : [
@@ -865,6 +910,46 @@
         "MaximumValue" : 270,
         "MinimumValue" : 0
       }
+    },
+    {
+      "UUID" : "000000D2-0000-1000-8000-0026BB765291",
+      "Name" : "In Use",
+      "Format" : "uint8",
+      "Constraints" : {
+        "ValidValues" : {
+          "0" : "Not in use",
+          "1" : "In use"
+        }
+      },
+      "Permissions" : [
+        "securedRead"
+      ],
+      "Properties" : [
+        "read",
+        "cnotify",
+        "uncnotify"
+      ]
+    },
+    {
+      "UUID" : "000000D6-0000-1000-8000-0026BB765291",
+      "Name" : "Is Configured",
+      "Format" : "uint8",
+      "Constraints" : {
+        "ValidValues" : {
+          "0" : "Not Configured",
+          "1" : "Configured"
+        }
+      },
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
+      "Properties" : [
+        "read",
+        "write",
+        "cnotify",
+        "uncnotify"
+      ]
     },
     {
       "UUID" : "00000070-0000-1000-8000-0026BB765291",
@@ -939,7 +1024,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -953,7 +1039,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "UUID" : "0000001A-0000-1000-8000-0026BB765291"
     },
@@ -974,7 +1061,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -1006,7 +1094,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "UUID" : "0000001F-0000-1000-8000-0026BB765291"
     },
@@ -1055,7 +1144,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "UUID" : "0000011A-0000-1000-8000-0026BB765291"
     },
@@ -1080,7 +1170,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "UUID" : "0000011B-0000-1000-8000-0026BB765291"
     },
@@ -1144,7 +1235,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "UUID" : "00000025-0000-1000-8000-0026BB765291"
     },
@@ -1158,7 +1250,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "UUID" : "0000011C-0000-1000-8000-0026BB765291"
     },
@@ -1170,7 +1263,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "UUID" : "00000026-0000-1000-8000-0026BB765291"
     },
@@ -1294,7 +1388,28 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
+      ]
+    },
+    {
+      "UUID" : "000000D1-0000-1000-8000-0026BB765291",
+      "Name" : "Program Mode",
+      "Format" : "uint8",
+      "Constraints" : {
+        "ValidValues" : {
+          "0" : "No program scheduled",
+          "1" : "Program scheduled",
+          "2" : "Program scheduled (Manual Mode)"
+        }
+      },
+      "Permissions" : [
+        "securedRead"
+      ],
+      "Properties" : [
+        "read",
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -1313,7 +1428,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -1332,26 +1448,47 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
-      "UUID" : "000000CA-0000-1000-8000-0026BB765291",
-      "Name" : "Relative Humidity Humidifier Threshold",
       "Format" : "float",
-      "Constraints" : {
-        "StepValue" : 1,
-        "MaximumValue" : 100,
-        "MinimumValue" : 0
-      },
+      "UUID" : "000000CA-0000-1000-8000-0026BB765291",
+      "Properties" : [
+        "read",
+        "write",
+        "cnotify",
+        "uncnotify"
+      ],
+      "Name" : "Relative Humidity Humidifier Threshold",
       "Permissions" : [
         "securedRead",
         "securedWrite"
       ],
+      "Unit" : "percentage",
+      "Constraints" : {
+        "StepValue" : 1,
+        "MaximumValue" : 100,
+        "MinimumValue" : 0
+      }
+    },
+    {
+      "UUID" : "000000D4-0000-1000-8000-0026BB765291",
+      "Name" : "Remaining Duration",
+      "Format" : "uint32",
+      "Constraints" : {
+        "StepValue" : 1,
+        "MaximumValue" : 3600,
+        "MinimumValue" : 0
+      },
+      "Permissions" : [
+        "securedRead"
+      ],
       "Properties" : [
         "read",
-        "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -1387,7 +1524,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -1396,7 +1534,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Rotation Speed",
       "Permissions" : [
@@ -1416,7 +1555,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Saturation",
       "Permissions" : [
@@ -1444,7 +1584,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -1488,7 +1629,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -1552,6 +1694,26 @@
       ]
     },
     {
+      "UUID" : "000000D3-0000-1000-8000-0026BB765291",
+      "Name" : "Set Duration",
+      "Format" : "uint32",
+      "Constraints" : {
+        "StepValue" : 1,
+        "MaximumValue" : 3600,
+        "MinimumValue" : 0
+      },
+      "Permissions" : [
+        "securedRead",
+        "securedWrite"
+      ],
+      "Properties" : [
+        "read",
+        "write",
+        "cnotify",
+        "uncnotify"
+      ]
+    },
+    {
       "Name" : "Setup Endpoints",
       "Format" : "tlv8",
       "Permissions" : [
@@ -1608,7 +1770,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "UUID" : "00000075-0000-1000-8000-0026BB765291"
     },
@@ -1696,7 +1859,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "UUID" : "00000120-0000-1000-8000-0026BB765291"
     },
@@ -1768,7 +1932,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -1788,7 +1953,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -1809,7 +1975,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -1829,7 +1996,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -1849,7 +2017,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -1870,7 +2039,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -1892,7 +2062,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -1901,7 +2072,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Target Horizontal Tilt Angle",
       "Permissions" : [
@@ -1933,7 +2105,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -1942,7 +2115,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Target Position",
       "Permissions" : [
@@ -1962,7 +2136,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Target Relative Humidity",
       "Permissions" : [
@@ -1993,7 +2168,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -2002,7 +2178,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Target Temperature",
       "Permissions" : [
@@ -2022,7 +2199,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Target Tilt Angle",
       "Permissions" : [
@@ -2042,7 +2220,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Target Vertical Tilt Angle",
       "Permissions" : [
@@ -2073,7 +2252,29 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
+      ]
+    },
+    {
+      "UUID" : "000000D5-0000-1000-8000-0026BB765291",
+      "Name" : "Valve Type",
+      "Format" : "uint8",
+      "Constraints" : {
+        "ValidValues" : {
+          "3" : "Water faucet",
+          "1" : "Irrigation",
+          "2" : "Shower head",
+          "0" : "Generic valve"
+        }
+      },
+      "Permissions" : [
+        "securedRead"
+      ],
+      "Properties" : [
+        "read",
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -2088,7 +2289,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     },
     {
@@ -2115,7 +2317,8 @@
       "Properties" : [
         "read",
         "write",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ],
       "Name" : "Volume",
       "Permissions" : [
@@ -2142,7 +2345,8 @@
       ],
       "Properties" : [
         "read",
-        "cnotify"
+        "cnotify",
+        "uncnotify"
       ]
     }
   ],
@@ -2342,6 +2546,17 @@
     },
     {
       "RequiredCharacteristics" : [
+        "000000B0-0000-1000-8000-0026BB765291"
+      ],
+      "OptionalCharacteristics" : [
+        "00000023-0000-1000-8000-0026BB765291",
+        "00000077-0000-1000-8000-0026BB765291"
+      ],
+      "Name" : "Faucet",
+      "UUID" : "000000D7-0000-1000-8000-0026BB765291"
+    },
+    {
+      "RequiredCharacteristics" : [
         "0000000E-0000-1000-8000-0026BB765291",
         "00000032-0000-1000-8000-0026BB765291",
         "00000024-0000-1000-8000-0026BB765291"
@@ -2405,6 +2620,20 @@
       ],
       "Name" : "Humidity Sensor",
       "UUID" : "00000082-0000-1000-8000-0026BB765291"
+    },
+    {
+      "RequiredCharacteristics" : [
+        "000000B0-0000-1000-8000-0026BB765291",
+        "000000D1-0000-1000-8000-0026BB765291",
+        "000000D2-0000-1000-8000-0026BB765291"
+      ],
+      "OptionalCharacteristics" : [
+        "00000023-0000-1000-8000-0026BB765291",
+        "000000D4-0000-1000-8000-0026BB765291",
+        "00000077-0000-1000-8000-0026BB765291"
+      ],
+      "Name" : "Irrigation System",
+      "UUID" : "000000CF-0000-1000-8000-0026BB765291"
     },
     {
       "RequiredCharacteristics" : [
@@ -2641,6 +2870,23 @@
       ],
       "Name" : "Thermostat",
       "UUID" : "0000004A-0000-1000-8000-0026BB765291"
+    },
+    {
+      "RequiredCharacteristics" : [
+        "000000B0-0000-1000-8000-0026BB765291",
+        "000000D2-0000-1000-8000-0026BB765291",
+        "000000D5-0000-1000-8000-0026BB765291"
+      ],
+      "OptionalCharacteristics" : [
+        "000000D3-0000-1000-8000-0026BB765291",
+        "000000D4-0000-1000-8000-0026BB765291",
+        "000000D6-0000-1000-8000-0026BB765291",
+        "000000CB-0000-1000-8000-0026BB765291",
+        "00000077-0000-1000-8000-0026BB765291",
+        "00000023-0000-1000-8000-0026BB765291"
+      ],
+      "Name" : "Valve",
+      "UUID" : "000000D0-0000-1000-8000-0026BB765291"
     },
     {
       "RequiredCharacteristics" : [
