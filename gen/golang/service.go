@@ -38,12 +38,16 @@ func New{{.StructName}}() *{{.StructName}} {
 
 // Service holds service template data
 type Service struct {
-	StructName string // Name of the struct (e.g. Lightbulb)
-	FileName   string // Name of the file (e.g. lightbulb.go)
-	TypeName   string // Name of type e.g. TypeLightbulb
-	TypeValue  string // Value of the type e.g. 00000008-0000-1000-8000-0026BB765291
+	Name          string // Name of the service (e.g. Light bulb)
+	StructName    string // Name of the struct (e.g. Lightbulb)
+	FileName      string // Name of the file (e.g. lightbulb.go)
+	LocalFilePath string // Path to the file (e.g. ~/User/Go/src/github.com/brutella/hc/service/lightbulb.go)
+	RelFilePath   string // Relative path to the file from the project root (e.g. service/lightbulb.go)
+	TypeName      string // Name of type e.g. TypeLightbulb
+	TypeValue     string // Value of the type e.g. 00000008-0000-1000-8000-0026BB765291
 
-	Chars []*Characteristic
+	Chars    []*Characteristic
+	Optional []*Characteristic
 }
 
 // FileName returns the filename for a characteristic
@@ -51,18 +55,26 @@ func ServiceFileName(svc *gen.ServiceMetadata) string {
 	return fmt.Sprintf("%s.go", underscored(svc.Name))
 }
 
+func ServiceDecl(svc *gen.ServiceMetadata, chars []*gen.CharacteristicMetadata) *Service {
+	return &Service{
+		Name:          svc.Name,
+		StructName:    camelCased(svc.Name),
+		FileName:      ServiceFileName(svc),
+		LocalFilePath: ServiceLocalFilePath(svc),
+		RelFilePath:   ServiceRelativeFilePath(svc),
+		TypeName:      serviceTypeName(svc),
+		TypeValue:     minifyUUID(svc.UUID),
+		Chars:         requiredCharacteristics(svc, chars),
+		Optional:      optionalCharacteristics(svc, chars),
+	}
+}
+
 // ServiceGoCode returns the o code for a characteristic file
 func ServiceGoCode(svc *gen.ServiceMetadata, chars []*gen.CharacteristicMetadata) ([]byte, error) {
 	var err error
 	var buf bytes.Buffer
 
-	data := Service{
-		StructName: camelCased(svc.Name),
-		FileName:   ServiceFileName(svc),
-		TypeName:   serviceTypeName(svc),
-		TypeValue:  minifyUUID(svc.UUID),
-		Chars:      requiredCharacteristics(svc, chars),
-	}
+	data := ServiceDecl(svc, chars)
 
 	t := template.New("Test Template")
 
@@ -80,6 +92,17 @@ func serviceTypeName(svc *gen.ServiceMetadata) string {
 func requiredCharacteristics(svc *gen.ServiceMetadata, chars []*gen.CharacteristicMetadata) []*Characteristic {
 	var required = []*Characteristic{}
 	for _, uuid := range svc.RequiredCharacteristics {
+		char := charWithUUID(uuid, chars)
+		data := NewCharacteristic(char)
+		required = append(required, data)
+	}
+
+	return required
+}
+
+func optionalCharacteristics(svc *gen.ServiceMetadata, chars []*gen.CharacteristicMetadata) []*Characteristic {
+	var required = []*Characteristic{}
+	for _, uuid := range svc.OptionalCharacteristics {
 		char := charWithUUID(uuid, chars)
 		data := NewCharacteristic(char)
 		required = append(required, data)

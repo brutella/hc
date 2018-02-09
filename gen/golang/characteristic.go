@@ -46,10 +46,13 @@ func New{{.StructName}}() *{{.StructName}} {
 
 // Characteristic holds characteristic template data
 type Characteristic struct {
+	Name               string      // Name of the characteristic
 	EmbeddedStructName string      // Name of the embedded struct (e.g. Int)
 	FormatTypeName     string      // Name of the format type (e.g. FormatInt32)
 	StructName         string      // Name of the struct (e.g. Brightness)
 	FileName           string      // Name of the file (e.g. brightness.go)
+	LocalFilePath      string      // Path to the file (e.g. ~/User/Go/src/github.com/brutella/hc/characteristic/brightness.go)
+	RelFilePath        string      // Relative path to the file from the project root (e.g. characteristic/brightness.go)
 	PermsDecl          string      // Permissions declaration (e.g. []string{PermRead, PermWrite, PermEvents})
 	TypeName           string      // Name of type e.g. TypeBrightness
 	TypeValue          string      // Value of the type e.g. 00000008-0000-1000-8000-0026BB765291
@@ -64,10 +67,13 @@ type Characteristic struct {
 
 func NewCharacteristic(char *gen.CharacteristicMetadata) *Characteristic {
 	data := Characteristic{
+		Name:               char.Name,
 		EmbeddedStructName: embeddedStructNames[char.Format],
 		FormatTypeName:     formatConstants[char.Format],
 		StructName:         structName(char),
-		FileName:           FileName(char),
+		FileName:           CharacteristicFileName(char),
+		LocalFilePath:      CharacteristicLocalFilePath(char),
+		RelFilePath:        CharacteristicRelativeFilePath(char),
 		PermsDecl:          permissionDecl(char),
 		TypeName:           typeName(char),
 		TypeValue:          minifyUUID(char.UUID),
@@ -140,7 +146,7 @@ func (v ByValue) Swap(i, j int) {
 }
 
 // FileName returns the filename for a characteristic
-func FileName(char *gen.CharacteristicMetadata) string {
+func CharacteristicFileName(char *gen.CharacteristicMetadata) string {
 	return fmt.Sprintf("%s.go", underscored(char.Name))
 }
 

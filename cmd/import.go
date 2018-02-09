@@ -55,7 +55,7 @@ func main() {
 		if b, err := golang.CharacteristicGoCode(char); err != nil {
 			log.Println(err)
 		} else {
-			filePath := filepath.Join(CharPkgPath, golang.FileName(char))
+			filePath := filepath.Join(CharPkgPath, golang.CharacteristicFileName(char))
 			log.Println("Creating file", filePath)
 			if f, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666); err != nil {
 				log.Fatal(err)

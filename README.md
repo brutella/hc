@@ -23,6 +23,7 @@ Once you've setup HomeKit, you can use Siri to interact with your accessories us
 ## Features
 
 - Full implementation of the HAP in Go
+- Supports all HomeKit [services and characteristics](service/README.md)
 - Built-in service announcement via DNS-SD using [dnssd](http://github.com/brutella/dnssd)
 - Runs on multiple platforms (already in use on Linux and OS X)
 - Documentation: http://godoc.org/github.com/brutella/hc
@@ -124,9 +125,6 @@ The HomeKit model hierarchy looks like this:
     |   |-- * Characteristic
 
 HomeKit accessories are container for services. Every accessory must provide the `Accessory Information Service`. Every service provides one or more characteristics (a characteristic might be the power state of an outlet). HomeKit has predefined service and characteristic types, which are supported by iOS. You can define your own service and characteristic types, but it's recommended to use predefined ones.
-
-This library provides all HomeKit characteristics (see `characteristic` package) and services (see `service` package).
-You can also find common accessory types like lightbulbs, outlets, thermostats in the `accessory` package.
 
 ## Dependencies
 
