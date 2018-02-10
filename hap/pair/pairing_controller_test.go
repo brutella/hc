@@ -11,6 +11,7 @@ import (
 func TestUnknownPairingMethod(t *testing.T) {
 	tlv8 := util.NewTLV8Container()
 	tlv8.SetByte(TagPairingMethod, 0x09)
+	tlv8.SetByte(TagPermission, AdminPerm)
 
 	database, _ := db.NewDatabase(os.TempDir())
 	controller := NewPairingController(database)
@@ -29,6 +30,7 @@ func TestAddPairing(t *testing.T) {
 	in := util.NewTLV8Container()
 	in.SetByte(TagPairingMethod, PairingMethodAdd.Byte())
 	in.SetByte(TagSequence, 0x01)
+	in.SetByte(TagPermission, AdminPerm)
 	in.SetString(TagUsername, "Unit Test")
 	in.SetBytes(TagPublicKey, []byte{0x01, 0x02})
 
@@ -43,6 +45,32 @@ func TestAddPairing(t *testing.T) {
 		t.Fatal("no response")
 	}
 	if is, want := out.GetByte(TagSequence), byte(0x2); is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+}
+
+func TestAddPairingAsNonAdmin(t *testing.T) {
+	in := util.NewTLV8Container()
+	in.SetByte(TagPairingMethod, PairingMethodAdd.Byte())
+	in.SetByte(TagSequence, 0x01)
+	in.SetString(TagUsername, "Unit Test")
+	in.SetBytes(TagPublicKey, []byte{0x01, 0x02})
+
+	database, _ := db.NewDatabase(os.TempDir())
+	controller := NewPairingController(database)
+
+	out, err := controller.Handle(in)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if out == nil {
+		t.Fatal("no response")
+	}
+	if is, want := out.GetByte(TagSequence), byte(0x2); is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	if is, want := out.GetByte(TagErrCode), ErrCodeAuthenticationFailed.Byte(); is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 }
