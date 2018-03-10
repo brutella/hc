@@ -10,7 +10,7 @@ type HeaterCooler struct {
 }
 
 // NewSwitch returns a heater which implements model.Heater.
-func NewHeater(info Info) *HeaterCooler {
+func NewHeaterCooler(info Info) *HeaterCooler {
 	acc := HeaterCooler{}
 	acc.Accessory = New(info, TypeHeater)
 	acc.HeaterCooler = service.NewHeaterCooler()
