@@ -1,4 +1,3 @@
-// Created by mestafin
 package accessory
 
 import (

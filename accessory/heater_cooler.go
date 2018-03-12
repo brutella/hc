@@ -6,6 +6,7 @@ import (
 
 type HeaterCooler struct {
 	*Accessory
+
 	HeaterCooler *service.HeaterCooler
 }
 

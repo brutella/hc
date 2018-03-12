@@ -1,4 +1,3 @@
-// Created by mestafin
 package accessory
 
 import (
@@ -7,6 +6,7 @@ import (
 
 type Fan struct {
 	*Accessory
+
 	Fan *service.Fan
 }
 
