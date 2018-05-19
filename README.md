@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/brutella/hc.svg)](https://travis-ci.org/brutella/dnssd)
 
-This library implements [Multicast DNS](mDNS) and [DNS-Based Service Discovery](dnssd) to provide zero-configuration operations. It lets you announce and find services in a specific link-local domain.
+This library implements [Multicast DNS][mdns] and [DNS-Based Service Discovery][dnssd] to provide zero-configuration operations. It lets you announce and find services in a specific link-local domain.
 
 [mdns]: https://tools.ietf.org/html/rfc6762
 [dnssd]: https://tools.ietf.org/html/rfc6763
