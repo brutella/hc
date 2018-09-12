@@ -163,11 +163,6 @@ func (c *Characteristic) updateValue(value interface{}, conn net.Conn, checkPerm
 		value = c.boundIntValue(value.(int))
 	}
 
-	// Ignore when new value is same
-	if c.Value == value {
-		return
-	}
-
 	// Ignore new values from remote when permissions don't allow write and checkPerms is true
 	if checkPerms == true && c.hasWritePerms() == false {
 		return
