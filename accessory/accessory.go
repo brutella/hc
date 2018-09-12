@@ -11,10 +11,9 @@ type Info struct {
 	Model        string
 }
 
-// Accessory implements the model.Accessory interface and contains the data
-// structures to communicate with HomeKit.
+// Accessory is a HomeKit accessory.
 //
-// An accessory in consists of services, which consists of characteristics.
+// An accessory contains services, which themselves contain characteristics.
 // Every accessory has the "accessory info" service by default which consists
 // of characteristics to identify the accessory: name, model, manufacturer,...
 type Accessory struct {
