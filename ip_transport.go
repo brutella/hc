@@ -7,7 +7,7 @@ import (
 	"net"
 	"strings"
 	"sync"
-	_ "time"
+	"time"
 
 	"github.com/brutella/dnssd"
 	"github.com/brutella/hc/accessory"
@@ -200,7 +200,16 @@ func (t *ipTransport) Stop() <-chan struct{} {
 	return t.stopped
 }
 
-func (t *ipTransport) IPs() []net.IP {
+// WaitForIPs waits until ip address of the transport was published.
+func (t *ipTransport) WaitForIPs() []net.IP {
+    for {
+        if t.handle != nil {
+            break
+        }
+        
+        time.Sleep(100 *time.Millisecond)
+    }
+    
 	ips := make([]net.IP, 0)
 	for _, ip := range t.handle.Service().IPs {
 		ips = append(ips, ip)
