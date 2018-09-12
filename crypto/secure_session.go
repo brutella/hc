@@ -10,9 +10,6 @@ import (
 )
 
 // secureSession provide a secure session by encrypting and decrypting data
-//
-// TODO(brutella) Why is the data encoded in little endian when we are sending
-// it over the wire and it should be network byte order (big endian)?
 type secureSession struct {
 	encryptKey [32]byte
 	decryptKey [32]byte
