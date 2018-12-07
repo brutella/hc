@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"runtime"
 
 	"github.com/brutella/dnssd/log"
 	"github.com/miekg/dns"
@@ -103,11 +102,8 @@ func newMDNSConn() (*mdnsConn, error) {
 	} else {
 		connIPv4 = ipv4.NewPacketConn(conn)
 		connIPv4.SetControlMessage(ipv4.FlagInterface, true)
-
-		if runtime.GOOS == "linux" {
-			// Don't send us our own messages back
-			connIPv4.SetMulticastLoopback(false)
-		}
+		// Don't send us our own messages back
+		connIPv4.SetMulticastLoopback(false)
 
 		for _, iface := range multicastInterfaces() {
 			if err := connIPv4.JoinGroup(&iface, &net.UDPAddr{IP: IPv4LinkLocalMulticast}); err != nil {
@@ -123,11 +119,8 @@ func newMDNSConn() (*mdnsConn, error) {
 	} else {
 		connIPv6 = ipv6.NewPacketConn(conn)
 		connIPv6.SetControlMessage(ipv6.FlagInterface, true)
-
-		if runtime.GOOS == "linux" {
-			// Don't send us our own messages back
-			connIPv6.SetMulticastLoopback(false)
-		}
+		// Don't send us our own messages back
+		connIPv6.SetMulticastLoopback(false)
 
 		for _, iface := range multicastInterfaces() {
 			if err := connIPv6.JoinGroup(&iface, &net.UDPAddr{IP: IPv6LinkLocalMulticast}); err != nil {
