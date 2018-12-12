@@ -13,7 +13,7 @@ var (
 
 	// Info generates debug lines of output with a "INFO" prefix.
 	// By default the lines are written to stdout.
-	Info = &Logger{log.New(os.Stdout, "INFO ", log.LstdFlags)}
+	Info = &Logger{log.New(os.Stdout, "INFO ", log.LstdFlags|log.Lshortfile)}
 )
 
 // Logger is a wrapper for log.Logger and provides
