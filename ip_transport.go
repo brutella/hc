@@ -7,7 +7,6 @@ import (
 	"net"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/brutella/dnssd"
 	"github.com/brutella/hc/accessory"
@@ -20,9 +19,13 @@ import (
 	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/util"
 	"github.com/gosexy/to"
+
+	"image"
 )
 
 type ipTransport struct {
+	CameraSnapshotReq func(width, height uint) (*image.Image, error)
+
 	config  *Config
 	context hap.Context
 	server  *http.Server
@@ -149,6 +152,10 @@ func (t *ipTransport) Start() {
 	s := http.NewServer(config)
 	t.server = s
 
+	if t.CameraSnapshotReq != nil {
+		t.server.Mux.Handle("/resource", endpoint.NewResource(t.context, t.CameraSnapshotReq))
+	}
+
 	// Publish server port which might be different then `t.config.Port`
 	t.config.servePort = int(to.Int64(s.Port()))
 
@@ -198,24 +205,6 @@ func (t *ipTransport) Stop() <-chan struct{} {
 	t.cancel()
 
 	return t.stopped
-}
-
-// WaitForIPs waits until ip address of the transport was published.
-func (t *ipTransport) WaitForIPs() []net.IP {
-	for {
-		if t.handle != nil {
-			break
-		}
-
-		time.Sleep(100 * time.Millisecond)
-	}
-
-	ips := make([]net.IP, 0)
-	for _, ip := range t.handle.Service().IPs {
-		ips = append(ips, ip)
-	}
-
-	return ips
 }
 
 // isPaired returns true when the transport is already paired
@@ -326,9 +315,4 @@ func newService(config *Config) dnssd.Service {
 	}
 
 	return service
-}
-
-// HandleSnapshotRequest handles requrest for a camera snapshot
-func (t *ipTransport) HandleCameraSnapshotRequest(fn endpoint.SnapshotFunc) {
-	t.server.Mux.Handle("/resource", endpoint.NewResource(t.context, fn))
 }

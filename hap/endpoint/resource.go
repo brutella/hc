@@ -12,20 +12,20 @@ import (
 	"net/http"
 )
 
-type SnapshotFunc func(width, height uint) (*image.Image, error)
+type GetImageFunc func(width, height uint) (*image.Image, error)
 
 // Resource handles the /resource endpoint
 type Resource struct {
 	http.Handler
-	snapshot SnapshotFunc
-	context  hap.Context
+	imgFn   GetImageFunc
+	context hap.Context
 }
 
 // NewResource returns a new handler for resource requests
-func NewResource(context hap.Context, snapshot SnapshotFunc) *Resource {
+func NewResource(context hap.Context, imgFn GetImageFunc) *Resource {
 	r := Resource{
-		context:  context,
-		snapshot: snapshot,
+		context: context,
+		imgFn:   imgFn,
 	}
 
 	return &r
@@ -64,7 +64,7 @@ func (r *Resource) postResource(resp http.ResponseWriter, req *http.Request) err
 	}
 
 	if imgRq.Type == "image" {
-		b, err := r.getJPEGSnapshot(imgRq)
+		b, err := r.getJPEGImage(imgRq)
 		if err != nil {
 			return err
 		}
@@ -80,10 +80,10 @@ func (r *Resource) postResource(resp http.ResponseWriter, req *http.Request) err
 	return nil
 }
 
-func (r *Resource) getJPEGSnapshot(req ImageRequest) ([]byte, error) {
-	img, err := r.snapshot(req.Width, req.Height)
+func (r *Resource) getJPEGImage(req ImageRequest) ([]byte, error) {
+	img, err := r.imgFn(req.Width, req.Height)
 	if err != nil {
-		return nil, fmt.Errorf("r.snapshot() %v", err)
+		return nil, fmt.Errorf("r.imgFn() %v", err)
 	}
 
 	buf := new(bytes.Buffer)
