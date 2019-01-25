@@ -15,6 +15,7 @@ func NewWaterLevel() *WaterLevel {
 	char.SetMaxValue(100)
 
 	char.SetValue(0)
+	char.Unit = UnitPercentage
 
 	return &WaterLevel{char}
 }
