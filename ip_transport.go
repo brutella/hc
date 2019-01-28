@@ -25,7 +25,8 @@ type ipTransport struct {
 	context hap.Context
 	server  http.Server
 	mutex   *sync.Mutex
-	mdns    *MDNSService
+	// TODO reference is not needed
+	mdns *MDNSService
 
 	storage  util.Storage
 	database db.Database
@@ -278,4 +279,8 @@ func (t *ipTransport) Handle(ev interface{}) {
 	default:
 		break
 	}
+}
+
+func (t *ipTransport) Storage() util.Storage {
+	return t.storage
 }

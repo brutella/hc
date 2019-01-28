@@ -1,6 +1,8 @@
 package hc
 
-import ()
+import (
+	"github.com/brutella/hc/util"
+)
 
 // Transport provides accessories over a network.
 type Transport interface {
@@ -10,4 +12,6 @@ type Transport interface {
 	// Stop stops the transport
 	// Use the returned channel to wait until the transport is fully stopped.
 	Stop() <-chan struct{}
+
+	Storage() util.Storage
 }

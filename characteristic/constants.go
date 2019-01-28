@@ -33,6 +33,7 @@ const (
 	UnitCelsius    = "celsius"
 	UnitLux        = "lux"
 	UnitSeconds    = "seconds"
+	UnitPPM        = "ppm"
 )
 
 // HAP characterisitic formats

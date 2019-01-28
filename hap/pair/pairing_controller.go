@@ -44,12 +44,6 @@ func (c *PairingController) Handle(cont util.Container) (util.Container, error) 
 		log.Debug.Printf("Remove LTPK for client '%s'\n", username)
 		c.database.DeleteEntity(entity)
 	case PairingMethodAdd:
-		if perm != AdminPerm {
-			log.Info.Println("Non-admin controllers are not allowed to add pairings")
-			out.SetByte(TagErrCode, ErrCodeAuthenticationFailed.Byte())
-			break
-		}
-
 		err := c.database.SaveEntity(entity)
 		if err != nil {
 			log.Info.Panic(err)

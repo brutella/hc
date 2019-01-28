@@ -2,9 +2,9 @@ package characteristic
 
 import (
 	"fmt"
-	"github.com/gosexy/to"
 	"net"
-	"reflect"
+
+	"github.com/gosexy/to"
 )
 
 type ConnChangeFunc func(conn net.Conn, c *Characteristic, newValue, oldValue interface{})
@@ -149,11 +149,7 @@ func (c *Characteristic) getValue(conn net.Conn) interface{} {
 //
 // When permissions are write only and checkPerms is true, this methods does not set the Value field.
 func (c *Characteristic) updateValue(value interface{}, conn net.Conn, checkPerms bool) {
-	if c.Value != nil {
-		if converted, err := to.Convert(value, reflect.TypeOf(c.Value).Kind()); err == nil {
-			value = converted
-		}
-	}
+	value = c.convert(value)
 
 	// Value must be within min and max
 	switch c.Format {
@@ -221,4 +217,21 @@ func (c *Characteristic) boundIntValue(value int) interface{} {
 	}
 
 	return value
+}
+
+func (c *Characteristic) convert(v interface{}) interface{} {
+	switch c.Format {
+	case FormatFloat:
+		return to.Float64(v)
+	case FormatUInt8:
+		return int(to.Uint64(v))
+	case FormatUInt32:
+		return int(to.Uint64(v))
+	case FormatInt32:
+		return int(to.Uint64(v))
+	case FormatUInt64:
+		return int(to.Uint64(v))
+	default:
+		return v
+	}
 }
