@@ -12,15 +12,22 @@ import (
 	"time"
 )
 
+type ReadFunc func(*Request)
+
 // Responder represents a mDNS responder.
 type Responder interface {
 	// Add adds a service to the responder.
 	// Use the returned service handle to update service properties.
 	Add(srv Service) (ServiceHandle, error)
+
 	// Remove removes the service associated with the service handle from the responder.
 	Remove(srv ServiceHandle)
+
 	// Respond makes the receiver announcing and managing services.
 	Respond(ctx context.Context) error
+
+	// Debug calls a function for every dns request the responder receives.
+	Debug(ctx context.Context, fn ReadFunc)
 }
 
 type responder struct {

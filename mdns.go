@@ -49,6 +49,10 @@ type Request struct {
 	iface *net.Interface // The network interface from which the message was received
 }
 
+func (r Request) String() string {
+	return fmt.Sprintf("%s@%s\n%v", r.from.IP, r.iface.Name, r.msg)
+}
+
 // MDNSConn represents a mDNS connection. It encapsulates an IPv4 and IPv6 UDP connection.
 type MDNSConn interface {
 	// SendQuery sends a mDNS query.

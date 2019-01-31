@@ -21,7 +21,6 @@ var portFlag = flag.Int("Port", 12345, "Port")
 var timeFormat = "15:04:05.000"
 
 func main() {
-	log.Debug.Enable()
 	flag.Parse()
 	if len(*instanceFlag) == 0 || len(*serviceFlag) == 0 || len(*domainFlag) == 0 {
 		flag.Usage()
