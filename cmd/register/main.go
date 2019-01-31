@@ -6,7 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/brutella/dnssd"
-	"github.com/brutella/dnssd/log"
 	slog "log"
 	"os"
 	"os/signal"
