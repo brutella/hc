@@ -1,3 +1,4 @@
+// Command register registers a dns-sd service instance.
 package main
 
 import (

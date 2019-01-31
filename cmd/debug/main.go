@@ -1,3 +1,4 @@
+// Command debug logs dns packets to the console.
 package main
 
 import (

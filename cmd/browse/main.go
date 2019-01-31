@@ -1,3 +1,4 @@
+// Command browse browses for specific dns-sd service types.
 package main
 
 import (
