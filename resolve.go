@@ -6,17 +6,19 @@ import (
 )
 
 // LookupInstance resolves a service by its service instance name.
-func LookupInstance(ctx context.Context, instance string) (srv Service, err error) {
-	var conn MDNSConn
-	var cache = NewCache()
+func LookupInstance(ctx context.Context, instance string) (Service, error) {
+	var srv Service
 
-	conn, err = NewMDNSConn()
-
+	conn, err := NewMDNSConn()
 	if err != nil {
-		return
+		return srv, err
 	}
 
-	defer conn.Close()
+	return lookupInstance(ctx, instance, conn)
+}
+
+func lookupInstance(ctx context.Context, instance string, conn MDNSConn) (srv Service, err error) {
+	var cache = NewCache()
 
 	m := new(dns.Msg)
 

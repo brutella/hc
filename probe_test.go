@@ -8,6 +8,20 @@ import (
 	"time"
 )
 
+var testIface = &net.Interface{
+	Index:        0,
+	MTU:          0,
+	Name:         "lo0",
+	HardwareAddr: []byte{},
+	Flags:        net.FlagUp,
+}
+
+var testAddr = net.UDPAddr{
+	IP:   net.IP{},
+	Port: 1234,
+	Zone: "",
+}
+
 type testConn struct {
 	read chan *Request
 
@@ -45,14 +59,15 @@ func (c *testConn) Read(ctx context.Context) <-chan *Request {
 	return c.read
 }
 
-func (c *testConn) Close() {
-}
+func (c *testConn) Drain(ctx context.Context) {}
+
+func (c *testConn) Close() {}
 
 func (c *testConn) start(ctx context.Context) {
 	for {
 		select {
 		case msg := <-c.in:
-			req := &Request{msg: msg}
+			req := &Request{msg: msg, from: &testAddr, iface: testIface}
 			c.read <- req
 		case <-ctx.Done():
 			return
@@ -71,16 +86,36 @@ func TestProbing(t *testing.T) {
 	conn.in = otherConn.out
 	conn.out = otherConn.in
 
-	srv := NewService("My Service", "._hap._tcp", "local.", "My Computer", []net.IP{net.ParseIP("192.168.0.122")}, 12334)
+	cfg := Config{
+		Name: "My Service",
+		Type: "_hap._tcp",
+		Host: "My-Computer",
+		Port: 12334,
+		ifaceIPs: map[string][]net.IP{
+			testIface.Name: []net.IP{net.ParseIP("192.168.0.122")},
+		},
+	}
+	srv, err := NewService(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	go func() {
-		otherSrv := NewService("My Service", "._hap._tcp", "local.", "My Computer", []net.IP{net.ParseIP("192.168.0.123")}, 43321)
+		otherCfg := cfg.Copy()
+		otherCfg.ifaceIPs = map[string][]net.IP{
+			testIface.Name: []net.IP{net.ParseIP("192.168.0.123")},
+		}
+		otherSrv, otherErr := NewService(otherCfg)
+		if otherErr != nil {
+			t.Fatal(otherErr)
+		}
 		otherResp := newResponder(otherConn)
-		otherResp.addManaged(otherSrv)
-		otherResp.isRunning = true
-		otherResp.respond(ctx)
+		otherResp.Add(otherSrv)
+		otherResp.Respond(ctx)
 	}()
 
+	// Allow other responder to claim service instance
+	<-time.After(1 * time.Second)
 	resolved, err := probeService(ctx, conn, srv, 1*time.Millisecond, true)
 
 	if x := err; x != nil {

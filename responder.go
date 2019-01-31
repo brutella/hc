@@ -6,6 +6,7 @@ import (
 	"github.com/brutella/dnssd/log"
 	"github.com/miekg/dns"
 	"math/rand"
+	"net"
 	"strings"
 	"sync"
 	"time"
@@ -32,6 +33,7 @@ type responder struct {
 	mutex     *sync.Mutex
 	truncated *Request
 	random    *rand.Rand
+	upIfaces  []string
 }
 
 var DefaultResponder, _ = NewResponder()
@@ -53,6 +55,7 @@ func newResponder(conn MDNSConn) *responder {
 		managed:   []*serviceHandle{},
 		mutex:     &sync.Mutex{},
 		random:    rand.New(rand.NewSource(time.Now().UnixNano())),
+		upIfaces:  []string{},
 	}
 }
 
@@ -106,17 +109,45 @@ func (r *responder) Respond(ctx context.Context) error {
 
 // announce sends announcement messages including all services.
 func (r *responder) announce(services []*Service) {
+	names := ifaceNames(services)
+
+	if len(names) == 0 {
+		r.announceAtInterface(services, nil)
+		return
+	}
+
+	for _, name := range names {
+		if iface, err := net.InterfaceByName(name); err != nil {
+			log.Debug.Println("Unable to find interface", name)
+		} else {
+			r.announceAtInterface(services, iface)
+		}
+	}
+}
+
+func (r *responder) announceAtInterface(services []*Service, iface *net.Interface) {
 	var msgs []*dns.Msg
 	for _, srv := range services {
+		var ips []net.IP
+		if iface != nil {
+			ips = srv.IPsAtInterface(iface)
+		} else {
+			ips = srv.IPs
+		}
+		if len(ips) == 0 {
+			log.Debug.Println("No IPs for service", srv.ServiceInstanceName())
+			continue
+		}
+
 		var answer []dns.RR
 		answer = append(answer, SRV(*srv))
 		answer = append(answer, PTR(*srv))
 		answer = append(answer, TXT(*srv))
-		for _, a := range A(*srv, nil) {
+		for _, a := range A(*srv, iface) {
 			answer = append(answer, a)
 		}
 
-		for _, aaaa := range AAAA(*srv, nil) {
+		for _, aaaa := range AAAA(*srv, iface) {
 			answer = append(answer, aaaa)
 		}
 		msg := new(dns.Msg)
@@ -129,10 +160,12 @@ func (r *responder) announce(services []*Service) {
 
 	setAnswerCacheFlushBit(msg)
 
-	resp := &Response{msg: msg}
+	resp := &Response{msg: msg, iface: iface}
 
+	log.Debug.Println("Sending 1st announcement", msg)
 	r.conn.SendResponse(resp)
 	time.Sleep(1 * time.Second)
+	log.Debug.Println("Sending 2nd announcement", msg)
 	r.conn.SendResponse(resp)
 }
 
@@ -151,7 +184,6 @@ func (r *responder) register(ctx context.Context, srv Service) (Service, error) 
 	for _, h := range r.managed {
 		srvs = append(srvs, h.service)
 	}
-	log.Debug.Println("Announcing services", srvs)
 	go r.announce(srvs)
 
 	return probed, nil
@@ -176,12 +208,15 @@ func (r *responder) respond(ctx context.Context) error {
 
 	readCtx, readCancel := context.WithCancel(ctx)
 	defer readCancel()
-
 	ch := r.conn.Read(readCtx)
 
 	for {
 		select {
 		case req := <-ch:
+			if len(r.managed) == 0 {
+				// Ignore requests when no services are managed
+				break
+			}
 
 			// If messages is truncated, we wait for the next message to come (RFC6762 18.5)
 			if req.msg.Truncated {
@@ -201,14 +236,13 @@ func (r *responder) respond(ctx context.Context) error {
 			// Conflicting records remove managed services from
 			// the responder and trigger reprobing
 			conflicts := r.findConflicts(req, r.managed)
-		loop:
 			for _, h := range conflicts {
 				log.Debug.Println("Reprobe for", h.service)
 				go r.reprobe(h)
 				for i, m := range r.managed {
 					if h == m {
 						r.managed = append(r.managed[:i], r.managed[i+1:]...)
-						continue loop
+						break
 					}
 				}
 			}
@@ -272,15 +306,16 @@ func (r *responder) handleQuery(req *Request, services []*Service) {
 		msg.Authoritative = true
 
 		if len(msg.Answer) == 0 {
+			log.Debug.Println("No answers")
 			continue
 		}
 
 		if isUnicastQuestion(q) {
-			resp := &Response{msg: msg, addr: req.from}
+			resp := &Response{msg: msg, addr: req.from, iface: req.iface}
 			log.Debug.Printf("Send unicast response\n%v\n", msg)
 			r.conn.SendResponse(resp)
 		} else {
-			resp := &Response{msg: msg}
+			resp := &Response{msg: msg, iface: req.iface}
 			log.Debug.Printf("Send multicast response\n%v\n", msg)
 			r.conn.SendResponse(resp)
 		}
@@ -411,35 +446,42 @@ func services(hs []*serviceHandle) []*Service {
 	return result
 }
 
+func ifaceNames(svs []*Service) []string {
+	var names []string
+	for _, sv := range svs {
+		for name, _ := range sv.IfaceIPs {
+			names = append(names, name)
+		}
+	}
+
+	return names
+}
+
 func containsConflictingAnswers(req *Request, handle *serviceHandle) bool {
 	answers := allRecords(req.msg)
 
-	as := A(*handle.service, nil)
-	aaaas := AAAA(*handle.service, nil)
+	as := A(*handle.service, req.iface)
+	aaaas := AAAA(*handle.service, req.iface)
 	srv := SRV(*handle.service)
 
 	for _, answer := range answers {
 		switch rr := answer.(type) {
 		case *dns.A:
-			if len(as) == 0 {
-				continue
-			}
-
-			if isLexicographicalLaterA(rr, as[0]) {
-				return true
+			for _, a := range as {
+				if isDenyingA(rr, a) {
+					return true
+				}
 			}
 
 		case *dns.AAAA:
-			if len(aaaas) == 0 {
-				continue
-			}
-
-			if isLexicographicalLaterAAAA(rr, aaaas[0]) {
-				return true
+			for _, aaaa := range aaaas {
+				if isDenyingAAAA(rr, aaaa) {
+					return true
+				}
 			}
 
 		case *dns.SRV:
-			if isLexicographicalLaterSRV(rr, srv) {
+			if isDenyingSRV(rr, srv) {
 				return true
 			}
 

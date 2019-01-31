@@ -31,13 +31,15 @@ var (
 
 // Query is a mDNS query
 type Query struct {
-	msg *dns.Msg // The query message
+	msg   *dns.Msg       // The query message
+	iface *net.Interface // The network interface to which the message is sent
 }
 
 // Response is a mDNS response
 type Response struct {
-	msg  *dns.Msg     // The response message
-	addr *net.UDPAddr // Is nil for multicast response
+	msg   *dns.Msg       // The response message
+	addr  *net.UDPAddr   // Is nil for multicast response
+	iface *net.Interface // The network interface to which the message is sent
 }
 
 // Request represents an incoming mDNS message
@@ -58,6 +60,9 @@ type MDNSConn interface {
 	// Read returns a channel which receives mDNS messages
 	Read(ctx context.Context) <-chan *Request
 
+	// Clears the connection buffer
+	Drain(ctx context.Context)
+
 	// Close closes the connection
 	Close()
 }
@@ -73,19 +78,32 @@ func NewMDNSConn() (MDNSConn, error) {
 }
 
 func (c *mdnsConn) SendQuery(q *Query) error {
-	return c.sendQuery(q.msg)
+	return c.sendQuery(q.msg, q.iface)
 }
 
 func (c *mdnsConn) SendResponse(resp *Response) error {
 	if resp.addr != nil {
-		return c.sendResponseTo(resp.msg, resp.addr)
+		return c.sendResponseTo(resp.msg, resp.iface, resp.addr)
 	}
 
-	return c.sendResponse(resp.msg)
+	return c.sendResponse(resp.msg, resp.iface)
 }
 
 func (c *mdnsConn) Read(ctx context.Context) <-chan *Request {
 	return c.read(ctx)
+}
+
+func (c *mdnsConn) Drain(ctx context.Context) {
+	log.Debug.Println("Draining connection")
+	for {
+		select {
+		case req := <-c.Read(ctx):
+			log.Debug.Println("Ignoring msg from", req.from.IP)
+			break
+		default:
+			return
+		}
+	}
 }
 
 func (c *mdnsConn) Close() {
@@ -239,50 +257,58 @@ func (c *mdnsConn) readInto(ctx context.Context, ch chan *Request) {
 	}()
 }
 
-func (c *mdnsConn) sendQuery(m *dns.Msg) error {
+func (c *mdnsConn) sendQuery(m *dns.Msg, iface *net.Interface) error {
 	sanitizeQuery(m)
 
-	return c.writeMsg(m)
+	return c.writeMsg(m, iface)
 }
 
-func (c *mdnsConn) sendResponse(m *dns.Msg) error {
+func (c *mdnsConn) sendResponse(m *dns.Msg, iface *net.Interface) error {
 	sanitizeResponse(m)
 
-	return c.writeMsg(m)
+	return c.writeMsg(m, iface)
 }
 
-func (c *mdnsConn) sendResponseTo(m *dns.Msg, addr *net.UDPAddr) error {
+func (c *mdnsConn) sendResponseTo(m *dns.Msg, iface *net.Interface, addr *net.UDPAddr) error {
 	sanitizeResponse(m)
 
-	return c.writeMsgTo(m, addr)
+	return c.writeMsgTo(m, iface, addr)
 }
 
-func (c *mdnsConn) writeMsg(m *dns.Msg) error {
+func (c *mdnsConn) writeMsg(m *dns.Msg, iface *net.Interface) error {
 	var err error
 	if c.ipv4 != nil {
-		err = c.writeMsgTo(m, AddrIPv4LinkLocalMulticast)
+		err = c.writeMsgTo(m, iface, AddrIPv4LinkLocalMulticast)
 	}
 
 	if c.ipv6 != nil {
-		err = c.writeMsgTo(m, AddrIPv6LinkLocalMulticast)
+		err = c.writeMsgTo(m, iface, AddrIPv6LinkLocalMulticast)
 	}
 
 	return err
 }
 
-func (c *mdnsConn) writeMsgTo(m *dns.Msg, addr *net.UDPAddr) error {
+func (c *mdnsConn) writeMsgTo(m *dns.Msg, iface *net.Interface, addr *net.UDPAddr) error {
 	sanitizeMsg(m)
 
 	var err error
 	if c.ipv4 != nil && addr.IP.To4() != nil {
 		if out, err := m.Pack(); err == nil {
-			_, err = c.ipv4.WriteTo(out, nil, addr)
+			ctrl := &ipv4.ControlMessage{}
+			if iface != nil {
+				ctrl.IfIndex = iface.Index
+			}
+			_, err = c.ipv4.WriteTo(out, ctrl, addr)
 		}
 	}
 
 	if c.ipv6 != nil && addr.IP.To4() == nil {
 		if out, err := m.Pack(); err == nil {
-			_, err = c.ipv6.WriteTo(out, nil, addr)
+			ctrl := &ipv6.ControlMessage{}
+			if iface != nil {
+				ctrl.IfIndex = iface.Index
+			}
+			_, err = c.ipv6.WriteTo(out, ctrl, addr)
 		}
 	}
 

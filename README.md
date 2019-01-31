@@ -14,30 +14,48 @@ This library implements [Multicast DNS][mdns] and [DNS-Based Service Discovery][
 The following code creates a service with name "My Website._http._tcp.local." for the host "My Computer" which has the IP "192.168.0.123" on port "12345". The service is added to a responder.
 
 ```go
-service := dnssd.NewService("My Website", "_http._tcp.", "local.", "My Computer", []net.IP{net.ParseIP("192.168.0.123")}, 12345)
-resp, _ := dnssd.NewResponder()
-handle, _ := resp.Add(service)
+cfg := dnssd.Config{
+    Name:   "My Website",
+    Type:   "_http._tcp",
+    Domain: "local",
+    Host:   "My Computer",
+    IPs:    []net.IP{net.ParseIP("192.168.0.123")},
+    Port:   12345,
+}
+sv, _ := dnssd.NewService(cfg)
+```
+
+In most cases you only need to specify the name, type and port of the service.
+
+```go
+cfg := dnssd.Config{
+    Name:   "My Website",
+    Type:   "_http._tcp",
+    Port:   12345,
+}
+sv, _ := dnssd.NewService(cfg)
+```
+
+Then you create a responder and add the service to it.
+```go
+rp, _ := dnssd.NewResponder()
+hdl, _ := rp.Add(sv)
 
 ctx, cancel := context.WithCancel(context.Background())
 defer cancel()
 
-resp.Respond(ctx)
+rp.Respond(ctx)
 ```
 
-If the service should be published on all available network interfaces, you can provide an empty host name and no IP addresses. The service will then get the local host name and IP addresses assigned to it.
-
-```go
-service := dnssd.NewService("My Website", "_http._tcp.", "local.", "", nil, 12345)
-```
-
-When calling `Respond` the responder probes for the service instance name and host name to be unqiue in the network. Once probing is finished, the service will be announced.
+When calling `Respond` the responder probes for the service instance name and host name to be unqiue in the network. 
+Once probing is finished, the service will be announced.
 
 #### Update TXT records
 
-Once a service is added to a responder, you have to use the `handle` object to update properties.
+Once a service is added to a responder, you can use the `hdl` to update properties.
 
 ```go
-handle.UpdateText(map[string]string{"key1": "value1", "key2": "value2"}, resp)
+hdl.UpdateText(map[string]string{"key1": "value1", "key2": "value2"}, rsp)
 ```
 
 ## Examples
@@ -50,6 +68,7 @@ This library passes the [multicast DNS tests](https://github.com/brutella/dnssd/
 
 ## TODO
 
+- [ ] Support hot plugging
 - [ ] Support negative responses (RFC6762 6.1)
 - [ ] Handle txt records case insensitive
 - [ ] Remove outdated services from cache regularly
