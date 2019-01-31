@@ -6,15 +6,12 @@ import (
 	"fmt"
 	"github.com/brutella/dnssd"
 	"github.com/brutella/dnssd/log"
-	"net"
 	"os"
 	"os/signal"
 	"strings"
 )
 
 func main() {
-	log.Debug.Enable()
-
 	if resp, err := dnssd.NewResponder(); err != nil {
 		fmt.Println(err)
 	} else {
@@ -26,7 +23,7 @@ func main() {
 		go func() {
 			for {
 				reader := bufio.NewReader(os.Stdin)
-				fmt.Print("Enter name \nor\n\"exit\"\n>")
+				fmt.Print("Enter name \nor\nexit\n>")
 				name, _ := reader.ReadString('\n')
 				name = strings.Trim(name, "\n")
 
@@ -35,7 +32,16 @@ func main() {
 					return
 				}
 
-				srv := dnssd.NewService(name, "_asdf._tcp.", "local.", "", []net.IP{net.ParseIP("192.168.0.123")}, 12345)
+				cfg := dnssd.Config{
+					Name: name,
+					Type: "_asdf._tcp",
+					Port: 12345,
+				}
+				srv, err := dnssd.NewService(cfg)
+				if err != nil {
+					log.Debug.Fatal(err)
+				}
+				log.Debug.Printf("%+v\n", srv)
 				h, _ := resp.Add(srv)
 
 				<-stop

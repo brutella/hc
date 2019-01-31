@@ -68,7 +68,6 @@ loop:
 		case *dns.A:
 			for _, entry := range c.services {
 				if entry.Hostname() == rr.Hdr.Name {
-
 					for _, ip := range entry.IPs {
 						if ip.Equal(rr.A) {
 							continue loop

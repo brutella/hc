@@ -8,12 +8,54 @@ import (
 	"time"
 )
 
+type Config struct {
+	// Name of the service
+	Name string
+
+	// Type is the service type, for example "_hap._tcp".
+	Type string
+
+	// Domain is the name of the domain, for example "local".
+	// If empty, "local" is used.
+	Domain string
+
+	// Host is the name of the host (no trailing dot).
+	// If empty the local host name is used.
+	Host string
+
+	// Txt records
+	Text map[string]string
+
+	// IP addresses of the service.
+	// If specified, probing for uniqueness of the service instance name
+	// and host names is skipped and the service is announced as is.
+	IPs []net.IP
+
+	// Port is the port of the service.
+	Port int
+
+	ifaceIPs map[string][]net.IP
+}
+
+func (c Config) Copy() Config {
+	return Config{
+		Name:     c.Name,
+		Type:     c.Type,
+		Domain:   c.Domain,
+		Host:     c.Host,
+		Text:     c.Text,
+		IPs:      c.IPs,
+		Port:     c.Port,
+		ifaceIPs: c.ifaceIPs,
+	}
+}
+
 // Service represents a DNS-SD service instance
 type Service struct {
-	Name     string // e.g. Accessory (no trailing dot)
-	Type     string // e.g. _hap._tcp.
-	Domain   string // e.g. local.
-	Host     string // e.g. MacBook (no trailing dot)
+	Name     string
+	Type     string
+	Domain   string
+	Host     string
 	Text     map[string]string
 	Ttl      time.Duration // Original time to live
 	Port     int
@@ -23,70 +65,84 @@ type Service struct {
 	expiration time.Time
 }
 
-func NewService(name, typ, domain, host string, ips []net.IP, port int) Service {
-	if len(host) == 0 {
-		if osHost, err := os.Hostname(); err != nil {
-			host = "unknown"
-		} else {
-			host = osHost
-		}
+func NewService(cfg Config) (s Service, err error) {
+	name := cfg.Name
+	typ := cfg.Type
+	port := cfg.Port
+
+	if len(name) == 0 {
+		err = fmt.Errorf("invalid name \"%s\"", name)
+		return
 	}
 
-	var ifIPs map[string][]net.IP
+	if len(typ) == 0 {
+		err = fmt.Errorf("invalid type \"%s\"", typ)
+		return
+	}
 
-	// If no ips are specified, use the resolved ips
-	if ips == nil {
-		ips = []net.IP{}
-		osIPs, err := net.LookupIP(host)
-		if err == nil && osIPs != nil && len(osIPs) > 0 {
-			ips = append(ips, osIPs...)
-		}
+	if port == 0 {
+		err = fmt.Errorf("invalid port \"%d\"", port)
+		return
+	}
 
-		ifIPs = make(map[string][]net.IP, 0)
+	domain := cfg.Domain
+	if len(domain) == 0 {
+		domain = "local"
+	}
+
+	host := cfg.Host
+	if len(host) == 0 {
+		host = hostname()
+	}
+
+	text := cfg.Text
+	if text == nil {
+		text = map[string]string{}
+	}
+
+	ips := []net.IP{}
+	ifaceIPs := map[string][]net.IP{}
+
+	if cfg.IPs != nil && len(cfg.IPs) > 0 {
+		ips = cfg.IPs
+	}
+
+	if cfg.ifaceIPs != nil && len(cfg.ifaceIPs) > 0 {
+		ifaceIPs = cfg.ifaceIPs
+	}
+
+	if len(ips) == 0 && len(ifaceIPs) == 0 {
 		for _, iface := range multicastInterfaces() {
 			ipv4, ipv6 := addrsForInterface(&iface)
-			ifIPs[iface.Name] = append(ipv4, ipv6...)
-		}
-
-		if len(ips) == 0 {
-			for _, ip := range ifIPs {
-				ips = append(ips, ip...)
+			ifiIPs := append(ipv4, ipv6...)
+			if len(ips) > 0 {
+				ifiIPs = intersection(ips, ifiIPs)
+			}
+			if len(ifiIPs) > 0 {
+				ifaceIPs[iface.Name] = ifiIPs
 			}
 		}
 	}
-
-	host = sanitizeHostname(host)
-
-	// Must not end with .
-	name = strings.Trim(name, ".")
-	host, _ = parseHostname(host)
-
-	// Must end with .
-	typ = fmt.Sprintf("%s.", strings.Trim(typ, "."))
-	domain = fmt.Sprintf("%s.", strings.Trim(domain, "."))
 
 	return Service{
 		Name:     name,
 		Type:     typ,
 		Domain:   domain,
 		Host:     host,
-		Text:     make(map[string]string),
+		Text:     text,
 		Port:     port,
 		IPs:      ips,
-		IfaceIPs: ifIPs,
-	}
+		IfaceIPs: ifaceIPs,
+	}, nil
 }
 
-func newService(instance string) *Service {
-	name, typ, domain := parseServiceInstanceName(instance)
-	return &Service{
-		Name:   name,
-		Type:   typ,
-		Domain: domain,
-		Host:   "",
-		Text:   make(map[string]string),
-		IPs:    []net.IP{},
+// IPsAtInterface returns the ip address at a specific interface.
+func (s *Service) IPsAtInterface(iface *net.Interface) []net.IP {
+	if ips := s.IfaceIPs[iface.Name]; ips != nil {
+		return ips
 	}
+
+	return []net.IP{}
 }
 
 func (srv Service) Copy() *Service {
@@ -97,22 +153,23 @@ func (srv Service) Copy() *Service {
 		Host:       srv.Host,
 		Text:       srv.Text,
 		Ttl:        srv.Ttl,
-		Port:       srv.Port,
 		IPs:        srv.IPs,
+		Port:       srv.Port,
+		IfaceIPs:   srv.IfaceIPs,
 		expiration: srv.expiration,
 	}
 }
 
 func (srv Service) ServiceInstanceName() string {
-	return fmt.Sprintf("%s.%s%s", srv.Name, srv.Type, srv.Domain)
+	return fmt.Sprintf("%s.%s.%s.", srv.Name, srv.Type, srv.Domain)
 }
 
 func (srv Service) ServiceName() string {
-	return fmt.Sprintf("%s%s", srv.Type, srv.Domain)
+	return fmt.Sprintf("%s.%s.", srv.Type, srv.Domain)
 }
 
 func (srv Service) Hostname() string {
-	return fmt.Sprintf("%s.%s", srv.Host, srv.Domain)
+	return fmt.Sprintf("%s.%s.", srv.Host, srv.Domain)
 }
 
 func (srv *Service) SetHostname(hostname string) {
@@ -123,55 +180,30 @@ func (srv *Service) SetHostname(hostname string) {
 }
 
 func (srv Service) ServicesMetaQueryName() string {
-	return fmt.Sprintf("_services._dns-sd._udp.%s", srv.Domain)
+	return fmt.Sprintf("_services._dns-sd._udp.%s.", srv.Domain)
 }
 
-func (srv Service) Equal(other Service) bool {
-	if srv.Name == other.Name && srv.Type == other.Type && srv.Domain == other.Domain && srv.Host == other.Host && srv.Port == other.Port {
-		for _, ip := range srv.IPs {
-			var found = false
-			for _, otherIP := range other.IPs {
-				if ip.String() == otherIP.String() {
-					found = true
-				}
-			}
-
-			if !found {
-				return false
-			}
-		}
-		return true
+func newService(instance string) *Service {
+	name, typ, domain := parseServiceInstanceName(instance)
+	return &Service{
+		Name:   name,
+		Type:   typ,
+		Domain: domain,
 	}
-
-	return false
 }
 
 func parseServiceInstanceName(str string) (name string, service string, domain string) {
 	elems := strings.Split(str, ".")
-	for i, e := range elems {
+	if len(elems) > 0 {
+		name = elems[0]
+	}
 
-		if len(e) == 0 {
-			continue
-		}
+	if len(elems) > 2 {
+		service = fmt.Sprintf("%s.%s", elems[1], elems[2])
+	}
 
-		if i == 0 {
-			name = e
-			continue
-		}
-
-		if strings.HasPrefix(e, "_") {
-			if len(service) > 0 {
-				service = fmt.Sprintf("%s%s.", service, e)
-			} else {
-				service = e + "."
-			}
-		} else {
-			if len(domain) > 0 {
-				domain = fmt.Sprintf("%s%s.", domain, e)
-			} else {
-				domain = e + "."
-			}
-		}
+	if len(elems) > 3 {
+		domain = elems[3]
 	}
 
 	return
@@ -185,26 +217,8 @@ func hostname() string {
 		return "unknown"
 	}
 
-	addrs, err := net.LookupIP(hostname)
-	if err != nil {
-		return hostname
-	}
-
-	for _, addr := range addrs {
-		if ipv4 := addr.To4(); ipv4 != nil {
-			ip, err := ipv4.MarshalText()
-			if err != nil {
-				return hostname
-			}
-			hosts, err := net.LookupAddr(string(ip))
-			if err != nil || len(hosts) == 0 {
-				return hostname
-			}
-			fqdn := hosts[0]
-			return strings.TrimSuffix(fqdn, ".") // return fqdn without trailing dot
-		}
-	}
-	return hostname
+	name, _ := parseHostname(hostname)
+	return sanitizeHostname(name)
 }
 
 /// TODO make it a FQDN
@@ -214,22 +228,12 @@ func sanitizeHostname(name string) string {
 
 func parseHostname(str string) (name string, domain string) {
 	elems := strings.Split(str, ".")
-	for i, e := range elems {
+	if len(elems) > 0 {
+		name = elems[0]
+	}
 
-		if len(e) == 0 {
-			continue
-		}
-
-		if i == 0 {
-			name = e
-			continue
-		}
-
-		if len(domain) > 0 {
-			domain = fmt.Sprintf("%s%s.", domain, e)
-		} else {
-			domain = e + "."
-		}
+	if len(elems) > 1 {
+		domain = elems[1]
 	}
 
 	return
@@ -241,6 +245,7 @@ func multicastInterfaces() []net.Interface {
 	if err != nil {
 		return nil
 	}
+
 	for _, ifi := range ifaces {
 		if (ifi.Flags & net.FlagUp) == 0 {
 			continue
@@ -263,7 +268,6 @@ func addrsForInterface(iface *net.Interface) ([]net.IP, []net.IP) {
 	var v4, v6, v6local []net.IP
 
 	addrs, _ := iface.Addrs()
-
 	for _, address := range addrs {
 		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 			if ipnet.IP.To4() != nil {
@@ -282,4 +286,17 @@ func addrsForInterface(iface *net.Interface) ([]net.IP, []net.IP) {
 		v6 = v6local
 	}
 	return v4, v6
+}
+
+func intersection(a []net.IP, b []net.IP) []net.IP {
+	var is []net.IP
+	for _, ea := range a {
+		for _, eb := range b {
+			if ea.Equal(eb) {
+				is = append(is, ea)
+			}
+		}
+	}
+
+	return is
 }

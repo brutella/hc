@@ -80,9 +80,7 @@ func NSEC(rr dns.RR, srv Service, iface *net.Interface) *dns.NSEC {
 		types := []uint16{}
 		var ips []net.IP
 		if iface != nil {
-			if srv.IfaceIPs[iface.Name] != nil {
-				ips = srv.IfaceIPs[iface.Name]
-			}
+			ips = srv.IPsAtInterface(iface)
 		} else {
 			ips = srv.IPs
 		}
@@ -114,10 +112,8 @@ func NSEC(rr dns.RR, srv Service, iface *net.Interface) *dns.NSEC {
 
 func A(srv Service, iface *net.Interface) []*dns.A {
 	var ips []net.IP
-	if iface != nil && srv.IfaceIPs != nil {
-		if srv.IfaceIPs[iface.Name] != nil {
-			ips = srv.IfaceIPs[iface.Name]
-		}
+	if iface != nil {
+		ips = srv.IPsAtInterface(iface)
 	} else {
 		ips = srv.IPs
 	}
@@ -143,10 +139,8 @@ func A(srv Service, iface *net.Interface) []*dns.A {
 
 func AAAA(srv Service, iface *net.Interface) []*dns.AAAA {
 	var ips []net.IP
-	if iface != nil && srv.IfaceIPs != nil {
-		if srv.IfaceIPs[iface.Name] != nil {
-			ips = srv.IfaceIPs[iface.Name]
-		}
+	if iface != nil {
+		ips = srv.IPsAtInterface(iface)
 	} else {
 		ips = srv.IPs
 	}
