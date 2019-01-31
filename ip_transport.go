@@ -5,6 +5,7 @@ import (
 	"context"
 	"io/ioutil"
 	"net"
+	"strings"
 	"sync"
 	_ "time"
 
@@ -25,8 +26,6 @@ type ipTransport struct {
 	context hap.Context
 	server  http.Server
 	mutex   *sync.Mutex
-	// TODO reference is not needed
-	mdns *MDNSService
 
 	storage  util.Storage
 	database db.Database
@@ -176,7 +175,7 @@ func (t *ipTransport) Start() {
 	// }()
 
 	// Publish accessory ip
-	log.Info.Printf("Accessory address is %s:%s\n", t.config.IP, s.Port())
+	log.Info.Printf("Listening on port %s\n", s.Port())
 
 	serverCtx, serverCancel := context.WithCancel(t.ctx)
 	defer serverCancel()
@@ -283,4 +282,33 @@ func (t *ipTransport) Handle(ev interface{}) {
 
 func (t *ipTransport) Storage() util.Storage {
 	return t.storage
+}
+
+func newService(config *Config) dnssd.Service {
+	// 2016-03-14(brutella): Replace whitespaces (" ") from service name
+	// with underscores ("_")to fix invalid http host header field value
+	// produces by iOS.
+	//
+	// [Radar] http://openradar.appspot.com/radar?id=4931940373233664
+	stripped := strings.Replace(config.name, " ", "_", -1)
+
+	var ips []net.IP
+	if ip := net.ParseIP(config.IP); ip != nil {
+		ips = append(ips, ip)
+	}
+
+	dnsCfg := dnssd.Config{
+		Name:   stripped,
+		Type:   "_hap._tcp",
+		Domain: "local",
+		Text:   config.txtRecords(),
+		IPs:    ips,
+		Port:   config.servePort,
+	}
+	service, err := dnssd.NewService(dnsCfg)
+	if err != nil {
+		log.Info.Fatal(err)
+	}
+
+	return service
 }
