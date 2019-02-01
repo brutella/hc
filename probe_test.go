@@ -77,8 +77,11 @@ func (c *testConn) start(ctx context.Context) {
 	}
 }
 
+// TestProbing tests probing by using 2 services with the same
+// service instance name and host name.Once the first services
+// is announced, the probing for the second service should give
 func TestProbing(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	conn := newTestConn()
@@ -102,21 +105,29 @@ func TestProbing(t *testing.T) {
 
 	go func() {
 		otherCfg := cfg.Copy()
-		otherCfg.ifaceIPs = map[string][]net.IP{
-			testIface.Name: []net.IP{net.ParseIP("192.168.0.123")},
-		}
+		otherCfg.IPs = []net.IP{net.ParseIP("192.168.0.123")}
+		otherCfg.ifaceIPs = map[string][]net.IP{}
 		otherSrv, otherErr := NewService(otherCfg)
 		if otherErr != nil {
 			t.Fatal(otherErr)
 		}
 		otherResp := newResponder(otherConn)
 		otherResp.Add(otherSrv)
-		otherResp.Respond(ctx)
+
+		otherCtx, otherCancel := context.WithCancel(ctx)
+		defer otherCancel()
+
+		// the responder won't probe for the service instance name and host name
+		// because we explicitely set the IP address.
+		otherResp.Respond(otherCtx)
 	}()
 
-	// Allow other responder to claim service instance
-	<-time.After(1 * time.Second)
-	resolved, err := probeService(ctx, conn, srv, 1*time.Millisecond, true)
+	// Wait until second service was announced.
+	// This doesn't take long because we set the IP address
+	// explicitely. Therefore no probing is done.
+	<-time.After(100 * time.Millisecond)
+
+	resolved, err := probeService(ctx, conn, srv, 1*time.Second, true)
 
 	if x := err; x != nil {
 		t.Fatal(x)
