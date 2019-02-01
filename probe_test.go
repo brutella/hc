@@ -125,7 +125,7 @@ func TestProbing(t *testing.T) {
 	// Wait until second service was announced.
 	// This doesn't take long because we set the IP address
 	// explicitely. Therefore no probing is done.
-	<-time.After(100 * time.Millisecond)
+	<-time.After(500 * time.Millisecond)
 
 	resolved, err := probeService(ctx, conn, srv, 1*time.Second, true)
 
