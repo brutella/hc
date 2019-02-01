@@ -148,7 +148,7 @@ func TestIsLexicographicLater(t *testing.T) {
 			Name:   "MyPrinter.local.",
 			Rrtype: dns.TypeA,
 			Class:  dns.ClassINET,
-			Ttl:    TtlHostname,
+			Ttl:    TTLHostname,
 		},
 		A: net.ParseIP("169.254.99.200"),
 	}
@@ -158,7 +158,7 @@ func TestIsLexicographicLater(t *testing.T) {
 			Name:   "MyPrinter.local.",
 			Rrtype: dns.TypeA,
 			Class:  dns.ClassINET,
-			Ttl:    TtlHostname,
+			Ttl:    TTLHostname,
 		},
 		A: net.ParseIP("169.254.200.50"),
 	}

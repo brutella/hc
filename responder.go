@@ -456,7 +456,7 @@ func services(hs []*serviceHandle) []*Service {
 func ifaceNames(svs []*Service) []string {
 	var names []string
 	for _, sv := range svs {
-		for name, _ := range sv.IfaceIPs {
+		for name := range sv.IfaceIPs {
 			names = append(names, name)
 		}
 	}

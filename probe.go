@@ -278,10 +278,10 @@ func isDenyingAAAA(this *dns.AAAA, that *dns.AAAA) bool {
 
 		switch compareIP(this.AAAA.To16(), that.AAAA.To16()) {
 		case -1:
-			log.Debug.Println("%s is lexicographical earlier than %s", this.AAAA.To16(), that.AAAA.To16())
+			log.Debug.Println("Lexicographical earlier")
 			break
 		case 1:
-			log.Debug.Println("%s is lexicographical later than %s", this.AAAA.To16(), that.AAAA.To16())
+			log.Debug.Println("Lexicographical later")
 			return true
 		default:
 			log.Debug.Println("Tiebreak")
