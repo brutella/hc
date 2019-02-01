@@ -106,7 +106,7 @@ func TestProbing(t *testing.T) {
 	go func() {
 		otherCfg := cfg.Copy()
 		otherCfg.IPs = []net.IP{net.ParseIP("192.168.0.123")}
-		otherCfg.ifaceIPs = map[string][]net.IP{}
+		otherCfg.ifaceIPs = nil
 		otherSrv, otherErr := NewService(otherCfg)
 		if otherErr != nil {
 			t.Fatal(otherErr)
