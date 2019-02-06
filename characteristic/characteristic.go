@@ -225,6 +225,8 @@ func (c *Characteristic) convert(v interface{}) interface{} {
 		return to.Float64(v)
 	case FormatUInt8:
 		return int(to.Uint64(v))
+	case FormatUInt16:
+		return int(to.Uint64(v))
 	case FormatUInt32:
 		return int(to.Uint64(v))
 	case FormatInt32:
