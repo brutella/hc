@@ -27,9 +27,6 @@ func NewInputSource() *InputSource {
 	svc.ConfiguredName = characteristic.NewConfiguredName()
 	svc.AddCharacteristic(svc.ConfiguredName.Characteristic)
 
-	svc.Name = characteristic.NewName()
-	svc.AddCharacteristic(svc.Name.Characteristic)
-
 	svc.InputSourceType = characteristic.NewInputSourceType()
 	svc.AddCharacteristic(svc.InputSourceType.Characteristic)
 
@@ -47,6 +44,9 @@ func NewInputSource() *InputSource {
 
 	svc.TargetVisibilityState = characteristic.NewTargetVisibilityState()
 	svc.AddCharacteristic(svc.TargetVisibilityState.Characteristic)
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
 
 	return &svc
 }

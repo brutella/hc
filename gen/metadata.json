@@ -1046,9 +1046,7 @@
                 "securedRead"
             ],
             "Properties": [
-                "read",
-                "cnotify",
-                "uncnotify"
+                "read"
             ],
             "Constraints": {
                 "StepValue": 1,
@@ -1656,7 +1654,7 @@
                     "1": "Hide"
                 }
             },
-            "Format": "float",
+            "Format": "uint8",
             "Properties": [
                 "write"
             ]

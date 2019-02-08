@@ -10,9 +10,8 @@ type Identifier struct {
 func NewIdentifier() *Identifier {
 	char := NewInt(TypeIdentifier)
 	char.Format = FormatUInt32
-	char.Perms = []string{PermRead, PermEvents}
+	char.Perms = []string{PermRead}
 	char.SetMinValue(0)
-
 	char.SetStepValue(1)
 	char.SetValue(0)
 
