@@ -4,6 +4,7 @@ const (
 	PermRead   = "pr" // can be read
 	PermWrite  = "pw" // can be written
 	PermEvents = "ev" // sends events
+	PermHidden = "hd" // is hidden
 )
 
 // PermsAll returns read, write and event permissions
