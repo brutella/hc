@@ -280,10 +280,6 @@ func (t *ipTransport) Handle(ev interface{}) {
 	}
 }
 
-func (t *ipTransport) Storage() util.Storage {
-	return t.storage
-}
-
 func newService(config *Config) dnssd.Service {
 	// 2016-03-14(brutella): Replace whitespaces (" ") from service name
 	// with underscores ("_")to fix invalid http host header field value

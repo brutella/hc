@@ -2,15 +2,15 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/brutella/hc"
 	"github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/service"
-	"github.com/brutella/hc/util"
 )
 
-func addInputSource(t *accessory.Television, id int, name string, inputSourceType int, storage util.Storage) {
+func addInputSource(t *accessory.Television, id int, name string, inputSourceType int) {
 	in := service.NewInputSource()
 
 	in.Identifier.SetValue(id)
@@ -22,15 +22,8 @@ func addInputSource(t *accessory.Television, id int, name string, inputSourceTyp
 	t.AddService(in.Service)
 	t.Television.AddLinkedService(in.Service)
 
-	key := fmt.Sprintf("input-%d", id)
-	if b, err := storage.Get(key); err == nil && len(b) > 0 {
-		fmt.Println("restore configured name", string(b))
-		in.ConfiguredName.SetValue(string(b))
-	}
-
 	in.ConfiguredName.OnValueRemoteUpdate(func(str string) {
 		fmt.Printf(" %s configured name => %s\n", name, str)
-		storage.Set(key, []byte(str))
 	})
 	in.InputSourceType.OnValueRemoteUpdate(func(v int) {
 		fmt.Printf(" %s source type => %v\n", name, v)
@@ -143,11 +136,17 @@ func main() {
 	config := hc.Config{Pin: "12344321", StoragePath: "./db"}
 	t, err := hc.NewIPTransport(config, acc.Accessory)
 
-	addInputSource(acc, 1, "HDMI 1", characteristic.InputSourceTypeHdmi, t.Storage())
-	addInputSource(acc, 2, "HDMI 2", characteristic.InputSourceTypeHdmi, t.Storage())
-	addInputSource(acc, 3, "Netflix", characteristic.InputSourceTypeApplication, t.Storage())
-	addInputSource(acc, 4, "YouTube", characteristic.InputSourceTypeApplication, t.Storage())
-	addInputSource(acc, 5, "Twitter", characteristic.InputSourceTypeApplication, t.Storage())
+	addInputSource(acc, 1, "HDMI 1", characteristic.InputSourceTypeHdmi)
+	addInputSource(acc, 2, "HDMI 2", characteristic.InputSourceTypeHdmi)
+	addInputSource(acc, 3, "Netflix", characteristic.InputSourceTypeApplication)
+	addInputSource(acc, 4, "YouTube", characteristic.InputSourceTypeApplication)
+	addInputSource(acc, 5, "Twitter", characteristic.InputSourceTypeApplication)
+	addInputSource(acc, 6, "Composite Video", characteristic.InputSourceTypeCompositeVideo)
+	addInputSource(acc, 7, "S-Video", characteristic.InputSourceTypeSVideo)
+	addInputSource(acc, 8, "Component Video", characteristic.InputSourceTypeComponentVideo)
+	addInputSource(acc, 9, "Dvi", characteristic.InputSourceTypeDvi)
+	addInputSource(acc, 10, "Airplay", characteristic.InputSourceTypeAirplay)
+	addInputSource(acc, 11, "Usb", characteristic.InputSourceTypeUsb)
 
 	if err != nil {
 		log.Info.Panic(err)
