@@ -2,20 +2,33 @@
 
 [![Build Status](https://travis-ci.org/brutella/hc.svg)](https://travis-ci.org/brutella/hc)
 
-HomeControl is an implementation of the [HomeKit][homekit] Accessory Protocol (HAP) to create your own HomeKit accessory in [Go](https://golang.org). [HomeKit][homekit] is a set of protocols and libraries to access devices for Home Automation. ~~The actual protocol documentation is only available to MFi members.~~ A non-commercial version of the documentation is now available on the [HomeKit developer website](https://developer.apple.com/homekit/).
+`hc` is a lightweight framework to develop HomeKit accessories in Go. 
+It abstracts the **H**omeKit **A**ccessory **P**rotocol and makes it easy to work with [services](service/README.md) and [characteristics](characteristic/README.md).
 
-You can use this library to make existing Home Automation devices HomeKit compatible. I've already developed the following HomeKit bridges with in:
+`hc` handles the underlying communication between HomeKit accessories and clients.
+You can focus on implementing the business logic for your accessory, without having to worry about the underlying protocol.
+
+I've already developed the following HomeKit bridges with in:
 
 - [LIFX](https://github.com/brutella/hklifx/)
 - [UVR1611](https://github.com/brutella/hkuvr)
 - [Fronius Symo](https://github.com/brutella/hksymo)
 
-## HomeKit on iOS
+**What is HomeKit?**
 
-HomeKit is fully integrated since iOS 8. Developers can use the HomeKit framework to communicate with HomeKit using high-level APIs.
-I've developed the [Home][home] app (for iPhone, iPad, Apple Watch) to control HomeKit accessories. If you [purchase Home][home-appstore] on the App Store, you not only support my work but also get an awesome iOS app. Thank you.
+[HomeKit][homekit] is a set of protocols and libraries to communicate with smart home appliances. ~~The actual protocol documentation is only available to MFi members.~~ A non-commercial version of the documentation is now available on the [HomeKit developer website](https://developer.apple.com/homekit/).
 
-Once you've setup HomeKit, you can use Siri to interact with your accessories using voice command (*Hey Siri, turn off the lights in the living room*).
+**iOS**
+
+
+HomeKit is fully integrated into iOS since iOS 8. Developers can use [HomeKit.framework](https://developer.apple.com/documentation/homekit) to communicate with accessories using high-level APIs.
+
+[[https://github.com/brutella/hc/blob/master/_img/home-icon.png|alt=Home.app]]
+
+I've developed the [Home][home] app to control HomeKit accessories from iPhone, iPad, and Apple Watch.
+If you would like to support `hc`, please purchase Home from the [App Store](home-appstore). That would be awesome. ❤️
+
+Once you've setup HomeKit on iOS, you can use Siri to interact with your accessories using voice command (*Hey Siri, turn off the lights in the living room*).
 
 [home]: https://hochgatterer.me/home/
 [home-appstore]: http://itunes.apple.com/app/id995994352
@@ -25,14 +38,13 @@ Once you've setup HomeKit, you can use Siri to interact with your accessories us
 - Full implementation of the HAP in Go
 - Supports all HomeKit [services and characteristics](service/README.md)
 - Built-in service announcement via DNS-SD using [dnssd](http://github.com/brutella/dnssd)
-- Runs on multiple platforms (already in use on Linux and OS X)
+- Runs on linux and macOS
 - Documentation: http://godoc.org/github.com/brutella/hc
 
 ## Getting Started
 
-1. [Install Go](http://golang.org/doc/install)
-2. [Setup Go workspace](http://golang.org/doc/code.html#Organization)
-3. Create your own HomeKit bridge or clone an existing one (e.g.  [hklight](https://github.com/brutella/hklight))
+1. [Install](http://golang.org/doc/install) and [set up](http://golang.org/doc/code.html#Organization) Go
+2. Create your own HomeKit accessory or clone an existing one (e.g.  [hklight](https://github.com/brutella/hklight))
 
         cd $GOPATH/src
         
@@ -42,9 +54,18 @@ Once you've setup HomeKit, you can use Siri to interact with your accessories us
         # Run the project
         make run
 
-4. Pair with your HomeKit App of choice (e.g. [Home][home-appstore])
+3. Pair with your HomeKit App of choice (e.g. [Home][home-appstore])
 
-## API Example
+**Go Modules**
+
+`hc` supports [Go module](https://github.com/golang/go/wiki/Modules) since `v1.0.0`.
+Make sure to set the environment variable `GO111MODULE=on`.
+
+## Example
+
+See [_example](_example) for a variety of examples.
+
+**Basic switch accessory**
 
 Create a simple on/off switch, which is accessible via IP and secured using the pin *00102003*.
 
@@ -58,11 +79,11 @@ import (
 )
 
 func main() {
-	info := accessory.Info{
-		Name: "Lamp",
-	}
+    // create an accessory
+	info := accessory.Info{Name: "Lamp"}
 	ac := accessory.NewSwitch(info)
     
+    // configure the ip transport
     config := hc.Config{Pin: "00102003"}
 	t, err := hc.NewIPTransport(config, ac.Accessory)
 	if err != nil {
@@ -89,9 +110,10 @@ info := accessory.Info{
 }
 ```
 
-### Callbacks
+### Events
 
-You get a callback when the power state of a switch changed by a client.
+When a connected client changes the value of characteristics, you get a callback.
+The following example shows how to get notified when the [On](characteristic/on.go) characteristic value changes.
 
 ```go
 ac.Switch.On.OnValueRemoteUpdate(func(on bool) {
@@ -109,29 +131,18 @@ When the switch is turned on "the analog way", you should set the state of the a
 ac.Switch.On.SetValue(true)
 ```
 
-A complete example is available in `_example/example.go`.
+## Accessory Architecture
 
-## Model
+HomeKit uses a hierarchical architecture for define accessories, services and characeristics.
+At the root level there is an accessory.
+Every accessory contains services.
+And every service contains characteristics.
 
-The HomeKit model hierarchy looks like this:
+For example a [lightbulb accessory](accessory/lightbulb.go) contains a [lightbulb service](service/lightbulb.go).
+This service contains characteristics like [on](characteristic/on.go) and [brightness](characteristic/brightness.go).
 
-    Accessory
-    |-- Accessory Info Service
-    |   |-- Identify Characteristic
-    |   |-- Manufacturer Characteristic
-    |   |-- Model Characteristic
-    |   |-- Name Characteristic
-    |   |-- Serial Characteristic
-    |   
-    |-- * Service
-    |   |-- * Characteristic
-
-HomeKit accessories are container for services. Every accessory must provide the `Accessory Information Service`. Every service provides one or more characteristics (a characteristic might be the power state of an outlet). HomeKit has predefined service and characteristic types, which are supported by iOS. You can define your own service and characteristic types, but it's recommended to use predefined ones.
-
-## Go Module
-
-`hc` can be integrated as [Go module](https://github.com/golang/go/wiki/Modules) since `v1.0.0`.
-Make sure to set the environment variable `GO111MODULE=on`.
+There are predefined accessories, services and characteristics available in HomeKit.
+Those types are defined in the packages [accessory](accessory), [service](service), [characteristic](characteristic).
 
 # Contact
 
