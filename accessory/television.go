@@ -10,7 +10,7 @@ type Television struct {
 	Speaker    *service.Speaker
 }
 
-// NewOutlet returns an outlet accessory containing one outlet service.
+// NewTelevision returns a television accessory.
 func NewTelevision(info Info) *Television {
 	acc := Television{}
 	acc.Accessory = New(info, TypeTelevision)
