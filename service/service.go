@@ -9,6 +9,9 @@ type Service struct {
 	ID              int64                            `json:"iid"`
 	Type            string                           `json:"type"`
 	Characteristics []*characteristic.Characteristic `json:"characteristics"`
+	Hidden          *bool                            `json:"hidden,omitempty"`
+	Primary         *bool                            `json:"primary,omitempty"`
+	Linked          []int64                          `json:"linked,omitempty"`
 }
 
 // New returns a new service.
@@ -16,6 +19,7 @@ func New(typ string) *Service {
 	s := Service{
 		Type:            typ,
 		Characteristics: []*characteristic.Characteristic{},
+		Linked:          []int64{},
 	}
 
 	return &s
@@ -38,6 +42,28 @@ func (s *Service) GetCharacteristics() []*characteristic.Characteristic {
 		result = append(result, c)
 	}
 	return result
+}
+
+func (s *Service) SetHidden(b bool) {
+	s.Hidden = &b
+}
+
+func (s *Service) IsHidden() bool {
+	if s.Hidden != nil && *s.Hidden == true {
+		return true
+	}
+	return false
+}
+
+func (s *Service) SetPrimary(b bool) {
+	s.Primary = &b
+}
+
+func (s *Service) IsPrimary() bool {
+	if s.Primary != nil && *s.Primary == true {
+		return true
+	}
+	return false
 }
 
 // Equal returns true when receiver has the same characteristics, service id and service type as the argument.
@@ -63,4 +89,11 @@ func (s *Service) Equal(other interface{}) bool {
 
 func (s *Service) AddCharacteristic(c *characteristic.Characteristic) {
 	s.Characteristics = append(s.Characteristics, c)
+}
+
+func (s *Service) AddLinkedService(other *Service) {
+	if other.ID == 0 {
+		panic("adding a linked should be done after the server was added to an accessory")
+	}
+	s.Linked = append(s.Linked, other.ID)
 }

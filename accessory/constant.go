@@ -30,4 +30,6 @@ const (
 	TypeSprinklers         AccessoryType = 28
 	TypeFaucets            AccessoryType = 29
 	TypeShowerSystems      AccessoryType = 30
+	TypeTelevision         AccessoryType = 31
+	TypeRemoteControl      AccessoryType = 32
 )

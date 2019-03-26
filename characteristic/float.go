@@ -32,7 +32,7 @@ func (c *Float) SetStepValue(value float64) {
 
 // GetValue returns the value as float
 func (c *Float) GetValue() float64 {
-	return c.Value.(float64)
+	return c.Characteristic.GetValue().(float64)
 }
 
 func (c *Float) GetMinValue() float64 {

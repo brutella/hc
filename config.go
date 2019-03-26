@@ -6,7 +6,6 @@ import (
 	"net"
 	"reflect"
 
-	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/util"
 	"github.com/gosexy/to"
 )
@@ -21,7 +20,7 @@ type Config struct {
 	// When empty, the transport uses a random port
 	Port string
 
-	// IP on which clients can connect.
+	// Deprecated: Specifying a static IP is discouraged.
 	IP string
 
 	// Pin with has to be entered on iOS client to pair with the accessory
@@ -41,16 +40,10 @@ type Config struct {
 }
 
 func defaultConfig(name string) *Config {
-	ip, err := getFirstLocalIPAddr()
-	if err != nil {
-		log.Info.Panic(err)
-	}
-
 	return &Config{
 		StoragePath:  name,
 		Pin:          "00102003", // default pin
 		Port:         "",         // empty string means that we get port from assigned by the system
-		IP:           ip.String(),
 		name:         name,
 		id:           util.MAC48Address(util.RandomHexString()),
 		version:      1,

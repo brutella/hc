@@ -32,7 +32,7 @@ func (c *Int) SetStepValue(value int) {
 
 // GetValue returns the value as int
 func (c *Int) GetValue() int {
-	return c.Value.(int)
+	return c.Characteristic.GetValue().(int)
 }
 
 func (c *Int) GetMinValue() int {

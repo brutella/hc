@@ -26,3 +26,5 @@
 | Sprinklers | 28 | 
 | Faucets | 29 | 
 | Shower Systems | 30 | 
+| Television | 31 | 
+| Remote Control | 32 | 
