@@ -1,14 +1,14 @@
-# HomeControl
+# hc
 
 [![Build Status](https://travis-ci.org/brutella/hc.svg)](https://travis-ci.org/brutella/hc)
 
 `hc` is a lightweight framework to develop HomeKit accessories in Go. 
-It abstracts the **H**omeKit **A**ccessory **P**rotocol and makes it easy to work with [services](service/README.md) and [characteristics](characteristic/README.md).
+It abstracts the **H**omeKit **A**ccessory **P**rotocol (HAP) and makes it easy to work with [services](service/README.md) and [characteristics](characteristic/README.md).
 
 `hc` handles the underlying communication between HomeKit accessories and clients.
-You can focus on implementing the business logic for your accessory, without having to worry about the underlying protocol.
+You can focus on implementing the business logic for your accessory, without having to worry about the protocol.
 
-I've already developed the following HomeKit bridges with in:
+Here are some projects which use `hc`.
 
 - [LIFX](https://github.com/brutella/hklifx/)
 - [UVR1611](https://github.com/brutella/hkuvr)
@@ -16,17 +16,17 @@ I've already developed the following HomeKit bridges with in:
 
 **What is HomeKit?**
 
-[HomeKit][homekit] is a set of protocols and libraries to communicate with smart home appliances. ~~The actual protocol documentation is only available to MFi members.~~ A non-commercial version of the documentation is now available on the [HomeKit developer website](https://developer.apple.com/homekit/).
+[HomeKit][homekit] is a set of protocols and libraries to communicate with smart home appliances. A non-commercial version of the documentation is now available on the [HomeKit developer website](https://developer.apple.com/homekit/).
 
 **iOS**
 
 
 HomeKit is fully integrated into iOS since iOS 8. Developers can use [HomeKit.framework](https://developer.apple.com/documentation/homekit) to communicate with accessories using high-level APIs.
 
-![Home.app](_img/home-icon.png?raw=true "Home.app")
+<img alt="Home.app" src="_img/home-icon.png?raw=true" width="92" />
 
 I've developed the [Home][home] app to control HomeKit accessories from iPhone, iPad, and Apple Watch.
-If you would like to support `hc`, please purchase Home from the [App Store](home-appstore). That would be awesome. ❤️
+If you would like to support `hc`, please purchase Home from the [App Store][home-appstore]. That would be awesome. ❤️
 
 Once you've setup HomeKit on iOS, you can use Siri to interact with your accessories using voice command (*Hey Siri, turn off the lights in the living room*).
 
@@ -80,48 +80,48 @@ import (
 
 func main() {
     // create an accessory
-	info := accessory.Info{Name: "Lamp"}
-	ac := accessory.NewSwitch(info)
+    info := accessory.Info{Name: "Lamp"}
+    ac := accessory.NewSwitch(info)
     
     // configure the ip transport
     config := hc.Config{Pin: "00102003"}
-	t, err := hc.NewIPTransport(config, ac.Accessory)
-	if err != nil {
-		log.Panic(err)
-	}
+    t, err := hc.NewIPTransport(config, ac.Accessory)
+    if err != nil {
+        log.Panic(err)
+    }
     
     hc.OnTermination(func(){
         <-t.Stop()
     })
     
-	t.Start()
+    t.Start()
 }
 ```
 
-You should change some default values for your own needs
+You can define more specific accessory info, if you want.
 
 ```go
 info := accessory.Info{
-	Name: "Lamp",
-	SerialNumber: "051AC-23AAM1",
-	Manufacturer: "Apple",
-	Model: "AB",
-	Firmware: "1.0.1",
+    Name: "Lamp",
+    SerialNumber: "051AC-23AAM1",
+    Manufacturer: "Apple",
+    Model: "AB",
+    Firmware: "1.0.1",
 }
 ```
 
 ### Events
 
-When a connected client changes the value of characteristics, you get a callback.
+The library provides callback functions, which let you know when a clients updates a characteristic value.
 The following example shows how to get notified when the [On](characteristic/on.go) characteristic value changes.
 
 ```go
 ac.Switch.On.OnValueRemoteUpdate(func(on bool) {
-	if on == true {
-		log.Println("Client changed switch to on")
-	} else {
-		log.Println("Client changed switch to off")
-	}
+    if on == true {
+        log.Println("Switch is on")
+    } else {
+        log.Println("Switch is off")
+    }
 })
 ```
 
@@ -148,7 +148,7 @@ Those types are defined in the packages [accessory](accessory), [service](servic
 
 Matthias Hochgatterer
 
-Website: [http://hochgatterer.me](https://hochgatterer.me)
+Website: [https://hochgatterer.me](https://hochgatterer.me)
 
 Github: [https://github.com/brutella](https://github.com/brutella/)
 
