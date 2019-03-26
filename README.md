@@ -17,7 +17,7 @@ I've developed the [Home][home] app (for iPhone, iPad, Apple Watch) to control H
 
 Once you've setup HomeKit, you can use Siri to interact with your accessories using voice command (*Hey Siri, turn off the lights in the living room*).
 
-[home]: http://hochgatterer.me/home/
+[home]: https://hochgatterer.me/home/
 [home-appstore]: http://itunes.apple.com/app/id995994352
 
 ## Features
@@ -40,7 +40,7 @@ Once you've setup HomeKit, you can use Siri to interact with your accessories us
         git clone https://github.com/brutella/hklight && cd hklight
         
         # Run the project
-        go run hklightd.go
+        make run
 
 4. Pair with your HomeKit App of choice (e.g. [Home][home-appstore])
 
@@ -61,10 +61,10 @@ func main() {
 	info := accessory.Info{
 		Name: "Lamp",
 	}
-	acc := accessory.NewSwitch(info)
+	ac := accessory.NewSwitch(info)
     
     config := hc.Config{Pin: "00102003"}
-	t, err := hc.NewIPTransport(config, acc.Accessory)
+	t, err := hc.NewIPTransport(config, ac.Accessory)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -94,7 +94,7 @@ info := accessory.Info{
 You get a callback when the power state of a switch changed by a client.
 
 ```go
-acc.Switch.On.OnValueRemoteUpdate(func(on bool) {
+ac.Switch.On.OnValueRemoteUpdate(func(on bool) {
 	if on == true {
 		log.Println("Client changed switch to on")
 	} else {
@@ -105,7 +105,9 @@ acc.Switch.On.OnValueRemoteUpdate(func(on bool) {
 
 When the switch is turned on "the analog way", you should set the state of the accessory.
 
-	acc.Switch.On.SetValue(true)
+```go
+ac.Switch.On.SetValue(true)
+```
 
 A complete example is available in `_example/example.go`.
 
@@ -126,20 +128,16 @@ The HomeKit model hierarchy looks like this:
 
 HomeKit accessories are container for services. Every accessory must provide the `Accessory Information Service`. Every service provides one or more characteristics (a characteristic might be the power state of an outlet). HomeKit has predefined service and characteristic types, which are supported by iOS. You can define your own service and characteristic types, but it's recommended to use predefined ones.
 
-## Dependencies
+## Go Module
 
-HomeControl uses vendor directories (`vendor/`) to integrate the following libraries
-
-- `github.com/tadglines/go-pkgs/crypto/srp` for *SRP* algorithm
-- `github.com/agl/ed25519` for *ed25519* signature
-- `github.com/gosexy/to` for type conversion
-- `github.com/brutella/dnssd` for DNS service discovery
+`hc` can be integrated as [Go module](https://github.com/golang/go/wiki/Modules) since `v1.0.0`.
+Make sure to set the environment variable `GO111MODULE=on`.
 
 # Contact
 
 Matthias Hochgatterer
 
-Website: [http://hochgatterer.me](http://hochgatterer.me)
+Website: [http://hochgatterer.me](https://hochgatterer.me)
 
 Github: [https://github.com/brutella](https://github.com/brutella/)
 
