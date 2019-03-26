@@ -23,7 +23,7 @@ I've already developed the following HomeKit bridges with in:
 
 HomeKit is fully integrated into iOS since iOS 8. Developers can use [HomeKit.framework](https://developer.apple.com/documentation/homekit) to communicate with accessories using high-level APIs.
 
-![Home.app][https://github.com/brutella/hc/blob/master/_img/home-icon.png]
+![Home.app][https://github.com/brutella/hc/blob/tv/_img/home-icon.png]
 
 I've developed the [Home][home] app to control HomeKit accessories from iPhone, iPad, and Apple Watch.
 If you would like to support `hc`, please purchase Home from the [App Store](home-appstore). That would be awesome. ❤️
