@@ -1,6 +1,6 @@
 # hc
 
-[![Build Status](https://travis-ci.org/brutella/hc.svg)](https://travis-ci.org/brutella/hc)
+[![GoDoc Widget]][GoDoc] [![Travis Widget]][Travis]
 
 `hc` is a lightweight framework to develop HomeKit accessories in Go. 
 It abstracts the **H**omeKit **A**ccessory **P**rotocol (HAP) and makes it easy to work with [services](service/README.md) and [characteristics](characteristic/README.md).
@@ -29,6 +29,10 @@ Once you've setup HomeKit on iOS, you can use Siri to interact with your accesso
 
 [home]: https://hochgatterer.me/home/
 [home-appstore]: http://itunes.apple.com/app/id995994352
+[GoDoc]: https://godoc.org/github.com/brutella/hc
+[GoDoc Widget]: https://godoc.org/github.com/brutella/hc?status.svg
+[Travis]: https://travis-ci.org/brutella/hc
+[Travis Widget]: https://travis-ci.org/brutella/hc.svg
 
 ## Features
 
