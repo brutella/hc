@@ -12,11 +12,11 @@ func TestParseServiceInstanceName(t *testing.T) {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 
-	if is, want := service, "_hap._tcp."; is != want {
+	if is, want := service, "_hap._tcp"; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 
-	if is, want := domain, "local."; is != want {
+	if is, want := domain, "local"; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 }
@@ -28,7 +28,7 @@ func TestParseHostname(t *testing.T) {
 		t.Fatalf("%s != Computer", name)
 	}
 
-	if is, want := domain, "local."; is != want {
+	if is, want := domain, "local"; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 }
@@ -40,7 +40,7 @@ func TestParseHostnameTrailingDomain(t *testing.T) {
 		t.Fatalf("%s != Computer", name)
 	}
 
-	if is, want := domain, "local."; is != want {
+	if is, want := domain, "local"; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 }
@@ -69,39 +69,53 @@ func TestParseHostnameWithoutTrailingDot(t *testing.T) {
 	}
 }
 
-func TestNewServiceWithoutHostname(t *testing.T) {
-	i := NewService("Test", "_asdf._tcp", "local.", "", nil, 1234)
-
-	if len(i.IPs) == 0 {
-		t.Fatal("Expected ips")
+func TestNewServiceWithMinimalConfig(t *testing.T) {
+	cfg := Config{
+		Name: "Test",
+		Type: "_asdf._tcp",
+		Port: 1234,
 	}
 
-	if len(i.IfaceIPs) == 0 {
+	sv, err := NewService(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(sv.Host) == 0 {
+		t.Fatal("Expected hostname")
+	}
+
+	if is, want := sv.Domain, "local"; is != want {
+		t.Fatalf("%v != %v", is, want)
+	}
+
+	if is, want := len(sv.IPs), 0; is != want {
+		t.Fatalf("%v != %v", is, want)
+	}
+
+	if len(sv.IfaceIPs) == 0 {
 		t.Fatal("Expected interface ips")
 	}
 }
 
-func TestNewServiceWithoutIP(t *testing.T) {
-	i := NewService("Test", "_asdf._tcp", "local.", "Computer", nil, 1234)
-
-	if len(i.IPs) == 0 {
-		t.Fatal("Expected ips")
+func TestNewServiceWithExplicitIP(t *testing.T) {
+	cfg := Config{
+		Name: "Test",
+		Type: "_asdf._tcp",
+		IPs:  []net.IP{net.ParseIP("127.0.0.1")},
+		Port: 1234,
+	}
+	sv, err := NewService(cfg)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	if len(i.IfaceIPs) == 0 {
-		t.Fatal("Expected interface ips")
-	}
-}
-
-func TestNewServiceIP(t *testing.T) {
-	i := NewService("Test", "_asdf._tcp", "local.", "Computer", []net.IP{net.ParseIP("127.0.0.1")}, 1234)
-
-	if is, want := len(i.IPs), 1; is != want {
+	if is, want := len(sv.IPs), 1; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 
-	if x := i.IfaceIPs; x != nil {
-		t.Fatal(x)
+	if is, want := sv.IPs[0].String(), "127.0.0.1"; is != want {
+		t.Fatalf("%v != %v", is, want)
 	}
 }
 

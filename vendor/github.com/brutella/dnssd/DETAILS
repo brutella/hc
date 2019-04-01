@@ -2,10 +2,10 @@
 
 - Every DNS resource record has a TTL, which is the number of seconds for which the resource record may be cached.
 - mDNS allows host names of form `<single-dns-label>.local`
-- The domain "local." is a link-local Multicast DNS domain.
-	> This means that names within that domain are only meaningful on the link they originate. Any DNS query for a name ending with ".local." must be sent to the mDNS IPv4 link-local mutlicast adress "224.0.0.251" (or "FF02::FB" for IPv6)
+- The domain "local" is a link-local Multicast DNS domain.
+	> This means that names within that domain are only meaningful on the link they originate. Any DNS query for a name ending with ".local" must be sent to the mDNS IPv4 link-local mutlicast adress "224.0.0.251" (or "FF02::FB" for IPv6)
 	> […]
-	> DNS queries for names not ending ".local." may be sent to the mDNS multicast address.
+	> DNS queries for names not ending "local." may be sent to the mDNS multicast address.
 	> […]
 	> Any DNS query for a name ending with "254.169.in-addr.arpa." MUST be sent to the mDNS IPv4 link-local multicast address 224.0.0.251 or the mDNS IPv6 multicast address FF02::FB.
 	> Likewise, any DNS query for a name within the reverse mapping domains for IPv6 link-local addresses ("8.e.f.ip6.arpa.", "9.e.f.ip6.arpa.", "a.e.f.ip6.arpa.", and "b.e.f.ip6.arpa.") MUST be sent to the mDNS IPv6 link-local multicast address FF02::FB or the mDNS IPv4 link-local multicast address 224.0.0.251.
@@ -52,5 +52,5 @@ DNS-SD specifies how services services can be described and found using standard
 	- Must not be empty, and shouldn't be longer than 15 characters (without the mandatory underscore)
 	- One ore more letter, and digits, and no consecutive hyphens (--)
 - RFC6763 Section 9 defines a meta-query for problem diagnostics and network management (not needed yet)
-- RFC6763 Section 10: A mDNS client should answer mDNS queries for its PTR, SRV and TXT names ending with ".local.".
+- RFC6763 Section 10: A mDNS client should answer mDNS queries for its PTR, SRV and TXT names ending with "local.".
 - RFC6763 Section 12: Additional records can be placed in the addition section of a DNS message. It's recommended to improve network efficiency (TODO later)

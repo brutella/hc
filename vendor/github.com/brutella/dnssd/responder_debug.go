@@ -4,8 +4,6 @@ import (
 	"context"
 )
 
-type ReadFunc func(*Request)
-
 func (r *responder) Debug(ctx context.Context, fn ReadFunc) {
 	conn := r.conn.(*mdnsConn)
 

@@ -58,7 +58,6 @@ func probeService(ctx context.Context, conn MDNSConn, srv Service, delay time.Du
 	numNameConflicts := 0
 
 	for i := 1; i <= 100; i++ {
-
 		conflict, err := probe(ctx, conn, *candidate)
 		if err != nil {
 			e = err
@@ -86,10 +85,14 @@ func probeService(ctx context.Context, conn MDNSConn, srv Service, delay time.Du
 
 		prevConflict = conflict
 
-		if i == 10 {
-			// [...] after the tenth try, the device correctly limits its rate to no more than one try per second. [...]
-			// – Bonjour conformance test
+		if conflict.hasAny() {
+			// If the host finds that its own data is lexicographically earlier,
+			// then it defers to the winning host by waiting one second,
+			// and then begins probing for this record again. (RFC6762 8.2)
+			log.Debug.Println("Increase wait time after receiving conflicting data")
 			delay = 1 * time.Second
+		} else {
+			delay = 250 * time.Millisecond
 		}
 
 		log.Debug.Println("Probing wait", delay)
@@ -100,6 +103,24 @@ func probeService(ctx context.Context, conn MDNSConn, srv Service, delay time.Du
 }
 
 func probe(ctx context.Context, conn MDNSConn, service Service) (conflict probeConflict, err error) {
+	for ifname, ips := range service.IfaceIPs {
+		iface, err := net.InterfaceByName(ifname)
+		if err != nil {
+			log.Debug.Printf("error getting interface with name %s: %v\n", ifname, err)
+			continue
+		}
+		log.Debug.Printf("Probing with %v at %s\n", ips, iface.Name)
+
+		conflict, err := probeAtInterface(ctx, conn, service, iface)
+		if conflict.hasAny() {
+			return conflict, err
+		}
+	}
+
+	return probeConflict{}, nil
+}
+
+func probeAtInterface(ctx context.Context, conn MDNSConn, service Service, iface *net.Interface) (conflict probeConflict, err error) {
 
 	msg := new(dns.Msg)
 
@@ -122,8 +143,8 @@ func probe(ctx context.Context, conn MDNSConn, service Service) (conflict probeC
 	msg.Question = []dns.Question{instanceQ, hostQ}
 
 	srv := SRV(service)
-	as := A(service, nil)
-	aaaas := AAAA(service, nil)
+	as := A(service, iface)
+	aaaas := AAAA(service, iface)
 
 	var authority = []dns.RR{srv}
 	for _, a := range as {
@@ -137,6 +158,9 @@ func probe(ctx context.Context, conn MDNSConn, service Service) (conflict probeC
 	readCtx, readCancel := context.WithCancel(ctx)
 	defer readCancel()
 
+	// Multicast DNS responses received *before* the first probe packet is sent
+	// MUST be silently ignored. (RFC6762 8.1)
+	conn.Drain(readCtx)
 	ch := conn.Read(readCtx)
 
 	queryTime := time.After(1 * time.Millisecond)
@@ -149,25 +173,25 @@ func probe(ctx context.Context, conn MDNSConn, service Service) (conflict probeC
 			for _, answer := range answers {
 				switch rr := answer.(type) {
 				case *dns.A:
-					if len(as) == 0 {
-						continue
-					}
-
-					if isLexicographicalLaterA(rr, as[0]) {
-						conflict.hostname = true
+					for _, a := range as {
+						if isDenyingA(rr, a) {
+							log.Debug.Printf("%v:%d@%s denies A\n", req.from.IP, req.from.Port, req.iface.Name)
+							conflict.hostname = true
+							break
+						}
 					}
 
 				case *dns.AAAA:
-					if len(aaaas) == 0 {
-						continue
-					}
-
-					if isLexicographicalLaterAAAA(rr, aaaas[0]) {
-						conflict.hostname = true
+					for _, aaaa := range aaaas {
+						if isDenyingAAAA(rr, aaaa) {
+							log.Debug.Printf("%v:%d@%s denies AAAA\n", req.from.IP, req.from.Port, req.iface.Name)
+							conflict.hostname = true
+							break
+						}
 					}
 
 				case *dns.SRV:
-					if isLexicographicalLaterSRV(rr, srv) {
+					if isDenyingSRV(rr, srv) {
 						conflict.serviceName = true
 					}
 
@@ -182,7 +206,7 @@ func probe(ctx context.Context, conn MDNSConn, service Service) (conflict probeC
 
 		case <-queryTime:
 			// Stop on conflict
-			if !conflict.hasNone() {
+			if conflict.hasAny() {
 				return
 			}
 
@@ -193,11 +217,11 @@ func probe(ctx context.Context, conn MDNSConn, service Service) (conflict probeC
 
 			queriesCount++
 			log.Debug.Println("Sending probe", msg)
-			q := &Query{msg: msg}
+			q := &Query{msg: msg, iface: iface}
 			conn.SendQuery(q)
 
 			delay := 250 * time.Millisecond
-			log.Debug.Println("Sending wait", delay)
+			log.Debug.Println("Waiting for conflicting data", delay)
 			queryTime = time.After(delay)
 		}
 	}
@@ -214,9 +238,14 @@ func (pr probeConflict) hasNone() bool {
 	return !pr.hostname && !pr.serviceName
 }
 
-func isLexicographicalLaterA(this *dns.A, that *dns.A) bool {
+func (pr probeConflict) hasAny() bool {
+	return pr.hostname || pr.serviceName
+}
+
+func isDenyingA(this *dns.A, that *dns.A) bool {
 	if strings.EqualFold(this.Hdr.Name, that.Hdr.Name) {
 		log.Debug.Println("Conflicting hosts")
+
 		if !isValidRR(this) {
 			log.Debug.Println("Invalid record produces conflict")
 			return true
@@ -238,7 +267,8 @@ func isLexicographicalLaterA(this *dns.A, that *dns.A) bool {
 	return false
 }
 
-func isLexicographicalLaterAAAA(this *dns.AAAA, that *dns.AAAA) bool {
+// isDenyingAAAA returns true if this denies that.
+func isDenyingAAAA(this *dns.AAAA, that *dns.AAAA) bool {
 	if strings.EqualFold(this.Hdr.Name, that.Hdr.Name) {
 		log.Debug.Println("Conflicting hosts")
 		if !isValidRR(this) {
@@ -262,10 +292,10 @@ func isLexicographicalLaterAAAA(this *dns.AAAA, that *dns.AAAA) bool {
 	return false
 }
 
-func isLexicographicalLaterSRV(this *dns.SRV, that *dns.SRV) bool {
+// isDenyingSRV returns true if this denies that.
+func isDenyingSRV(this *dns.SRV, that *dns.SRV) bool {
 	if strings.EqualFold(this.Hdr.Name, that.Hdr.Name) {
 		log.Debug.Println("Conflicting SRV")
-
 		if !isValidRR(this) {
 			log.Debug.Println("Invalid record produces conflict")
 			return true
