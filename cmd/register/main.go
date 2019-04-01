@@ -1,3 +1,4 @@
+// Command register registers a dns-sd service instance.
 package main
 
 import (
@@ -5,7 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/brutella/dnssd"
-	"github.com/brutella/dnssd/log"
+	slog "log"
 	"os"
 	"os/signal"
 	"strings"
@@ -13,14 +14,13 @@ import (
 )
 
 var instanceFlag = flag.String("Name", "Service", "Service name")
-var serviceFlag = flag.String("Type", "_asdf._tcp.", "Service type")
-var domainFlag = flag.String("Domain", "local.", "domain")
+var serviceFlag = flag.String("Type", "_asdf._tcp", "Service type")
+var domainFlag = flag.String("Domain", "local", "domain")
 var portFlag = flag.Int("Port", 12345, "Port")
 
 var timeFormat = "15:04:05.000"
 
 func main() {
-	log.Debug.Enable()
 	flag.Parse()
 	if len(*instanceFlag) == 0 || len(*serviceFlag) == 0 || len(*domainFlag) == 0 {
 		flag.Usage()
@@ -39,7 +39,16 @@ func main() {
 	if resp, err := dnssd.NewResponder(); err != nil {
 		fmt.Println(err)
 	} else {
-		srv := dnssd.NewService(*instanceFlag, *serviceFlag, *domainFlag, "", nil, *portFlag)
+		cfg := dnssd.Config{
+			Name:   *instanceFlag,
+			Type:   *serviceFlag,
+			Domain: *domainFlag,
+			Port:   *portFlag,
+		}
+		srv, err := dnssd.NewService(cfg)
+		if err != nil {
+			slog.Fatal(err)
+		}
 
 		go func() {
 			stop := make(chan os.Signal, 1)

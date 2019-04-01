@@ -13,7 +13,7 @@ func PTR(srv Service) *dns.PTR {
 			Name:   srv.ServiceName(),
 			Rrtype: dns.TypePTR,
 			Class:  dns.ClassINET,
-			Ttl:    TtlDefault,
+			Ttl:    TTLDefault,
 		},
 		Ptr: srv.ServiceInstanceName(),
 	}
@@ -25,7 +25,7 @@ func DNSSDServicesPTR(srv Service) *dns.PTR {
 			Name:   srv.ServicesMetaQueryName(),
 			Rrtype: dns.TypePTR,
 			Class:  dns.ClassINET,
-			Ttl:    TtlDefault,
+			Ttl:    TTLDefault,
 		},
 		Ptr: srv.ServiceName(),
 	}
@@ -37,7 +37,7 @@ func SRV(srv Service) *dns.SRV {
 			Name:   srv.ServiceInstanceName(),
 			Rrtype: dns.TypeSRV,
 			Class:  dns.ClassINET,
-			Ttl:    TtlHostname,
+			Ttl:    TTLHostname,
 		},
 		Priority: 0,
 		Weight:   0,
@@ -57,7 +57,7 @@ func TXT(srv Service) *dns.TXT {
 			Name:   srv.ServiceInstanceName(),
 			Rrtype: dns.TypeTXT,
 			Class:  dns.ClassINET,
-			Ttl:    TtlDefault,
+			Ttl:    TTLDefault,
 		},
 		Txt: txts,
 	}
@@ -71,7 +71,7 @@ func NSEC(rr dns.RR, srv Service, iface *net.Interface) *dns.NSEC {
 				Name:   r.Ptr,
 				Rrtype: dns.TypeNSEC,
 				Class:  dns.ClassINET,
-				Ttl:    TtlDefault,
+				Ttl:    TTLDefault,
 			},
 			NextDomain: r.Ptr,
 			TypeBitMap: []uint16{dns.TypeTXT, dns.TypeSRV},
@@ -80,9 +80,7 @@ func NSEC(rr dns.RR, srv Service, iface *net.Interface) *dns.NSEC {
 		types := []uint16{}
 		var ips []net.IP
 		if iface != nil {
-			if srv.IfaceIPs[iface.Name] != nil {
-				ips = srv.IfaceIPs[iface.Name]
-			}
+			ips = srv.IPsAtInterface(iface)
 		} else {
 			ips = srv.IPs
 		}
@@ -99,7 +97,7 @@ func NSEC(rr dns.RR, srv Service, iface *net.Interface) *dns.NSEC {
 					Name:   r.Target,
 					Rrtype: dns.TypeNSEC,
 					Class:  dns.ClassINET,
-					Ttl:    TtlDefault,
+					Ttl:    TTLDefault,
 				},
 				NextDomain: r.Target,
 				TypeBitMap: types,
@@ -114,10 +112,8 @@ func NSEC(rr dns.RR, srv Service, iface *net.Interface) *dns.NSEC {
 
 func A(srv Service, iface *net.Interface) []*dns.A {
 	var ips []net.IP
-	if iface != nil && srv.IfaceIPs != nil {
-		if srv.IfaceIPs[iface.Name] != nil {
-			ips = srv.IfaceIPs[iface.Name]
-		}
+	if iface != nil {
+		ips = srv.IPsAtInterface(iface)
 	} else {
 		ips = srv.IPs
 	}
@@ -130,7 +126,7 @@ func A(srv Service, iface *net.Interface) []*dns.A {
 					Name:   srv.Hostname(),
 					Rrtype: dns.TypeA,
 					Class:  dns.ClassINET,
-					Ttl:    TtlHostname,
+					Ttl:    TTLHostname,
 				},
 				A: ip,
 			}
@@ -143,10 +139,8 @@ func A(srv Service, iface *net.Interface) []*dns.A {
 
 func AAAA(srv Service, iface *net.Interface) []*dns.AAAA {
 	var ips []net.IP
-	if iface != nil && srv.IfaceIPs != nil {
-		if srv.IfaceIPs[iface.Name] != nil {
-			ips = srv.IfaceIPs[iface.Name]
-		}
+	if iface != nil {
+		ips = srv.IPsAtInterface(iface)
 	} else {
 		ips = srv.IPs
 	}
@@ -159,7 +153,7 @@ func AAAA(srv Service, iface *net.Interface) []*dns.AAAA {
 					Name:   srv.Hostname(),
 					Rrtype: dns.TypeAAAA,
 					Class:  dns.ClassINET,
-					Ttl:    TtlHostname,
+					Ttl:    TTLHostname,
 				},
 				AAAA: ip,
 			}

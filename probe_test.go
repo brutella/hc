@@ -8,6 +8,20 @@ import (
 	"time"
 )
 
+var testIface = &net.Interface{
+	Index:        0,
+	MTU:          0,
+	Name:         "lo0",
+	HardwareAddr: []byte{},
+	Flags:        net.FlagUp,
+}
+
+var testAddr = net.UDPAddr{
+	IP:   net.IP{},
+	Port: 1234,
+	Zone: "",
+}
+
 type testConn struct {
 	read chan *Request
 
@@ -45,14 +59,15 @@ func (c *testConn) Read(ctx context.Context) <-chan *Request {
 	return c.read
 }
 
-func (c *testConn) Close() {
-}
+func (c *testConn) Drain(ctx context.Context) {}
+
+func (c *testConn) Close() {}
 
 func (c *testConn) start(ctx context.Context) {
 	for {
 		select {
 		case msg := <-c.in:
-			req := &Request{msg: msg}
+			req := &Request{msg: msg, from: &testAddr, iface: testIface}
 			c.read <- req
 		case <-ctx.Done():
 			return
@@ -62,8 +77,11 @@ func (c *testConn) start(ctx context.Context) {
 	}
 }
 
+// TestProbing tests probing by using 2 services with the same
+// service instance name and host name.Once the first services
+// is announced, the probing for the second service should give
 func TestProbing(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	conn := newTestConn()
@@ -71,17 +89,45 @@ func TestProbing(t *testing.T) {
 	conn.in = otherConn.out
 	conn.out = otherConn.in
 
-	srv := NewService("My Service", "._hap._tcp", "local.", "My Computer", []net.IP{net.ParseIP("192.168.0.122")}, 12334)
+	cfg := Config{
+		Name: "My Service",
+		Type: "_hap._tcp",
+		Host: "My-Computer",
+		Port: 12334,
+		ifaceIPs: map[string][]net.IP{
+			testIface.Name: []net.IP{net.ParseIP("192.168.0.122")},
+		},
+	}
+	srv, err := NewService(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	go func() {
-		otherSrv := NewService("My Service", "._hap._tcp", "local.", "My Computer", []net.IP{net.ParseIP("192.168.0.123")}, 43321)
+		otherCfg := cfg.Copy()
+		otherCfg.IPs = []net.IP{net.ParseIP("192.168.0.123")}
+		otherCfg.ifaceIPs = nil
+		otherSrv, otherErr := NewService(otherCfg)
+		if otherErr != nil {
+			t.Fatal(otherErr)
+		}
 		otherResp := newResponder(otherConn)
-		otherResp.addManaged(otherSrv)
-		otherResp.isRunning = true
-		otherResp.respond(ctx)
+		otherResp.Add(otherSrv)
+
+		otherCtx, otherCancel := context.WithCancel(ctx)
+		defer otherCancel()
+
+		// the responder won't probe for the service instance name and host name
+		// because we explicitely set the IP address.
+		otherResp.Respond(otherCtx)
 	}()
 
-	resolved, err := probeService(ctx, conn, srv, 1*time.Millisecond, true)
+	// Wait until second service was announced.
+	// This doesn't take long because we set the IP address
+	// explicitely. Therefore no probing is done.
+	<-time.After(500 * time.Millisecond)
+
+	resolved, err := probeService(ctx, conn, srv, 1*time.Second, true)
 
 	if x := err; x != nil {
 		t.Fatal(x)
@@ -102,7 +148,7 @@ func TestIsLexicographicLater(t *testing.T) {
 			Name:   "MyPrinter.local.",
 			Rrtype: dns.TypeA,
 			Class:  dns.ClassINET,
-			Ttl:    TtlHostname,
+			Ttl:    TTLHostname,
 		},
 		A: net.ParseIP("169.254.99.200"),
 	}
@@ -112,7 +158,7 @@ func TestIsLexicographicLater(t *testing.T) {
 			Name:   "MyPrinter.local.",
 			Rrtype: dns.TypeA,
 			Class:  dns.ClassINET,
-			Ttl:    TtlHostname,
+			Ttl:    TTLHostname,
 		},
 		A: net.ParseIP("169.254.200.50"),
 	}

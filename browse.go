@@ -9,15 +9,17 @@ type AddServiceFunc func(Service)
 type RmvServiceFunc func(Service)
 
 func LookupType(ctx context.Context, service string, add AddServiceFunc, rmv RmvServiceFunc) (err error) {
-	var conn *mdnsConn
-	var cache = NewCache()
-	conn, err = newMDNSConn()
-
+	conn, err := newMDNSConn()
 	if err != nil {
-		return
+		return err
 	}
-
 	defer conn.close()
+
+	return lookupType(ctx, service, conn, add, rmv)
+}
+
+func lookupType(ctx context.Context, service string, conn MDNSConn, add AddServiceFunc, rmv RmvServiceFunc) (err error) {
+	var cache = NewCache()
 
 	m := new(dns.Msg)
 	m.Question = []dns.Question{
@@ -30,7 +32,7 @@ func LookupType(ctx context.Context, service string, add AddServiceFunc, rmv Rmv
 	readCtx, readCancel := context.WithCancel(ctx)
 	defer readCancel()
 
-	ch := conn.read(readCtx)
+	ch := conn.Read(readCtx)
 
 	q := &Query{msg: m}
 	conn.SendQuery(q)
@@ -52,7 +54,7 @@ func LookupType(ctx context.Context, service string, add AddServiceFunc, rmv Rmv
 				}
 			}
 		case <-ctx.Done():
-			return
+			return ctx.Err()
 		}
 	}
 }

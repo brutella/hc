@@ -1,3 +1,4 @@
+// Command browse browses for specific dns-sd service types.
 package main
 
 import (
@@ -11,7 +12,7 @@ import (
 	"time"
 )
 
-var serviceFlag = flag.String("Type", "_hap._tcp.", "Service type")
+var serviceFlag = flag.String("Type", "_hap._tcp", "Service type")
 var domainFlag = flag.String("Domain", "local.", "Browsing domain")
 
 var timeFormat = "15:04:05.000"
