@@ -233,6 +233,8 @@ func (c *Characteristic) convert(v interface{}) interface{} {
 		return int(to.Uint64(v))
 	case FormatUInt64:
 		return int(to.Uint64(v))
+	case FormatBool:
+		return to.Bool(v)
 	default:
 		return v
 	}
