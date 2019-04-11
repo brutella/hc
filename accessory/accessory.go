@@ -98,15 +98,20 @@ func (a *Accessory) Identify() {
 
 // Adds a service to the accessory and updates the ids of the service and the corresponding characteristics
 func (a *Accessory) AddService(s *service.Service) {
-	s.SetID(a.idCount)
-	a.idCount++
-
-	for _, c := range s.Characteristics {
-		c.SetID(a.idCount)
-		a.idCount++
-	}
-
 	a.Services = append(a.Services, s)
+}
+
+// UpdateIDs updates the service and characteirstic ids.
+func (a *Accessory) UpdateIDs() {
+	for _, s := range a.Services {
+		s.SetID(a.idCount)
+		a.idCount++
+
+		for _, c := range s.Characteristics {
+			c.SetID(a.idCount)
+			a.idCount++
+		}
+	}
 }
 
 // Equal returns true when receiver has the same services and id as the argument.
