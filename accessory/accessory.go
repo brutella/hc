@@ -5,10 +5,11 @@ import (
 )
 
 type Info struct {
-	Name         string
-	SerialNumber string
-	Manufacturer string
-	Model        string
+	Name             string
+	SerialNumber     string
+	Manufacturer     string
+	Model            string
+	FirmwareRevision string
 }
 
 // Accessory is a HomeKit accessory.
@@ -53,6 +54,12 @@ func New(info Info, typ AccessoryType) *Accessory {
 		svc.Model.SetValue(model)
 	} else {
 		svc.Model.SetValue("undefined")
+	}
+
+	if version := info.FirmwareRevision; len(version) > 0 {
+		svc.FirmwareRevision.SetValue(version)
+	} else {
+		svc.FirmwareRevision.SetValue("undefined")
 	}
 
 	acc := &Accessory{
