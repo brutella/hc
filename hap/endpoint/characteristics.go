@@ -39,8 +39,8 @@ func (handler *Characteristics) ServeHTTP(response http.ResponseWriter, request 
 	handler.mutex.Lock()
 	switch request.Method {
 	case hap.MethodGET:
-		log.Debug.Printf("%v GET /characteristics", request.RemoteAddr)
 		request.ParseForm()
+		log.Debug.Printf("%v GET /characteristics %v", request.RemoteAddr, request.Form)
 		session := handler.context.GetSessionForRequest(request)
 		conn := session.Connection()
 		res, err = handler.controller.HandleGetCharacteristics(request.Form, conn)

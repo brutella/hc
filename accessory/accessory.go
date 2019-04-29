@@ -5,16 +5,16 @@ import (
 )
 
 type Info struct {
-	Name         string
-	SerialNumber string
-	Manufacturer string
-	Model        string
+	Name             string
+	SerialNumber     string
+	Manufacturer     string
+	Model            string
+	FirmwareRevision string
 }
 
-// Accessory implements the model.Accessory interface and contains the data
-// structures to communicate with HomeKit.
+// Accessory is a HomeKit accessory.
 //
-// An accessory in consists of services, which consists of characteristics.
+// An accessory contains services, which themselves contain characteristics.
 // Every accessory has the "accessory info" service by default which consists
 // of characteristics to identify the accessory: name, model, manufacturer,...
 type Accessory struct {
@@ -54,6 +54,12 @@ func New(info Info, typ AccessoryType) *Accessory {
 		svc.Model.SetValue(model)
 	} else {
 		svc.Model.SetValue("undefined")
+	}
+
+	if version := info.FirmwareRevision; len(version) > 0 {
+		svc.FirmwareRevision.SetValue(version)
+	} else {
+		svc.FirmwareRevision.SetValue("undefined")
 	}
 
 	acc := &Accessory{
@@ -99,15 +105,20 @@ func (a *Accessory) Identify() {
 
 // Adds a service to the accessory and updates the ids of the service and the corresponding characteristics
 func (a *Accessory) AddService(s *service.Service) {
-	s.SetID(a.idCount)
-	a.idCount++
-
-	for _, c := range s.Characteristics {
-		c.SetID(a.idCount)
-		a.idCount++
-	}
-
 	a.Services = append(a.Services, s)
+}
+
+// UpdateIDs updates the service and characteirstic ids.
+func (a *Accessory) UpdateIDs() {
+	for _, s := range a.Services {
+		s.SetID(a.idCount)
+		a.idCount++
+
+		for _, c := range s.Characteristics {
+			c.SetID(a.idCount)
+			a.idCount++
+		}
+	}
 }
 
 // Equal returns true when receiver has the same services and id as the argument.

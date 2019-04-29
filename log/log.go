@@ -9,11 +9,11 @@ import (
 var (
 	// Debug generates debug lines of output with a "DEBUG" prefix.
 	// By default the lines are written to /dev/null.
-	Debug = &Logger{log.New(ioutil.Discard, "DEBUG ", log.LstdFlags)}
+	Debug = &Logger{log.New(ioutil.Discard, "DEBUG ", log.LstdFlags|log.Lshortfile)}
 
 	// Info generates debug lines of output with a "INFO" prefix.
 	// By default the lines are written to stdout.
-	Info = &Logger{log.New(os.Stdout, "INFO ", log.LstdFlags)}
+	Info = &Logger{log.New(os.Stdout, "INFO ", log.LstdFlags|log.Lshortfile)}
 )
 
 // Logger is a wrapper for log.Logger and provides

@@ -7,7 +7,6 @@ import (
 	"net"
 	"strings"
 	"sync"
-	_ "time"
 
 	"github.com/brutella/dnssd"
 	"github.com/brutella/hc/accessory"
@@ -15,16 +14,21 @@ import (
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/event"
 	"github.com/brutella/hc/hap"
+	"github.com/brutella/hc/hap/endpoint"
 	"github.com/brutella/hc/hap/http"
 	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/util"
 	"github.com/gosexy/to"
+
+	"image"
 )
 
 type ipTransport struct {
+	CameraSnapshotReq func(width, height uint) (*image.Image, error)
+
 	config  *Config
 	context hap.Context
-	server  http.Server
+	server  *http.Server
 	mutex   *sync.Mutex
 
 	storage  util.Storage
@@ -61,7 +65,7 @@ type ipTransport struct {
 // The transport is secured with an 8-digit pin, which must be entered
 // by an iOS client to successfully pair with the accessory. If the
 // provided transport config does not specify any pin, 00102003 is used.
-func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Accessory) (Transport, error) {
+func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Accessory) (*ipTransport, error) {
 	// Find transport name which is visible in mDNS
 	name := a.Info.Name.GetValue()
 	if len(name) == 0 {
@@ -147,6 +151,10 @@ func (t *ipTransport) Start() {
 
 	s := http.NewServer(config)
 	t.server = s
+
+	if t.CameraSnapshotReq != nil {
+		t.server.Mux.Handle("/resource", endpoint.NewResource(t.context, t.CameraSnapshotReq))
+	}
 
 	// Publish server port which might be different then `t.config.Port`
 	t.config.servePort = int(to.Int64(s.Port()))

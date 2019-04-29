@@ -29,10 +29,9 @@ func (bs *Bytes) GetValue() []byte {
 	}
 }
 
-// OnValueRemoteUpdate calls fn when the value was updated by a client.
 func (bs *Bytes) OnValueRemoteUpdate(fn func([]byte)) {
 	bs.OnValueUpdateFromConn(func(conn net.Conn, c *Characteristic, new, old interface{}) {
-		fn(new.([]byte))
+		fn(bs.GetValue())
 	})
 }
 

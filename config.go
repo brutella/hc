@@ -70,15 +70,15 @@ func (cfg Config) txtRecords() map[string]string {
 
 // loads load the id, version and config hash
 func (cfg *Config) load(storage util.Storage) {
-	if b, err := storage.Get("uuid"); err == nil {
+	if b, err := storage.Get("uuid"); err == nil && len(b) > 0 {
 		cfg.id = string(b)
 	}
 
-	if b, err := storage.Get("version"); err == nil {
+	if b, err := storage.Get("version"); err == nil && len(b) > 0 {
 		cfg.version = to.Int64(string(b))
 	}
 
-	if b, err := storage.Get("configHash"); err == nil {
+	if b, err := storage.Get("configHash"); err == nil && len(b) > 0 {
 		cfg.configHash = b
 	}
 }
