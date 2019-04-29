@@ -10,9 +10,10 @@ You can focus on implementing the business logic for your accessory, without hav
 
 Here are some projects which use `hc`.
 
-- [LIFX](https://github.com/brutella/hklifx/)
-- [UVR1611](https://github.com/brutella/hkuvr)
-- [Fronius Symo](https://github.com/brutella/hksymo)
+- [hkcam](https://github.com/brutella/hkcam)
+- [hklifx](https://github.com/brutella/hklifx/)
+- [hkuvr](https://github.com/brutella/hkuvr)
+- [hksymo](https://github.com/brutella/hksymo)
 
 **What is HomeKit?**
 
