@@ -12,6 +12,8 @@ type Microphone struct {
 
 	Volume *characteristic.Volume
 	Mute   *characteristic.Mute
+
+	Name *characteristic.Name
 }
 
 func NewMicrophone() *Microphone {
@@ -23,6 +25,9 @@ func NewMicrophone() *Microphone {
 
 	svc.Mute = characteristic.NewMute()
 	svc.AddCharacteristic(svc.Mute.Characteristic)
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
 
 	return &svc
 }

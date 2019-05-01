@@ -11,6 +11,10 @@ type FilterMaintenance struct {
 	*Service
 
 	FilterChangeIndication *characteristic.FilterChangeIndication
+
+	FilterLifeLevel       *characteristic.FilterLifeLevel
+	ResetFilterIndication *characteristic.ResetFilterIndication
+	Name                  *characteristic.Name
 }
 
 func NewFilterMaintenance() *FilterMaintenance {
@@ -19,6 +23,15 @@ func NewFilterMaintenance() *FilterMaintenance {
 
 	svc.FilterChangeIndication = characteristic.NewFilterChangeIndication()
 	svc.AddCharacteristic(svc.FilterChangeIndication.Characteristic)
+
+	svc.FilterLifeLevel = characteristic.NewFilterLifeLevel()
+	svc.AddCharacteristic(svc.FilterLifeLevel.Characteristic)
+
+	svc.ResetFilterIndication = characteristic.NewResetFilterIndication()
+	svc.AddCharacteristic(svc.ResetFilterIndication.Characteristic)
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
 
 	return &svc
 }

@@ -11,6 +11,10 @@ type Doorbell struct {
 	*Service
 
 	ProgrammableSwitchEvent *characteristic.ProgrammableSwitchEvent
+
+	Brightness *characteristic.Brightness
+	Volume     *characteristic.Volume
+	Name       *characteristic.Name
 }
 
 func NewDoorbell() *Doorbell {
@@ -19,6 +23,15 @@ func NewDoorbell() *Doorbell {
 
 	svc.ProgrammableSwitchEvent = characteristic.NewProgrammableSwitchEvent()
 	svc.AddCharacteristic(svc.ProgrammableSwitchEvent.Characteristic)
+
+	svc.Brightness = characteristic.NewBrightness()
+	svc.AddCharacteristic(svc.Brightness.Characteristic)
+
+	svc.Volume = characteristic.NewVolume()
+	svc.AddCharacteristic(svc.Volume.Characteristic)
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
 
 	return &svc
 }

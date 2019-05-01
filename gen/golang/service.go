@@ -22,12 +22,19 @@ type {{.StructName}} struct {
     *Service
     {{range .Chars}}
     {{.StructName}} *characteristic.{{.StructName}}{{end}}
+    {{range .Optional}}
+    {{.StructName}} *characteristic.{{.StructName}}{{end}}
 }
 
 func New{{.StructName}}() *{{.StructName}} {
     svc := {{.StructName}}{}
     svc.Service = New({{.TypeName}})
+
     {{range .Chars}}
+    svc.{{.StructName}} = characteristic.New{{.StructName}}()
+    svc.AddCharacteristic(svc.{{.StructName}}.Characteristic)
+
+    {{range .Optional}}
     svc.{{.StructName}} = characteristic.New{{.StructName}}()
     svc.AddCharacteristic(svc.{{.StructName}}.Characteristic)
     {{end}}

@@ -13,6 +13,10 @@ type IrrigationSystem struct {
 	Active      *characteristic.Active
 	ProgramMode *characteristic.ProgramMode
 	InUse       *characteristic.InUse
+
+	Name              *characteristic.Name
+	RemainingDuration *characteristic.RemainingDuration
+	StatusFault       *characteristic.StatusFault
 }
 
 func NewIrrigationSystem() *IrrigationSystem {
@@ -27,6 +31,15 @@ func NewIrrigationSystem() *IrrigationSystem {
 
 	svc.InUse = characteristic.NewInUse()
 	svc.AddCharacteristic(svc.InUse.Characteristic)
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
+
+	svc.RemainingDuration = characteristic.NewRemainingDuration()
+	svc.AddCharacteristic(svc.RemainingDuration.Characteristic)
+
+	svc.StatusFault = characteristic.NewStatusFault()
+	svc.AddCharacteristic(svc.StatusFault.Characteristic)
 
 	return &svc
 }

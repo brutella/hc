@@ -12,6 +12,11 @@ type SecuritySystem struct {
 
 	SecuritySystemCurrentState *characteristic.SecuritySystemCurrentState
 	SecuritySystemTargetState  *characteristic.SecuritySystemTargetState
+
+	StatusFault             *characteristic.StatusFault
+	StatusTampered          *characteristic.StatusTampered
+	SecuritySystemAlarmType *characteristic.SecuritySystemAlarmType
+	Name                    *characteristic.Name
 }
 
 func NewSecuritySystem() *SecuritySystem {
@@ -23,6 +28,18 @@ func NewSecuritySystem() *SecuritySystem {
 
 	svc.SecuritySystemTargetState = characteristic.NewSecuritySystemTargetState()
 	svc.AddCharacteristic(svc.SecuritySystemTargetState.Characteristic)
+
+	svc.StatusFault = characteristic.NewStatusFault()
+	svc.AddCharacteristic(svc.StatusFault.Characteristic)
+
+	svc.StatusTampered = characteristic.NewStatusTampered()
+	svc.AddCharacteristic(svc.StatusTampered.Characteristic)
+
+	svc.SecuritySystemAlarmType = characteristic.NewSecuritySystemAlarmType()
+	svc.AddCharacteristic(svc.SecuritySystemAlarmType.Characteristic)
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
 
 	return &svc
 }

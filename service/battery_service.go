@@ -13,6 +13,8 @@ type BatteryService struct {
 	BatteryLevel     *characteristic.BatteryLevel
 	ChargingState    *characteristic.ChargingState
 	StatusLowBattery *characteristic.StatusLowBattery
+
+	Name *characteristic.Name
 }
 
 func NewBatteryService() *BatteryService {
@@ -27,6 +29,9 @@ func NewBatteryService() *BatteryService {
 
 	svc.StatusLowBattery = characteristic.NewStatusLowBattery()
 	svc.AddCharacteristic(svc.StatusLowBattery.Characteristic)
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
 
 	return &svc
 }

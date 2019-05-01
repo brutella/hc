@@ -10,10 +10,12 @@ const TypeLightbulb = "43"
 type Lightbulb struct {
 	*Service
 
-	On         *characteristic.On
+	On *characteristic.On
+
 	Brightness *characteristic.Brightness
-	Saturation *characteristic.Saturation
 	Hue        *characteristic.Hue
+	Saturation *characteristic.Saturation
+	Name       *characteristic.Name
 }
 
 func NewLightbulb() *Lightbulb {
@@ -26,11 +28,14 @@ func NewLightbulb() *Lightbulb {
 	svc.Brightness = characteristic.NewBrightness()
 	svc.AddCharacteristic(svc.Brightness.Characteristic)
 
+	svc.Hue = characteristic.NewHue()
+	svc.AddCharacteristic(svc.Hue.Characteristic)
+
 	svc.Saturation = characteristic.NewSaturation()
 	svc.AddCharacteristic(svc.Saturation.Characteristic)
 
-	svc.Hue = characteristic.NewHue()
-	svc.AddCharacteristic(svc.Hue.Characteristic)
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
 
 	return &svc
 }

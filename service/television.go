@@ -14,6 +14,7 @@ type Television struct {
 	ActiveIdentifier   *characteristic.ActiveIdentifier
 	ConfiguredName     *characteristic.ConfiguredName
 	SleepDiscoveryMode *characteristic.SleepDiscoveryMode
+
 	Brightness         *characteristic.Brightness
 	ClosedCaptions     *characteristic.ClosedCaptions
 	DisplayOrder       *characteristic.DisplayOrder

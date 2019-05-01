@@ -14,10 +14,11 @@ type InputSource struct {
 	InputSourceType        *characteristic.InputSourceType
 	IsConfigured           *characteristic.IsConfigured
 	CurrentVisibilityState *characteristic.CurrentVisibilityState
-	Identifier             *characteristic.Identifier
-	InputDeviceType        *characteristic.InputDeviceType
-	TargetVisibilityState  *characteristic.TargetVisibilityState
-	Name                   *characteristic.Name
+
+	Identifier            *characteristic.Identifier
+	InputDeviceType       *characteristic.InputDeviceType
+	TargetVisibilityState *characteristic.TargetVisibilityState
+	Name                  *characteristic.Name
 }
 
 func NewInputSource() *InputSource {

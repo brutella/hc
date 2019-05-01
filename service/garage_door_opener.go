@@ -13,6 +13,10 @@ type GarageDoorOpener struct {
 	CurrentDoorState    *characteristic.CurrentDoorState
 	TargetDoorState     *characteristic.TargetDoorState
 	ObstructionDetected *characteristic.ObstructionDetected
+
+	LockCurrentState *characteristic.LockCurrentState
+	LockTargetState  *characteristic.LockTargetState
+	Name             *characteristic.Name
 }
 
 func NewGarageDoorOpener() *GarageDoorOpener {
@@ -27,6 +31,15 @@ func NewGarageDoorOpener() *GarageDoorOpener {
 
 	svc.ObstructionDetected = characteristic.NewObstructionDetected()
 	svc.AddCharacteristic(svc.ObstructionDetected.Characteristic)
+
+	svc.LockCurrentState = characteristic.NewLockCurrentState()
+	svc.AddCharacteristic(svc.LockCurrentState.Characteristic)
+
+	svc.LockTargetState = characteristic.NewLockTargetState()
+	svc.AddCharacteristic(svc.LockTargetState.Characteristic)
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
 
 	return &svc
 }

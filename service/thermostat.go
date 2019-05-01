@@ -15,6 +15,12 @@ type Thermostat struct {
 	CurrentTemperature         *characteristic.CurrentTemperature
 	TargetTemperature          *characteristic.TargetTemperature
 	TemperatureDisplayUnits    *characteristic.TemperatureDisplayUnits
+
+	CurrentRelativeHumidity     *characteristic.CurrentRelativeHumidity
+	TargetRelativeHumidity      *characteristic.TargetRelativeHumidity
+	CoolingThresholdTemperature *characteristic.CoolingThresholdTemperature
+	HeatingThresholdTemperature *characteristic.HeatingThresholdTemperature
+	Name                        *characteristic.Name
 }
 
 func NewThermostat() *Thermostat {
@@ -35,6 +41,21 @@ func NewThermostat() *Thermostat {
 
 	svc.TemperatureDisplayUnits = characteristic.NewTemperatureDisplayUnits()
 	svc.AddCharacteristic(svc.TemperatureDisplayUnits.Characteristic)
+
+	svc.CurrentRelativeHumidity = characteristic.NewCurrentRelativeHumidity()
+	svc.AddCharacteristic(svc.CurrentRelativeHumidity.Characteristic)
+
+	svc.TargetRelativeHumidity = characteristic.NewTargetRelativeHumidity()
+	svc.AddCharacteristic(svc.TargetRelativeHumidity.Characteristic)
+
+	svc.CoolingThresholdTemperature = characteristic.NewCoolingThresholdTemperature()
+	svc.AddCharacteristic(svc.CoolingThresholdTemperature.Characteristic)
+
+	svc.HeatingThresholdTemperature = characteristic.NewHeatingThresholdTemperature()
+	svc.AddCharacteristic(svc.HeatingThresholdTemperature.Characteristic)
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
 
 	return &svc
 }

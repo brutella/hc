@@ -13,6 +13,14 @@ type WindowCovering struct {
 	CurrentPosition *characteristic.CurrentPosition
 	TargetPosition  *characteristic.TargetPosition
 	PositionState   *characteristic.PositionState
+
+	HoldPosition               *characteristic.HoldPosition
+	TargetHorizontalTiltAngle  *characteristic.TargetHorizontalTiltAngle
+	TargetVerticalTiltAngle    *characteristic.TargetVerticalTiltAngle
+	CurrentHorizontalTiltAngle *characteristic.CurrentHorizontalTiltAngle
+	CurrentVerticalTiltAngle   *characteristic.CurrentVerticalTiltAngle
+	ObstructionDetected        *characteristic.ObstructionDetected
+	Name                       *characteristic.Name
 }
 
 func NewWindowCovering() *WindowCovering {
@@ -27,6 +35,27 @@ func NewWindowCovering() *WindowCovering {
 
 	svc.PositionState = characteristic.NewPositionState()
 	svc.AddCharacteristic(svc.PositionState.Characteristic)
+
+	svc.HoldPosition = characteristic.NewHoldPosition()
+	svc.AddCharacteristic(svc.HoldPosition.Characteristic)
+
+	svc.TargetHorizontalTiltAngle = characteristic.NewTargetHorizontalTiltAngle()
+	svc.AddCharacteristic(svc.TargetHorizontalTiltAngle.Characteristic)
+
+	svc.TargetVerticalTiltAngle = characteristic.NewTargetVerticalTiltAngle()
+	svc.AddCharacteristic(svc.TargetVerticalTiltAngle.Characteristic)
+
+	svc.CurrentHorizontalTiltAngle = characteristic.NewCurrentHorizontalTiltAngle()
+	svc.AddCharacteristic(svc.CurrentHorizontalTiltAngle.Characteristic)
+
+	svc.CurrentVerticalTiltAngle = characteristic.NewCurrentVerticalTiltAngle()
+	svc.AddCharacteristic(svc.CurrentVerticalTiltAngle.Characteristic)
+
+	svc.ObstructionDetected = characteristic.NewObstructionDetected()
+	svc.AddCharacteristic(svc.ObstructionDetected.Characteristic)
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
 
 	return &svc
 }
