@@ -8,10 +8,11 @@ import (
 )
 
 var info = Info{
-	Name:         "Accessory1",
-	SerialNumber: "001",
-	Manufacturer: "Google",
-	Model:        "Accessory",
+	Name:             "Accessory1",
+	SerialNumber:     "001",
+	Manufacturer:     "Google",
+	Model:            "Accessory",
+	FirmwareRevision: "1.0.0",
 }
 
 func TestContainer(t *testing.T) {
