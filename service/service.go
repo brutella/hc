@@ -25,6 +25,11 @@ func New(typ string) *Service {
 	return &s
 }
 
+// GetType of the service.
+func (s *Service) GetType() string {
+	return s.Type
+}
+
 // SetID sets the service id.
 func (s *Service) SetID(id int64) {
 	s.ID = id
