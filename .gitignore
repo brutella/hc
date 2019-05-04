@@ -1,3 +1,5 @@
 .DS_Store
 /data
 /cmd/cmd
+/cscope.files
+/cscope.out
