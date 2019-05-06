@@ -70,6 +70,7 @@ See [_example](_example) for a variety of examples.
 **Basic switch accessory**
 
 Create a simple on/off switch, which is accessible via IP and secured using the pin *00102003*.
+By default only **required** charateristics for services are added.
 
 ```go
 package main
@@ -109,6 +110,40 @@ info := accessory.Info{
     Manufacturer: "Apple",
     Model: "AB",
     Firmware: "1.0.1",
+}
+```
+
+Should you need the **optional charateristics** add a call to AddOptionalCharateristics()
+
+```go
+package main
+
+import (
+    "log"
+    "github.com/brutella/hc"
+    "github.com/brutella/hc/accessory"
+)
+
+func main() {
+    // create an accessory
+    info := accessory.Info{Name: "Lamp"}
+    ac := accessory.NewSwitch(info)
+    
+	// Add optional charteristics
+	ac.Switch.AddOptionalCharaterics()
+
+    // configure the ip transport
+    config := hc.Config{Pin: "00102003"}
+    t, err := hc.NewIPTransport(config, ac.Accessory)
+    if err != nil {
+        log.Panic(err)
+    }
+    
+    hc.OnTermination(func(){
+        <-t.Stop()
+    })
+    
+    t.Start()
 }
 ```
 
