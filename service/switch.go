@@ -11,6 +11,8 @@ type Switch struct {
 	*Service
 
 	On *characteristic.On
+
+	Name *characteristic.Name
 }
 
 func NewSwitch() *Switch {
@@ -21,4 +23,11 @@ func NewSwitch() *Switch {
 	svc.AddCharacteristic(svc.On.Characteristic)
 
 	return &svc
+}
+
+func (svc *Switch) addOptionalCharaterics() {
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
+
 }

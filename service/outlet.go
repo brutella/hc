@@ -12,6 +12,8 @@ type Outlet struct {
 
 	On          *characteristic.On
 	OutletInUse *characteristic.OutletInUse
+
+	Name *characteristic.Name
 }
 
 func NewOutlet() *Outlet {
@@ -25,4 +27,11 @@ func NewOutlet() *Outlet {
 	svc.AddCharacteristic(svc.OutletInUse.Characteristic)
 
 	return &svc
+}
+
+func (svc *Outlet) addOptionalCharaterics() {
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
+
 }

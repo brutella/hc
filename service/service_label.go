@@ -11,6 +11,8 @@ type ServiceLabel struct {
 	*Service
 
 	ServiceLabelNamespace *characteristic.ServiceLabelNamespace
+
+	Name *characteristic.Name
 }
 
 func NewServiceLabel() *ServiceLabel {
@@ -21,4 +23,11 @@ func NewServiceLabel() *ServiceLabel {
 	svc.AddCharacteristic(svc.ServiceLabelNamespace.Characteristic)
 
 	return &svc
+}
+
+func (svc *ServiceLabel) addOptionalCharaterics() {
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
+
 }

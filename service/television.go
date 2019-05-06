@@ -14,6 +14,7 @@ type Television struct {
 	ActiveIdentifier   *characteristic.ActiveIdentifier
 	ConfiguredName     *characteristic.ConfiguredName
 	SleepDiscoveryMode *characteristic.SleepDiscoveryMode
+
 	Brightness         *characteristic.Brightness
 	ClosedCaptions     *characteristic.ClosedCaptions
 	DisplayOrder       *characteristic.DisplayOrder
@@ -40,6 +41,11 @@ func NewTelevision() *Television {
 	svc.SleepDiscoveryMode = characteristic.NewSleepDiscoveryMode()
 	svc.AddCharacteristic(svc.SleepDiscoveryMode.Characteristic)
 
+	return &svc
+}
+
+func (svc *Television) addOptionalCharaterics() {
+
 	svc.Brightness = characteristic.NewBrightness()
 	svc.AddCharacteristic(svc.Brightness.Characteristic)
 
@@ -64,5 +70,4 @@ func NewTelevision() *Television {
 	svc.RemoteKey = characteristic.NewRemoteKey()
 	svc.AddCharacteristic(svc.RemoteKey.Characteristic)
 
-	return &svc
 }

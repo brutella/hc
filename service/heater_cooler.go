@@ -14,6 +14,14 @@ type HeaterCooler struct {
 	CurrentHeaterCoolerState *characteristic.CurrentHeaterCoolerState
 	TargetHeaterCoolerState  *characteristic.TargetHeaterCoolerState
 	CurrentTemperature       *characteristic.CurrentTemperature
+
+	LockPhysicalControls        *characteristic.LockPhysicalControls
+	Name                        *characteristic.Name
+	SwingMode                   *characteristic.SwingMode
+	CoolingThresholdTemperature *characteristic.CoolingThresholdTemperature
+	HeatingThresholdTemperature *characteristic.HeatingThresholdTemperature
+	TemperatureDisplayUnits     *characteristic.TemperatureDisplayUnits
+	RotationSpeed               *characteristic.RotationSpeed
 }
 
 func NewHeaterCooler() *HeaterCooler {
@@ -33,4 +41,29 @@ func NewHeaterCooler() *HeaterCooler {
 	svc.AddCharacteristic(svc.CurrentTemperature.Characteristic)
 
 	return &svc
+}
+
+func (svc *HeaterCooler) addOptionalCharaterics() {
+
+	svc.LockPhysicalControls = characteristic.NewLockPhysicalControls()
+	svc.AddCharacteristic(svc.LockPhysicalControls.Characteristic)
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
+
+	svc.SwingMode = characteristic.NewSwingMode()
+	svc.AddCharacteristic(svc.SwingMode.Characteristic)
+
+	svc.CoolingThresholdTemperature = characteristic.NewCoolingThresholdTemperature()
+	svc.AddCharacteristic(svc.CoolingThresholdTemperature.Characteristic)
+
+	svc.HeatingThresholdTemperature = characteristic.NewHeatingThresholdTemperature()
+	svc.AddCharacteristic(svc.HeatingThresholdTemperature.Characteristic)
+
+	svc.TemperatureDisplayUnits = characteristic.NewTemperatureDisplayUnits()
+	svc.AddCharacteristic(svc.TemperatureDisplayUnits.Characteristic)
+
+	svc.RotationSpeed = characteristic.NewRotationSpeed()
+	svc.AddCharacteristic(svc.RotationSpeed.Characteristic)
+
 }

@@ -11,6 +11,9 @@ type StatelessProgrammableSwitch struct {
 	*Service
 
 	ProgrammableSwitchEvent *characteristic.ProgrammableSwitchEvent
+
+	Name              *characteristic.Name
+	ServiceLabelIndex *characteristic.ServiceLabelIndex
 }
 
 func NewStatelessProgrammableSwitch() *StatelessProgrammableSwitch {
@@ -21,4 +24,14 @@ func NewStatelessProgrammableSwitch() *StatelessProgrammableSwitch {
 	svc.AddCharacteristic(svc.ProgrammableSwitchEvent.Characteristic)
 
 	return &svc
+}
+
+func (svc *StatelessProgrammableSwitch) addOptionalCharaterics() {
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
+
+	svc.ServiceLabelIndex = characteristic.NewServiceLabelIndex()
+	svc.AddCharacteristic(svc.ServiceLabelIndex.Characteristic)
+
 }

@@ -22,6 +22,9 @@ type {{.StructName}} struct {
     *Service
     {{range .Chars}}
     {{.StructName}} *characteristic.{{.StructName}}{{end}}
+
+    {{range .Optional}}
+    {{.StructName}} *characteristic.{{.StructName}}{{end}}
 }
 
 func New{{.StructName}}() *{{.StructName}} {
@@ -33,6 +36,13 @@ func New{{.StructName}}() *{{.StructName}} {
     {{end}}
     
 	return &svc
+}
+
+func (svc *{{.StructName}}) addOptionalCharaterics() {
+   {{range .Optional}}
+   svc.{{.StructName}} = characteristic.New{{.StructName}}()
+   svc.AddCharacteristic(svc.{{.StructName}}.Characteristic)
+   {{end}}
 }
 `
 

@@ -11,6 +11,14 @@ type CarbonMonoxideSensor struct {
 	*Service
 
 	CarbonMonoxideDetected *characteristic.CarbonMonoxideDetected
+
+	StatusActive            *characteristic.StatusActive
+	StatusFault             *characteristic.StatusFault
+	StatusLowBattery        *characteristic.StatusLowBattery
+	StatusTampered          *characteristic.StatusTampered
+	CarbonMonoxideLevel     *characteristic.CarbonMonoxideLevel
+	CarbonMonoxidePeakLevel *characteristic.CarbonMonoxidePeakLevel
+	Name                    *characteristic.Name
 }
 
 func NewCarbonMonoxideSensor() *CarbonMonoxideSensor {
@@ -21,4 +29,29 @@ func NewCarbonMonoxideSensor() *CarbonMonoxideSensor {
 	svc.AddCharacteristic(svc.CarbonMonoxideDetected.Characteristic)
 
 	return &svc
+}
+
+func (svc *CarbonMonoxideSensor) addOptionalCharaterics() {
+
+	svc.StatusActive = characteristic.NewStatusActive()
+	svc.AddCharacteristic(svc.StatusActive.Characteristic)
+
+	svc.StatusFault = characteristic.NewStatusFault()
+	svc.AddCharacteristic(svc.StatusFault.Characteristic)
+
+	svc.StatusLowBattery = characteristic.NewStatusLowBattery()
+	svc.AddCharacteristic(svc.StatusLowBattery.Characteristic)
+
+	svc.StatusTampered = characteristic.NewStatusTampered()
+	svc.AddCharacteristic(svc.StatusTampered.Characteristic)
+
+	svc.CarbonMonoxideLevel = characteristic.NewCarbonMonoxideLevel()
+	svc.AddCharacteristic(svc.CarbonMonoxideLevel.Characteristic)
+
+	svc.CarbonMonoxidePeakLevel = characteristic.NewCarbonMonoxidePeakLevel()
+	svc.AddCharacteristic(svc.CarbonMonoxidePeakLevel.Characteristic)
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
+
 }

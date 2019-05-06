@@ -14,10 +14,11 @@ type InputSource struct {
 	InputSourceType        *characteristic.InputSourceType
 	IsConfigured           *characteristic.IsConfigured
 	CurrentVisibilityState *characteristic.CurrentVisibilityState
-	Identifier             *characteristic.Identifier
-	InputDeviceType        *characteristic.InputDeviceType
-	TargetVisibilityState  *characteristic.TargetVisibilityState
-	Name                   *characteristic.Name
+
+	Identifier            *characteristic.Identifier
+	InputDeviceType       *characteristic.InputDeviceType
+	TargetVisibilityState *characteristic.TargetVisibilityState
+	Name                  *characteristic.Name
 }
 
 func NewInputSource() *InputSource {
@@ -36,6 +37,11 @@ func NewInputSource() *InputSource {
 	svc.CurrentVisibilityState = characteristic.NewCurrentVisibilityState()
 	svc.AddCharacteristic(svc.CurrentVisibilityState.Characteristic)
 
+	return &svc
+}
+
+func (svc *InputSource) addOptionalCharaterics() {
+
 	svc.Identifier = characteristic.NewIdentifier()
 	svc.AddCharacteristic(svc.Identifier.Characteristic)
 
@@ -48,5 +54,4 @@ func NewInputSource() *InputSource {
 	svc.Name = characteristic.NewName()
 	svc.AddCharacteristic(svc.Name.Characteristic)
 
-	return &svc
 }

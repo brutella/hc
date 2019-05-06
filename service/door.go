@@ -13,6 +13,10 @@ type Door struct {
 	CurrentPosition *characteristic.CurrentPosition
 	PositionState   *characteristic.PositionState
 	TargetPosition  *characteristic.TargetPosition
+
+	HoldPosition        *characteristic.HoldPosition
+	ObstructionDetected *characteristic.ObstructionDetected
+	Name                *characteristic.Name
 }
 
 func NewDoor() *Door {
@@ -29,4 +33,17 @@ func NewDoor() *Door {
 	svc.AddCharacteristic(svc.TargetPosition.Characteristic)
 
 	return &svc
+}
+
+func (svc *Door) addOptionalCharaterics() {
+
+	svc.HoldPosition = characteristic.NewHoldPosition()
+	svc.AddCharacteristic(svc.HoldPosition.Characteristic)
+
+	svc.ObstructionDetected = characteristic.NewObstructionDetected()
+	svc.AddCharacteristic(svc.ObstructionDetected.Characteristic)
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
+
 }

@@ -1,4 +1,5 @@
 // +build ignore
+//
 
 // Imports HomeKit metadata from a file and creates files for every characteristic and service.
 // It finishes by running `go fmt` in the characterist and service packages.
@@ -10,13 +11,14 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/brutella/hc/gen"
-	"github.com/brutella/hc/gen/golang"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/brutella/hc/gen"
+	"github.com/brutella/hc/gen/golang"
 )
 
 var LibPath = os.ExpandEnv("$GOPATH/src/github.com/brutella/hc")

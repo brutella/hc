@@ -11,6 +11,9 @@ type Speaker struct {
 	*Service
 
 	Mute *characteristic.Mute
+
+	Name   *characteristic.Name
+	Volume *characteristic.Volume
 }
 
 func NewSpeaker() *Speaker {
@@ -21,4 +24,14 @@ func NewSpeaker() *Speaker {
 	svc.AddCharacteristic(svc.Mute.Characteristic)
 
 	return &svc
+}
+
+func (svc *Speaker) addOptionalCharaterics() {
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
+
+	svc.Volume = characteristic.NewVolume()
+	svc.AddCharacteristic(svc.Volume.Characteristic)
+
 }

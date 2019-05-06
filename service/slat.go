@@ -12,6 +12,11 @@ type Slat struct {
 
 	SlatType         *characteristic.SlatType
 	CurrentSlatState *characteristic.CurrentSlatState
+
+	Name             *characteristic.Name
+	CurrentTiltAngle *characteristic.CurrentTiltAngle
+	TargetTiltAngle  *characteristic.TargetTiltAngle
+	SwingMode        *characteristic.SwingMode
 }
 
 func NewSlat() *Slat {
@@ -25,4 +30,20 @@ func NewSlat() *Slat {
 	svc.AddCharacteristic(svc.CurrentSlatState.Characteristic)
 
 	return &svc
+}
+
+func (svc *Slat) addOptionalCharaterics() {
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
+
+	svc.CurrentTiltAngle = characteristic.NewCurrentTiltAngle()
+	svc.AddCharacteristic(svc.CurrentTiltAngle.Characteristic)
+
+	svc.TargetTiltAngle = characteristic.NewTargetTiltAngle()
+	svc.AddCharacteristic(svc.TargetTiltAngle.Characteristic)
+
+	svc.SwingMode = characteristic.NewSwingMode()
+	svc.AddCharacteristic(svc.SwingMode.Characteristic)
+
 }

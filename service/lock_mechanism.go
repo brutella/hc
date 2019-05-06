@@ -12,6 +12,8 @@ type LockMechanism struct {
 
 	LockCurrentState *characteristic.LockCurrentState
 	LockTargetState  *characteristic.LockTargetState
+
+	Name *characteristic.Name
 }
 
 func NewLockMechanism() *LockMechanism {
@@ -25,4 +27,11 @@ func NewLockMechanism() *LockMechanism {
 	svc.AddCharacteristic(svc.LockTargetState.Characteristic)
 
 	return &svc
+}
+
+func (svc *LockMechanism) addOptionalCharaterics() {
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
+
 }

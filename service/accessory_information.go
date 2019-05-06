@@ -16,6 +16,9 @@ type AccessoryInformation struct {
 	Name             *characteristic.Name
 	SerialNumber     *characteristic.SerialNumber
 	FirmwareRevision *characteristic.FirmwareRevision
+
+	HardwareRevision *characteristic.HardwareRevision
+	AccessoryFlags   *characteristic.AccessoryFlags
 }
 
 func NewAccessoryInformation() *AccessoryInformation {
@@ -41,4 +44,14 @@ func NewAccessoryInformation() *AccessoryInformation {
 	svc.AddCharacteristic(svc.FirmwareRevision.Characteristic)
 
 	return &svc
+}
+
+func (svc *AccessoryInformation) addOptionalCharaterics() {
+
+	svc.HardwareRevision = characteristic.NewHardwareRevision()
+	svc.AddCharacteristic(svc.HardwareRevision.Characteristic)
+
+	svc.AccessoryFlags = characteristic.NewAccessoryFlags()
+	svc.AddCharacteristic(svc.AccessoryFlags.Characteristic)
+
 }

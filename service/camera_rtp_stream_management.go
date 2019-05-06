@@ -16,6 +16,8 @@ type CameraRTPStreamManagement struct {
 	SelectedRTPStreamConfiguration    *characteristic.SelectedRTPStreamConfiguration
 	StreamingStatus                   *characteristic.StreamingStatus
 	SetupEndpoints                    *characteristic.SetupEndpoints
+
+	Name *characteristic.Name
 }
 
 func NewCameraRTPStreamManagement() *CameraRTPStreamManagement {
@@ -41,4 +43,11 @@ func NewCameraRTPStreamManagement() *CameraRTPStreamManagement {
 	svc.AddCharacteristic(svc.SetupEndpoints.Characteristic)
 
 	return &svc
+}
+
+func (svc *CameraRTPStreamManagement) addOptionalCharaterics() {
+
+	svc.Name = characteristic.NewName()
+	svc.AddCharacteristic(svc.Name.Characteristic)
+
 }
