@@ -29,7 +29,7 @@ func NewMotionSensor() *MotionSensor {
 	return &svc
 }
 
-func (svc *MotionSensor) addOptionalCharaterics() {
+func (svc *MotionSensor) AddOptionalCharaterics() {
 
 	svc.StatusActive = characteristic.NewStatusActive()
 	svc.AddCharacteristic(svc.StatusActive.Characteristic)

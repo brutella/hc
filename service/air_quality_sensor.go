@@ -37,7 +37,7 @@ func NewAirQualitySensor() *AirQualitySensor {
 	return &svc
 }
 
-func (svc *AirQualitySensor) addOptionalCharaterics() {
+func (svc *AirQualitySensor) AddOptionalCharaterics() {
 
 	svc.StatusActive = characteristic.NewStatusActive()
 	svc.AddCharacteristic(svc.StatusActive.Characteristic)

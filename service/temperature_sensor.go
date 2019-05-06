@@ -29,7 +29,7 @@ func NewTemperatureSensor() *TemperatureSensor {
 	return &svc
 }
 
-func (svc *TemperatureSensor) addOptionalCharaterics() {
+func (svc *TemperatureSensor) AddOptionalCharaterics() {
 
 	svc.StatusActive = characteristic.NewStatusActive()
 	svc.AddCharacteristic(svc.StatusActive.Characteristic)

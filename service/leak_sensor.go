@@ -29,7 +29,7 @@ func NewLeakSensor() *LeakSensor {
 	return &svc
 }
 
-func (svc *LeakSensor) addOptionalCharaterics() {
+func (svc *LeakSensor) AddOptionalCharaterics() {
 
 	svc.StatusActive = characteristic.NewStatusActive()
 	svc.AddCharacteristic(svc.StatusActive.Characteristic)

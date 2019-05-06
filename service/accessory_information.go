@@ -46,7 +46,7 @@ func NewAccessoryInformation() *AccessoryInformation {
 	return &svc
 }
 
-func (svc *AccessoryInformation) addOptionalCharaterics() {
+func (svc *AccessoryInformation) AddOptionalCharaterics() {
 
 	svc.HardwareRevision = characteristic.NewHardwareRevision()
 	svc.AddCharacteristic(svc.HardwareRevision.Characteristic)

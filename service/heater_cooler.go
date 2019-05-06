@@ -43,7 +43,7 @@ func NewHeaterCooler() *HeaterCooler {
 	return &svc
 }
 
-func (svc *HeaterCooler) addOptionalCharaterics() {
+func (svc *HeaterCooler) AddOptionalCharaterics() {
 
 	svc.LockPhysicalControls = characteristic.NewLockPhysicalControls()
 	svc.AddCharacteristic(svc.LockPhysicalControls.Characteristic)

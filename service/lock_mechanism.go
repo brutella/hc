@@ -29,7 +29,7 @@ func NewLockMechanism() *LockMechanism {
 	return &svc
 }
 
-func (svc *LockMechanism) addOptionalCharaterics() {
+func (svc *LockMechanism) AddOptionalCharaterics() {
 
 	svc.Name = characteristic.NewName()
 	svc.AddCharacteristic(svc.Name.Characteristic)

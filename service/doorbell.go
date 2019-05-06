@@ -27,7 +27,7 @@ func NewDoorbell() *Doorbell {
 	return &svc
 }
 
-func (svc *Doorbell) addOptionalCharaterics() {
+func (svc *Doorbell) AddOptionalCharaterics() {
 
 	svc.Brightness = characteristic.NewBrightness()
 	svc.AddCharacteristic(svc.Brightness.Characteristic)

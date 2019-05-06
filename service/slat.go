@@ -32,7 +32,7 @@ func NewSlat() *Slat {
 	return &svc
 }
 
-func (svc *Slat) addOptionalCharaterics() {
+func (svc *Slat) AddOptionalCharaterics() {
 
 	svc.Name = characteristic.NewName()
 	svc.AddCharacteristic(svc.Name.Characteristic)

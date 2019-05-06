@@ -36,7 +36,7 @@ func NewLockManagement() *LockManagement {
 	return &svc
 }
 
-func (svc *LockManagement) addOptionalCharaterics() {
+func (svc *LockManagement) AddOptionalCharaterics() {
 
 	svc.Logs = characteristic.NewLogs()
 	svc.AddCharacteristic(svc.Logs.Characteristic)

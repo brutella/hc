@@ -27,7 +27,7 @@ func NewFan() *Fan {
 	return &svc
 }
 
-func (svc *Fan) addOptionalCharaterics() {
+func (svc *Fan) AddOptionalCharaterics() {
 
 	svc.RotationDirection = characteristic.NewRotationDirection()
 	svc.AddCharacteristic(svc.RotationDirection.Characteristic)

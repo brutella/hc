@@ -36,7 +36,7 @@ func NewAirPurifier() *AirPurifier {
 	return &svc
 }
 
-func (svc *AirPurifier) addOptionalCharaterics() {
+func (svc *AirPurifier) AddOptionalCharaterics() {
 
 	svc.LockPhysicalControls = characteristic.NewLockPhysicalControls()
 	svc.AddCharacteristic(svc.LockPhysicalControls.Characteristic)

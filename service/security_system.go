@@ -32,7 +32,7 @@ func NewSecuritySystem() *SecuritySystem {
 	return &svc
 }
 
-func (svc *SecuritySystem) addOptionalCharaterics() {
+func (svc *SecuritySystem) AddOptionalCharaterics() {
 
 	svc.StatusFault = characteristic.NewStatusFault()
 	svc.AddCharacteristic(svc.StatusFault.Characteristic)

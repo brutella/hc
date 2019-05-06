@@ -35,7 +35,7 @@ func NewWindow() *Window {
 	return &svc
 }
 
-func (svc *Window) addOptionalCharaterics() {
+func (svc *Window) AddOptionalCharaterics() {
 
 	svc.HoldPosition = characteristic.NewHoldPosition()
 	svc.AddCharacteristic(svc.HoldPosition.Characteristic)

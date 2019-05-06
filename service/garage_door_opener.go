@@ -35,7 +35,7 @@ func NewGarageDoorOpener() *GarageDoorOpener {
 	return &svc
 }
 
-func (svc *GarageDoorOpener) addOptionalCharaterics() {
+func (svc *GarageDoorOpener) AddOptionalCharaterics() {
 
 	svc.LockCurrentState = characteristic.NewLockCurrentState()
 	svc.AddCharacteristic(svc.LockCurrentState.Characteristic)

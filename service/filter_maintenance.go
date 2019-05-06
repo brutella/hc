@@ -27,7 +27,7 @@ func NewFilterMaintenance() *FilterMaintenance {
 	return &svc
 }
 
-func (svc *FilterMaintenance) addOptionalCharaterics() {
+func (svc *FilterMaintenance) AddOptionalCharaterics() {
 
 	svc.FilterLifeLevel = characteristic.NewFilterLifeLevel()
 	svc.AddCharacteristic(svc.FilterLifeLevel.Characteristic)

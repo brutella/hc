@@ -29,7 +29,7 @@ func NewOutlet() *Outlet {
 	return &svc
 }
 
-func (svc *Outlet) addOptionalCharaterics() {
+func (svc *Outlet) AddOptionalCharaterics() {
 
 	svc.Name = characteristic.NewName()
 	svc.AddCharacteristic(svc.Name.Characteristic)

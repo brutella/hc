@@ -40,7 +40,7 @@ func NewInputSource() *InputSource {
 	return &svc
 }
 
-func (svc *InputSource) addOptionalCharaterics() {
+func (svc *InputSource) AddOptionalCharaterics() {
 
 	svc.Identifier = characteristic.NewIdentifier()
 	svc.AddCharacteristic(svc.Identifier.Characteristic)

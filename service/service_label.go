@@ -25,7 +25,7 @@ func NewServiceLabel() *ServiceLabel {
 	return &svc
 }
 
-func (svc *ServiceLabel) addOptionalCharaterics() {
+func (svc *ServiceLabel) AddOptionalCharaterics() {
 
 	svc.Name = characteristic.NewName()
 	svc.AddCharacteristic(svc.Name.Characteristic)

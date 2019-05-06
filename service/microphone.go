@@ -29,7 +29,7 @@ func NewMicrophone() *Microphone {
 	return &svc
 }
 
-func (svc *Microphone) addOptionalCharaterics() {
+func (svc *Microphone) AddOptionalCharaterics() {
 
 	svc.Name = characteristic.NewName()
 	svc.AddCharacteristic(svc.Name.Characteristic)

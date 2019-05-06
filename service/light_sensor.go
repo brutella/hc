@@ -29,7 +29,7 @@ func NewLightSensor() *LightSensor {
 	return &svc
 }
 
-func (svc *LightSensor) addOptionalCharaterics() {
+func (svc *LightSensor) AddOptionalCharaterics() {
 
 	svc.Name = characteristic.NewName()
 	svc.AddCharacteristic(svc.Name.Characteristic)

@@ -28,7 +28,7 @@ func NewLightbulb() *Lightbulb {
 	return &svc
 }
 
-func (svc *Lightbulb) addOptionalCharaterics() {
+func (svc *Lightbulb) AddOptionalCharaterics() {
 
 	svc.Brightness = characteristic.NewBrightness()
 	svc.AddCharacteristic(svc.Brightness.Characteristic)

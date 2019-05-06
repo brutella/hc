@@ -29,7 +29,7 @@ func NewOccupancySensor() *OccupancySensor {
 	return &svc
 }
 
-func (svc *OccupancySensor) addOptionalCharaterics() {
+func (svc *OccupancySensor) AddOptionalCharaterics() {
 
 	svc.Name = characteristic.NewName()
 	svc.AddCharacteristic(svc.Name.Characteristic)

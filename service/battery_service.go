@@ -33,7 +33,7 @@ func NewBatteryService() *BatteryService {
 	return &svc
 }
 
-func (svc *BatteryService) addOptionalCharaterics() {
+func (svc *BatteryService) AddOptionalCharaterics() {
 
 	svc.Name = characteristic.NewName()
 	svc.AddCharacteristic(svc.Name.Characteristic)
