@@ -29,7 +29,7 @@ func NewSmokeSensor() *SmokeSensor {
 	return &svc
 }
 
-func (svc *SmokeSensor) AddOptionalCharaterics() {
+func (svc *SmokeSensor) AddOptionalCharacteristics() {
 
 	svc.StatusActive = characteristic.NewStatusActive()
 	svc.AddCharacteristic(svc.StatusActive.Characteristic)

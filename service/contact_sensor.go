@@ -29,7 +29,7 @@ func NewContactSensor() *ContactSensor {
 	return &svc
 }
 
-func (svc *ContactSensor) AddOptionalCharaterics() {
+func (svc *ContactSensor) AddOptionalCharacteristics() {
 
 	svc.StatusActive = characteristic.NewStatusActive()
 	svc.AddCharacteristic(svc.StatusActive.Characteristic)

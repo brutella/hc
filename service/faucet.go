@@ -26,7 +26,7 @@ func NewFaucet() *Faucet {
 	return &svc
 }
 
-func (svc *Faucet) AddOptionalCharaterics() {
+func (svc *Faucet) AddOptionalCharacteristics() {
 
 	svc.Name = characteristic.NewName()
 	svc.AddCharacteristic(svc.Name.Characteristic)

@@ -31,7 +31,7 @@ func NewCarbonDioxideSensor() *CarbonDioxideSensor {
 	return &svc
 }
 
-func (svc *CarbonDioxideSensor) AddOptionalCharaterics() {
+func (svc *CarbonDioxideSensor) AddOptionalCharacteristics() {
 
 	svc.StatusActive = characteristic.NewStatusActive()
 	svc.AddCharacteristic(svc.StatusActive.Characteristic)

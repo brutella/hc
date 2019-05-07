@@ -26,7 +26,7 @@ func NewSpeaker() *Speaker {
 	return &svc
 }
 
-func (svc *Speaker) AddOptionalCharaterics() {
+func (svc *Speaker) AddOptionalCharacteristics() {
 
 	svc.Name = characteristic.NewName()
 	svc.AddCharacteristic(svc.Name.Characteristic)

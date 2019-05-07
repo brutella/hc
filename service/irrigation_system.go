@@ -35,7 +35,7 @@ func NewIrrigationSystem() *IrrigationSystem {
 	return &svc
 }
 
-func (svc *IrrigationSystem) AddOptionalCharaterics() {
+func (svc *IrrigationSystem) AddOptionalCharacteristics() {
 
 	svc.Name = characteristic.NewName()
 	svc.AddCharacteristic(svc.Name.Characteristic)

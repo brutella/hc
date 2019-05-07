@@ -45,7 +45,7 @@ func NewThermostat() *Thermostat {
 	return &svc
 }
 
-func (svc *Thermostat) AddOptionalCharaterics() {
+func (svc *Thermostat) AddOptionalCharacteristics() {
 
 	svc.CurrentRelativeHumidity = characteristic.NewCurrentRelativeHumidity()
 	svc.AddCharacteristic(svc.CurrentRelativeHumidity.Characteristic)

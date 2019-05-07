@@ -29,7 +29,7 @@ func NewHumiditySensor() *HumiditySensor {
 	return &svc
 }
 
-func (svc *HumiditySensor) AddOptionalCharaterics() {
+func (svc *HumiditySensor) AddOptionalCharacteristics() {
 
 	svc.StatusActive = characteristic.NewStatusActive()
 	svc.AddCharacteristic(svc.StatusActive.Characteristic)

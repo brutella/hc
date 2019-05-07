@@ -45,7 +45,7 @@ func NewCameraRTPStreamManagement() *CameraRTPStreamManagement {
 	return &svc
 }
 
-func (svc *CameraRTPStreamManagement) AddOptionalCharaterics() {
+func (svc *CameraRTPStreamManagement) AddOptionalCharacteristics() {
 
 	svc.Name = characteristic.NewName()
 	svc.AddCharacteristic(svc.Name.Characteristic)

@@ -31,7 +31,7 @@ func NewFanV2() *FanV2 {
 	return &svc
 }
 
-func (svc *FanV2) AddOptionalCharaterics() {
+func (svc *FanV2) AddOptionalCharacteristics() {
 
 	svc.CurrentFanState = characteristic.NewCurrentFanState()
 	svc.AddCharacteristic(svc.CurrentFanState.Characteristic)

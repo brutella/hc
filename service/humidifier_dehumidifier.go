@@ -43,7 +43,7 @@ func NewHumidifierDehumidifier() *HumidifierDehumidifier {
 	return &svc
 }
 
-func (svc *HumidifierDehumidifier) AddOptionalCharaterics() {
+func (svc *HumidifierDehumidifier) AddOptionalCharacteristics() {
 
 	svc.LockPhysicalControls = characteristic.NewLockPhysicalControls()
 	svc.AddCharacteristic(svc.LockPhysicalControls.Characteristic)

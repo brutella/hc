@@ -35,7 +35,7 @@ func NewDoor() *Door {
 	return &svc
 }
 
-func (svc *Door) AddOptionalCharaterics() {
+func (svc *Door) AddOptionalCharacteristics() {
 
 	svc.HoldPosition = characteristic.NewHoldPosition()
 	svc.AddCharacteristic(svc.HoldPosition.Characteristic)

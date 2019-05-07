@@ -26,7 +26,7 @@ func NewStatelessProgrammableSwitch() *StatelessProgrammableSwitch {
 	return &svc
 }
 
-func (svc *StatelessProgrammableSwitch) AddOptionalCharaterics() {
+func (svc *StatelessProgrammableSwitch) AddOptionalCharacteristics() {
 
 	svc.Name = characteristic.NewName()
 	svc.AddCharacteristic(svc.Name.Characteristic)

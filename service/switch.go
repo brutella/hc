@@ -25,7 +25,7 @@ func NewSwitch() *Switch {
 	return &svc
 }
 
-func (svc *Switch) AddOptionalCharaterics() {
+func (svc *Switch) AddOptionalCharacteristics() {
 
 	svc.Name = characteristic.NewName()
 	svc.AddCharacteristic(svc.Name.Characteristic)

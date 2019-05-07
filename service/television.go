@@ -44,7 +44,7 @@ func NewTelevision() *Television {
 	return &svc
 }
 
-func (svc *Television) AddOptionalCharaterics() {
+func (svc *Television) AddOptionalCharacteristics() {
 
 	svc.Brightness = characteristic.NewBrightness()
 	svc.AddCharacteristic(svc.Brightness.Characteristic)

@@ -38,7 +38,7 @@ func New{{.StructName}}() *{{.StructName}} {
 	return &svc
 }
 
-func (svc *{{.StructName}}) AddOptionalCharaterics() {
+func (svc *{{.StructName}}) AddOptionalCharacteristics() {
    {{range .Optional}}
    svc.{{.StructName}} = characteristic.New{{.StructName}}()
    svc.AddCharacteristic(svc.{{.StructName}}.Characteristic)

@@ -39,7 +39,7 @@ func NewWindowCovering() *WindowCovering {
 	return &svc
 }
 
-func (svc *WindowCovering) AddOptionalCharaterics() {
+func (svc *WindowCovering) AddOptionalCharacteristics() {
 
 	svc.HoldPosition = characteristic.NewHoldPosition()
 	svc.AddCharacteristic(svc.HoldPosition.Characteristic)

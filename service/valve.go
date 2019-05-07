@@ -38,7 +38,7 @@ func NewValve() *Valve {
 	return &svc
 }
 
-func (svc *Valve) AddOptionalCharaterics() {
+func (svc *Valve) AddOptionalCharacteristics() {
 
 	svc.SetDuration = characteristic.NewSetDuration()
 	svc.AddCharacteristic(svc.SetDuration.Characteristic)
