@@ -17,7 +17,7 @@ const (
 	VideoCodecCvoSuppported         = 1
 )
 
-type SupportedVideoStreamConfiguration struct {
+type VideoStreamConfiguration struct {
 	Codecs []VideoCodecConfiguration `tlv8:"1"`
 }
 
@@ -53,8 +53,8 @@ type VideoCodecAttributes struct {
 	Framerate byte   `tlv8:"3"`
 }
 
-func DefaultVideoStreamConfiguration() SupportedVideoStreamConfiguration {
-	return SupportedVideoStreamConfiguration{
+func DefaultVideoStreamConfiguration() VideoStreamConfiguration {
+	return VideoStreamConfiguration{
 		Codecs: []VideoCodecConfiguration{
 			NewH264VideoCodecConfiguration(),
 		},

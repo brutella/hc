@@ -1,11 +1,11 @@
 package rtp
 
-type SupportedRTPConfiguration struct {
+type Configuration struct {
 	Suites []SupportedCryptoSuite `tlv8:"-"`
 }
 
-func NewSupportedRTPConfiguration(suite byte) SupportedRTPConfiguration {
-	return SupportedRTPConfiguration{[]SupportedCryptoSuite{
+func NewConfiguration(suite byte) Configuration {
+	return Configuration{[]SupportedCryptoSuite{
 		SupportedCryptoSuite{suite},
 	}}
 }

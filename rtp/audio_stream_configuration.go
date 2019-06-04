@@ -17,7 +17,7 @@ const (
 	AudioCodecSampleRate24Khz byte = 2
 )
 
-type SupportedAudioStreamConfiguration struct {
+type AudioStreamConfiguration struct {
 	Codecs       []AudioCodecConfiguration `tlv8:"1"`
 	ComfortNoise bool                      `tlv8:"2"`
 }
@@ -36,8 +36,8 @@ type AudioCodecParameters struct {
 	// PacketTime byte `tlv8:"4"` // RFC 4566, supported values: 20, 30, 40, 60 ms
 }
 
-func DefaultAudioStreamConfiguration() SupportedAudioStreamConfiguration {
-	return SupportedAudioStreamConfiguration{
+func DefaultAudioStreamConfiguration() AudioStreamConfiguration {
+	return AudioStreamConfiguration{
 		Codecs: []AudioCodecConfiguration{
 			NewOpusAudioCodecConfiguration(),
 			NewAacEldAudioCodecConfiguration(),

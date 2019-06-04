@@ -1,6 +1,6 @@
 package rtp
 
-type SelectedRtpStreamConfiguration struct {
+type StreamConfiguration struct {
 	Command SessionControlCommand `tlv8:"1"`
 	Video   VideoParameters       `tlv8:"2"`
 	Audio   AudioParameters       `tlv8:"3"`

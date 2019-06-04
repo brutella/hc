@@ -15,7 +15,7 @@ func TestStreamController(t *testing.T) {
 		t.Fatalf("Zero length bytes")
 	}
 
-	var cfg SupportedVideoStreamConfiguration
+	var cfg VideoStreamConfiguration
 	err := tlv8.Unmarshal(b, &cfg)
 	if err != nil {
 		t.Fatal(err)

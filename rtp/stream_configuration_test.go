@@ -13,7 +13,7 @@ func TestSelectedStreamConfiguration(t *testing.T) {
 
 	b := c.GetValue()
 
-	var cfg SelectedRtpStreamConfiguration
+	var cfg StreamConfiguration
 	err := tlv8.Unmarshal(b, &cfg)
 	if err != nil {
 		t.Fatal(err)
