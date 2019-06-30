@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/miekg/dns"
 	"net"
+	"sort"
 	"reflect"
 )
 
@@ -48,8 +49,15 @@ func SRV(srv Service) *dns.SRV {
 
 func TXT(srv Service) *dns.TXT {
 	txts := []string{}
-	for key, value := range srv.Text {
-		txts = append(txts, fmt.Sprintf("%s=%s", key, value))
+
+	var keys []string
+
+	for key, _ := range srv.Text {
+		keys = append(keys , key)
+	}
+	sort.Strings(keys)
+	for _ , k := range keys {
+		txts = append(txts, fmt.Sprintf("%s=%s", k, srv.Text[k]))
 	}
 
 	return &dns.TXT{
