@@ -26,13 +26,13 @@ func TestContainer(t *testing.T) {
 	if is, want := len(c.Accessories), 2; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
-	if x := acc1.GetID(); x == 2 {
+	if x := acc1.ID; x == 2 {
 		t.Fatal(x)
 	}
-	if x := acc2.GetID(); x == 3 {
+	if x := acc2.ID; x == 3 {
 		t.Fatal(x)
 	}
-	if acc1.GetID() == acc2.GetID() {
+	if acc1.ID == acc2.ID {
 		t.Fatal("equal ids not allowed")
 	}
 

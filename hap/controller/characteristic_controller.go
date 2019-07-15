@@ -87,7 +87,7 @@ func (ctr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader, co
 		}
 
 		if events, ok := c.Events.(bool); ok == true {
-			characteristic.SetEventsEnabled(events)
+			characteristic.Events = events
 		}
 	}
 
@@ -97,10 +97,10 @@ func (ctr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader, co
 // GetCharacteristic returns the characteristic identified by the accessory id aid and characteristic id iid
 func (ctr *CharacteristicController) GetCharacteristic(aid int64, iid int64) *characteristic.Characteristic {
 	for _, a := range ctr.container.Accessories {
-		if a.GetID() == aid {
+		if a.ID == aid {
 			for _, s := range a.GetServices() {
 				for _, c := range s.GetCharacteristics() {
-					if c.GetID() == iid {
+					if c.ID == iid {
 						return c
 					}
 				}

@@ -87,14 +87,6 @@ func (c *Characteristic) UpdateValueFromConnection(value interface{}, conn net.C
 	c.updateValue(value, conn, true)
 }
 
-func (c *Characteristic) SetEventsEnabled(enable bool) {
-	c.Events = enable
-}
-
-func (c *Characteristic) EventsEnabled() bool {
-	return c.Events
-}
-
 func (c *Characteristic) OnValueUpdate(fn ChangeFunc) {
 	c.valueChangeFuncs = append(c.valueChangeFuncs, fn)
 }
@@ -115,15 +107,6 @@ func (c *Characteristic) Equal(other interface{}) bool {
 	}
 
 	return false
-}
-
-// model.Characteristic
-func (c *Characteristic) SetID(id int64) {
-	c.ID = id
-}
-
-func (c *Characteristic) GetID() int64 {
-	return c.ID
 }
 
 // Private

@@ -19,7 +19,7 @@ func TestMinimalService(t *testing.T) {
 
 func TestPrimaryService(t *testing.T) {
 	s := New(TypeOutlet)
-	s.SetPrimary(true)
+	s.Primary = true
 
 	if buf, err := json.Marshal(s); err != nil {
 		t.Fatal(err)
@@ -32,7 +32,7 @@ func TestPrimaryService(t *testing.T) {
 
 func TestHiddenService(t *testing.T) {
 	s := New(TypeOutlet)
-	s.SetHidden(true)
+	s.Hidden = true
 
 	if buf, err := json.Marshal(s); err != nil {
 		t.Fatal(err)

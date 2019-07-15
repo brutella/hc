@@ -77,14 +77,6 @@ func New(info Info, typ AccessoryType) *Accessory {
 	return acc
 }
 
-func (a *Accessory) SetID(id int64) {
-	a.ID = id
-}
-
-func (a *Accessory) GetID() int64 {
-	return a.ID
-}
-
 func (a *Accessory) GetServices() []*service.Service {
 	result := make([]*service.Service, 0)
 	for _, s := range a.Services {
@@ -111,11 +103,11 @@ func (a *Accessory) AddService(s *service.Service) {
 // UpdateIDs updates the service and characteirstic ids.
 func (a *Accessory) UpdateIDs() {
 	for _, s := range a.Services {
-		s.SetID(a.idCount)
+		s.ID = a.idCount
 		a.idCount++
 
 		for _, c := range s.Characteristics {
-			c.SetID(a.idCount)
+			c.ID = a.idCount
 			a.idCount++
 		}
 	}

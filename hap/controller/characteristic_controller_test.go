@@ -34,9 +34,7 @@ func TestGetCharacteristic(t *testing.T) {
 	m := accessory.NewContainer()
 	m.AddAccessory(a)
 
-	aid := a.GetID()
-	cid := a.Info.Name.GetID()
-	values := idsString(aid, cid)
+	values := idsString(a.ID, a.Info.Name.ID)
 	controller := NewCharacteristicController(m)
 	res, err := controller.HandleGetCharacteristics(values, characteristic.TestConn)
 
