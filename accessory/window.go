@@ -1,7 +1,7 @@
 package accessory
 
 import (
-	"bitbucket.org/proalex777/hap.control/hc/service"
+	"github.com/brutella/hc/service"
 )
 
 //Window struct

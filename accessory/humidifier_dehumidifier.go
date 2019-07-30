@@ -12,16 +12,15 @@ type HumidifierDehumidifier struct {
 }
 
 // NewHumidifierDehumidifier returns.
-func NewHumidifierDehumidifier(info Info,
-	thdState, thdStateMin, thdStateMax, thdStateStep int) *HumidifierDehumidifier {
+func NewHumidifierDehumidifier(info Info, stateTHDS, minTHDS, maxTHDS, stepTHDS int) *HumidifierDehumidifier {
 	acc := HumidifierDehumidifier{}
 	acc.Accessory = New(info, TypeDehumidifier)
 	acc.HumidifierDehumidifier = service.NewHumidifierDehumidifier()
 
-	acc.HumidifierDehumidifier.TargetHumidifierDehumidifierState.SetValue(thdState)
-	acc.HumidifierDehumidifier.TargetHumidifierDehumidifierState.SetMinValue(thdStateMin)
-	acc.HumidifierDehumidifier.TargetHumidifierDehumidifierState.SetMaxValue(thdStateMax)
-	acc.HumidifierDehumidifier.TargetHumidifierDehumidifierState.SetStepValue(thdStateStep)
+	acc.HumidifierDehumidifier.TargetHumidifierDehumidifierState.SetValue(stateTHDS)
+	acc.HumidifierDehumidifier.TargetHumidifierDehumidifierState.SetMinValue(stateMinTHDS)
+	acc.HumidifierDehumidifier.TargetHumidifierDehumidifierState.SetMaxValue(stateMaxTHDS)
+	acc.HumidifierDehumidifier.TargetHumidifierDehumidifierState.SetStepValue(stateStepTHDS)
 
 	acc.AddService(acc.HumidifierDehumidifier.Service)
 
