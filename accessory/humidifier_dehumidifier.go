@@ -18,9 +18,9 @@ func NewHumidifierDehumidifier(info Info, stateTHDS, minTHDS, maxTHDS, stepTHDS 
 	acc.HumidifierDehumidifier = service.NewHumidifierDehumidifier()
 
 	acc.HumidifierDehumidifier.TargetHumidifierDehumidifierState.SetValue(stateTHDS)
-	acc.HumidifierDehumidifier.TargetHumidifierDehumidifierState.SetMinValue(stateMinTHDS)
-	acc.HumidifierDehumidifier.TargetHumidifierDehumidifierState.SetMaxValue(stateMaxTHDS)
-	acc.HumidifierDehumidifier.TargetHumidifierDehumidifierState.SetStepValue(stateStepTHDS)
+	acc.HumidifierDehumidifier.TargetHumidifierDehumidifierState.SetMinValue(minTHDS)
+	acc.HumidifierDehumidifier.TargetHumidifierDehumidifierState.SetMaxValue(maxTHDS)
+	acc.HumidifierDehumidifier.TargetHumidifierDehumidifierState.SetStepValue(stepTHDS)
 
 	acc.AddService(acc.HumidifierDehumidifier.Service)
 
