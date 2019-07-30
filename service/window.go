@@ -13,6 +13,8 @@ type Window struct {
 	CurrentPosition *characteristic.CurrentPosition
 	TargetPosition  *characteristic.TargetPosition
 	PositionState   *characteristic.PositionState
+	HoldPosition          *characteristic.HoldPosition
+	ObstructionDetected   *characteristic.ObstructionDetected
 }
 
 func NewWindow() *Window {
@@ -27,6 +29,12 @@ func NewWindow() *Window {
 
 	svc.PositionState = characteristic.NewPositionState()
 	svc.AddCharacteristic(svc.PositionState.Characteristic)
+	
+	svc.HoldPosition = characteristic.NewHoldPosition()
+	svc.AddCharacteristic(svc.HoldPosition.Characteristic)
+
+	svc.ObstructionDetected = characteristic.NewObstructionDetected()
+	svc.AddCharacteristic(svc.ObstructionDetected.Characteristic)
 
 	return &svc
 }
