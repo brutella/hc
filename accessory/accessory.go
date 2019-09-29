@@ -5,6 +5,7 @@ import (
 )
 
 type Info struct {
+	ID               int64
 	Name             string
 	SerialNumber     string
 	Manufacturer     string
@@ -63,6 +64,7 @@ func New(info Info, typ AccessoryType) *Accessory {
 	}
 
 	acc := &Accessory{
+		ID:      info.ID,
 		idCount: 1,
 		Info:    svc,
 		Type:    typ,

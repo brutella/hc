@@ -25,9 +25,10 @@ func NewContainer() *Container {
 // This method ensures that the accessory ids are valid and unique withing the container.
 func (m *Container) AddAccessory(a *Accessory) {
 	a.UpdateIDs()
-	a.ID = m.idCount
+	//a.ID = m.idCount
 	m.idCount++
 	m.Accessories = append(m.Accessories, a)
+	// FIX: verify that the ID is not a duplicate
 }
 
 // RemoveAccessory removes an accessory from the container.
