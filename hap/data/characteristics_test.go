@@ -1,7 +1,7 @@
 package data
 
 import (
-	"github.com/gosexy/to"
+	"github.com/xiam/to"
 
 	"encoding/json"
 	"reflect"

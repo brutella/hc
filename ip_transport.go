@@ -18,7 +18,7 @@ import (
 	"github.com/brutella/hc/hap/http"
 	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/util"
-	"github.com/gosexy/to"
+	"github.com/xiam/to"
 
 	"image"
 )

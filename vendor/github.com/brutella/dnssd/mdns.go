@@ -25,8 +25,8 @@ var (
 		Port: 5353,
 	}
 
-	TTLDefault  uint32 = 75 * 60 // Default ttl for mDNS resource records
-	TTLHostname uint32 = 120     // TTL for mDNS resource records containing the host name
+	TtlDefault  uint32 = 75 * 60 // Default ttl for mDNS resource records
+	TtlHostname uint32 = 120     // TTL for mDNS resource records containing the host name
 )
 
 // Query is a mDNS query

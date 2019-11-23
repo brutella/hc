@@ -42,7 +42,7 @@ loop:
 				entry = e
 			}
 
-			entry.TTL = ttl
+			entry.Ttl = ttl
 			entry.expiration = time.Now().Add(ttl)
 
 		case *dns.SRV:
@@ -61,7 +61,7 @@ loop:
 			}
 
 			entry.SetHostname(rr.Target)
-			entry.TTL = ttl
+			entry.Ttl = ttl
 			entry.expiration = time.Now().Add(ttl)
 			entry.Port = int(rr.Port)
 
@@ -113,8 +113,8 @@ loop:
 				}
 
 				entry.Text = text
-				entry.TTL = time.Duration(rr.Hdr.Ttl) * time.Second
-				entry.expiration = time.Now().Add(entry.TTL)
+				entry.Ttl = time.Duration(rr.Hdr.Ttl) * time.Second
+				entry.expiration = time.Now().Add(entry.Ttl)
 			}
 		default:
 			// ignore

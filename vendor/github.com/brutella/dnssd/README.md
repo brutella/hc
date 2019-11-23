@@ -14,11 +14,6 @@ This library implements [Multicast DNS][mdns] and [DNS-Based Service Discovery][
 The following code creates a service with name "My Website._http._tcp.local." for the host "My Computer" which has the IP "192.168.0.123" on port "12345". The service is added to a responder.
 
 ```go
-import (
-	"context"
-	"github.com/brutella/dnssd"
-)
-
 cfg := dnssd.Config{
     Name:   "My Website",
     Type:   "_http._tcp",
