@@ -21,14 +21,14 @@ Here are some projects which use `hc`.
 
 HomeKit is fully integrated into iOS since iOS 8. Developers can use [HomeKit.framework](https://developer.apple.com/documentation/homekit) to communicate with accessories using high-level APIs.
 
-<img alt="Home.app" src="_img/home-icon.png?raw=true" width="92" />
+<img alt="Home+.app" src="_img/home-icon.png?raw=true" width="87" />
 
-I've developed the [Home][home] app to control HomeKit accessories from iPhone, iPad, and Apple Watch.
+I've developed the [Home+][home+] app to control HomeKit accessories from iPhone, iPad, and Apple Watch.
 If you want to support `hc`, please purchase Home from the [App Store][home-appstore]. That would be awesome. ❤️
 
 Checkout the official [website][home].
 
-[home]: https://hochgatterer.me/home/
+[home+]: https://hochgatterer.me/home/
 [home-appstore]: http://itunes.apple.com/app/id995994352
 [GoDoc]: https://godoc.org/github.com/brutella/hc
 [GoDoc Widget]: https://godoc.org/github.com/brutella/hc?status.svg
