@@ -26,7 +26,7 @@ HomeKit is fully integrated into iOS since iOS 8. Developers can use [HomeKit.fr
 I've developed the [Home+][home+] app to control HomeKit accessories from iPhone, iPad, and Apple Watch.
 If you want to support `hc`, please purchase Home from the [App Store][home-appstore]. That would be awesome. ❤️
 
-Checkout the official [website][home].
+Checkout the official [website][home+].
 
 [home+]: https://hochgatterer.me/home/
 [home-appstore]: http://itunes.apple.com/app/id995994352
