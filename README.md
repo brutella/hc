@@ -2,7 +2,7 @@
 
 [![GoDoc Widget]][GoDoc] [![Travis Widget]][Travis]
 
-`hc` is a lightweight framework to develop HomeKit accessories in Go. 
+`hc` is a lightweight framework to develop HomeKit accessories in Go.
 It abstracts the **H**omeKit **A**ccessory **P**rotocol (HAP) and makes it easy to work with [services](service/README.md) and [characteristics](characteristic/README.md).
 
 `hc` handles the underlying communication between HomeKit accessories and clients.
@@ -37,6 +37,7 @@ Checkout the official [website][home].
 
 ## Features
 
+- Supports Go modules (requires Go 1.13, or setting `GO111MODULE` to `on` when using Go 1.11/12)
 - Full implementation of the HAP in Go
 - Supports all HomeKit [services and characteristics](service/README.md)
 - Built-in service announcement via DNS-SD using [dnssd](http://github.com/brutella/dnssd)
