@@ -112,7 +112,7 @@ func probe(ctx context.Context, conn MDNSConn, service Service) (conflict probeC
 		log.Debug.Printf("Probing with %v at %s\n", ips, iface.Name)
 
 		conflict, err := probeAtInterface(ctx, conn, service, iface)
-		if conflict.hasAny() {
+		if !conflict.hasNone() {
 			return conflict, err
 		}
 	}
@@ -206,7 +206,7 @@ func probeAtInterface(ctx context.Context, conn MDNSConn, service Service, iface
 
 		case <-queryTime:
 			// Stop on conflict
-			if conflict.hasAny() {
+			if !conflict.hasNone() {
 				return
 			}
 
@@ -242,6 +242,30 @@ func (pr probeConflict) hasAny() bool {
 	return pr.hostname || pr.serviceName
 }
 
+func isLexicographicalLaterA(this *dns.A, that *dns.A) bool {
+	if strings.EqualFold(this.Hdr.Name, that.Hdr.Name) {
+		log.Debug.Println("Conflicting hosts")
+		if !isValidRR(this) {
+			log.Debug.Println("Invalid record produces conflict")
+			return true
+		}
+
+		switch compareIP(this.A.To4(), that.A.To4()) {
+		case -1:
+			log.Debug.Println("Lexicographical earlier")
+			break
+		case 1:
+			log.Debug.Println("Lexicographical later")
+			return true
+		default:
+			log.Debug.Println("Tiebreak")
+			break
+		}
+	}
+
+	return false
+}
+
 func isDenyingA(this *dns.A, that *dns.A) bool {
 	if strings.EqualFold(this.Hdr.Name, that.Hdr.Name) {
 		log.Debug.Println("Conflicting hosts")
@@ -267,6 +291,30 @@ func isDenyingA(this *dns.A, that *dns.A) bool {
 	return false
 }
 
+func isLexicographicalLaterAAAA(this *dns.AAAA, that *dns.AAAA) bool {
+	if strings.EqualFold(this.Hdr.Name, that.Hdr.Name) {
+		log.Debug.Println("Conflicting hosts")
+		if !isValidRR(this) {
+			log.Debug.Println("Invalid record produces conflict")
+			return true
+		}
+
+		switch compareIP(this.AAAA.To16(), that.AAAA.To16()) {
+		case -1:
+			log.Debug.Println("%s is lexicographical earlier than %s", this.AAAA.To16(), that.AAAA.To16())
+			break
+		case 1:
+			log.Debug.Println("%s is lexicographical later than %s", this.AAAA.To16(), that.AAAA.To16())
+			return true
+		default:
+			log.Debug.Println("Tiebreak")
+			break
+		}
+	}
+
+	return false
+}
+
 // isDenyingAAAA returns true if this denies that.
 func isDenyingAAAA(this *dns.AAAA, that *dns.AAAA) bool {
 	if strings.EqualFold(this.Hdr.Name, that.Hdr.Name) {
@@ -277,6 +325,29 @@ func isDenyingAAAA(this *dns.AAAA, that *dns.AAAA) bool {
 		}
 
 		switch compareIP(this.AAAA.To16(), that.AAAA.To16()) {
+		case -1:
+			log.Debug.Println("%s is lexicographical earlier than %s", this.AAAA.To16(), that.AAAA.To16())
+			break
+		case 1:
+			log.Debug.Println("%s is lexicographical later than %s", this.AAAA.To16(), that.AAAA.To16())
+			return true
+		default:
+			log.Debug.Println("Tiebreak")
+			break
+		}
+	}
+
+	return false
+}
+func isLexicographicalLaterSRV(this *dns.SRV, that *dns.SRV) bool {
+	if strings.EqualFold(this.Hdr.Name, that.Hdr.Name) {
+		log.Debug.Println("Conflicting SRV")
+		if !isValidRR(this) {
+			log.Debug.Println("Invalid record produces conflict")
+			return true
+		}
+
+		switch compareSRV(this, that) {
 		case -1:
 			log.Debug.Println("Lexicographical earlier")
 			break

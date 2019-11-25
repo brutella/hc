@@ -2,7 +2,7 @@ package tlv8
 
 import (
 	"bytes"
-	"github.com/gosexy/to"
+	"github.com/xiam/to"
 	"io"
 	"reflect"
 	"strings"

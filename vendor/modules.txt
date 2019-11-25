@@ -1,0 +1,30 @@
+# github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412
+github.com/agl/ed25519
+github.com/agl/ed25519/edwards25519
+# github.com/brutella/dnssd v1.1.0
+github.com/brutella/dnssd
+github.com/brutella/dnssd/log
+# github.com/miekg/dns v1.1.4
+github.com/miekg/dns
+# github.com/tadglines/go-pkgs v0.0.0-20140924210655-1f86682992f1
+github.com/tadglines/go-pkgs/crypto/srp
+# github.com/xiam/to v0.0.0-20191116183551-8328998fc0ed
+github.com/xiam/to
+# golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9
+golang.org/x/crypto/chacha20poly1305
+golang.org/x/crypto/curve25519
+golang.org/x/crypto/ed25519
+golang.org/x/crypto/ed25519/internal/edwards25519
+golang.org/x/crypto/hkdf
+golang.org/x/crypto/internal/chacha20
+golang.org/x/crypto/internal/subtle
+golang.org/x/crypto/poly1305
+# golang.org/x/net v0.0.0-20190125091013-d26f9f9a57f3
+golang.org/x/net/bpf
+golang.org/x/net/internal/iana
+golang.org/x/net/internal/socket
+golang.org/x/net/ipv4
+golang.org/x/net/ipv6
+# golang.org/x/sys v0.0.0-20190130150945-aca44879d564
+golang.org/x/sys/cpu
+golang.org/x/sys/unix

@@ -1,0 +1,12 @@
+language: go
+
+go:
+  - 1.13
+
+env:
+  - GOARCH=amd64
+
+script:
+  - go version
+  - go test -v
+  - go test -bench=.

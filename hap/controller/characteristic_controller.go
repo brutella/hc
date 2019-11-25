@@ -6,7 +6,7 @@ import (
 	"github.com/brutella/hc/hap"
 	"github.com/brutella/hc/hap/data"
 	"github.com/brutella/hc/log"
-	"github.com/gosexy/to"
+	"github.com/xiam/to"
 
 	"bytes"
 	"encoding/json"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/gosexy/to"
+	"github.com/xiam/to"
 )
 
 type ConnChangeFunc func(conn net.Conn, c *Characteristic, newValue, oldValue interface{})

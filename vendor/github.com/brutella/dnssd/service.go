@@ -57,7 +57,7 @@ type Service struct {
 	Domain   string
 	Host     string
 	Text     map[string]string
-	TTL      time.Duration // Original time to live
+	Ttl      time.Duration // Original time to live
 	Port     int
 	IPs      []net.IP
 	IfaceIPs map[string][]net.IP
@@ -145,42 +145,42 @@ func (s *Service) IPsAtInterface(iface *net.Interface) []net.IP {
 	return []net.IP{}
 }
 
-func (s Service) Copy() *Service {
+func (srv Service) Copy() *Service {
 	return &Service{
-		Name:       s.Name,
-		Type:       s.Type,
-		Domain:     s.Domain,
-		Host:       s.Host,
-		Text:       s.Text,
-		TTL:        s.TTL,
-		IPs:        s.IPs,
-		Port:       s.Port,
-		IfaceIPs:   s.IfaceIPs,
-		expiration: s.expiration,
+		Name:       srv.Name,
+		Type:       srv.Type,
+		Domain:     srv.Domain,
+		Host:       srv.Host,
+		Text:       srv.Text,
+		Ttl:        srv.Ttl,
+		IPs:        srv.IPs,
+		Port:       srv.Port,
+		IfaceIPs:   srv.IfaceIPs,
+		expiration: srv.expiration,
 	}
 }
 
-func (s Service) ServiceInstanceName() string {
-	return fmt.Sprintf("%s.%s.%s.", s.Name, s.Type, s.Domain)
+func (srv Service) ServiceInstanceName() string {
+	return fmt.Sprintf("%s.%s.%s.", srv.Name, srv.Type, srv.Domain)
 }
 
-func (s Service) ServiceName() string {
-	return fmt.Sprintf("%s.%s.", s.Type, s.Domain)
+func (srv Service) ServiceName() string {
+	return fmt.Sprintf("%s.%s.", srv.Type, srv.Domain)
 }
 
-func (s Service) Hostname() string {
-	return fmt.Sprintf("%s.%s.", s.Host, s.Domain)
+func (srv Service) Hostname() string {
+	return fmt.Sprintf("%s.%s.", srv.Host, srv.Domain)
 }
 
-func (s *Service) SetHostname(hostname string) {
+func (srv *Service) SetHostname(hostname string) {
 	name, domain := parseHostname(hostname)
-	if domain == s.Domain {
-		s.Host = name
+	if domain == srv.Domain {
+		srv.Host = name
 	}
 }
 
-func (s Service) ServicesMetaQueryName() string {
-	return fmt.Sprintf("_services._dns-sd._udp.%s.", s.Domain)
+func (srv Service) ServicesMetaQueryName() string {
+	return fmt.Sprintf("_services._dns-sd._udp.%s.", srv.Domain)
 }
 
 func newService(instance string) *Service {
