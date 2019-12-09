@@ -64,8 +64,8 @@ func (verify *VerifyServerController) Handle(in util.Container) (util.Container,
 		}
 		out, err = verify.handlePairVerifyStart(in)
 	case VerifyStepFinishRequest:
+		defer verify.reset()
 		if verify.step != VerifyStepStartResponse {
-			verify.reset()
 			return nil, errInvalidInternalVerifyStep(verify.step)
 		}
 
