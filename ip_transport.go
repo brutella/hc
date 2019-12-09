@@ -126,6 +126,7 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 		cfg.discoverable = false
 	}
 
+	cfg.categoryId = uint8(t.container.AccessoryType())
 	cfg.updateConfigHash(t.container.ContentHash())
 	cfg.save(storage)
 
@@ -204,6 +205,10 @@ func (t *ipTransport) Stop() <-chan struct{} {
 	t.cancel()
 
 	return t.stopped
+}
+
+func (t *ipTransport) XHMURI() (string, error) {
+	return t.config.xhmUri(util.SetupFlagIP)
 }
 
 // isPaired returns true when the transport is already paired

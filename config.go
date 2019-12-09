@@ -12,7 +12,7 @@ import (
 	"github.com/xiam/to"
 )
 
-// Config provides  basic cfguration for an IP transport
+// Config holds configuration options.
 type Config struct {
 	// Path to the storage
 	// When empty, the tranport stores the data inside a folder named exactly like the accessory
@@ -47,9 +47,9 @@ type Config struct {
 func defaultConfig(name string) *Config {
 	return &Config{
 		StoragePath:  name,
-		Pin:          "00102003",  // default pin
-		Port:         "",          // empty string means that we get port from assigned by the system
-		SetupId:      "EASYSETUP", // default setup id
+		Pin:          "00102003", // default pin
+		Port:         "",         // empty string means that we get port from assigned by the system
+		SetupId:      "HOME",     // default setup id
 		name:         name,
 		id:           util.MAC48Address(util.RandomHexString()),
 		version:      1,
@@ -82,6 +82,11 @@ func (cfg *Config) setupHash() string {
 	code := []byte{sum[0], sum[1], sum[2], sum[3]}
 	encoded := base64.StdEncoding.EncodeToString(code)
 	return encoded
+}
+
+func (cfg *Config) xhmUri(flag util.SetupFlag) (string, error) {
+	flags := []util.SetupFlag{flag}
+	return util.XHMURI(cfg.Pin, cfg.SetupId, cfg.categoryId, flags)
 }
 
 // loads load the id, version and config hash
