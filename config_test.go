@@ -29,6 +29,7 @@ func TestTxtRecords(t *testing.T) {
 		"ff": "0",
 		"md": "My MDNS Service",
 		"ci": "1",
+		"sh": "1ARVnw==",
 	}
 
 	config.discoverable = false
