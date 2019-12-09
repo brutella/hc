@@ -3,6 +3,7 @@ package hc
 import (
 	"bytes"
 	"context"
+	"image"
 	"io/ioutil"
 	"net"
 	"strings"
@@ -19,8 +20,6 @@ import (
 	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/util"
 	"github.com/xiam/to"
-
-	"image"
 )
 
 type ipTransport struct {
@@ -137,7 +136,6 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 }
 
 func (t *ipTransport) Start() {
-
 	// Create server which handles incoming tcp connections
 	config := http.Config{
 		Port:      t.config.Port,
