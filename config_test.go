@@ -1,9 +1,10 @@
 package hc
 
 import (
-	"github.com/brutella/hc/util"
 	"reflect"
 	"testing"
+
+	"github.com/brutella/hc/util"
 )
 
 var config = &Config{
@@ -61,4 +62,23 @@ func TestVersionUpdate(t *testing.T) {
 	if x, _ := storage.Get("version"); reflect.DeepEqual(x, []byte("2")) == false {
 		t.Fatal(string(x))
 	}
+}
+
+func TestSetupID(t *testing.T) {
+	expected := "1ARVnw=="
+	hash := config.setupHash()
+
+	if hash != expected {
+		t.Fatalf("generated setup hash is not identical (actual: %s, expected: %s)", hash, expected)
+	}
+
+	config.SetupId = "UPDT"
+
+	expected = "PrXxQA=="
+	hash = config.setupHash()
+
+	if hash != expected {
+		t.Fatalf("generated setup hash is not identical (actual: %s, expected: %s)", hash, expected)
+	}
+
 }

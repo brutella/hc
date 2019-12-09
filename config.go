@@ -1,6 +1,8 @@
 package hc
 
 import (
+	"crypto/sha512"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net"
@@ -27,6 +29,9 @@ type Config struct {
 	// When empty, the pin 00102003 is used
 	Pin string
 
+	// SetupId used for setup code should be 4 uppercase letters
+	SetupId string
+
 	name         string // Accessory name
 	id           string // Accessory id
 	servePort    int    // Actual port the server listens at (might be differen than Port field)
@@ -44,6 +49,7 @@ func defaultConfig(name string) *Config {
 		StoragePath:  name,
 		Pin:          "00102003", // default pin
 		Port:         "",         // empty string means that we get port from assigned by the system
+		SetupId:      "EASYSETUP", // default setup id
 		name:         name,
 		id:           util.MAC48Address(util.RandomHexString()),
 		version:      1,
@@ -65,7 +71,17 @@ func (cfg Config) txtRecords() map[string]string {
 		"ff": fmt.Sprintf("%d", to.Int64(cfg.mfiCompliant)),
 		"md": cfg.name,
 		"ci": fmt.Sprintf("%d", cfg.categoryId),
+		"sh": cfg.setupHash(),
 	}
+}
+
+func (cfg *Config) setupHash() string {
+	hashvalue := fmt.Sprintf("%s%s", cfg.SetupId, cfg.id)
+	sum := sha512.Sum512([]byte(hashvalue))
+	// use only first 4 bytes
+	code := []byte{sum[0], sum[1], sum[2], sum[3]}
+	encoded := base64.StdEncoding.EncodeToString(code)
+	return encoded
 }
 
 // loads load the id, version and config hash
@@ -106,6 +122,10 @@ func (cfg *Config) merge(other Config) {
 
 	if ip := other.IP; len(ip) > 0 {
 		cfg.IP = ip
+	}
+
+	if setupid := other.SetupId; len(setupid) > 0 {
+		cfg.SetupId = setupid
 	}
 }
 
