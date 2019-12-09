@@ -32,7 +32,7 @@ func (c *Int) SetStepValue(value int) {
 
 // GetValue returns the value as int
 func (c *Int) GetValue() int {
-	return c.Value.(int)
+	return c.Characteristic.GetValue().(int)
 }
 
 func (c *Int) GetMinValue() int {
@@ -45,6 +45,13 @@ func (c *Int) GetMaxValue() int {
 
 func (c *Int) GetStepValue() int {
 	return c.StepValue.(int)
+}
+
+// OnValueRemoteGet calls fn when the value was read by a client.
+func (c *Int) OnValueRemoteGet(fn func() int) {
+	c.OnValueGet(func() interface{} {
+		return fn()
+	})
 }
 
 // OnValueRemoteUpdate calls fn when the value was updated by a client.

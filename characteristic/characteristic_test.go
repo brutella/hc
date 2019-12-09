@@ -5,8 +5,48 @@ import (
 	"testing"
 )
 
+func TestCharacteristicGetValue(t *testing.T) {
+	getCalls := 0
+	updateCalls := 0
+
+	c := NewBrightness()
+	c.Value = getCalls
+
+	c.OnValueUpdateFromConn(func(conn net.Conn, c *Characteristic, new, old interface{}) {
+		if conn != TestConn {
+			t.Fatal(conn)
+		}
+		updateCalls++
+	})
+
+	c.OnValueGet(func() interface{} {
+		getCalls++
+		return getCalls
+	})
+
+	if is, want := c.GetValue(), 1; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	if is, want := updateCalls, 0; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	if is, want := c.GetValueFromConnection(TestConn), 2; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	if is, want := c.GetValueFromConnection(TestConn), 3; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	if is, want := updateCalls, 2; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+}
+
 func TestCharacteristicUpdateValuesOfWrongType(t *testing.T) {
-	c := NewCharacteristic(TypeOn)
+	c := NewBrightness()
 	c.Value = 5
 
 	c.UpdateValue(float64(20.5))
@@ -29,7 +69,7 @@ func TestCharacteristicUpdateValuesOfWrongType(t *testing.T) {
 }
 
 func TestCharacteristicLocalDelegate(t *testing.T) {
-	c := NewCharacteristic(TypeOn)
+	c := NewBrightness()
 	c.Value = 5
 
 	var oldValue interface{}
@@ -52,7 +92,7 @@ func TestCharacteristicLocalDelegate(t *testing.T) {
 }
 
 func TestCharacteristicRemoteDelegate(t *testing.T) {
-	c := NewCharacteristic(TypeOn)
+	c := NewBrightness()
 	c.Perms = PermsAll()
 	c.Value = 5
 
@@ -78,7 +118,7 @@ func TestCharacteristicRemoteDelegate(t *testing.T) {
 }
 
 func TestNoValueChange(t *testing.T) {
-	c := NewCharacteristic(TypeOn)
+	c := NewBrightness()
 	c.Value = 5
 
 	changed := false
@@ -102,7 +142,7 @@ func TestNoValueChange(t *testing.T) {
 }
 
 func TestReadOnlyValue(t *testing.T) {
-	c := NewCharacteristic(TypeOn)
+	c := NewBrightness()
 	c.Perms = PermsRead()
 	c.Value = 5
 
@@ -134,13 +174,13 @@ func TestReadOnlyValue(t *testing.T) {
 }
 
 func TestEqual(t *testing.T) {
-	c1 := NewCharacteristic(TypeOn)
+	c1 := NewBrightness()
 	c1.Value = 5
 
-	c2 := NewCharacteristic(TypeOn)
+	c2 := NewBrightness()
 	c2.Value = 5
 
-	if c1.Equal(c2) == false {
+	if c1.Characteristic.Equal(c2.Characteristic) == false {
 		t.Fatal("characteristics not the same")
 	}
 }

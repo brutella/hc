@@ -22,7 +22,14 @@ func (c *String) SetValue(str string) {
 
 // GetValue returns the value as string
 func (c *String) GetValue() string {
-	return c.Value.(string)
+	return c.Characteristic.GetValue().(string)
+}
+
+// OnValueRemoteGet calls fn when the value was read by a client.
+func (c *String) OnValueRemoteGet(fn func() string) {
+	c.OnValueGet(func() interface{} {
+		return fn()
+	})
 }
 
 // OnValueRemoteUpdate calls fn when the value was updated by a client.

@@ -8,9 +8,8 @@ import (
 	"net"
 	"reflect"
 
-	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/util"
-	"github.com/gosexy/to"
+	"github.com/xiam/to"
 )
 
 // Config provides  basic cfguration for an IP transport
@@ -23,7 +22,7 @@ type Config struct {
 	// When empty, the transport uses a random port
 	Port string
 
-	// IP on which clients can connect.
+	// Deprecated: Specifying a static IP is discouraged.
 	IP string
 
 	// Pin with has to be entered on iOS client to pair with the accessory
@@ -46,16 +45,10 @@ type Config struct {
 }
 
 func defaultConfig(name string) *Config {
-	ip, err := getFirstLocalIPAddr()
-	if err != nil {
-		log.Info.Panic(err)
-	}
-
 	return &Config{
 		StoragePath:  name,
 		Pin:          "00102003", // default pin
 		Port:         "",         // empty string means that we get port from assigned by the system
-		IP:           ip.String(),
 		SetupId:      "EASYSETUP", // default setup id
 		name:         name,
 		id:           util.MAC48Address(util.RandomHexString()),
@@ -77,7 +70,7 @@ func (cfg Config) txtRecords() map[string]string {
 		"sf": fmt.Sprintf("%d", to.Int64(cfg.discoverable)),
 		"ff": fmt.Sprintf("%d", to.Int64(cfg.mfiCompliant)),
 		"md": cfg.name,
-		"ci": fmt.Sprintf("c%d", cfg.categoryId),
+		"ci": fmt.Sprintf("%d", cfg.categoryId),
 		"sh": cfg.setupHash(),
 	}
 }
@@ -93,15 +86,15 @@ func (cfg *Config) setupHash() string {
 
 // loads load the id, version and config hash
 func (cfg *Config) load(storage util.Storage) {
-	if b, err := storage.Get("uuid"); err == nil {
+	if b, err := storage.Get("uuid"); err == nil && len(b) > 0 {
 		cfg.id = string(b)
 	}
 
-	if b, err := storage.Get("version"); err == nil {
+	if b, err := storage.Get("version"); err == nil && len(b) > 0 {
 		cfg.version = to.Int64(string(b))
 	}
 
-	if b, err := storage.Get("configHash"); err == nil {
+	if b, err := storage.Get("configHash"); err == nil && len(b) > 0 {
 		cfg.configHash = b
 	}
 }

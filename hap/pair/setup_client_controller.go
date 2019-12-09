@@ -218,7 +218,7 @@ func (setup *SetupClientController) handleKeyExchange(in util.Container) (util.C
 		entity := db.NewEntity(username, ltpk, nil)
 		err = setup.database.SaveEntity(entity)
 		if err != nil {
-            log.Info.Panic(err)
+			log.Info.Panic(err)
 		}
 	}
 

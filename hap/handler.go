@@ -25,7 +25,7 @@ type AccessoriesHandler interface {
 
 // A CharacteristicsHandler handles get and update characteristic.
 type CharacteristicsHandler interface {
-	HandleGetCharacteristics(url.Values) (io.Reader, error)
+	HandleGetCharacteristics(url.Values, net.Conn) (io.Reader, error)
 	HandleUpdateCharacteristics(io.Reader, net.Conn) error
 }
 

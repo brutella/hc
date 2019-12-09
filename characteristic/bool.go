@@ -22,7 +22,14 @@ func (c *Bool) SetValue(value bool) {
 
 // GetValue returns the value as bool
 func (c *Bool) GetValue() bool {
-	return c.Value.(bool)
+	return c.Characteristic.GetValue().(bool)
+}
+
+// OnValueRemoteGet calls fn when the value was read by a client.
+func (c *Bool) OnValueRemoteGet(fn func() bool) {
+	c.OnValueGet(func() interface{} {
+		return fn()
+	})
 }
 
 // OnValueRemoteUpdate calls fn when the value was updated by a client.

@@ -2,13 +2,14 @@ package characteristic
 
 import (
 	"fmt"
-	"github.com/gosexy/to"
 	"net"
-	"reflect"
+
+	"github.com/xiam/to"
 )
 
 type ConnChangeFunc func(conn net.Conn, c *Characteristic, newValue, oldValue interface{})
 type ChangeFunc func(c *Characteristic, newValue, oldValue interface{})
+type GetFunc func() interface{}
 
 // Characteristic is a HomeKit characteristic.
 type Characteristic struct {
@@ -31,6 +32,7 @@ type Characteristic struct {
 
 	connValueUpdateFuncs []ConnChangeFunc
 	valueChangeFuncs     []ChangeFunc
+	valueGetFunc         GetFunc
 }
 
 // writeOnlyPerms returns true when permissions only include write permission
@@ -65,20 +67,24 @@ func NewCharacteristic(typ string) *Characteristic {
 	}
 }
 
+func (c *Characteristic) GetValue() interface{} {
+	return c.getValue(nil)
+}
+
+func (c *Characteristic) GetValueFromConnection(conn net.Conn) interface{} {
+	return c.getValue(conn)
+}
+
+func (c *Characteristic) OnValueGet(fn GetFunc) {
+	c.valueGetFunc = fn
+}
+
 func (c *Characteristic) UpdateValue(value interface{}) {
-	c.updateValue(value, nil)
+	c.updateValue(value, nil, false)
 }
 
 func (c *Characteristic) UpdateValueFromConnection(value interface{}, conn net.Conn) {
-	c.updateValue(value, conn)
-}
-
-func (c *Characteristic) SetEventsEnabled(enable bool) {
-	c.Events = enable
-}
-
-func (c *Characteristic) EventsEnabled() bool {
-	return c.Events
+	c.updateValue(value, conn, true)
 }
 
 func (c *Characteristic) OnValueUpdate(fn ChangeFunc) {
@@ -103,15 +109,6 @@ func (c *Characteristic) Equal(other interface{}) bool {
 	return false
 }
 
-// model.Characteristic
-func (c *Characteristic) SetID(id int64) {
-	c.ID = id
-}
-
-func (c *Characteristic) GetID() int64 {
-	return c.ID
-}
-
 // Private
 
 func (c *Characteristic) isWriteOnly() bool {
@@ -122,17 +119,20 @@ func (c *Characteristic) hasWritePerms() bool {
 	return noWritePerms(c.Perms) == false
 }
 
+func (c *Characteristic) getValue(conn net.Conn) interface{} {
+	if c.valueGetFunc != nil {
+		c.updateValue(c.valueGetFunc(), conn, false)
+	}
+	return c.Value
+}
+
 // Sets the value of the characteristic
 // The implementation makes sure that the type of the value stays the same
 // E.g. Type of characteristic value int, calling updateValue("10.5") sets the value to int(10)
 //
-// When permissions are write only, this methods does not set the Value field.
-func (c *Characteristic) updateValue(value interface{}, conn net.Conn) {
-	if c.Value != nil {
-		if converted, err := to.Convert(value, reflect.TypeOf(c.Value).Kind()); err == nil {
-			value = converted
-		}
-	}
+// When permissions are write only and checkPerms is true, this methods does not set the Value field.
+func (c *Characteristic) updateValue(value interface{}, conn net.Conn, checkPerms bool) {
+	value = c.convert(value)
 
 	// Value must be within min and max
 	switch c.Format {
@@ -147,8 +147,8 @@ func (c *Characteristic) updateValue(value interface{}, conn net.Conn) {
 		return
 	}
 
-	// Ignore new values from remote when permissions don't allow write
-	if c.hasWritePerms() == false && conn != nil {
+	// Ignore new values from remote when permissions don't allow write and checkPerms is true
+	if checkPerms == true && c.hasWritePerms() == false {
 		return
 	}
 
@@ -200,4 +200,25 @@ func (c *Characteristic) boundIntValue(value int) interface{} {
 	}
 
 	return value
+}
+
+func (c *Characteristic) convert(v interface{}) interface{} {
+	switch c.Format {
+	case FormatFloat:
+		return to.Float64(v)
+	case FormatUInt8:
+		return int(to.Uint64(v))
+	case FormatUInt16:
+		return int(to.Uint64(v))
+	case FormatUInt32:
+		return int(to.Uint64(v))
+	case FormatInt32:
+		return int(to.Uint64(v))
+	case FormatUInt64:
+		return int(to.Uint64(v))
+	case FormatBool:
+		return to.Bool(v)
+	default:
+		return v
+	}
 }

@@ -15,6 +15,7 @@ func NewRelativeHumidityHumidifierThreshold() *RelativeHumidityHumidifierThresho
 	char.SetMaxValue(100)
 	char.SetStepValue(1)
 	char.SetValue(0)
+	char.Unit = UnitPercentage
 
 	return &RelativeHumidityHumidifierThreshold{char}
 }

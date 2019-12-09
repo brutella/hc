@@ -39,9 +39,11 @@ func (handler *Characteristics) ServeHTTP(response http.ResponseWriter, request 
 	handler.mutex.Lock()
 	switch request.Method {
 	case hap.MethodGET:
-		log.Debug.Printf("%v GET /characteristics", request.RemoteAddr)
 		request.ParseForm()
-		res, err = handler.controller.HandleGetCharacteristics(request.Form)
+		log.Debug.Printf("%v GET /characteristics %v", request.RemoteAddr, request.Form)
+		session := handler.context.GetSessionForRequest(request)
+		conn := session.Connection()
+		res, err = handler.controller.HandleGetCharacteristics(request.Form, conn)
 	case hap.MethodPUT:
 		log.Debug.Printf("%v PUT /characteristics", request.RemoteAddr)
 		session := handler.context.GetSessionForRequest(request)

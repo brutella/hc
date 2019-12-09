@@ -2,6 +2,7 @@ package characteristic
 
 import (
 	"encoding/base64"
+	"net"
 )
 
 type Bytes struct {
@@ -26,6 +27,12 @@ func (bs *Bytes) GetValue() []byte {
 	} else {
 		return b
 	}
+}
+
+func (bs *Bytes) OnValueRemoteUpdate(fn func([]byte)) {
+	bs.OnValueUpdateFromConn(func(conn net.Conn, c *Characteristic, new, old interface{}) {
+		fn(bs.GetValue())
+	})
 }
 
 func base64FromBytes(b []byte) string {

@@ -8,7 +8,7 @@ const (
 	// TagUsername is the username tag. The value is of type string.
 	TagUsername = 0x01
 
-	// TagSalt is sthe salt tag. The value is of type 16 bytes.
+	// TagSalt is the salt tag. The value is of type 16 bytes.
 	TagSalt = 0x02
 
 	// TagPublicKey is the public key tag. The value is either SRP client public key (384 bytes) or ED25519 public key (32 bytes) - depending on the context.
@@ -26,12 +26,12 @@ const (
 	// TagErrCode is the error tag. The value is of type ErrCode.
 	TagErrCode = 0x07
 
-	// TagSignature is the Ed25519 signature tag. The value is of type 64 bytes.
-	TagSignature = 0x0A
-
 	// TagMFiCertificate is the MFi certificate tag (currently not used).
 	TagMFiCertificate = 0x09
 
-	// TagMFiSignature is the MFi signature tag (currently not used).
-	TagMFiSignature = 0x0A
+	// TagSignature is the Ed25519 signature tag. The value is of type 64 bytes.
+	TagSignature = 0x0A
+
+	// TagPermission is the permission tag. A value of 0x00 means a regular user, 0x01 is an admin which can remove and add pairings.
+	TagPermission = 0x0B
 )

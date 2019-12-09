@@ -1,7 +1,5 @@
 package hc
 
-import ()
-
 // Transport provides accessories over a network.
 type Transport interface {
 	// Start starts the transport

@@ -16,15 +16,6 @@ import (
 	"sync"
 )
 
-// Server provides a similar interfaces as http.Server to start and stop a TCP server.
-type Server interface {
-	// ListenAndServe start the server
-	ListenAndServe(context.Context) error
-
-	// Port returns the port on which the server listens to
-	Port() string
-}
-
 type Config struct {
 	Port      string
 	Context   hap.Context
@@ -35,11 +26,11 @@ type Config struct {
 	Emitter   event.Emitter
 }
 
-type server struct {
+type Server struct {
 	context  hap.Context
 	database db.Database
 	device   hap.SecuredDevice
-	mux      *http.ServeMux
+	Mux      *http.ServeMux
 
 	mutex     *sync.Mutex
 	container *accessory.Container
@@ -52,7 +43,7 @@ type server struct {
 }
 
 // NewServer returns a server
-func NewServer(c Config) *server {
+func NewServer(c Config) *Server {
 
 	// os gives us a free Port when Port is ""
 	ln, err := net.Listen("tcp", c.Port)
@@ -62,12 +53,12 @@ func NewServer(c Config) *server {
 
 	_, port, _ := net.SplitHostPort(ln.Addr().String())
 
-	s := server{
+	s := Server{
 		context:   c.Context,
 		database:  c.Database,
 		container: c.Container,
 		device:    c.Device,
-		mux:       http.NewServeMux(),
+		Mux:       http.NewServeMux(),
 		mutex:     c.Mutex,
 		listener:  ln.(*net.TCPListener),
 		port:      port,
@@ -79,7 +70,7 @@ func NewServer(c Config) *server {
 	return &s
 }
 
-func (s *server) ListenAndServe(ctx context.Context) error {
+func (s *Server) ListenAndServe(ctx context.Context) error {
 	go func() {
 		<-ctx.Done()
 		for _, c := range s.context.ActiveConnections() {
@@ -88,15 +79,15 @@ func (s *server) ListenAndServe(ctx context.Context) error {
 		// Stop listener
 		s.hapListener.Close()
 	}()
-	return s.listenAndServe(s.addrString(), s.mux, s.context)
+	return s.listenAndServe(s.addrString(), s.Mux, s.context)
 }
 
-func (s *server) Port() string {
+func (s *Server) Port() string {
 	return s.port
 }
 
 // listenAndServe returns a http.Server to listen on a specific address
-func (s *server) listenAndServe(addr string, handler http.Handler, context hap.Context) error {
+func (s *Server) listenAndServe(addr string, handler http.Handler, context hap.Context) error {
 	server := http.Server{Addr: addr, Handler: handler}
 	// Use a TCPListener
 	listener := hap.NewTCPListener(s.listener, context)
@@ -104,20 +95,20 @@ func (s *server) listenAndServe(addr string, handler http.Handler, context hap.C
 	return server.Serve(listener)
 }
 
-func (s *server) addrString() string {
+func (s *Server) addrString() string {
 	return ":" + s.port
 }
 
 // setupEndpoints creates controller objects to handle HAP endpoints
-func (s *server) setupEndpoints() {
+func (s *Server) setupEndpoints() {
 	containerController := controller.NewContainerController(s.container)
 	characteristicsController := controller.NewCharacteristicController(s.container)
 	pairingController := pair.NewPairingController(s.database)
 
-	s.mux.Handle("/pair-setup", endpoint.NewPairSetup(s.context, s.device, s.database, s.emitter))
-	s.mux.Handle("/pair-verify", endpoint.NewPairVerify(s.context, s.database))
-	s.mux.Handle("/accessories", endpoint.NewAccessories(containerController, s.mutex))
-	s.mux.Handle("/characteristics", endpoint.NewCharacteristics(s.context, characteristicsController, s.mutex))
-	s.mux.Handle("/pairings", endpoint.NewPairing(pairingController, s.emitter))
-	s.mux.Handle("/identify", endpoint.NewIdentify(containerController))
+	s.Mux.Handle("/pair-setup", endpoint.NewPairSetup(s.context, s.device, s.database, s.emitter))
+	s.Mux.Handle("/pair-verify", endpoint.NewPairVerify(s.context, s.database))
+	s.Mux.Handle("/accessories", endpoint.NewAccessories(containerController, s.mutex))
+	s.Mux.Handle("/characteristics", endpoint.NewCharacteristics(s.context, characteristicsController, s.mutex))
+	s.Mux.Handle("/pairings", endpoint.NewPairing(pairingController, s.emitter))
+	s.Mux.Handle("/identify", endpoint.NewIdentify(containerController))
 }

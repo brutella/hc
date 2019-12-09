@@ -4,16 +4,16 @@ import (
 	"github.com/brutella/hc/service"
 )
 
-type Lightbulb struct {
+type ColoredLightbulb struct {
 	*Accessory
-	Lightbulb *service.Lightbulb
+	Lightbulb *service.ColoredLightbulb
 }
 
 // NewLightbulb returns an light bulb accessory which one light bulb service.
-func NewLightbulb(info Info) *Lightbulb {
-	acc := Lightbulb{}
+func NewColoredLightbulb(info Info) *ColoredLightbulb {
+	acc := ColoredLightbulb{}
 	acc.Accessory = New(info, TypeLightbulb)
-	acc.Lightbulb = service.NewLightbulb()
+	acc.Lightbulb = service.NewColoredLightbulb()
 
 	acc.Lightbulb.Brightness.SetValue(100)
 

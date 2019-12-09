@@ -25,6 +25,11 @@ const (
 	TypeAirPurifier        AccessoryType = 19
 	TypeHeater             AccessoryType = 20
 	TypeAirConditioner     AccessoryType = 21
-	TypeHumidifer          AccessoryType = 22
+	TypeHumidifier         AccessoryType = 22
 	TypeDehumidifier       AccessoryType = 23
+	TypeSprinklers         AccessoryType = 28
+	TypeFaucets            AccessoryType = 29
+	TypeShowerSystems      AccessoryType = 30
+	TypeTelevision         AccessoryType = 31
+	TypeRemoteControl      AccessoryType = 32
 )

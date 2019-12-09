@@ -6,7 +6,7 @@ import (
 	"github.com/brutella/hc/hap"
 	"github.com/brutella/hc/hap/data"
 	"github.com/brutella/hc/log"
-	"github.com/gosexy/to"
+	"github.com/xiam/to"
 
 	"bytes"
 	"encoding/json"
@@ -30,7 +30,7 @@ func NewCharacteristicController(m *accessory.Container) *CharacteristicControll
 }
 
 // HandleGetCharacteristics handles a get characteristic request like `/characteristics?id=1.4,1.5`
-func (ctr *CharacteristicController) HandleGetCharacteristics(form url.Values) (io.Reader, error) {
+func (ctr *CharacteristicController) HandleGetCharacteristics(form url.Values, conn net.Conn) (io.Reader, error) {
 	var b bytes.Buffer
 	var chs []data.Characteristic
 
@@ -42,7 +42,7 @@ func (ctr *CharacteristicController) HandleGetCharacteristics(form url.Values) (
 			iid := to.Int64(ids[1]) // instance id (= characteristic id)
 			c := data.Characteristic{AccessoryID: aid, CharacteristicID: iid}
 			if ch := ctr.GetCharacteristic(aid, iid); ch != nil {
-				c.Value = ch.Value
+				c.Value = ch.GetValueFromConnection(conn)
 			} else {
 				c.Status = hap.StatusServiceCommunicationFailure
 			}
@@ -87,7 +87,7 @@ func (ctr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader, co
 		}
 
 		if events, ok := c.Events.(bool); ok == true {
-			characteristic.SetEventsEnabled(events)
+			characteristic.Events = events
 		}
 	}
 
@@ -97,10 +97,10 @@ func (ctr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader, co
 // GetCharacteristic returns the characteristic identified by the accessory id aid and characteristic id iid
 func (ctr *CharacteristicController) GetCharacteristic(aid int64, iid int64) *characteristic.Characteristic {
 	for _, a := range ctr.container.Accessories {
-		if a.GetID() == aid {
+		if a.ID == aid {
 			for _, s := range a.GetServices() {
 				for _, c := range s.GetCharacteristics() {
-					if c.GetID() == iid {
+					if c.ID == iid {
 						return c
 					}
 				}
