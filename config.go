@@ -36,7 +36,7 @@ type Config struct {
 	id           string // Accessory id
 	servePort    int    // Actual port the server listens at (might be differen than Port field)
 	version      int64  // Accessory content version (c#)
-	categoryId   int    // Accessory category (ci)
+	categoryId   uint8  // Accessory category (ci)
 	state        int64  // Accessory state (s#)
 	protocol     string // Protocol version, default 1.0 (pv)
 	discoverable bool   // Flag if accessory is discoverable (sf)
