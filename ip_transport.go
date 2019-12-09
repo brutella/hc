@@ -205,6 +205,14 @@ func (t *ipTransport) Stop() <-chan struct{} {
 	return t.stopped
 }
 
+// XHMURI returns a X-HM styled uri to easily add the accessory to HomeKit.
+// To print a QR code to the console, use the follow code snippet.
+// ```
+// import "github.com/mdp/qrterminal/v3"
+//
+// uri, _ := transport.XHMURI()
+// qrterminal.Generate(uri, qrterminal.L, os.Stdout)
+// ```
 func (t *ipTransport) XHMURI() (string, error) {
 	return t.config.xhmUri(util.SetupFlagIP)
 }
