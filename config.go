@@ -47,8 +47,8 @@ type Config struct {
 func defaultConfig(name string) *Config {
 	return &Config{
 		StoragePath:  name,
-		Pin:          "00102003", // default pin
-		Port:         "",         // empty string means that we get port from assigned by the system
+		Pin:          "00102003",  // default pin
+		Port:         "",          // empty string means that we get port from assigned by the system
 		SetupId:      "EASYSETUP", // default setup id
 		name:         name,
 		id:           util.MAC48Address(util.RandomHexString()),
