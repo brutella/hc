@@ -1,7 +1,7 @@
 // THIS FILE IS AUTO-GENERATED
 package accessory
 
-type AccessoryType int
+type AccessoryType uint8
 
 const (
 	TypeUnknown            AccessoryType = 0

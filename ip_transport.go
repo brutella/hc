@@ -126,7 +126,6 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 		cfg.discoverable = false
 	}
 
-	cfg.categoryId = int(t.container.AccessoryType())
 	cfg.updateConfigHash(t.container.ContentHash())
 	cfg.save(storage)
 

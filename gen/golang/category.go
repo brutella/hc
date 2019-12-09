@@ -10,7 +10,7 @@ import (
 const CatsStructTemplate = `// THIS FILE IS AUTO-GENERATED
 package accessory
 
-type AccessoryType int
+type AccessoryType uint8
 
 const ({{range .Consts}}
     {{.Identifier}} {{.TypeName}} = {{.Value}}{{end}}
