@@ -8,12 +8,18 @@ import (
 	"time"
 )
 
-var testIface *net.Interface
-
 var testAddr = net.UDPAddr{
 	IP:   net.IP{},
 	Port: 1234,
 	Zone: "",
+}
+
+var testIface = &net.Interface{
+	Index:        0,
+	MTU:          0,
+	Name:         "lo0",
+	HardwareAddr: []byte{},
+	Flags:        net.FlagUp,
 }
 
 type testConn struct {
@@ -75,9 +81,9 @@ func (c *testConn) start(ctx context.Context) {
 // service instance name and host name.Once the first services
 // is announced, the probing for the second service should give
 func TestProbing(t *testing.T) {
-	testIface,_ = net.InterfaceByName("lo0")
+	testIface, _ = net.InterfaceByName("lo0")
 	if testIface == nil {
-	   testIface,_ = net.InterfaceByName("lo")
+		testIface, _ = net.InterfaceByName("lo")
 	}
 	if testIface == nil {
 		t.Fatal("can not find the local interface")

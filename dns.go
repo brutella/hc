@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/miekg/dns"
 	"net"
-	"sort"
 	"reflect"
+	"sort"
 )
 
 func PTR(srv Service) *dns.PTR {
@@ -48,15 +48,14 @@ func SRV(srv Service) *dns.SRV {
 }
 
 func TXT(srv Service) *dns.TXT {
-	txts := []string{}
-
-	var keys []string
-
+	keys := []string{}
 	for key, _ := range srv.Text {
-		keys = append(keys , key)
+		keys = append(keys, key)
 	}
 	sort.Strings(keys)
-	for _ , k := range keys {
+
+	txts := []string{}
+	for _, k := range keys {
 		txts = append(txts, fmt.Sprintf("%s=%s", k, srv.Text[k]))
 	}
 
