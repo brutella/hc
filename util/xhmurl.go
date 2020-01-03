@@ -24,7 +24,8 @@ var SetupFlagIPWAC SetupFlag = 8
 func XHMURI(pincode, setupId string, categoryId uint8, flags []SetupFlag) (string, error) {
 	var version uint64 = 0
 	var reserved uint64 = 0
-	pincode = strings.ReplaceAll(pincode, "-", "")
+
+	pincode = strings.Replace(pincode, "-", "", -1)
 	code, err := strconv.ParseUint(pincode, 10, 64)
 	if err != nil {
 		return "", err
