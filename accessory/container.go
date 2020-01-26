@@ -25,10 +25,28 @@ func NewContainer() *Container {
 // This method ensures that the accessory ids are valid and unique withing the container.
 func (m *Container) AddAccessory(a *Accessory) {
 	a.UpdateIDs()
-	//a.ID = m.idCount
-	m.idCount++
+	if a.ID == 0 {
+		// No ID set, use "next free"
+		a.ID = m.idCount
+		m.idCount++
+	} else {
+		if m.idCount <= a.ID {
+			m.idCount = a.ID + 1
+		}
+	}
+
+	// check against all existing accesories for duplicate IDs
+	for _, accessory := range m.Accessories {
+		if accessory.ID == a.ID {
+			// generate new id on collision
+			// midCount is allways the biggest unused ID
+			log.Info.Printf("Accesory ID %d is already in use, will use %d instead", a.ID, m.idCount)
+			a.ID = m.idCount
+			m.idCount++
+			break
+		}
+	}
 	m.Accessories = append(m.Accessories, a)
-	// FIX: verify that the ID is not a duplicate
 }
 
 // RemoveAccessory removes an accessory from the container.
