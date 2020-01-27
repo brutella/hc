@@ -20,8 +20,13 @@ func TestContainer(t *testing.T) {
 	acc2 := New(info, TypeOther)
 
 	c := NewContainer()
-	c.AddAccessory(acc1)
-	c.AddAccessory(acc2)
+	if err := c.AddAccessory(acc1); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := c.AddAccessory(acc2); err != nil {
+		t.Fatal(err)
+	}
 
 	if is, want := len(c.Accessories), 2; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
@@ -40,6 +45,20 @@ func TestContainer(t *testing.T) {
 
 	if is, want := len(c.Accessories), 1; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
+	}
+}
+
+func TestDuplicateAccessoryId(t *testing.T) {
+	acc1 := New(Info{ID: 1}, TypeOther)
+	acc2 := New(Info{ID: 1}, TypeOther)
+
+	c := NewContainer()
+	if err := c.AddAccessory(acc1); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := c.AddAccessory(acc2); err == nil {
+		t.Fatal("Error expected")
 	}
 }
 

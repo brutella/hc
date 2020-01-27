@@ -38,8 +38,8 @@ func (ctr *CharacteristicController) HandleGetCharacteristics(form url.Values, c
 	paths := strings.Split(form.Get("id"), ",")
 	for _, p := range paths {
 		if ids := strings.Split(p, "."); len(ids) == 2 {
-			aid := to.Int64(ids[0]) // accessory id
-			iid := to.Int64(ids[1]) // instance id (= characteristic id)
+			aid := to.Uint64(ids[0]) // accessory id
+			iid := to.Uint64(ids[1]) // instance id (= characteristic id)
 			c := data.Characteristic{AccessoryID: aid, CharacteristicID: iid}
 			if ch := ctr.GetCharacteristic(aid, iid); ch != nil {
 				c.Value = ch.GetValueFromConnection(conn)
@@ -95,7 +95,7 @@ func (ctr *CharacteristicController) HandleUpdateCharacteristics(r io.Reader, co
 }
 
 // GetCharacteristic returns the characteristic identified by the accessory id aid and characteristic id iid
-func (ctr *CharacteristicController) GetCharacteristic(aid int64, iid int64) *characteristic.Characteristic {
+func (ctr *CharacteristicController) GetCharacteristic(aid uint64, iid uint64) *characteristic.Characteristic {
 	for _, a := range ctr.container.Accessories {
 		if a.ID == aid {
 			for _, s := range a.GetServices() {

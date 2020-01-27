@@ -3,6 +3,7 @@ package accessory
 import (
 	"crypto/md5"
 	"encoding/json"
+	"fmt"
 	"github.com/brutella/hc/log"
 )
 
@@ -10,24 +11,35 @@ import (
 type Container struct {
 	Accessories []*Accessory `json:"accessories"`
 
-	idCount int64
+	as      map[uint64]*Accessory
+	idCount uint64
 }
 
 // NewContainer returns a container.
 func NewContainer() *Container {
 	return &Container{
 		Accessories: make([]*Accessory, 0),
+		as:          map[uint64]*Accessory{},
 		idCount:     1,
 	}
 }
 
 // AddAccessory adds an accessory to the container.
 // This method ensures that the accessory ids are valid and unique withing the container.
-func (m *Container) AddAccessory(a *Accessory) {
+func (m *Container) AddAccessory(a *Accessory) error {
 	a.UpdateIDs()
-	a.ID = m.idCount
-	m.idCount++
+	if a.ID == 0 {
+		a.ID = m.idCount
+		m.idCount++
+	}
+
+	if m.as[a.ID] != nil {
+		return fmt.Errorf("duplicate accessory id %d", a.ID)
+	}
+
+	m.as[a.ID] = a
 	m.Accessories = append(m.Accessories, a)
+	return nil
 }
 
 // RemoveAccessory removes an accessory from the container.
@@ -59,12 +71,12 @@ func (m *Container) Equal(other interface{}) bool {
 
 // AccessoryType returns the accessory type identifier for the accessories inside the container.
 func (m *Container) AccessoryType() AccessoryType {
-	if as := m.Accessories; len(as) > 0 {
-		if len(as) > 1 {
-			return TypeBridge
-		}
+	if len(m.Accessories) > 1 {
+		return TypeBridge
+	}
 
-		return as[0].Type
+	for _, a := range m.Accessories {
+		return a.Type
 	}
 
 	return TypeOther

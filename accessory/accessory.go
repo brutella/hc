@@ -10,6 +10,7 @@ type Info struct {
 	Manufacturer     string
 	Model            string
 	FirmwareRevision string
+	ID               uint64
 }
 
 // Accessory is a HomeKit accessory.
@@ -18,13 +19,13 @@ type Info struct {
 // Every accessory has the "accessory info" service by default which consists
 // of characteristics to identify the accessory: name, model, manufacturer,...
 type Accessory struct {
-	ID       int64              `json:"aid"`
+	ID       uint64             `json:"aid"`
 	Services []*service.Service `json:"services"`
 
 	Type AccessoryType                 `json:"-"`
 	Info *service.AccessoryInformation `json:"-"`
 
-	idCount    int64
+	idCount    uint64
 	onIdentify func()
 }
 
@@ -62,8 +63,14 @@ func New(info Info, typ AccessoryType) *Accessory {
 		svc.FirmwareRevision.SetValue("undefined")
 	}
 
+	var id uint64 = 0
+	if info.ID > id {
+		id = info.ID
+	}
+
 	acc := &Accessory{
 		idCount: 1,
+		ID:      id,
 		Info:    svc,
 		Type:    typ,
 	}
