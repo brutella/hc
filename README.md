@@ -154,7 +154,14 @@ Once the bridge was added, the other accessories appear automatically.
 
 HomeKit requires that every accessory has a unique id, which must not change between system restarts.
 `hc` automatically assigns the ids for you based on the order in which the accessories are added to the bridge.
-I recommend that you specify the accessory id yourself, via the [accessory.Config.ID](https://github.com/brutella/hc/blob/master/accessory/accessory.go#L13) field.
+
+But I recommend that you specify the accessory id yourself, via the [accessory.Config.ID](https://github.com/brutella/hc/blob/master/accessory/accessory.go#L13) field, like this.
+
+```go
+bridge := accessory.NewBridge(accessory.Info{Name: "Bridge", ID: 1})
+outlet := accessory.NewOutlet(accessory.Info{Name: "Outlet", ID: 2})
+lightbulb := accessory.NewColoredLightbulb(accessory.Info{Name: "Light", ID: 3})
+```
 
 ## Accessory Architecture
 
