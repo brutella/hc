@@ -8,7 +8,7 @@ import (
 
 // Service is an HomeKit service consisting of characteristics.
 type Service struct {
-	ID              int64
+	ID              uint64
 	Type            string
 	Characteristics []*characteristic.Characteristic
 	Hidden          bool
@@ -66,16 +66,16 @@ func (s *Service) AddLinkedService(other *Service) {
 }
 
 type servicePayload struct {
-	ID              int64                            `json:"iid"`
+	ID              uint64                           `json:"iid"`
 	Type            string                           `json:"type"`
 	Characteristics []*characteristic.Characteristic `json:"characteristics"`
 	Hidden          *bool                            `json:"hidden,omitempty"`
 	Primary         *bool                            `json:"primary,omitempty"`
-	Linked          []int64                          `json:"linked,omitempty"`
+	Linked          []uint64                         `json:"linked,omitempty"`
 }
 
 func (s *Service) MarshalJSON() ([]byte, error) {
-	ids := []int64{}
+	ids := []uint64{}
 	for _, s := range s.Linked {
 		ids = append(ids, s.ID)
 	}

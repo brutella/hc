@@ -17,8 +17,8 @@ type Characteristics struct {
 //      "aid": 0, "iid": 1, "value": 10 [, "status": 0, "ev": true ]
 //  }
 type Characteristic struct {
-	AccessoryID      int64       `json:"aid"`
-	CharacteristicID int64       `json:"iid"`
+	AccessoryID      uint64      `json:"aid"`
+	CharacteristicID uint64      `json:"iid"`
 	Value            interface{} `json:"value"`
 
 	// Status contains the status code. Should be interpreted as integer.

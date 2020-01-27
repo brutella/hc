@@ -13,7 +13,7 @@ type GetFunc func() interface{}
 
 // Characteristic is a HomeKit characteristic.
 type Characteristic struct {
-	ID          int64    `json:"iid"` // managed by accessory
+	ID          uint64   `json:"iid"` // managed by accessory
 	Type        string   `json:"type"`
 	Perms       []string `json:"perms"`
 	Description string   `json:"description,omitempty"` // manufacturer description (optional)

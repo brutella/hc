@@ -14,7 +14,7 @@ import (
 	"testing"
 )
 
-func idsString(accessoryID, characteristicID int64) url.Values {
+func idsString(accessoryID, characteristicID uint64) url.Values {
 	values := url.Values{}
 	values.Set("id", fmt.Sprintf("%d.%d", accessoryID, characteristicID))
 
@@ -82,7 +82,7 @@ func TestPutCharacteristic(t *testing.T) {
 	m.AddAccessory(a.Accessory)
 
 	// find on characteristic with type TypeOn
-	var cid int64
+	var cid uint64
 	for _, s := range a.Accessory.Services {
 		for _, c := range s.Characteristics {
 			if c.Type == characteristic.TypeOn {
