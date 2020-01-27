@@ -165,7 +165,7 @@ lightbulb := accessory.NewColoredLightbulb(accessory.Info{Name: "Light", ID: 3})
 
 ## Accessory Architecture
 
-HomeKit uses a hierarchical architecture for define accessories, services and characeristics.
+HomeKit uses a hierarchical architecture to define accessories, services and characeristics.
 At the root level there is an accessory.
 Every accessory contains services.
 And every service contains characteristics.
