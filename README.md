@@ -134,6 +134,28 @@ When the switch is turned on "the analog way", you should set the state of the a
 ac.Switch.On.SetValue(true)
 ```
 
+## Multiple Accessories
+
+When you create an IP transport, you can specify more than one accessory like this
+
+```go
+bridge := accessory.NewBridge(...)
+outlet := accessory.NewOutlet(...)
+lightbulb := accessory.NewColoredLightbulb(...)
+
+hc.NewIPTransport(config, bridge, outlet.Accessory, lightbulb.Accessory)
+```
+
+By doing so, the *bridge* accessory will become a HomeKit bridge.
+The *outlet* and *lightbulb* are the bridged accessories.
+
+When adding the accessories to HomeKit, iOS only shows the *bridge* accessory.
+Once the bridge was added, the other accessories appear automatically.
+
+HomeKit requires that every accessory has a unique id, which must not change between system restarts.
+`hc` automatically assigns the ids for you based on the order in which the accessories are added to the bridge.
+I recommend that you specify the accessory id yourself, via the [accessory.Config.ID](https://github.com/brutella/hc/blob/master/accessory/accessory.go#L13) field.
+
 ## Accessory Architecture
 
 HomeKit uses a hierarchical architecture for define accessories, services and characeristics.
