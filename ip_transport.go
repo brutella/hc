@@ -312,7 +312,7 @@ func newService(config *Config) dnssd.Service {
 	}
 
 	dnsCfg := dnssd.Config{
-		Name:   stripped,
+		Name:   util.RemoveAccentsFromString(stripped),
 		Type:   "_hap._tcp",
 		Domain: "local",
 		Text:   config.txtRecords(),
