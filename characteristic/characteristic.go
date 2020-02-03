@@ -35,27 +35,6 @@ type Characteristic struct {
 	valueGetFunc         GetFunc
 }
 
-// readPerm returns true when perms only include read permission
-func readPerm(perms []string) bool {
-	for _, perm := range perms {
-		if perm == PermRead {
-			return true
-		}
-	}
-
-	return false
-}
-
-// noWritePerms returns true when permissions include no write permission
-func noWritePerms(permissions []string) bool {
-	for _, value := range permissions {
-		if value == PermWrite {
-			return false
-		}
-	}
-	return true
-}
-
 // NewCharacteristic returns a characteristic
 // If no permissions are specified, the value of PermsAll() is used.
 //
@@ -118,8 +97,8 @@ func (c *Characteristic) isReadable() bool {
 	return readPerm(c.Perms)
 }
 
-func (c *Characteristic) hasWritePerms() bool {
-	return noWritePerms(c.Perms) == false
+func (c *Characteristic) isWritable() bool {
+	return writePerm(c.Perms)
 }
 
 func (c *Characteristic) getValue(conn net.Conn) interface{} {
@@ -140,13 +119,14 @@ func (c *Characteristic) updateValue(value interface{}, conn net.Conn, checkPerm
 	// Value must be within min and max
 	switch c.Format {
 	case FormatFloat:
-		value = c.boundFloat64Value(value.(float64))
+		value = c.clampFloat(value.(float64))
 	case FormatUInt8, FormatUInt16, FormatUInt32, FormatUInt64, FormatInt32:
-		value = c.boundIntValue(value.(int))
+		value = c.clampInt(value.(int))
 	}
 
 	// Ignore new values from remote when permissions don't allow write and checkPerms is true
-	if checkPerms == true && c.hasWritePerms() == false {
+	// Ignore value when not writable
+	if checkPerms && !c.isWritable() {
 		return
 	}
 
@@ -174,7 +154,7 @@ func (c *Characteristic) onValueUpdateFromConn(funcs []ConnChangeFunc, conn net.
 	}
 }
 
-func (c *Characteristic) boundFloat64Value(value float64) interface{} {
+func (c *Characteristic) clampFloat(value float64) interface{} {
 	min, minOK := c.MinValue.(float64)
 	max, maxOK := c.MaxValue.(float64)
 	if maxOK == true && value > max {
@@ -186,7 +166,7 @@ func (c *Characteristic) boundFloat64Value(value float64) interface{} {
 	return value
 }
 
-func (c *Characteristic) boundIntValue(value int) interface{} {
+func (c *Characteristic) clampInt(value int) interface{} {
 	min, minOK := c.MinValue.(int)
 	max, maxOK := c.MaxValue.(int)
 	if maxOK == true && value > max {
@@ -217,4 +197,25 @@ func (c *Characteristic) convert(v interface{}) interface{} {
 	default:
 		return v
 	}
+}
+
+// readPerm returns true when perms include read permission
+func readPerm(perms []string) bool {
+	for _, perm := range perms {
+		if perm == PermRead {
+			return true
+		}
+	}
+
+	return false
+}
+
+// writePerm returns true when perms include write permission
+func writePerm(permissions []string) bool {
+	for _, value := range permissions {
+		if value == PermWrite {
+			return true
+		}
+	}
+	return false
 }
