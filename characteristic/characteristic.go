@@ -35,11 +35,14 @@ type Characteristic struct {
 	valueGetFunc         GetFunc
 }
 
-// writeOnlyPerms returns true when permissions only include write permission
-func writeOnlyPerms(permissions []string) bool {
-	if len(permissions) == 1 {
-		return permissions[0] == PermWrite
+// readPerm returns true when perms only include read permission
+func readPerm(perms []string) bool {
+	for _, perm := range perms {
+		if perm == PermRead {
+			return true
+		}
 	}
+
 	return false
 }
 
@@ -111,8 +114,8 @@ func (c *Characteristic) Equal(other interface{}) bool {
 
 // Private
 
-func (c *Characteristic) isWriteOnly() bool {
-	return writeOnlyPerms(c.Perms)
+func (c *Characteristic) isReadable() bool {
+	return readPerm(c.Perms)
 }
 
 func (c *Characteristic) hasWritePerms() bool {
@@ -153,10 +156,8 @@ func (c *Characteristic) updateValue(value interface{}, conn net.Conn, checkPerm
 	}
 
 	old := c.Value
-	if c.isWriteOnly() == false {
+	if c.isReadable() {
 		c.Value = value
-	} else {
-		c.Value = nil
 	}
 
 	if conn != nil {

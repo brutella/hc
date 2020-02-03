@@ -6,6 +6,7 @@ import (
 
 func TestString(t *testing.T) {
 	str := NewString(TypeName)
+	str.Perms = PermsAll()
 	str.Value = "A String"
 
 	if is, want := str.GetValue(), "A String"; is != want {

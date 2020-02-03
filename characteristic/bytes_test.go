@@ -9,6 +9,7 @@ import (
 func TestBytesEncoding(t *testing.T) {
 	val := []byte{0xFA, 0xAA}
 	b := NewBytes(TypeLogs)
+	b.Perms = PermsAll()
 	b.SetValue(val)
 
 	expect := base64.StdEncoding.EncodeToString(val)

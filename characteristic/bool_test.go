@@ -5,7 +5,7 @@ import (
 )
 
 func TestBool(t *testing.T) {
-	b := NewBool(TypeOn)
+	b := NewOn()
 	b.Value = true
 
 	if is, want := b.GetValue(), true; is != want {
@@ -20,8 +20,7 @@ func TestBool(t *testing.T) {
 }
 
 func TestValueUpdate(t *testing.T) {
-	b := NewBool(TypeOn)
-	b.Perms = PermsAll()
+	b := NewOn()
 
 	var newValue bool
 	b.OnValueRemoteUpdate(func(value bool) {

@@ -5,8 +5,7 @@ import (
 )
 
 func TestFloat(t *testing.T) {
-	float := NewFloat(TypeBrightness)
-	float.Format = FormatFloat
+	float := NewHue()
 	float.Value = 20.2
 
 	if is, want := float.GetValue(), 20.2; is != want {
@@ -21,16 +20,10 @@ func TestFloat(t *testing.T) {
 }
 
 func TestNumberFloatOutOfBounds(t *testing.T) {
-	float := NewFloat(TypeBrightness)
-	float.Format = FormatFloat
+	float := NewHue()
 
-	float.Value = 20.2
-	float.SetMinValue(0.0)
-	float.SetMaxValue(100.0)
-	float.SetStepValue(0.1)
-
-	float.SetValue(120)
-	if is, want := float.GetValue(), 100.0; is != want {
+	float.SetValue(400)
+	if is, want := float.GetValue(), 360.0; is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 
