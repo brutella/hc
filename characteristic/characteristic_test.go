@@ -117,15 +117,12 @@ func TestCharacteristicRemoteDelegate(t *testing.T) {
 	}
 }
 
-func TestNoValueChange(t *testing.T) {
+func TestValueChange(t *testing.T) {
 	c := NewBrightness()
 	c.Value = 5
 
 	changed := false
 	c.OnValueUpdateFromConn(func(conn net.Conn, c *Characteristic, new, old interface{}) {
-		if conn != TestConn {
-			t.Fatal(conn)
-		}
 		changed = true
 	})
 
@@ -136,8 +133,8 @@ func TestNoValueChange(t *testing.T) {
 	c.UpdateValue(5)
 	c.UpdateValueFromConnection(5, TestConn)
 
-	if changed != false {
-		t.Fatal(changed)
+	if is, want := changed, true; is != want {
+		t.Fatalf("%v != %v", is, want)
 	}
 }
 
@@ -149,9 +146,6 @@ func TestReadOnlyValue(t *testing.T) {
 	remoteChanged := false
 	localChanged := false
 	c.OnValueUpdateFromConn(func(conn net.Conn, c *Characteristic, new, old interface{}) {
-		if conn != TestConn {
-			t.Fatal(conn)
-		}
 		remoteChanged = true
 	})
 
