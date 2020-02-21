@@ -10,6 +10,7 @@ You can focus on implementing the business logic for your accessory, without hav
 
 Here are some projects which use `hc`.
 
+- [hkknx](https://hochgatterer.me/hkknx)
 - [hkcam](https://github.com/brutella/hkcam)
 - [hklifx](https://github.com/brutella/hklifx/)
 - [hkuvr](https://github.com/brutella/hkuvr)
