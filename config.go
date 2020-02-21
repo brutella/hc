@@ -84,7 +84,7 @@ func (cfg *Config) setupHash() string {
 	return encoded
 }
 
-func (cfg *Config) xhmUri(flag util.SetupFlag) (string, error) {
+func (cfg *Config) XHMURI(flag util.SetupFlag) (string, error) {
 	flags := []util.SetupFlag{flag}
 	return util.XHMURI(cfg.Pin, cfg.SetupId, cfg.categoryId, flags)
 }

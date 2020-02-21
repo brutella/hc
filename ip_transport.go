@@ -214,7 +214,7 @@ func (t *ipTransport) Stop() <-chan struct{} {
 // qrterminal.Generate(uri, qrterminal.L, os.Stdout)
 // ```
 func (t *ipTransport) XHMURI() (string, error) {
-	return t.config.xhmUri(util.SetupFlagIP)
+	return t.config.XHMURI(util.SetupFlagIP)
 }
 
 // isPaired returns true when the transport is already paired
