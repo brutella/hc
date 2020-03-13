@@ -2,8 +2,7 @@ package crypto
 
 import (
 	"bytes"
-	"github.com/agl/ed25519"
-
+	"crypto/ed25519"
 	"fmt"
 )
 
@@ -13,12 +12,7 @@ func ValidateED25519Signature(key, data, signature []byte) bool {
 		return false
 	}
 
-	var k [ed25519.PublicKeySize]byte
-	var s [ed25519.SignatureSize]byte
-	copy(k[:], key)
-	copy(s[:], signature)
-
-	return ed25519.Verify(&k, data, &s)
+	return ed25519.Verify(ed25519.PublicKey(key), data, signature)
 }
 
 // ED25519Signature returns the ED25519 signature of data using the key.
@@ -27,9 +21,7 @@ func ED25519Signature(key, data []byte) ([]byte, error) {
 		return nil, fmt.Errorf("Invalid size of key (%v)", len(key))
 	}
 
-	var k [ed25519.PrivateKeySize]byte
-	copy(k[:], key)
-	signature := ed25519.Sign(&k, data)
+	signature := ed25519.Sign(ed25519.PrivateKey(key), data)
 
 	return signature[:], nil
 }
