@@ -1,13 +1,10 @@
 sudo: false
 language: go
 go:
-  - 1.11.x
+  - 1.13.x
   - master
 os:
   - linux
   - osx
 dist: trusty
 install: true
-script:
-  - env GO111MODULE=on go build
-  - env GO111MODULE=on go test ./...
