@@ -110,7 +110,7 @@ info := accessory.Info{
     SerialNumber: "051AC-23AAM1",
     Manufacturer: "Apple",
     Model: "AB",
-    Firmware: "1.0.1",
+    FirmwareRevision: "1.0.1",
 }
 ```
 
