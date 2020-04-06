@@ -315,6 +315,7 @@ func newService(config *Config) dnssd.Service {
 		Name:   util.RemoveAccentsFromString(stripped),
 		Type:   "_hap._tcp",
 		Domain: "local",
+		Host:   strings.Replace(config.id, ":", "", -1), // use the id (without the colons) to get unique hostnames
 		Text:   config.txtRecords(),
 		IPs:    ips,
 		Port:   config.servePort,
