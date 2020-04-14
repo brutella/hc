@@ -1,7 +1,6 @@
 module github.com/brutella/hc
 
 require (
-	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412
 	github.com/brutella/dnssd v1.1.1
 	github.com/miekg/dns v1.1.4 // indirect
 	github.com/tadglines/go-pkgs v0.0.0-20140924210655-1f86682992f1
