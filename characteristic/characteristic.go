@@ -30,6 +30,7 @@ type Characteristic struct {
 	// unused
 	Events bool `json:"-"`
 
+	updateOnSameValue    bool // if true the update notifications
 	connValueUpdateFuncs []ConnChangeFunc
 	valueChangeFuncs     []ChangeFunc
 	valueGetFunc         GetFunc
@@ -124,8 +125,11 @@ func (c *Characteristic) updateValue(value interface{}, conn net.Conn, checkPerm
 		value = c.clampInt(value.(int))
 	}
 
+	if c.Value == value && !c.updateOnSameValue {
+		return
+	}
+
 	// Ignore new values from remote when permissions don't allow write and checkPerms is true
-	// Ignore value when not writable
 	if checkPerms && !c.isWritable() {
 		return
 	}

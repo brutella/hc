@@ -20,5 +20,7 @@ func NewProgrammableSwitchEvent() *ProgrammableSwitchEvent {
 
 	char.SetValue(0)
 
+	char.updateOnSameValue = true
+
 	return &ProgrammableSwitchEvent{char}
 }

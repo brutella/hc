@@ -117,21 +117,32 @@ func TestCharacteristicRemoteDelegate(t *testing.T) {
 	}
 }
 
-func TestValueChange(t *testing.T) {
-	c := NewBrightness()
-	c.Value = 5
+func TestValueChangeNoUPdate(t *testing.T) {
+	c := NewOn()
+	c.Value = true
 
 	changed := false
-	c.OnValueUpdateFromConn(func(conn net.Conn, c *Characteristic, new, old interface{}) {
-		changed = true
-	})
-
 	c.OnValueUpdate(func(c *Characteristic, new, old interface{}) {
 		changed = true
 	})
 
-	c.UpdateValue(5)
-	c.UpdateValueFromConnection(5, TestConn)
+	c.UpdateValue(true)
+
+	if is, want := changed, false; is != want {
+		t.Fatalf("%v != %v", is, want)
+	}
+}
+
+func TestValueChange(t *testing.T) {
+	c := NewProgrammableSwitchEvent()
+	c.Value = ProgrammableSwitchEventSinglePress
+
+	changed := false
+	c.OnValueUpdate(func(c *Characteristic, new, old interface{}) {
+		changed = true
+	})
+
+	c.UpdateValue(ProgrammableSwitchEventSinglePress)
 
 	if is, want := changed, true; is != want {
 		t.Fatalf("%v != %v", is, want)
