@@ -74,9 +74,15 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 	cfg := defaultConfig(name)
 	cfg.merge(config)
 
-	storage, err := util.NewFileStorage(cfg.StoragePath)
-	if err != nil {
-		return nil, err
+	var storage util.Storage
+	if config.Storage == nil {
+		var err error
+		storage, err = util.NewFileStorage(cfg.StoragePath)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		storage = config.Storage
 	}
 
 	database := db.NewDatabaseWithStorage(storage)

@@ -18,6 +18,10 @@ type Config struct {
 	// When empty, the tranport stores the data inside a folder named exactly like the accessory
 	StoragePath string
 
+	// Storage Engine to persist data across restarts
+	// Will default to FileStorage driver using StoragePath if unset
+	Storage util.Storage
+
 	// Port on which transport is reachable e.g. 12345
 	// When empty, the transport uses a random port
 	Port string
