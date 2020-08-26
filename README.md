@@ -144,7 +144,7 @@ bridge := accessory.NewBridge(...)
 outlet := accessory.NewOutlet(...)
 lightbulb := accessory.NewColoredLightbulb(...)
 
-hc.NewIPTransport(config, bridge, outlet.Accessory, lightbulb.Accessory)
+hc.NewIPTransport(config, bridge.Accessory, outlet.Accessory, lightbulb.Accessory)
 ```
 
 By doing so, the *bridge* accessory will become a HomeKit bridge.
