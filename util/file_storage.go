@@ -27,9 +27,9 @@ func NewFileStorage(dir string) (Storage, error) {
 		return nil, err
 	}
 
-	// Why 0777?
+	// Ensure that execute permission bit is set on all created dirs
 	// Read http://unix.stackexchange.com/questions/21251/why-do-directories-need-the-executable-x-permission-to-be-opened
-	err = os.MkdirAll(path, 0777)
+	err = os.MkdirAll(path, 0755)
 	return &fileStorage{dirPath: path}, err
 }
 
