@@ -94,12 +94,16 @@ func (c *Characteristic) Equal(other interface{}) bool {
 
 // Private
 
-func (c *Characteristic) isReadable() bool {
+func (c *Characteristic) IsReadable() bool {
 	return readPerm(c.Perms)
 }
 
-func (c *Characteristic) isWritable() bool {
+func (c *Characteristic) IsWritable() bool {
 	return writePerm(c.Perms)
+}
+
+func (c *Characteristic) IsObservable() bool {
+	return eventPerm(c.Perms)
 }
 
 func (c *Characteristic) getValue(conn net.Conn) interface{} {
@@ -130,12 +134,12 @@ func (c *Characteristic) updateValue(value interface{}, conn net.Conn, checkPerm
 	}
 
 	// Ignore new values from remote when permissions don't allow write and checkPerms is true
-	if checkPerms && !c.isWritable() {
+	if checkPerms && !c.IsWritable() {
 		return
 	}
 
 	old := c.Value
-	if c.isReadable() {
+	if c.IsReadable() {
 		c.Value = value
 	}
 
@@ -218,6 +222,16 @@ func readPerm(perms []string) bool {
 func writePerm(permissions []string) bool {
 	for _, value := range permissions {
 		if value == PermWrite {
+			return true
+		}
+	}
+	return false
+}
+
+// eventPerm returns true when perms include events permission
+func eventPerm(permissions []string) bool {
+	for _, value := range permissions {
+		if value == PermEvents {
 			return true
 		}
 	}
