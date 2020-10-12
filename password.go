@@ -8,8 +8,8 @@ import (
 
 var invalidPins = []string{"12345678", "87654321", "00000000", "11111111", "22222222", "33333333", "44444444", "55555555", "66666666", "77777777", "88888888", "99999999"}
 
-// NewPin returns a HomeKit compatible pin string from a 8-numbers strings e.g. '01020304'.
-func NewPin(pin string) (string, error) {
+// ValidatePin validates a HomeKit pin.
+func ValidatePin(pin string) (string, error) {
 	var fmtPin string
 	for _, invalidPin := range invalidPins {
 		if pin == invalidPin {

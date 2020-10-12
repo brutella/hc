@@ -2,10 +2,10 @@ package http
 
 import (
 	"github.com/brutella/hc/accessory"
+	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/event"
 	"github.com/brutella/hc/hap"
-	"github.com/brutella/hc/hap/controller"
 	"github.com/brutella/hc/hap/endpoint"
 	"github.com/brutella/hc/hap/pair"
 	"github.com/brutella/hc/log"
@@ -35,9 +35,8 @@ type Server struct {
 	mutex     *sync.Mutex
 	container *accessory.Container
 
-	port        string
-	listener    *net.TCPListener
-	hapListener *hap.TCPListener
+	port     string
+	listener *net.TCPListener
 
 	emitter event.Emitter
 }
@@ -70,6 +69,22 @@ func NewServer(c Config) *Server {
 	return &s
 }
 
+func testable(c Config) *Server {
+	s := Server{
+		context:   c.Context,
+		database:  c.Database,
+		container: c.Container,
+		device:    c.Device,
+		Mux:       http.NewServeMux(),
+		mutex:     c.Mutex,
+		emitter:   c.Emitter,
+	}
+
+	s.setupEndpoints()
+
+	return &s
+}
+
 func (s *Server) ListenAndServe(ctx context.Context) error {
 	go func() {
 		<-ctx.Done()
@@ -77,7 +92,7 @@ func (s *Server) ListenAndServe(ctx context.Context) error {
 			c.Close()
 		}
 		// Stop listener
-		s.hapListener.Close()
+		s.listener.Close()
 	}()
 	return s.listenAndServe(s.addrString(), s.Mux, s.context)
 }
@@ -86,13 +101,9 @@ func (s *Server) Port() string {
 	return s.port
 }
 
-// listenAndServe returns a http.Server to listen on a specific address
 func (s *Server) listenAndServe(addr string, handler http.Handler, context hap.Context) error {
 	server := http.Server{Addr: addr, Handler: handler}
-	// Use a TCPListener
-	listener := hap.NewTCPListener(s.listener, context)
-	s.hapListener = listener
-	return server.Serve(listener)
+	return server.Serve(s)
 }
 
 func (s *Server) addrString() string {
@@ -101,14 +112,27 @@ func (s *Server) addrString() string {
 
 // setupEndpoints creates controller objects to handle HAP endpoints
 func (s *Server) setupEndpoints() {
-	containerController := controller.NewContainerController(s.container)
-	characteristicsController := controller.NewCharacteristicController(s.container)
 	pairingController := pair.NewPairingController(s.database)
 
 	s.Mux.Handle("/pair-setup", endpoint.NewPairSetup(s.context, s.device, s.database, s.emitter))
 	s.Mux.Handle("/pair-verify", endpoint.NewPairVerify(s.context, s.database))
-	s.Mux.Handle("/accessories", endpoint.NewAccessories(containerController, s.mutex))
-	s.Mux.Handle("/characteristics", endpoint.NewCharacteristics(s.context, characteristicsController, s.mutex))
+	s.Mux.Handle("/accessories", s.Authenticate(http.HandlerFunc(s.Accessories)))
+	s.Mux.Handle("/characteristics", s.Authenticate(http.HandlerFunc(s.Characteristics)))
 	s.Mux.Handle("/pairings", endpoint.NewPairing(pairingController, s.emitter))
-	s.Mux.Handle("/identify", endpoint.NewIdentify(containerController))
+	s.Mux.HandleFunc("/identify", s.Identify)
+}
+
+func (srv *Server) getCharacteristic(aid uint64, iid uint64) *characteristic.Characteristic {
+	for _, a := range srv.container.Accessories {
+		if a.ID == aid {
+			for _, s := range a.GetServices() {
+				for _, c := range s.GetCharacteristics() {
+					if c.ID == iid {
+						return c
+					}
+				}
+			}
+		}
+	}
+	return nil
 }

@@ -1,6 +1,7 @@
 package hap
 
 import (
+	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/crypto"
 	"net"
 )
@@ -30,6 +31,10 @@ type Session interface {
 
 	// Connection returns the associated connection
 	Connection() net.Conn
+
+	Subscribe(*characteristic.Characteristic)
+	Unsubscribe(*characteristic.Characteristic)
+	IsSubscribedTo(*characteristic.Characteristic) bool
 }
 
 type session struct {
@@ -37,6 +42,7 @@ type session struct {
 	pairStartHandler  ContainerHandler
 	pairVerifyHandler PairVerifyHandler
 	connection        net.Conn
+	subs              map[*characteristic.Characteristic]bool
 
 	// Temporary variable to reference next cryptographer
 	nextCryptographer crypto.Cryptographer
@@ -46,6 +52,7 @@ type session struct {
 func NewSession(connection net.Conn) Session {
 	s := session{
 		connection: connection,
+		subs:       map[*characteristic.Characteristic]bool{},
 	}
 
 	return &s
@@ -90,4 +97,16 @@ func (s *session) SetPairSetupHandler(c ContainerHandler) {
 
 func (s *session) SetPairVerifyHandler(c PairVerifyHandler) {
 	s.pairVerifyHandler = c
+}
+
+func (s *session) IsSubscribedTo(ch *characteristic.Characteristic) bool {
+	return s.subs[ch] == true
+}
+
+func (s *session) Subscribe(ch *characteristic.Characteristic) {
+	s.subs[ch] = true
+}
+
+func (s *session) Unsubscribe(ch *characteristic.Characteristic) {
+	s.subs[ch] = false
 }

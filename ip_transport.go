@@ -81,7 +81,7 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 
 	database := db.NewDatabaseWithStorage(storage)
 
-	hap_pin, err := NewPin(cfg.Pin)
+	hap_pin, err := ValidatePin(cfg.Pin)
 	if err != nil {
 		return nil, err
 	}
@@ -246,16 +246,12 @@ func (t *ipTransport) addAccessory(a *accessory.Accessory) {
 			// all listeners are notified. Since we don't track which client is interested in
 			// which characteristic change event, we send them to all active connections.
 			onConnChange := func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
-				if c.Events == true {
-					t.notifyListener(a, c, conn)
-				}
+				t.notifyListener(a, c, conn)
 			}
 			c.OnValueUpdateFromConn(onConnChange)
 
 			onChange := func(c *characteristic.Characteristic, new, old interface{}) {
-				if c.Events == true {
-					t.notifyListener(a, c, nil)
-				}
+				t.notifyListener(a, c, nil)
 			}
 			c.OnValueUpdate(onChange)
 		}
@@ -268,6 +264,16 @@ func (t *ipTransport) notifyListener(a *accessory.Accessory, c *characteristic.C
 		if conn == except {
 			continue
 		}
+
+		sess := t.context.GetSessionForConnection(conn)
+		if sess == nil {
+			continue
+		}
+
+		if !sess.IsSubscribedTo(c) {
+			continue
+		}
+
 		resp, err := hap.NewCharacteristicNotification(a, c)
 		if err != nil {
 			log.Info.Panic(err)

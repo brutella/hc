@@ -2,9 +2,6 @@ package hap
 
 import (
 	"github.com/brutella/hc/util"
-	"io"
-	"net"
-	"net/url"
 )
 
 // A ContainerHandler abstracts request/response communication
@@ -16,20 +13,4 @@ type ContainerHandler interface {
 type PairVerifyHandler interface {
 	ContainerHandler
 	SharedKey() [32]byte
-}
-
-// A AccessoriesHandler returns a list of accessories as json.
-type AccessoriesHandler interface {
-	HandleGetAccessories(r io.Reader) (io.Reader, error)
-}
-
-// A CharacteristicsHandler handles get and update characteristic.
-type CharacteristicsHandler interface {
-	HandleGetCharacteristics(url.Values, net.Conn) (io.Reader, error)
-	HandleUpdateCharacteristics(io.Reader, net.Conn) error
-}
-
-// IdentifyHandler calls Identify() on accessories.
-type IdentifyHandler interface {
-	IdentifyAccessory()
 }
