@@ -4,6 +4,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/crypto"
 	"net"
+	"sync"
 )
 
 // Session contains objects (encrypter, decrypter, pairing handler,...) used to handle the data communication.
@@ -42,6 +43,7 @@ type session struct {
 	pairStartHandler  ContainerHandler
 	pairVerifyHandler PairVerifyHandler
 	connection        net.Conn
+	mu                *sync.Mutex
 	subs              map[*characteristic.Characteristic]bool
 
 	// Temporary variable to reference next cryptographer
@@ -52,6 +54,7 @@ type session struct {
 func NewSession(connection net.Conn) Session {
 	s := session{
 		connection: connection,
+		mu:         &sync.Mutex{},
 		subs:       map[*characteristic.Characteristic]bool{},
 	}
 
@@ -100,13 +103,19 @@ func (s *session) SetPairVerifyHandler(c PairVerifyHandler) {
 }
 
 func (s *session) IsSubscribedTo(ch *characteristic.Characteristic) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	return s.subs[ch] == true
 }
 
 func (s *session) Subscribe(ch *characteristic.Characteristic) {
+	s.mu.Lock()
 	s.subs[ch] = true
+	s.mu.Unlock()
 }
 
 func (s *session) Unsubscribe(ch *characteristic.Characteristic) {
+	s.mu.Lock()
 	s.subs[ch] = false
+	s.mu.Unlock()
 }
