@@ -16,7 +16,7 @@ import (
 
 // SetupServerController handles pairing with a cliet using SRP.
 // The entity has to known the bridge pin to successfully pair.
-// When pairing was successful, the entity's public key (refered as ltpk - long term public key)
+// When pairing was successful, the entity's public key (referred as ltpk - long term public key)
 // is stored in the database.
 //
 // Pairing may fail because the pin is wrong or the key exchange failed (e.g. packet seals or SRP key authenticator is wrong, ...).
@@ -161,11 +161,11 @@ func (setup *SetupServerController) handlePairVerify(in util.Container) (util.Co
 // - auth tag (mac)
 //
 // Server
-// - Validate signature of encrpyted tlv8
+// - Validate signature of encrypted tlv8
 // - Read and store entity ltpk and name
 //
 // Server -> Client
-// - encrpyted tlv8: bridge ltpk, bridge name, signature (of hash, bridge name, ltpk)
+// - encrypted tlv8: bridge ltpk, bridge name, signature (of hash, bridge name, ltpk)
 func (setup *SetupServerController) handleKeyExchange(in util.Container) (util.Container, error) {
 	out := util.NewTLV8Container()
 

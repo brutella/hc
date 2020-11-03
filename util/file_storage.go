@@ -20,7 +20,7 @@ func NewTempFileStorage() (Storage, error) {
 }
 
 // NewFileStorage create a file storage for the specified directory.
-// The folder is created if necessary. Every key-value pair is stored in a seperate file.
+// The folder is created if necessary. Every key-value pair is stored in a separate file.
 func NewFileStorage(dir string) (Storage, error) {
 	path, err := filepath.Abs(dir)
 	if err != nil {

@@ -184,11 +184,11 @@ func (setup *SetupClientController) handlePairStepVerifyResponse(in util.Contain
 // - auth tag (mac)
 //
 // Server
-// - Validate signature of encrpyted tlv8
+// - Validate signature of encrypted tlv8
 // - Read and store client LTPK and name
 //
 // Server -> Client
-// - encrpyted tlv8: bridge LTPK, bridge name, signature (of hash `H2`, bridge name, LTPK)
+// - encrypted tlv8: bridge LTPK, bridge name, signature (of hash `H2`, bridge name, LTPK)
 func (setup *SetupClientController) handleKeyExchange(in util.Container) (util.Container, error) {
 	data := in.GetBytes(TagEncryptedData)
 	message := data[:(len(data) - 16)]

@@ -22,10 +22,10 @@ type Characteristic struct {
 	Value            interface{} `json:"value"`
 
 	// Status contains the status code. Should be interpreted as integer.
-	// The property is omited if not specified, which makes the payload smaller.
+	// The property is omitted if not specified, which makes the payload smaller.
 	Status interface{} `json:"status,omitempty"`
 
 	// Events contains the events settings for a characteristic. Should be interpreted as boolean.
-	// The property is omited if not specified, which makes the payload smaller.
+	// The property is omitted if not specified, which makes the payload smaller.
 	Events interface{} `json:"ev,omitempty"`
 }
