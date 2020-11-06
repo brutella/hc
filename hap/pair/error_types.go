@@ -26,7 +26,7 @@ const (
 	// ErrCodeMaxPeer is code for reaching maximum number of peers error (not used)
 	ErrCodeMaxPeer errCode = 0x05
 
-	// ErrCodeMaxAuthenticationAttempts is code for reaching maximum number of authentication attemps error (not used)
+	// ErrCodeMaxAuthenticationAttempts is code for reaching maximum number of authentication attempts error (not used)
 	ErrCodeMaxAuthenticationAttempts errCode = 0x06
 )
 
@@ -47,7 +47,7 @@ func (t errCode) String() string {
 	case ErrCodeAuthenticationFailed:
 		return "Authentication Failed"
 	case ErrCodeTooManyAttempts:
-		return "Too Many Attemps"
+		return "Too Many Attempts"
 	case ErrCodeUnknownPeer:
 		return "Unknown Peer"
 	case ErrCodeMaxPeer:

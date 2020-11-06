@@ -37,7 +37,7 @@ const (
 	UnitPPM        = "ppm"
 )
 
-// HAP characterisitic formats
+// HAP characteristic formats
 const (
 	FormatString = "string"
 	FormatBool   = "bool"

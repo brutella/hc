@@ -21,7 +21,7 @@ type CharacteristicResponse struct {
 	Value            interface{} `json:"value,omitempty"`
 
 	// Status contains the status code. Should be interpreted as integer.
-	// The property is omited if not specified, which makes the payload smaller.
+	// The property is omitted if not specified, which makes the payload smaller.
 	Status *int `json:"status,omitempty"`
 }
 

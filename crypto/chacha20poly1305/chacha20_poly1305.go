@@ -32,7 +32,7 @@ func DecryptAndVerify(key, nonce, message []byte, mac [16]byte, add []byte) ([]b
 	return aead.Open(aeadOut[:0], Nonce[:], append(message, mac[:]...), add)
 }
 
-// EncryptAndSeal returns the chacha20 encrypted message and poly1305 message authentictor (also refered as seals)
+// EncryptAndSeal returns the chacha20 encrypted message and poly1305 message authentictor (also referred as seals)
 // Nonce should be 8 byte
 func EncryptAndSeal(key, nonce, message []byte, add []byte) ([]byte /*encrypted*/, [16]byte /*mac*/, error) {
 	var mac [poly1305.TagSize]byte

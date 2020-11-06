@@ -6,7 +6,7 @@ import (
 
 // Main SRP algorithm is described in http://srp.stanford.edu/design.html
 // The HAP uses the SRP-6a Stanford implementation with the following characteristics
-//      x = H(s | H(I | ":" | P)) -> called the key derivate function
+//      x = H(s | H(I | ":" | P)) -> called the key derivative function
 //      M1 = H(H(N) xor H(g), H(I), s, A, B, K)
 const (
 	SRPGroup = "rfc5054.3072" // N (modulo) => 384 byte
