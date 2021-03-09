@@ -4,7 +4,7 @@ import (
 	"github.com/brutella/hc/characteristic"
 )
 
-const TypeWifiTransport = "203"
+const TypeWifiTransport = "22A"
 
 type WifiTransport struct {
 	*Service

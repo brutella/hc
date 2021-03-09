@@ -1,8 +1,5 @@
 package characteristic
 
-// WifiConfigurationControl
-// this can't be right -- '0000021E-0000-1000-8000-0000022D'
-// const TypeWifiCapabilities = "21E"
 const TypeWifiConfigurationControl = "22D"
 
 type WifiConfigurationControl = struct {

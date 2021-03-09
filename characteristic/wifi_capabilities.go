@@ -1,11 +1,7 @@
 package characteristic
 
-// WifiCapabilities
-// this can't be right -- '0000021E-0000-1000-8000-0000022D'
-// const TypeWifiCapabilities = "21E"
-const TypeWifiCapabilities = "22D"
+const TypeWifiCapabilities = "22C"
 
-// I don't know what the various ints mean yet
 type WifiCapabilities = struct {
 	*Int
 }
