@@ -13,6 +13,8 @@ type WindowCovering struct {
 	CurrentPosition *characteristic.CurrentPosition
 	TargetPosition  *characteristic.TargetPosition
 	PositionState   *characteristic.PositionState
+	//
+	HoldPosition *characteristic.HoldPosition
 }
 
 func NewWindowCovering() *WindowCovering {
@@ -27,6 +29,9 @@ func NewWindowCovering() *WindowCovering {
 
 	svc.PositionState = characteristic.NewPositionState()
 	svc.AddCharacteristic(svc.PositionState.Characteristic)
+
+	svc.HoldPosition = characteristic.NewHoldPosition()
+	svc.AddCharacteristic(svc.HoldPosition.Characteristic)
 
 	return &svc
 }
