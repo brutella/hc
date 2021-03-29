@@ -155,7 +155,7 @@ func TestCharacteristicRemoteDelegate(t *testing.T) {
 	}
 }
 
-func TestValueChangeNoUPdate(t *testing.T) {
+func TestValueChangeNoUpdate(t *testing.T) {
 	c := NewOn()
 	c.Value = true
 
