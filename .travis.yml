@@ -8,3 +8,4 @@ os:
   - osx
 dist: trusty
 install: true
+script: go test -race -v ./...

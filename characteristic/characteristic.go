@@ -1,8 +1,10 @@
 package characteristic
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
+	"sync"
 
 	"github.com/xiam/to"
 )
@@ -34,6 +36,8 @@ type Characteristic struct {
 	connValueUpdateFuncs []ConnChangeFunc
 	valueChangeFuncs     []ChangeFunc
 	valueGetFunc         GetFunc
+
+	mu *sync.RWMutex
 }
 
 // NewCharacteristic returns a characteristic
@@ -47,7 +51,15 @@ func NewCharacteristic(typ string) *Characteristic {
 		Type:                 typ,
 		connValueUpdateFuncs: make([]ConnChangeFunc, 0),
 		valueChangeFuncs:     make([]ChangeFunc, 0),
+		mu:                   &sync.RWMutex{},
 	}
+}
+
+func (c *Characteristic) MarshalJSON() ([]byte, error) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	return json.Marshal(*c)
 }
 
 func (c *Characteristic) GetValue() interface{} {
@@ -110,6 +122,9 @@ func (c *Characteristic) getValue(conn net.Conn) interface{} {
 	if c.valueGetFunc != nil {
 		c.updateValue(c.valueGetFunc(), conn, false)
 	}
+
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	return c.Value
 }
 
@@ -119,6 +134,9 @@ func (c *Characteristic) getValue(conn net.Conn) interface{} {
 //
 // When permissions are write only and checkPerms is true, this methods does not set the Value field.
 func (c *Characteristic) updateValue(value interface{}, conn net.Conn, checkPerms bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	value = c.convert(value)
 
 	// Value must be within min and max

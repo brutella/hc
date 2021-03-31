@@ -1,7 +1,6 @@
 package rtp
 
 import (
-	"fmt"
 	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/tlv8"
 	"testing"
@@ -18,6 +17,4 @@ func TestSelectedStreamConfiguration(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	fmt.Printf("%+v", cfg)
 }

@@ -2,8 +2,46 @@ package characteristic
 
 import (
 	"net"
+	"sync"
 	"testing"
 )
+
+func TestCharacteristic_UpdateGetValue_DataRace(t *testing.T) {
+	c := NewCharacteristic(TypeBrightness)
+	c.Perms = []string{PermRead, PermWrite}
+
+	c.Value = 0
+	newValue := 1
+
+	wg := sync.WaitGroup{}
+	wg.Add(4)
+
+	go func() {
+		defer wg.Done()
+		c.UpdateValue(newValue)
+	}()
+
+	go func() {
+		defer wg.Done()
+		c.UpdateValueFromConnection(newValue, TestConn)
+	}()
+
+	go func() {
+		defer wg.Done()
+		if is, want := c.GetValue(), 1; is != want {
+			t.Fatalf("is=%d, want=%d", is, want)
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		if is, want := c.GetValueFromConnection(TestConn), 1; is != want {
+			t.Fatalf("is=%d, want=%d", is, want)
+		}
+	}()
+
+	wg.Wait()
+}
 
 func TestCharacteristicGetValue(t *testing.T) {
 	getCalls := 0
@@ -117,7 +155,7 @@ func TestCharacteristicRemoteDelegate(t *testing.T) {
 	}
 }
 
-func TestValueChangeNoUPdate(t *testing.T) {
+func TestValueChangeNoUpdate(t *testing.T) {
 	c := NewOn()
 	c.Value = true
 

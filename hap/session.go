@@ -43,7 +43,7 @@ type session struct {
 	pairStartHandler  ContainerHandler
 	pairVerifyHandler PairVerifyHandler
 	connection        net.Conn
-	mu                *sync.Mutex
+	mu                *sync.RWMutex
 	subs              map[*characteristic.Characteristic]bool
 
 	// Temporary variable to reference next cryptographer
@@ -54,7 +54,7 @@ type session struct {
 func NewSession(connection net.Conn) Session {
 	s := session{
 		connection: connection,
-		mu:         &sync.Mutex{},
+		mu:         &sync.RWMutex{},
 		subs:       map[*characteristic.Characteristic]bool{},
 	}
 
@@ -68,6 +68,9 @@ func (s *session) Connection() net.Conn {
 func (s *session) Decrypter() crypto.Decrypter {
 	// Return the next cryptographer when possible
 	// This allows sessions to switch encryption
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	if s.nextCryptographer != nil {
 		s.cryptographer = s.nextCryptographer
 		s.nextCryptographer = nil
@@ -77,14 +80,23 @@ func (s *session) Decrypter() crypto.Decrypter {
 }
 
 func (s *session) Encrypter() crypto.Encrypter {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	return s.cryptographer
 }
 
 func (s *session) PairSetupHandler() ContainerHandler {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	return s.pairStartHandler
 }
 
 func (s *session) PairVerifyHandler() PairVerifyHandler {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	return s.pairVerifyHandler
 }
 
@@ -92,30 +104,39 @@ func (s *session) SetCryptographer(c crypto.Cryptographer) {
 	// Temporarily set the cryptographer as the nextCryptographer
 	// The nextCryptographer is used the next time Decrypter() is called.
 	// Otherwise the Encrypter() encrypts differently than the previous Decrypter()
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	s.nextCryptographer = c
 }
 func (s *session) SetPairSetupHandler(c ContainerHandler) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	s.pairStartHandler = c
 }
 
 func (s *session) SetPairVerifyHandler(c PairVerifyHandler) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	s.pairVerifyHandler = c
 }
 
 func (s *session) IsSubscribedTo(ch *characteristic.Characteristic) bool {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	return s.subs[ch] == true
 }
 
 func (s *session) Subscribe(ch *characteristic.Characteristic) {
 	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.subs[ch] = true
-	s.mu.Unlock()
 }
 
 func (s *session) Unsubscribe(ch *characteristic.Characteristic) {
 	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.subs[ch] = false
-	s.mu.Unlock()
 }
