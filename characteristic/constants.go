@@ -1,10 +1,11 @@
 package characteristic
 
 const (
-	PermRead   = "pr" // can be read
-	PermWrite  = "pw" // can be written
-	PermEvents = "ev" // sends events
-	PermHidden = "hd" // is hidden
+	PermRead          = "pr" // can be read
+	PermWrite         = "pw" // can be written
+	PermEvents        = "ev" // sends events
+	PermHidden        = "hd" // is hidden
+	PermWriteResponse = "wr"
 )
 
 // PermsAll returns read, write and event permissions
