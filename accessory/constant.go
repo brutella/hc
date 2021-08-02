@@ -20,6 +20,7 @@ const (
 	TypeWindow             AccessoryType = 13
 	TypeWindowCovering     AccessoryType = 14
 	TypeProgrammableSwitch AccessoryType = 15
+	TypeRangeExtender      AccessoryType = 16
 	TypeIPCamera           AccessoryType = 17
 	TypeVideoDoorbell      AccessoryType = 18
 	TypeAirPurifier        AccessoryType = 19
@@ -27,9 +28,16 @@ const (
 	TypeAirConditioner     AccessoryType = 21
 	TypeHumidifier         AccessoryType = 22
 	TypeDehumidifier       AccessoryType = 23
+	TypeAppleTV            AccessoryType = 24
+	TypeSpeaker            AccessoryType = 26
+	TypeAirport            AccessoryType = 27
 	TypeSprinklers         AccessoryType = 28
 	TypeFaucets            AccessoryType = 29
 	TypeShowerSystems      AccessoryType = 30
 	TypeTelevision         AccessoryType = 31
 	TypeRemoteControl      AccessoryType = 32
+	TypeWiFiRouter         AccessoryType = 33
+	TypeAudioReceiver      AccessoryType = 34
+	TypeTVSetTopBox        AccessoryType = 35
+	TypeTVStick            AccessoryType = 36
 )
