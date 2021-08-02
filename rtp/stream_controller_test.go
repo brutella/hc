@@ -12,7 +12,7 @@ func TestStreamController(t *testing.T) {
 
 	b := c.GetValue()
 	if len(b) == 0 {
-		t.Fatalf("Zero length bytes")
+		t.Fatal("Zero length bytes")
 	}
 
 	var cfg VideoStreamConfiguration
