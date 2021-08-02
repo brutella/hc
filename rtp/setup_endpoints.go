@@ -40,9 +40,9 @@ type Addr struct {
 }
 
 type CryptoSuite struct {
-	Types      []CryptoSuiteType `tlv8:"-"`
-	MasterKey  []byte            `tlv8:"2"` // 16 (AES_CM_128) or 32 (AES_256_CM)
-	MasterSalt []byte            `tlv8:"3"` // 14 byte
+	Type       byte   `tlv8:"1"`
+	MasterKey  []byte `tlv8:"2"` // 16 (AES_CM_128) or 32 (AES_256_CM)
+	MasterSalt []byte `tlv8:"3"` // 14 byte
 }
 
 func (c *CryptoSuite) SrtpKey() string {
