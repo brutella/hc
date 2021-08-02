@@ -12,7 +12,5 @@ func unmarshal(data []byte, v interface{}) error {
 		return err
 	}
 
-	d.decode(v)
-
-	return d.err
+	return d.decode(v)
 }

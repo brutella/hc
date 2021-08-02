@@ -66,6 +66,7 @@ func TestMarshalList(t *testing.T) {
 	tlv8, _ := Marshal(l)
 	expect := []byte{
 		1, 1, 1,
+		0, 0,
 		1, 1, 2,
 	}
 	if is, want := tlv8, expect; reflect.DeepEqual(is, want) == false {
@@ -79,10 +80,13 @@ func TestUnmarshalList(t *testing.T) {
 	}
 
 	objs := []Object{Object{1}, Object{2}}
-	tlv8, _ := Marshal(objs)
+	tlv8, err := Marshal(objs)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	var objects []Object
-	err := Unmarshal(tlv8, &objects)
+	err = Unmarshal(tlv8, &objects)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -250,8 +254,9 @@ func TestList(t *testing.T) {
 
 	expected := []byte{
 		10, 3, 1, 1, 2,
+		0, 0,
 		10, 3, 1, 1, 3,
-		1, 1, 4, 1, 1, 5,
+		1, 1, 4, 0, 0, 1, 1, 5,
 	}
 
 	if is, want := tlv8, expected; reflect.DeepEqual(is, want) == false {

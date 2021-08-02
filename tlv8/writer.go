@@ -72,6 +72,26 @@ func (wr *writer) writeInt32(tag uint8, v int32) {
 	wr.writeBytes(tag, buf[:4])
 }
 
+func (wr *writer) writeInt64(tag uint8, v int64) {
+	buf := make([]byte, 8)
+	// little endian
+	buf[0] = byte(v)
+	buf[1] = byte(v >> 8)
+	buf[2] = byte(v >> 16)
+	buf[3] = byte(v >> 24)
+	buf[4] = byte(v >> 32)
+	buf[5] = byte(v >> 40)
+	buf[6] = byte(v >> 48)
+	buf[7] = byte(v >> 56)
+	wr.writeBytes(tag, buf[:4])
+}
+
+func (wr *writer) writeUint64(tag uint8, v uint64) {
+	var b [8]byte
+	binary.LittleEndian.PutUint64(b[:], v)
+	wr.writeBytes(tag, b[:])
+}
+
 func (wr *writer) writeFloat32(tag uint8, v float32) {
 	var b [4]byte
 	math.Float32bits(v)

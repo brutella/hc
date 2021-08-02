@@ -76,26 +76,32 @@ func structPayload(v interface{}) ([]byte, error) {
 				wr.writeInt32(tag, v)
 			case float32:
 				wr.writeFloat32(tag, v)
+			case int64:
+				wr.writeInt64(tag, v)
+			case uint64:
+				wr.writeUint64(tag, v)
 			case bool:
 				wr.writeBool(tag, v)
 			default:
 				vValue := reflect.ValueOf(v)
 				if vValue.Kind() == reflect.Slice {
-					if tlv8 == "-" { // unnamed slices
-						if b, err := slicePayload(v); err != nil {
+					for i := 0; i < vValue.Len(); i++ {
+						eValue := vValue.Index(i)
+						b, err := structPayload(interfaceOf(eValue))
+						if err != nil {
 							return nil, err
-						} else {
-							wr.write(b)
 						}
-					} else { // named slice
-						for i := 0; i < vValue.Len(); i++ {
-							eValue := vValue.Index(i)
-							if b, err := structPayload(interfaceOf(eValue)); err != nil {
-								return nil, err
-							} else {
-								// every element in a named slice is encoded by the slice field tlv8 tag
-								wr.writeBytes(tag, b)
-							}
+
+						if i > 0 {
+							// delimit elements with {0x00, 0x00}
+							wr.write([]byte{0x0, 0x0})
+						}
+
+						if tlv8 == "-" {
+							wr.write(b)
+						} else {
+							// every element in a named slice is encoded by the slice field tlv8 tag
+							wr.writeBytes(tag, b)
 						}
 					}
 				} else {
