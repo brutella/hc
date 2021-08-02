@@ -31,7 +31,12 @@ func (bs *Bytes) GetValue() []byte {
 
 func (bs *Bytes) OnValueRemoteUpdate(fn func([]byte)) {
 	bs.OnValueUpdateFromConn(func(conn net.Conn, c *Characteristic, new, old interface{}) {
-		fn(bs.GetValue())
+		str := new.(string)
+		if b, err := base64.StdEncoding.DecodeString(str); err != nil {
+			fn([]byte{})
+		} else {
+			fn(b)
+		}
 	})
 }
 
