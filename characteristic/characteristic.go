@@ -22,10 +22,12 @@ type Characteristic struct {
 	Format string      `json:"format"`
 	Unit   string      `json:"unit,omitempty"`
 
-	MaxLen    int         `json:"maxLen,omitempty"`
-	MaxValue  interface{} `json:"maxValue,omitempty"`
-	MinValue  interface{} `json:"minValue,omitempty"`
-	StepValue interface{} `json:"minStep,omitempty"`
+	MaxLen           int         `json:"maxLen,omitempty"`
+	MaxValue         interface{} `json:"maxValue,omitempty"`
+	MinValue         interface{} `json:"minValue,omitempty"`
+	StepValue        interface{} `json:"minStep,omitempty"`
+	ValidValues      interface{} `json:"valid-values,omitempty"`
+	ValidValuesRange interface{} `json:"valid-values-range,omitempty"`
 
 	// unused
 	Events bool `json:"-"`
@@ -177,6 +179,23 @@ func (c *Characteristic) clampFloat(value float64) interface{} {
 func (c *Characteristic) clampInt(value int) interface{} {
 	min, minOK := c.MinValue.(int)
 	max, maxOK := c.MaxValue.(int)
+	validValues, validValuesOK := c.ValidValues.([]int)
+	validValuesRange, validValuesRangeOK := c.ValidValuesRange.([]int)
+
+	if validValuesOK == true && len(validValues) > 0 {
+		for _, valid := range validValues {
+			if value == valid {
+				return value
+			}
+		}
+		return validValues[0] // Invalid, clamp to the first valid value
+	}
+
+	if validValuesRangeOK == true {
+		min, minOK = validValuesRange[0], true
+		max, maxOK = validValuesRange[1], true
+	}
+
 	if maxOK == true && value > max {
 		value = max
 	} else if minOK == true && value < min {

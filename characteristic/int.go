@@ -30,6 +30,14 @@ func (c *Int) SetStepValue(value int) {
 	c.StepValue = value
 }
 
+func (c *Int) SetValidValues(values []int) {
+	c.ValidValues = values
+}
+
+func (c *Int) SetValidValuesRange(start int, end int) {
+	c.ValidValuesRange = []int{start, end}
+}
+
 // GetValue returns the value as int
 func (c *Int) GetValue() int {
 	return c.Characteristic.GetValue().(int)
@@ -45,6 +53,14 @@ func (c *Int) GetMaxValue() int {
 
 func (c *Int) GetStepValue() int {
 	return c.StepValue.(int)
+}
+
+func (c *Int) GetValidValues() []int {
+	return c.ValidValues.([]int)
+}
+
+func (c *Int) GetValidValuesRange() (int, int) {
+	return c.ValidValues.([]int)[0], c.ValidValues.([]int)[1]
 }
 
 // OnValueRemoteGet calls fn when the value was read by a client.
