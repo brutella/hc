@@ -99,10 +99,6 @@ func (s *secureSession) Decrypt(r io.Reader) (io.Reader, error) {
 			return nil, err
 		}
 
-		if length > PacketLengthMax {
-			return nil, fmt.Errorf("Packet size too big %d", length)
-		}
-
 		var b = make([]byte, length)
 		if err := binary.Read(r, binary.LittleEndian, &b); err != nil {
 			return nil, err
