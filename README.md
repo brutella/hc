@@ -1,6 +1,10 @@
-# hc
+# Not Maintained Anymore
 
-[![GoDoc Widget]][GoDoc] [![Travis Widget]][Travis]
+**This library is not maintained anymore. Please switch to the new [hap](https://github.com/brutella/hap) library.**
+
+---
+
+[![GoDoc Widget]][GoDoc]
 
 `hc` is a lightweight framework to develop HomeKit accessories in Go.
 It abstracts the **H**omeKit **A**ccessory **P**rotocol (HAP) and makes it easy to work with [services](service/README.md) and [characteristics](characteristic/README.md).
@@ -33,8 +37,6 @@ Checkout the official [website][home+].
 [home-appstore]: http://itunes.apple.com/app/id995994352
 [GoDoc]: https://godoc.org/github.com/brutella/hc
 [GoDoc Widget]: https://godoc.org/github.com/brutella/hc?status.svg
-[Travis]: https://travis-ci.org/brutella/hc
-[Travis Widget]: https://travis-ci.org/brutella/hc.svg
 
 ## Features
 
@@ -51,10 +53,10 @@ Checkout the official [website][home+].
 2. Create your own HomeKit accessory or clone an existing one (e.g.  [hklight](https://github.com/brutella/hklight))
 
         cd $GOPATH/src
-        
+
         # Clone project
         git clone https://github.com/brutella/hklight && cd hklight
-        
+
         # Run the project
         make run
 
@@ -86,18 +88,18 @@ func main() {
     // create an accessory
     info := accessory.Info{Name: "Lamp"}
     ac := accessory.NewSwitch(info)
-    
+
     // configure the ip transport
     config := hc.Config{Pin: "00102003"}
     t, err := hc.NewIPTransport(config, ac.Accessory)
     if err != nil {
         log.Panic(err)
     }
-    
+
     hc.OnTermination(func(){
         <-t.Stop()
     })
-    
+
     t.Start()
 }
 ```
