@@ -1,4 +1,5 @@
 // THIS FILE IS AUTO-GENERATED
+// Modified by mestafin
 package service
 
 import (
@@ -14,6 +15,8 @@ type HeaterCooler struct {
 	CurrentHeaterCoolerState *characteristic.CurrentHeaterCoolerState
 	TargetHeaterCoolerState  *characteristic.TargetHeaterCoolerState
 	CurrentTemperature       *characteristic.CurrentTemperature
+
+	TargetTemperature *characteristic.TargetTemperature
 }
 
 func NewHeaterCooler() *HeaterCooler {
@@ -31,6 +34,9 @@ func NewHeaterCooler() *HeaterCooler {
 
 	svc.CurrentTemperature = characteristic.NewCurrentTemperature()
 	svc.AddCharacteristic(svc.CurrentTemperature.Characteristic)
+
+	svc.TargetTemperature = characteristic.NewTargetTemperature()
+	svc.AddCharacteristic(svc.TargetTemperature.Characteristic)
 
 	return &svc
 }
