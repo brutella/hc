@@ -7,6 +7,7 @@ import (
 	"github.com/brutella/hc/crypto/chacha20poly1305"
 	"github.com/brutella/hc/crypto/hkdf"
 	"io"
+	"sync/atomic"
 )
 
 // secureSession provide a secure session by encrypting and decrypting data
@@ -68,8 +69,7 @@ func (s *secureSession) Encrypt(r io.Reader) (io.Reader, error) {
 	var buf bytes.Buffer
 	for _, p := range packets {
 		var nonce [8]byte
-		binary.LittleEndian.PutUint64(nonce[:], s.encryptCount)
-		s.encryptCount++
+		binary.LittleEndian.PutUint64(nonce[:], atomic.AddUint64(&s.encryptCount, 1)-1)
 
 		bLength := make([]byte, 2)
 		binary.LittleEndian.PutUint16(bLength, uint16(p.length))
@@ -110,8 +110,7 @@ func (s *secureSession) Decrypt(r io.Reader) (io.Reader, error) {
 		}
 
 		var nonce [8]byte
-		binary.LittleEndian.PutUint64(nonce[:], s.decryptCount)
-		s.decryptCount++
+		binary.LittleEndian.PutUint64(nonce[:], atomic.AddUint64(&s.decryptCount, 1)-1)
 
 		lengthBytes := make([]byte, 2)
 		binary.LittleEndian.PutUint16(lengthBytes, uint16(length))
