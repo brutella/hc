@@ -86,9 +86,7 @@ func New(info Info, typ AccessoryType) *Accessory {
 
 func (a *Accessory) GetServices() []*service.Service {
 	result := make([]*service.Service, 0)
-	for _, s := range a.Services {
-		result = append(result, s)
-	}
+	result = append(result, a.Services...)
 	return result
 }
 

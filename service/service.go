@@ -30,9 +30,7 @@ func New(typ string) *Service {
 // GetCharacteristics returns the characteristics which represent the service.
 func (s *Service) GetCharacteristics() []*characteristic.Characteristic {
 	var result []*characteristic.Characteristic
-	for _, c := range s.Characteristics {
-		result = append(result, c)
-	}
+	result = append(result, s.Characteristics...)
 	return result
 }
 
